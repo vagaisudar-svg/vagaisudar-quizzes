@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7ம் வகுப்பு தமிழ் - பருவம் 3 இயல் 2 - வினா விடைகள் Quiz</title>
+<style>
+  :root{
+    --maroon:#7a1530;
+    --maroon-dark:#5e0f24;
+    --cream:#faf7f0;
+    --card:#ffffff;
+    --ink:#2b2320;
+    --muted:#8a7f75;
+    --line:#e7ddd0;
+    --badge:#f6dade;
+    --badge-ink:#7a1530;
+    --good:#1f7a4d;
+    --bad:#b3261e;
+    --gold:#c99a3a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:"Noto Sans Tamil","Latha","Nirmala UI",system-ui,sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 14px 60px;
+  }
+  .wrap{width:100%;max-width:760px;}
+  header.top{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  header.top h1{
+    font-size:1.35rem;
+    line-height:1.4;
+    margin:0 0 4px;
+    color:var(--maroon-dark);
+  }
+  header.top p{
+    margin:0;
+    color:var(--muted);
+    font-size:.95rem;
+  }
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:18px 0 6px;
+    font-size:.9rem;
+    color:var(--muted);
+  }
+  .progress-track{
+    flex:1;
+    height:8px;
+    background:var(--line);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--maroon),var(--gold));
+    width:0%;
+    transition:width .35s ease;
+  }
+  .qnum{
+    font-weight:600;
+    color:var(--maroon-dark);
+    white-space:nowrap;
+  }
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    border:1px solid var(--line);
+    box-shadow:0 2px 14px rgba(122,21,48,.06);
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .card .bar{
+    height:6px;
+    background:linear-gradient(90deg,var(--maroon-dark),var(--maroon));
+  }
+  .card .body{
+    padding:26px 24px 22px;
+  }
+  .question-tag{
+    display:inline-block;
+    background:var(--maroon);
+    color:#fff;
+    font-size:.8rem;
+    padding:4px 14px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+  .question-text{
+    font-size:1.15rem;
+    line-height:1.6;
+    margin:0 0 20px;
+    font-weight:600;
+  }
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width:520px){
+    .options{grid-template-columns:1fr;}
+  }
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    background:#fff;
+    cursor:pointer;
+    font-size:1rem;
+    text-align:left;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .opt:hover{border-color:var(--maroon);}
+  .opt:active{transform:scale(.99);}
+  .opt .lbl{
+    width:30px;height:30px;
+    flex:0 0 30px;
+    border-radius:50%;
+    background:var(--badge);
+    color:var(--badge-ink);
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.95rem;
+  }
+  .opt.correct{
+    border-color:var(--good);
+    background:#eaf6ef;
+  }
+  .opt.correct .lbl{background:var(--good);color:#fff;}
+  .opt.incorrect{
+    border-color:var(--bad);
+    background:#fbebea;
+  }
+  .opt.incorrect .lbl{background:var(--bad);color:#fff;}
+  .opt.disabled{cursor:default;}
+  .opt.faded{opacity:.55;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:4px;
+  }
+  button.navbtn{
+    flex:1;
+    padding:13px 10px;
+    border-radius:12px;
+    border:1.5px solid var(--maroon);
+    background:#fff;
+    color:var(--maroon-dark);
+    font-size:.98rem;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  button.navbtn.primary{
+    background:var(--maroon);
+    color:#fff;
+  }
+  button.navbtn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+  }
+
+  .score-card{
+    text-align:center;
+    padding:34px 20px;
+  }
+  .score-card .pct{
+    font-size:3rem;
+    font-weight:800;
+    color:var(--maroon-dark);
+    margin:6px 0 0;
+  }
+  .score-card .pctlabel{
+    color:var(--muted);
+    font-size:.85rem;
+    letter-spacing:.03em;
+  }
+  .score-card .detail{
+    margin:14px 0 22px;
+    font-size:1.05rem;
+  }
+  .score-card .detail b.g{color:var(--good);}
+  .score-card .detail b.r{color:var(--bad);}
+  .score-actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  .review-item{
+    border-bottom:1px solid var(--line);
+    padding:16px 0;
+  }
+  .review-item:last-child{border-bottom:none;}
+  .review-item .qt{font-weight:600;margin-bottom:8px;}
+  .review-item .row{font-size:.95rem;margin:3px 0;}
+  .review-item .row.your.wrong{color:var(--bad);}
+  .review-item .row.your.right{color:var(--good);}
+  .review-item .row.ans{color:var(--good);}
+
+  footer.foot{
+    text-align:center;
+    color:var(--muted);
+    font-size:.82rem;
+    margin-top:10px;
+  }
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>7ம் வகுப்பு தமிழ் — பருவம் 3, இயல் 2</h1>
+    <p>வினா விடைகள் — Interactive Quiz</p>
+  </header>
+
+  <div id="quizView">
+    <div class="progress-row">
+      <span class="qnum" id="qnumLabel">Question 1 of 100</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="pctLabel">0%</span>
+    </div>
+
+    <div class="card">
+      <div class="bar"></div>
+      <div class="body">
+        <span class="question-tag" id="qtag">கேள்வி 1</span>
+        <p class="question-text" id="qtext"></p>
+        <div class="options" id="optionsWrap"></div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="navbtn" id="prevBtn">← முந்தையது</button>
+      <button class="navbtn primary" id="nextBtn">அடுத்தது →</button>
+    </div>
+  </div>
+
+  <div id="scoreView" class="card hidden">
+    <div class="bar"></div>
+    <div class="body score-card">
+      <div class="pctlabel">SCORE</div>
+      <div class="pct" id="finalPct">0%</div>
+      <div class="detail">
+        <b class="g" id="correctCount">0</b> சரி &nbsp;|&nbsp;
+        <b class="r" id="wrongCount">0</b> தவறு &nbsp;|&nbsp;
+        மொத்தம் 100 வினாக்கள்
+      </div>
+      <div class="score-actions">
+        <button class="navbtn primary" id="reviewBtn">விடைகளை மதிப்பாய்வு செய்க (Review Answers)</button>
+        <button class="navbtn" id="restartBtn">மீண்டும் தொடங்கு (Restart Quiz)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="reviewView" class="card hidden">
+    <div class="bar"></div>
+    <div class="body" id="reviewBody" style="max-height:70vh;overflow-y:auto;"></div>
+    <div class="body" style="padding-top:0;">
+      <button class="navbtn primary" id="backFromReview" style="width:100%;">மீண்டும் தொடங்கு (Restart Quiz)</button>
+    </div>
+  </div>
+
+  <footer class="foot">Vagai Sudar · 7th Std Tamil Term 3 Unit 2 · ஆஃப்லைன் வினாடி வினா</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+{q:"'வையம்' என்னும் சொல்லின் பொருள் என்ன?",o:["கடல்","உலகம்","வானம்","நெருப்பு"],a:1},
+{q:"'வெய்ய' என்னும் சொல்லின் பொருள் என்ன?",o:["குளிர்ச்சி வீசும்","வெப்பக்கதிர் வீசும்","இருள் சூழ்ந்த","ஒளி பொருந்திய"],a:1},
+{q:"'சுடர் ஆழியான்' என்று அழைக்கப்படுபவர் யார்?",o:["சிவன்","திருமால்","பிரம்மா","முருகன்"],a:1},
+{q:"'இடர் ஆழி' என்பதில் 'இடர்' என்பதன் பொருள் என்ன?",o:["மகிழ்ச்சி","ஆர்வம்","துன்பம்","இன்பம்"],a:2},
+{q:"பொய்கையாழ்வார் பூமியை எவ்விதமாக உருவகப்படுத்துகிறார்?",o:["அகல்விளக்கு","நெய்","சுடர்","திரி"],a:0},
+{q:"பொய்கையாழ்வார் ஒலிக்கின்ற கடலை எவ்வாறு உருவகப்படுத்துகிறார்?",o:["சுடர்","விளக்கு","நெய்","மாலை"],a:2},
+{q:"பொய்கையாழ்வார் கதிரவனை எவ்வாறு உருவகப்படுத்துகிறார்?",o:["நெய்","சுடர்","கடல்","விளக்கு"],a:3},
+{q:"பொய்கையாழ்வார் பிறந்த ஊர் எது?",o:["மாமல்லபுரம்","திருமுனைப்பாடி","திருவெஃகா","குன்றக்குடி"],a:2},
+{q:"திருவெஃகா என்னும் ஊர் எந்த மாவட்டத்திற்கு அருகில் உள்ளது?",o:["காஞ்சிபுரம்","சென்னை","மதுரை","திருச்சி"],a:0},
+{q:"நாலாயிரத் திவ்வியப் பிரபந்தத்தில் உள்ள முதல் திருவந்தாதியைப் பாடியவர் யார்?",o:["பேயாழ்வார்","பூதத்தாழ்வார்","பொய்கையாழ்வார்","நம்மாழ்வார்"],a:2},
+{q:"'தகளி' என்னும் சொல்லின் பொருள் என்ன?",o:["எண்ணெய்","திரி","சுடர்","அகல்விளக்கு"],a:3},
+{q:"'சிந்தை' என்னும் சொல்லின் பொருள் என்ன?",o:["அறிவு","மனம்","செயல்","சொல்"],a:1},
+{q:"'ஞானம்' என்னும் சொல்லின் பொருள் என்ன?",o:["அறியாமை","அறிவு","செல்வம்","வறுமை"],a:1},
+{q:"'நாரணன்' என்று அழைக்கப்படுபவர் யார்?",o:["பிரம்மா","திருமால்","சிவன்","இந்திரன்"],a:1},
+{q:"பூதத்தாழ்வார் அன்பை எவ்விதமாக உருவகப்படுத்துகிறார்?",o:["நெய்","திரி","சுடர்","அகல்விளக்கு"],a:3},
+{q:"பூதத்தாழ்வார் ஆர்வத்தை எவ்விதமாக உருவகப்படுத்துகிறார்?",o:["திரி","நெய்","அகல்விளக்கு","சுடர்"],a:1},
+{q:"பூதத்தாழ்வார் சிந்தையை (மனம்) எவ்விதமாக உருவகப்படுத்துகிறார்?",o:["இடுகின்ற திரி","அகல்விளக்கு","நெய்","சுடர்"],a:0},
+{q:"ஞானத்தமிழ் பயின்றவர் என்று தன்னைக் கூறிக் கொள்பவர் யார்?",o:["பொய்கையாழ்வார்","பூதத்தாழ்வார்","பேயாழ்வார்","திருமங்கையாழ்வார்"],a:1},
+{q:"அந்தாதி என்பதில் 'அந்தம்' என்பதன் பொருள் என்ன?",o:["முதல்","இடை","முடிவு","தொடக்கம்"],a:2},
+{q:"அந்தாதி என்பதில் 'ஆதி' என்பதன் பொருள் என்ன?",o:["முடிவு","இடை","முதல்","இறுதி"],a:2},
+{q:"அந்தாதி என்பது எவ்வகை இலக்கியங்களில் ஒன்று?",o:["காப்பியம்","சிற்றிலக்கியம்","புதுக்கவிதை","புதினம்"],a:1},
+{q:"பூதத்தாழ்வார் பிறந்த ஊர் எது?",o:["திருவெஃகா","திருமுனைப்பாடி","மாமல்லபுரம்","குன்றக்குடி"],a:2},
+{q:"மாமல்லபுரம் எந்த நகரத்திற்கு அடுத்துள்ளது?",o:["காஞ்சிபுரம்","சென்னை","செங்கல்பட்டு","வேலூர்"],a:1},
+{q:"நாலாயிரத் திவ்வியப் பிரபந்தத்தில் இரண்டாம் திருவந்தாதியைப் பாடியவர் யார்?",o:["பூதத்தாழ்வார்","பொய்கையாழ்வார்","பேயாழ்வார்","ஆண்டாள்"],a:0},
+{q:"'ஞானச்சுடர்' என்னும் சொல்லைப் பிரித்து எழுதக் கிடைப்பது எது?",o:["ஞான + சுடர்","ஞானச் + சுடர்","ஞானம் + சுடர்","ஞானி + சுடர்"],a:2},
+{q:"இன்பு + உருகு என்பதனைச் சேர்த்தெழுதக் கிடைக்கும் சொல் எது?",o:["இன்பு உருகு","இன்பும் உருகு","இன்பருகு","இன்புருகு"],a:3},
+{q:"'வித்து' என்னும் சொல்லின் பொருள் என்ன?",o:["நிலம்","விதை","செடி","பயிர்"],a:1},
+{q:"'ஈன' என்னும் சொல்லின் பொருள் என்ன?",o:["பெற","இழக்க","கொடுக்க","விதைக்க"],a:2},
+{q:"'களை' என்னும் சொல்லின் பொருள் என்ன?",o:["பசுமையான பயிர்","வேண்டாத செடி","விளைநிலம்","எரு"],a:1},
+{q:"'பைங்கூழ்' என்னும் சொல்லின் பொருள் என்ன?",o:["காய்ந்த புல்","வேண்டாத செடி","பசுமையான பயிர்","நல்ல விதை"],a:2},
+{q:"'வன்சொல்' என்னும் சொல்லின் பொருள் என்ன?",o:["இன்சொல்","கடுஞ்சொல்","உண்மை","பொய்"],a:1},
+{q:"முனைப்பாடியார் விளைநிலமாக எதனை உருவகப்படுத்துகிறார்?",o:["இன்சொல்","வன்சொல்","ஈகை","உண்மை"],a:3},
+{q:"முனைப்பாடியார் விதையாக எதனை உருவகப்படுத்துகிறார்?",o:["அன்பு","அறம்","ஈகை","வாய்மை"],a:1},
+{q:"முனைப்பாடியார் களையாக எதனை நீக்க வேண்டும் என்கிறார்?",o:["இன்சொல்","வன்சொல்","பொய்மை","கோபம்"],a:1},
+{q:"முனைப்பாடியார் எருவாக எதனை இடவேண்டும் என்கிறார்?",o:["ஈகை","அன்பு","வாய்மை","அறம்"],a:0},
+{q:"முனைப்பாடியார் நீராக எதனைப் பாய்ச்ச வேண்டும் என்கிறார்?",o:["ஈகை","அன்பு","அறம்","இன்சொல்"],a:1},
+{q:"முனைப்பாடியார் கதிராக எதனைப் பயனாகப் பெற வேண்டும் என்கிறார்?",o:["அன்பு","செல்வம்","அறம்","ஈகை"],a:1},
+{q:"அறநெறிச்சாரம் என்னும் நூலை இயற்றியவர் யார்?",o:["பாரதியார்","பொய்கையாழ்வார்","முனைப்பாடியார்","பூதத்தாழ்வார்"],a:2},
+{q:"முனைப்பாடியார் எந்த ஊரைச் சேர்ந்தவர்?",o:["திருவெஃகா","மாமல்லபுரம்","திருமுனைப்பாடி","குன்றக்குடி"],a:2},
+{q:"முனைப்பாடியார் எந்த மதத்தைச் சேர்ந்த புலவர்?",o:["சைவப்புலவர்","வைணவப்புலவர்","சமணப்புலவர்","பௌத்தப்புலவர்"],a:2},
+{q:"முனைப்பாடியாரின் காலம் எந்த நூற்றாண்டு?",o:["10ஆம் நூற்றாண்டு","12ஆம் நூற்றாண்டு","13ஆம் நூற்றாண்டு","15ஆம் நூற்றாண்டு"],a:0},
+{q:"அறநெறிச்சாரம் எத்தனை பாடல்களைக் கொண்டது?",o:["100","225","400","500"],a:0},
+{q:"'இன்சொல்' என்னும் சொல்லைப் பிரித்து எழுதக் கிடைப்பது எது?",o:["இனிய + சொல்","இன்மை + சொல்","இனிமை + சொல்","இன் + சொல்"],a:2},
+{q:"அறம் + கதிர் என்பதனைச் சேர்த்தெழுதக் கிடைக்கும் சொல் எது?",o:["அறகதிர்","அறுகதிர்","அறம்கதிர்","அறக்கதிர்"],a:3},
+{q:"இளமை என்னும் சொல்லின் எதிர்ச்சொல் எது?",o:["புதுமை","முதுமை","தனிமை","இனிமை"],a:1},
+{q:"'ஒருவர் எல்லாருக்காகவும், எல்லாரும் ஒருவருக்காகவும்' என்பது திருவள்ளுவரின் எந்த நெறி?",o:["தனியுடைமை நெறி","பொதுவுடைமை நெறி","பொருளுடைமை நெறி","ஒழுக்கமுடைமை நெறி"],a:1},
+{q:"அயலவர் விழித்து எழுந்தால் நமது நிலை பாதிக்கும் ஆதலால் வாழ்வு எவ்வாறாக அமைய வேண்டும்?",o:["அறநிலைப் பாதுகாவல் வாழ்வாக","பொருள் தேடும் வாழ்வாக","தனியுடைமை வாழ்வாக","வாணிக வாழ்வாக"],a:0},
+{q:"\"உலகம் உண்ண உண்: உடுத்த உடுப்பாய்\" என்று கூறியவர் யார்?",o:["பாரதியார்","பாவேந்தர் பாரதிதாசன்","முடியரசன்","கண்ணதாசன்"],a:1},
+{q:"வறுமையை தமிழ் மரபு எவ்வாறு கூறுகிறது?",o:["மருந்து","செல்வம்","பிணி","மாத்திரை"],a:2},
+{q:"செல்வத்தை தமிழ் மரபு எவ்வாறு கூறுகிறது?",o:["மருத்துவர்","பிணி","மருந்து","வறுமை"],a:2},
+{q:"\"செல்வத்துப் பயனே ஈதல்\" என்று கூறும் நூல் எது?",o:["அகநானூறு","புறநானூறு","திருக்குறள்","நாலடியார்"],a:2},
+{q:"\"ஊருணி நீர்நிறைந்து அற்றே உலகவாம் பேரறி வாளன் திரு\" - இக்குறளின் படி பேரறிவாளனின் செல்வம் எதனைப் போன்றது?",o:["ஊருணியில் நிரம்பிய நீர்","பயன்மரம்","மருந்துமரம்","மழை"],a:0},
+{q:"நற்பண்பு உடையவரிடம் செல்வம் சேர்வது எதனைப் போன்றது என்று திருக்குறள் கூறுகிறது?",o:["ஊருணி நீர்","மருந்துமரம்","உள்ளூர்ப் பழுத்த பயன்மரம்","கடல் நீர்"],a:2},
+{q:"குன்றக்குடி திருமடத்தின் தலைவராக விளங்கியவர் யார்?",o:["ராமலிங்க அடிகளார்","தவத்திரு குன்றக்குடி அடிகளார்","வேதாத்திரி மகரிஷி","பாம்பன் சுவாமிகள்"],a:1},
+{q:"'நாயன்மார் அடிச்சுவட்டில்' என்ற நூலை எழுதியவர் யார்?",o:["பாரதிதாசன்","குன்றக்குடி அடிகளார்","முனைப்பாடியார்","பொய்கையாழ்வார்"],a:1},
+{q:"'குறட்செல்வம்' என்ற நூலை எழுதியவர் யார்?",o:["குன்றக்குடி அடிகளார்","திருவள்ளுவர்","பரிமேலழகர்","பாரதியார்"],a:0},
+{q:"'ஆலயங்கள் சமுதாய மையங்கள்' என்ற நூலை எழுதியவர் யார்?",o:["குன்றக்குடி அடிகளார்","அண்ணா","பெரியார்","மு. வரதராசனார்"],a:0},
+{q:"குன்றக்குடி அடிகளார் நடத்திய இதழ்களில் ஒன்று எது?",o:["குயில்","அருளோசை","இந்தியா","தென்றல்"],a:1},
+{q:"ஜென் என்னும் ஜப்பானிய மொழிச் சொல்லுக்கு என்ன பொருள்?",o:["அமைதி கொள்","தியானம் செய்","அன்பு செலுத்து","உதவி செய்"],a:1},
+{q:"ஜென் சிந்தனையாளர்கள் எந்த மதத்தைச் சார்ந்த துறவியர்?",o:["இந்து மதம்","சமண மதம்","புத்த மதம்","கிறிஸ்துவ மதம்"],a:2},
+{q:"ஜென் துறவியர் பெரும்பாலும் எந்த நாடுகளில் வாழ்ந்து வந்தனர்?",o:["இந்தியா, இலங்கை","சீனா, ஜப்பான்","நேபாளம், பூடான்","தாய்லாந்து, மியான்மர்"],a:1},
+{q:"திணை எத்தனை வகைப்படும்?",o:["2","3","4","5"],a:0},
+{q:"ஆறு அறிவுடைய மனிதர்களை எவ்வாறு அழைப்பர்?",o:["அஃறிணை","உயர்திணை","மூவிடம்","பால்"],a:1},
+{q:"பறவைகள், விலங்கினங்கள், தாவரங்களை எவ்வாறு அழைப்பர்?",o:["உயர்திணை","மூவிடம்","அஃறிணை","தன்மை"],a:2},
+{q:"பால் எத்தனை வகைப்படும்?",o:["2","3","4","5"],a:3},
+{q:"உயர்திணைக்குரிய பால்கள் எத்தனை?",o:["2","3","4","5"],a:1},
+{q:"அஃறிணைக்குரிய பால்கள் எத்தனை?",o:["1","2","3","4"],a:1},
+{q:"ஓர் ஆணைக் குறிப்பது எது?",o:["பெண்பால்","பலர்பால்","ஆண்பால்","ஒன்றன்பால்"],a:2},
+{q:"ஒருவருக்கு மேற்பட்ட மனிதர்களைக் குறிப்பது எது?",o:["ஆண்பால்","பலவின்பால்","பலர்பால்","பெண்பால்"],a:2},
+{q:"அஃறிணையில் ஒன்றைக் குறிப்பது எது?",o:["பலவின்பால்","ஒன்றன்பால்","பலர்பால்","பெண்பால்"],a:1},
+{q:"அஃறிணையில் ஒன்றுக்கு மேற்பட்டவற்றைக் குறிப்பது எது?",o:["பலவின்பால்","ஒன்றன்பால்","பலர்பால்","ஆண்பால்"],a:0},
+{q:"தமிழில் எண் எத்தனை வகைப்படும்?",o:["1","2","3","4"],a:1},
+{q:"'மாடுகள் மேய்ந்தன' என்பது எதற்கு எடுத்துக்காட்டு?",o:["ஒருமை","பன்மை","உயர்திணை","ஒன்றன்பால்"],a:1},
+{q:"இடம் எத்தனை வகைப்படும்?",o:["2","3","4","5"],a:1},
+{q:"தன்னைக் குறிக்கும் இடம் எது?",o:["முன்னிலை","தன்மை","படர்க்கை","ஒருமை"],a:1},
+{q:"முன்னால் இருப்பவரைக் குறிக்கும் இடம் எது?",o:["படர்க்கை","முன்னிலை","தன்மை","பன்மை"],a:1},
+{q:"தன்னையும், முன்னால் இருப்பவரையும் அல்லாமல் மூன்றாமவரைக் குறிப்பது எது?",o:["முன்னிலை","தன்மை","படர்க்கை","பன்மை"],a:2},
+{q:"'நான், என்னை, எனக்கு' என்பன எதற்கு உதாரணம்?",o:["முன்னிலை ஒருமை","தன்மைப் பன்மை","தன்மை ஒருமை","படர்க்கை ஒருமை"],a:2},
+{q:"'நாம், நாங்கள்' என்பன எதற்கு உதாரணம்?",o:["தன்மைப் பன்மை","முன்னிலைப் பன்மை","படர்க்கைப் பன்மை","தன்மை ஒருமை"],a:0},
+{q:"காலம் எத்தனை வகைப்படும்?",o:["2","3","4","5"],a:1},
+{q:"'வந்தனர், பறந்தது' என்பன எந்தக் காலத்தைக் குறிக்கும்?",o:["நிகழ்காலம்","எதிர்காலம்","இறந்தகாலம்","முக்காலம்"],a:2},
+{q:"'ஆடுகின்றாள்' என்பது எந்தக் காலத்தைக் குறிக்கும்?",o:["நிகழ்காலம்","எதிர்காலம்","இறந்தகாலம்","காலம் கரந்த நிலை"],a:0},
+{q:"'செய்வர், பறக்கும்' என்பன எந்தக் காலத்தைக் குறிக்கும்?",o:["நிகழ்காலம்","இறந்தகாலம்","எதிர்காலம்","எக்காலமும் இல்லை"],a:2},
+{q:"'விறுவிறு, கலகல' போன்று இரட்டையாக இணைந்து வந்து, பிரித்தால் தனிப்பொருள் தராத சொற்கள் எவ்வாறு அழைக்கப்படும்?",o:["அடுக்குத்தொடர்","இரட்டைக்கிளவி","பண்புத்தொகை","வினைத்தொகை"],a:1},
+{q:"அச்சம், விரைவு, சினம் காரணங்களால் ஒரு சொல் ஒன்றுக்கு மேற்பட்ட முறை தொடர்ந்து வருவது எது?",o:["அடுக்குத்தொடர்","இரட்டைக்கிளவி","உவமைத்தொடர்","வினைமுற்று"],a:0},
+{q:"அடுக்குத்தொடரில் ஒரே சொல் எத்தனை முறை வரை அடுக்கி வரும்?",o:["இரண்டு முறை மட்டும்","இரண்டு முதல் மூன்று முறை","இரண்டு முதல் நான்கு முறை","ஐந்து முறை"],a:2},
+{q:"பிரித்தால் பொருள் தருவது எது?",o:["இரட்டைக்கிளவி","அடுக்குத்தொடர்","பண்புப்பெயர்","தொழிற்பெயர்"],a:1},
+{q:"'செல்கின்றன' என்பதற்கு உரிய பால் எது?",o:["ஒன்றன்பால்","பலவின்பால்","பலர்பால்","ஆண்பால்"],a:1},
+{q:"'மழை சடசடவெனப் பெய்தது' - இத்தொடரில் அமைந்துள்ளது எது?",o:["இரட்டைக்கிளவி","அடுக்குத்தொடர்","தொழிலாகுபெயர்","பண்பாகுபெயர்"],a:0},
+{q:"திருக்குறளின் படி ஒரு செயலைச் செய்ய எத்தனை காரியங்களை ஐயம்தீர ஆராய வேண்டும்?",o:["மூன்று","நான்கு","ஐந்து","ஆறு"],a:1},
+{q:"'வினையால் வினையாக்கிக் கோடல் நனைகவுள் யானையால் யானையாத் தற்று' - இக்குறளில் அமைந்துள்ள அணி எது?",o:["உருவக அணி","உவமை அணி","சொற்பொருள் பின்வருநிலை அணி","தற்குறிப்பேற்ற அணி"],a:1},
+{q:"'உறுபசியும் ஓவாப் பிணியும் செறுபகையும் சேராது இயல்வது' - எது?",o:["அரண்","நாடு","காடு","மலை"],a:1},
+{q:"ஒரு நாட்டுக்கு எவையெல்லாம் அரண்களாக அமையும் என வள்ளுவர் கூறுகிறார்?",o:["தெளிந்த நீர், நிலம், மலை, காடு","கடல், வானம், நிலம், காற்று","செல்வம், படை, நட்பு, அமைச்சர்","உணவு, உடை, இருப்பிடம், கல்வி"],a:0},
+{q:"'பிறப்பொக்கும் எல்லா உயிர்க்கும்' என்னும் வரியைக் கொண்ட நூல் எது?",o:["நாலடியார்","சிலப்பதிகாரம்","திருக்குறள்","மணிமேகலை"],a:2},
+{q:"'நாடென்ப' என்னும் சொல்லைப் பிரித்து எழுதக் கிடைப்பது எது?",o:["நான் + என்ப","நா + டென்ப","நாடு + என்ப","நாடு + டென்ப"],a:2},
+{q:"கண் + இல்லது என்பதனைச் சேர்த்தெழுதக் கிடைக்கும் சொல் எது?",o:["கணிஇல்லது","கணில்லது","கண்ணில்லாது","கண்ணில்லது"],a:3},
+{q:"'Objective' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["லட்சியம்","குறிக்கோள்","பொறுப்பு","நற்பண்பு"],a:1},
+{q:"'Communism' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["முதலாளித்துவம்","பொதுவுடைமை","சமூகவியல்","தனியுடைமை"],a:1},
+{q:"'Responsibility' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["குறிக்கோள்","லட்சியம்","பொறுப்பு","நற்பண்பு"],a:2},
+{q:"'Poverty' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["செல்வம்","வறுமை","நோய்","பிணி"],a:1}
+];
+
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+
+const qtext = document.getElementById('qtext');
+const qtag = document.getElementById('qtag');
+const optionsWrap = document.getElementById('optionsWrap');
+const qnumLabel = document.getElementById('qnumLabel');
+const pctLabel = document.getElementById('pctLabel');
+const progressFill = document.getElementById('progressFill');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const quizView = document.getElementById('quizView');
+const scoreView = document.getElementById('scoreView');
+const reviewView = document.getElementById('reviewView');
+
+const LETTERS = ['A','B','C','D'];
+
+function renderQuestion(){
+  const item = QUESTIONS[current];
+  qtag.textContent = 'கேள்வி ' + (current+1);
+  qtext.textContent = item.q;
+  qnumLabel.textContent = 'Question ' + (current+1) + ' of ' + QUESTIONS.length;
+  const pct = Math.round(((current)/QUESTIONS.length)*100);
+  pctLabel.textContent = pct + '%';
+  progressFill.style.width = pct + '%';
+
+  optionsWrap.innerHTML = '';
+  item.o.forEach((optText, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="lbl">'+LETTERS[idx]+'</span><span>'+optText+'</span>';
+    const chosen = answers[current];
+    if(chosen !== null){
+      btn.classList.add('disabled');
+      if(idx === item.a) btn.classList.add('correct');
+      else if(idx === chosen) btn.classList.add('incorrect');
+      else btn.classList.add('faded');
+    }
+    btn.addEventListener('click', ()=>{
+      if(answers[current] !== null) return;
+      answers[current] = idx;
+      renderQuestion();
+    });
+    optionsWrap.appendChild(btn);
+  });
+
+  prevBtn.disabled = current === 0;
+  nextBtn.textContent = (current === QUESTIONS.length-1) ? 'முடிக்க →' : 'அடுத்தது →';
+}
+
+prevBtn.addEventListener('click', ()=>{
+  if(current > 0){ current--; renderQuestion(); }
+});
+nextBtn.addEventListener('click', ()=>{
+  if(current < QUESTIONS.length-1){
+    current++;
+    renderQuestion();
+  } else {
+    showScore();
+  }
+});
+
+function showScore(){
+  quizView.classList.add('hidden');
+  reviewView.classList.add('hidden');
+  scoreView.classList.remove('hidden');
+  let correct = 0, wrong = 0;
+  answers.forEach((a,i)=>{
+    if(a === null) return;
+    if(a === QUESTIONS[i].a) correct++; else wrong++;
+  });
+  const pct = Math.round((correct/QUESTIONS.length)*100);
+  document.getElementById('finalPct').textContent = pct + '%';
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent = wrong;
+}
+
+document.getElementById('reviewBtn').addEventListener('click', ()=>{
+  scoreView.classList.add('hidden');
+  reviewView.classList.remove('hidden');
+  const body = document.getElementById('reviewBody');
+  body.innerHTML = '';
+  QUESTIONS.forEach((item,i)=>{
+    const chosen = answers[i];
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    let yourRow = '';
+    if(chosen === null){
+      yourRow = '<div class="row your wrong">உங்கள் விடை: — (பதிலளிக்கவில்லை)</div>';
+    } else if(chosen === item.a){
+      yourRow = '<div class="row your right">உங்கள் விடை: '+LETTERS[chosen]+'. '+item.o[chosen]+' ✓</div>';
+    } else {
+      yourRow = '<div class="row your wrong">உங்கள் விடை: '+LETTERS[chosen]+'. '+item.o[chosen]+' ✗</div>';
+    }
+    const ansRow = (chosen !== item.a) ? '<div class="row ans">சரியான விடை: '+LETTERS[item.a]+'. '+item.o[item.a]+'</div>' : '';
+    div.innerHTML = '<div class="qt">'+(i+1)+'. '+item.q+'</div>'+yourRow+ansRow;
+    body.appendChild(div);
+  });
+});
+
+function restartQuiz(){
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  scoreView.classList.add('hidden');
+  reviewView.classList.add('hidden');
+  quizView.classList.remove('hidden');
+  renderQuestion();
+}
+document.getElementById('restartBtn').addEventListener('click', restartQuiz);
+document.getElementById('backFromReview').addEventListener('click', restartQuiz);
+
+renderQuestion();
+</script>
+</body>
+</html>
