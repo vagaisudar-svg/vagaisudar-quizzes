@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>தமிழ் வினாடி வினா - Interactive Quiz</title>
+<style>
+  :root{
+    --bg1:#0f172a; --bg2:#1e293b; --card:#ffffff; --accent:#4f46e5; --accent2:#7c3aed;
+    --correct:#16a34a; --wrong:#dc2626; --muted:#64748b; --text:#1e293b; --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Noto Sans Tamil','Segoe UI',Arial,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    padding:24px 12px; color:var(--text);
+  }
+  .app{ width:100%; max-width:720px; }
+  .header{ text-align:center; color:#fff; margin-bottom:16px; }
+  .header h1{ font-size:1.5rem; margin:0 0 4px 0; }
+  .header p{ margin:0; color:#cbd5e1; font-size:0.9rem; }
+
+  .card{
+    background:var(--card); border-radius:16px; box-shadow:0 20px 45px rgba(0,0,0,0.35);
+    padding:24px; margin-bottom:16px;
+  }
+
+  .progress-wrap{ margin-bottom:18px; }
+  .progress-label{ display:flex; justify-content:space-between; font-size:0.85rem; color:var(--muted); margin-bottom:6px; }
+  .progress-bar{ width:100%; height:8px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .3s ease; }
+
+  .question-text{ font-size:1.15rem; line-height:1.6; margin:8px 0 20px 0; font-weight:600; }
+
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option{
+    display:flex; align-items:center; gap:12px;
+    border:2px solid var(--border); border-radius:12px; padding:14px 16px;
+    cursor:pointer; transition:all .15s ease; font-size:1rem; background:#f8fafc;
+  }
+  .option:hover{ border-color:var(--accent); background:#eef2ff; }
+  .option.selected{ border-color:var(--accent); background:#eef2ff; box-shadow:0 0 0 3px rgba(79,70,229,0.15); }
+  .option .letter{
+    flex:0 0 auto; width:28px; height:28px; border-radius:50%; background:var(--border);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:var(--muted);
+  }
+  .option.selected .letter{ background:var(--accent); color:#fff; }
+
+  .option.correct{ border-color:var(--correct); background:#f0fdf4; }
+  .option.correct .letter{ background:var(--correct); color:#fff; }
+  .option.incorrect{ border-color:var(--wrong); background:#fef2f2; }
+  .option.incorrect .letter{ background:var(--wrong); color:#fff; }
+  .option.disabled{ cursor:default; }
+
+  .feedback{ margin-top:14px; font-size:0.95rem; font-weight:600; padding:10px 14px; border-radius:10px; display:none; }
+  .feedback.show{ display:block; }
+  .feedback.correct-fb{ background:#f0fdf4; color:var(--correct); }
+  .feedback.wrong-fb{ background:#fef2f2; color:var(--wrong); }
+
+  .nav-row{ display:flex; justify-content:space-between; gap:12px; margin-top:22px; }
+  button{
+    font-family:inherit; font-size:0.95rem; font-weight:600; border:none; border-radius:10px;
+    padding:12px 20px; cursor:pointer; transition:transform .1s ease, opacity .15s ease;
+  }
+  button:active{ transform:scale(0.97); }
+  button:disabled{ opacity:0.45; cursor:not-allowed; }
+  .btn-secondary{ background:var(--border); color:var(--text); }
+  .btn-secondary:hover:not(:disabled){ background:#cbd5e1; }
+  .btn-primary{ background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover:not(:disabled){ opacity:0.92; }
+
+  .jump-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; max-height:110px; overflow-y:auto; padding:4px; }
+  .jump-btn{
+    width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:#f8fafc;
+    font-size:0.75rem; color:var(--muted); cursor:pointer; padding:0; font-weight:600;
+  }
+  .jump-btn.answered{ background:#eef2ff; border-color:var(--accent); color:var(--accent); }
+  .jump-btn.current{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* Results screen */
+  .results-header{ text-align:center; }
+  .score-circle{
+    width:150px; height:150px; border-radius:50%; margin:12px auto 20px auto;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:conic-gradient(var(--accent) calc(var(--pct)*1%), var(--border) 0);
+  }
+  .score-circle-inner{
+    width:120px; height:120px; border-radius:50%; background:#fff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .score-circle-inner .pct{ font-size:1.6rem; font-weight:800; color:var(--accent); }
+  .score-circle-inner .frac{ font-size:0.85rem; color:var(--muted); }
+
+  .summary-line{ text-align:center; color:var(--muted); margin-bottom:20px; font-size:0.95rem; }
+
+  .review-item{ border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
+  .review-item.correct-item{ border-left:5px solid var(--correct); }
+  .review-item.wrong-item{ border-left:5px solid var(--wrong); }
+  .review-q{ font-weight:700; margin-bottom:10px; }
+  .review-opt{ padding:8px 12px; border-radius:8px; margin-bottom:6px; font-size:0.9rem; display:flex; gap:8px; }
+  .review-opt.opt-correct{ background:#f0fdf4; color:var(--correct); font-weight:600; }
+  .review-opt.opt-user-wrong{ background:#fef2f2; color:var(--wrong); font-weight:600; }
+  .review-opt.opt-neutral{ color:var(--muted); }
+  .tag{ font-size:0.75rem; padding:2px 8px; border-radius:99px; margin-left:auto; font-weight:700; }
+  .tag-correct{ background:var(--correct); color:#fff; }
+  .tag-wrong{ background:var(--wrong); color:#fff; }
+
+  .restart-btn{ display:block; width:100%; margin-top:8px; }
+
+  .start-screen{ text-align:center; padding:12px 0; }
+  .start-screen p{ color:var(--muted); line-height:1.6; margin-bottom:24px; }
+  .stat-row{ display:flex; justify-content:center; gap:24px; margin-bottom:28px; }
+  .stat{ text-align:center; }
+  .stat .num{ font-size:1.8rem; font-weight:800; color:var(--accent); }
+  .stat .lbl{ font-size:0.8rem; color:var(--muted); }
+
+  @media (max-width:480px){
+    .card{ padding:16px; }
+    .question-text{ font-size:1.05rem; }
+    .nav-row{ flex-direction:row; }
+    button{ padding:12px 14px; font-size:0.9rem; flex:1; }
+    .score-circle{ width:130px; height:130px; }
+    .score-circle-inner{ width:104px; height:104px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>தமிழ் வினாடி வினா</h1>
+    <p>Interactive Tamil MCQ Quiz</p>
+  </div>
+
+  <div class="card" id="mainCard">
+    <!-- content injected by JS -->
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"id": 1, "question": "\"இயல் ஒன்று\" எனும் பாடப்பிரிவின் தலைப்பு என்ன?", "options": ["தமிழ் இன்பம்", "தமிழ் அறம்", "தமிழ் அமுதம்", "தமிழ் ஒளி"], "answer": 0}, {"id": 2, "question": "\"ஓரெழுத்து ஒரு மொழியை\" அடிப்படையாகக் கொண்டு எந்தத் திறனை வளர்த்தல் கற்றல் நோக்கமாகக் கூறப்பட்டுள்ளது?", "options": ["கவிதைத் திறன்", "சொல்லாட்சித் திறன்", "பேச்சுத் திறன்", "எழுதும் திறன்"], "answer": 1}, {"id": 3, "question": "\"தமிழ்மொழி வாழ்த்து\" எனும் பாடலை இயற்றியவர் யார்?", "options": ["பாரதிதாசன்", "பாரதியார்", "தமிழழகனார்", "இளங்குமரனார்"], "answer": 1}, {"id": 4, "question": "பாரதியாரின் இயற்பெயர் என்ன?", "options": ["சி. சுப்பிரமணிய பாரதியார்", "சுப்புரத்தினம்", "சண்முகசுந்தரம்", "சுப்பிரமணிய தாசன்"], "answer": 0}, {"id": 5, "question": "\"நிரந்தரம்\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["நிலப்பகுதி", "காலம் முழுமையும்", "புகழ்", "பழமை"], "answer": 1}, {"id": 6, "question": "\"வைப்பு\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["நிலப்பகுதி", "கடல்", "இருள்", "புகழ்"], "answer": 0}, {"id": 7, "question": "\"தூழ்கலி\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["வளமிக்க மொழி", "சூழ்ந்துள்ள அறியாமை இருள்", "காலம் முழுமையும்", "நிலப்பகுதி"], "answer": 1}, {"id": 8, "question": "\"வண்மொழி\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["வளமிக்க மொழி", "பழைய மொழி", "இனிய மொழி", "புதிய மொழி"], "answer": 0}, {"id": 9, "question": "\"தமிழ்மொழி வாழ்த்து\" பாடலில் \"இசை\" என்னும் சொல் குறிக்கும் பொருள் என்ன?", "options": ["பாடல்", "புகழ்", "இனிமை", "ஒலி"], "answer": 1}, {"id": 10, "question": "\"தொல்லை\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["பழமை, துன்பம்", "புதுமை, இன்பம்", "அறியாமை", "வளம்"], "answer": 0}, {"id": 11, "question": "பாரதியார் எழுதி விடுதலைப் போருக்கு வித்திட்ட இதழ்கள் எவை?", "options": ["குயில், விடுதலை", "இந்தியா, விஜயா", "தினமணி, ஆனந்த விகடன்", "கலைமகள், மணிக்கொடி"], "answer": 1}, {"id": 12, "question": "பாரதியார் எழுதிய உரைநடைநூல்கள் எவை?", "options": ["பாண்டியன் பரிசு, அழகின் சிரிப்பு", "சந்திரிகையின் கதை, தராசு", "சிலப்பதிகாரம், மணிமேகலை", "இலக்கணவரலாறு, தேவநேயம்"], "answer": 1}, {"id": 13, "question": "பாரதியாரை \"செந்தமிழ்த் தேனீ\" என்று புகழ்ந்தவர் யார்?", "options": ["பாரதிதாசன்", "தமிழழகனார்", "இளங்குமரனார்", "தந்தை பெரியார்"], "answer": 0}, {"id": 14, "question": "\"தமிழ்மொழி வாழ்த்து\" பாடல் எந்தத் தொகுப்பில் இடம்பெற்றுள்ளது?", "options": ["தனிப்பாடல் திரட்டு", "பாரதியார் கவிதைகள்", "குயில் பாட்டு", "பாஞ்சாலி சபதம்"], "answer": 1}, {"id": 15, "question": "\"வாழ்க – ஏழ்கடல் – தூழ்கலி – வாழ்க\" ஆகிய சொற்களில் இரண்டாம் எழுத்து ஒன்றி வந்துள்ளதால் அமையும் அணி எது?", "options": ["மோனைத்தொடை", "எதுகைத்தொடை", "இயைபுத்தொடை", "இரட்டுறமொழிதல் அணி"], "answer": 1}, {"id": 16, "question": "\"வாழ்க – வாழிய\" ஆகிய சொற்களில் முதல் எழுத்து ஒன்றி வந்துள்ளதால் அமையும் அணி எது?", "options": ["எதுகைத்தொடை", "மோனைத்தொடை", "இயைபுத்தொடை", "சிலேடை"], "answer": 1}, {"id": 17, "question": "\"வாழியவே, வையகமே, தமிழ்நாடே, தமிழ்மொழியே\" ஆகிய அடிகளின் இறுதிச் சொற்கள் ஒரே ஓசையில் முடிவதால் அமையும் அணி எது?", "options": ["எதுகைத்தொடை", "மோனைத்தொடை", "இயைபுத்தொடை", "இரட்டுறமொழிதல் அணி"], "answer": 2}, {"id": 18, "question": "\"என்றென்றும்\" எனும் சொல்லைப் பிரித்து எழுதக் கிடைப்பது எது?", "options": ["என் + றென்றும்", "என்று + என்றும்", "என் + என்றும்", "என்றும் + என்றும்"], "answer": 1}, {"id": 19, "question": "\"ஆழிக்கு இணை\" பாடலை இயற்றியவர் யார்?", "options": ["பாரதியார்", "சந்தக்கவிமணி தமிழழகனார்", "பாரதிதாசன்", "இரா. இளங்குமரனார்"], "answer": 1}, {"id": 20, "question": "தமிழழகனாரின் இயற்பெயர் என்ன?", "options": ["சண்முகசுந்தரம்", "சுப்புரத்தினம்", "சி. சுப்பிரமணியன்", "இராமலிங்கம்"], "answer": 0}, {"id": 21, "question": "தமிழழகனார் எத்தனை சிற்றிலக்கியநூல்களைப் படைத்துள்ளார்?", "options": ["பத்து", "பன்னிரண்டு", "பதினைந்து", "இருபது"], "answer": 1}, {"id": 22, "question": "\"ஆழிக்கு இணை\" பாடல் எடுக்கப்பட்ட நூல் எது?", "options": ["பாரதியார் கவிதைகள்", "தனிப்பாடல் திரட்டு", "தேவநேயம்", "நன்னூல்"], "answer": 1}, {"id": 23, "question": "\"துய்ப்பதால்\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["கற்பதால், தருதலால்", "பொருந்துதலால்", "நாள்தோறும்", "கடல்"], "answer": 0}, {"id": 24, "question": "\"மெத்த வணிகலம்\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["நாள்தோறும்", "அணிகலன், பெரிய வணிகக் கப்பல்", "கடல் அலை", "கற்பதால்"], "answer": 1}, {"id": 25, "question": "\"மேவலால்\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["பொருந்துதலால், பெறுதலால்", "கற்பதால்", "நாள்தோறும்", "கடல்"], "answer": 0}, {"id": 26, "question": "\"நித்தம்\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["நாள்தோறும்", "கடல்", "அணிகலன்", "புகழ்"], "answer": 0}, {"id": 27, "question": "\"ஆழி\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["மலை", "கடல்", "வானம்", "நிலம்"], "answer": 1}, {"id": 28, "question": "\"முத்தமிழ்\" என்பவை எவை?", "options": ["இயல், இசை, நாடகம்", "முதல், இடை, கடை", "சேரம், சோழம், பாண்டியம்", "எழுத்து, சொல், பொருள்"], "answer": 0}, {"id": 29, "question": "\"முச்சங்கம்\" என்பவை எவை?", "options": ["இயல், இசை, நாடகம்", "முதல், இடை, கடை", "வெண்சங்கு, சலஞ்சலம், பாஞ்சசன்யம்", "தமிழ், கடல், மொழி"], "answer": 1}, {"id": 30, "question": "கடல் தரும் மூன்று வகை சங்குகள் எவை?", "options": ["முதல், இடை, கடை", "வெண்சங்கு, சலஞ்சலம், பாஞ்சசன்யம்", "இயல், இசை, நாடகம்", "சேரம், சோழம், பாண்டியம்"], "answer": 1}, {"id": 31, "question": "தமிழுக்கு அணிகலன்களாக அமைந்தவை என \"ஆழிக்கு இணை\" பாடலில் குறிப்பிடப்படுவை எவை?", "options": ["ஐம்பெருங் காப்பியங்கள்", "சங்கப் பலகைகள்", "வணிகக் கப்பல்கள்", "கடல் அலைகள்"], "answer": 0}, {"id": 32, "question": "ஒரு சொல் அல்லது தொடர் இருபொருள் தருமாறு அமைவது எந்த அணி எனப்படும்?", "options": ["எதுகைத்தொடை", "இரட்டுறமொழிதல் அணி", "மோனைத்தொடை", "இயைபுத்தொடை"], "answer": 1}, {"id": 33, "question": "இரட்டுறமொழிதல் அணியை வேறு எந்தப் பெயரால் அழைப்பர்?", "options": ["உவமை", "சிலேடை", "இயைபு", "மோனை"], "answer": 1}, {"id": 34, "question": "\"மனிதன் தனது கருத்தைப் பிறருக்கு அறிவிக்க\" கண்டுபிடித்தது எது?", "options": ["எழுத்து", "மொழி", "அச்சு", "படம்"], "answer": 1}, {"id": 35, "question": "பொருளின் ஓவிய வடிவமாகவே இருந்த எழுத்து வடிவம் எவ்வாறு அழைக்கப்படுகிறது?", "options": ["ஒலி எழுத்து", "ஓவிய எழுத்து", "வட்டெழுத்து", "தமிழி எழுத்து"], "answer": 1}, {"id": 36, "question": "ஓர் ஒலிக்கு ஓர் எழுத்து என உருவான நிலை எவ்வாறு அழைக்கப்படுகிறது?", "options": ["ஓவிய எழுத்து வடிவ நிலை", "ஒலி எழுத்து வடிவ நிலை", "வட்டெழுத்து வடிவ நிலை", "தமிழி எழுத்து வடிவ நிலை"], "answer": 1}, {"id": 37, "question": "தமிழ்நாட்டில் கல்வெட்டுகள் எக்காலம் முதல் கிடைக்கின்றன?", "options": ["கி.மு. மூன்றாம் நூற்றாண்டு", "கி.பி. மூன்றாம் நூற்றாண்டு", "கி.பி. ஏழாம் நூற்றாண்டு", "கி.மு. ஏழாம் நூற்றாண்டு"], "answer": 0}, {"id": 38, "question": "செப்பேடுகள் எக்காலம் முதல் கிடைக்கின்றன?", "options": ["கி.மு. மூன்றாம் நூற்றாண்டு", "கி.பி. ஏழாம் நூற்றாண்டு", "கி.பி. பதினொன்றாம் நூற்றாண்டு", "கி.மு. ஏழாம் நூற்றாண்டு"], "answer": 1}, {"id": 39, "question": "கல்வெட்டு, செப்பேடுகளில் காணப்படும் வரிவடிவங்கள் இருவகையாகப் பிரிக்கப்படுகின்றன. அவை எவை?", "options": ["ஓவிய எழுத்து, ஒலி எழுத்து", "வட்டெழுத்து, தமிழி எழுத்து", "பிராம்மி, திராவிடி", "கண்ணெழுத்து, தமிழெழுத்து"], "answer": 1}, {"id": 40, "question": "வளைந்த கோடுகளால் அமைந்த மிகப் பழைய தமிழ் எழுத்து எது?", "options": ["தமிழி எழுத்து", "வட்டெழுத்து", "கண்ணெழுத்து", "ஓவிய எழுத்து"], "answer": 1}, {"id": 41, "question": "இக்காலத்தில் எழுதப்படும் தமிழ் எழுத்துகளின் பழைய வரிவடிவம் எது எனப்படுகிறது?", "options": ["வட்டெழுத்து", "தமிழி எழுத்து", "ஓவிய எழுத்து", "கண்ணெழுத்து"], "answer": 1}, {"id": 42, "question": "சேர மண்டலம், பாண்டிய மண்டலப் பகுதிகளில் வட்டெழுத்துகள் எந்த நூற்றாண்டுகளுக்கு இடையே காணப்படுகின்றன?", "options": ["மூன்றாம் முதல் ஆறாம் நூற்றாண்டு வரை", "எட்டாம் முதல் பதினொன்றாம் நூற்றாண்டு வரை", "பதின்மூன்றாம் முதல் பதினைந்தாம் நூற்றாண்டு வரை", "முதலாம் முதல் மூன்றாம் நூற்றாண்டு வரை"], "answer": 1}, {"id": 43, "question": "முதலாம் இராசராச சோழனின் ஆட்சிக் காலம் எது?", "options": ["பத்தாம் நூற்றாண்டு", "பதினொன்றாம் நூற்றாண்டு", "பன்னிரண்டாம் நூற்றாண்டு", "ஒன்பதாம் நூற்றாண்டு"], "answer": 1}, {"id": 44, "question": "கடைச்சங்க காலத்தில் தமிழகத்தில் எழுதப்பட்ட எழுத்துக்கள் என்று அழைக்கப்பட்டவை எவை?", "options": ["தமிழி எழுத்துகள்", "வட்டெழுத்துகள்", "கண்ணெழுத்துகள்", "ஓவிய எழுத்துகள்"], "answer": 2}, {"id": 45, "question": "\"கண்ணெழுத்துப் படுத்த எண்ணுப் பல்பொதி\" எனும் தொடர் எந்த நூலில் இடம்பெறுகிறது?", "options": ["தொல்காப்பியம்", "சிலப்பதிகாரம்", "நன்னூல்", "தேவநேயம்"], "answer": 1}, {"id": 46, "question": "தமிழ் எழுத்தும் வட்டெழுத்தும் கலந்து எழுதப்பட்டுள்ளதற்குச் சான்றாக அமையும் கல்வெட்டு எது?", "options": ["அசோகர் கல்வெட்டு", "அரச்சலூர் கல்வெட்டு", "மாமல்லபுரம் கல்வெட்டு", "தஞ்சாவூர் கல்வெட்டு"], "answer": 1}, {"id": 47, "question": "தென்தமிழ் நாட்டில் கண்டுபிடிக்கப்பட்ட கல்வெட்டுகளில் பிராம்மி வரிவடிவத்துடன் காணப்படும் வேறு வரிவடிவங்கள் எவை?", "options": ["தமிழி, தரமிழி, திராவிடி", "வட்டெழுத்து, கண்ணெழுத்து", "ஓவிய எழுத்து, ஒலி எழுத்து", "சேரம், சோழம், பாண்டியம்"], "answer": 0}, {"id": 48, "question": "ஐராவதம் மகாதேவனின் ஆய்வுநூல் எது?", "options": ["தமிழின் தனிப்பெருஞ் சிறப்புகள்", "எர்லி தமிழ் எபிகிராபி", "தேவநேயம்", "இலக்கணவரலாறு"], "answer": 1}, {"id": 49, "question": "ஐராவதம் மகாதேவன் பழந்தமிழ் வரிவடிவத்தை எவ்வாறு அழைக்கக் கோருகிறார்?", "options": ["தமிழ்ப் பிராம்மி என்று மட்டும்", "தமிழி அல்லது பழந்தமிழ் என்று", "வட்டெழுத்து என்று", "கண்ணெழுத்து என்று"], "answer": 1}, {"id": 50, "question": "எழுத்துகளின் மேல் புள்ளி வைக்கும் வழக்கம் எக்காலம் முதல் இருந்து வந்துள்ளது?", "options": ["நன்னூலார் காலம்", "தொல்காப்பியர் காலம்", "வீரமாமுனிவர் காலம்", "பெரியார் காலம்"], "answer": 1}, {"id": 51, "question": "பழங்காலத்தில் ஐகார எழுத்துகளைக் குறிப்பிட எழுத்துகளின் முன் என்ன இடப்பட்டது?", "options": ["ஒற்றைப் புள்ளி", "இரட்டைப் புள்ளி", "துணைக்கால்", "கொம்புக்கால்"], "answer": 1}, {"id": 52, "question": "நெடிலைக் குறிக்க இக்காலத்தில் பயன்படுத்தப்படுவது எது?", "options": ["ஒற்றைப் புள்ளி", "துணைக்கால் (ா)", "இரட்டைப் புள்ளி", "இணைக்கொம்பு"], "answer": 1}, {"id": 53, "question": "ஐகார உயிர்மெய்யைக் குறிக்க இக்காலத்தில் பயன்படுத்தப்படுவது எது?", "options": ["துணைக்கால்", "கொம்புக்கால்", "இணைக்கொம்பு (ை)", "ஒற்றைப் புள்ளி"], "answer": 2}, {"id": 54, "question": "ஒளகார உயிர்மெய்யைக் குறிக்க இக்காலத்தில் பயன்படுத்தப்படுவது எது?", "options": ["துணைக்கால்", "இணைக்கொம்பு", "கொம்புக்கால் (ௌ)", "இரட்டைப் புள்ளி"], "answer": 2}, {"id": 55, "question": "தமிழ் எழுத்துகளில் மிகப் பெரும் சீர்திருத்தத்தைச் செய்தவர் யார்?", "options": ["தந்தை பெரியார்", "வீரமாமுனிவர்", "இரா. இளங்குமரனார்", "நன்னூலார்"], "answer": 1}, {"id": 56, "question": "வீரமாமுனிவர் \"எ\" என்னும் எழுத்திற்குக் கீழ்க்கோடிட்டு உருவாக்கிய எழுத்து எது?", "options": ["ஏ", "ஓ", "ஔ", "ஈ"], "answer": 0}, {"id": 57, "question": "எகர, ஒகர வரிசை எழுத்துகளில் புள்ளிகளால் ஏற்பட்ட குழப்பங்களைக் களைந்தவர் யார்?", "options": ["தந்தை பெரியார்", "வீரமாமுனிவர்", "நன்னூலார்", "தொல்காப்பியர்"], "answer": 1}, {"id": 58, "question": "ணா, றா, னா, ணை, லை, ளை, னை ஆகிய எழுத்துகளின் சீர்திருத்தத்தைச் செய்தவர் யார்?", "options": ["வீரமாமுனிவர்", "தந்தை பெரியார்", "இரா. இளங்குமரனார்", "நன்னூலார்"], "answer": 1}, {"id": 59, "question": "தமிழில் \"சொல்\" என்பதற்கு ஒரு பொருள் என்ன?", "options": ["நெல்", "பூ", "கடல்", "மொழி"], "answer": 0}, {"id": 60, "question": "\"எல்லாச் சொல்லும் பொருள் குறித்தனவே\" என்று கூறியவர் யார்?", "options": ["நன்னூலார்", "தொல்காப்பியர்", "இளங்குமரனார்", "வீரமாமுனிவர்"], "answer": 1}, {"id": 61, "question": "மொழி எத்தனை வகையாகப் பிரிக்கப்படுகிறது?", "options": ["இரண்டு வகை", "மூன்று வகை", "நான்கு வகை", "ஐந்து வகை"], "answer": 1}, {"id": 62, "question": "\"நெட்டெழுத்து ஏழே ஓரெழுத்து ஒருமொழி\" என்று கூறியவர் யார்?", "options": ["நன்னூலார்", "தொல்காப்பியர்", "இளங்குமரனார்", "பெரியார்"], "answer": 1}, {"id": 63, "question": "குற்றெழுத்து ஐந்தும் எதனை இல்லாதவை என தொல்காப்பியர் கூறுகிறார்?", "options": ["மொழிநிறைபு", "பொருள்", "ஒலி", "இடம்"], "answer": 0}, {"id": 64, "question": "\"நொ\", \"து\" ஆகிய குறில் எழுத்துகளும் பொருளுடைய ஓர் எழுத்து மொழி எனக் கூறியவர் யார்?", "options": ["தொல்காப்பியர்", "நன்னூலார்", "வீரமாமுனிவர்", "இளங்குமரனார்"], "answer": 1}, {"id": 65, "question": "தமிழில் ஓரெழுத்து ஒருமொழிகளின் மொத்த எண்ணிக்கை என்ன?", "options": ["40", "42", "45", "126"], "answer": 1}, {"id": 66, "question": "\"நாற்பது\" நெடில்கள் ஓரெழுத்து ஒரு மொழியாக வரும் எனக் கூறியவர் யார்?", "options": ["தொல்காப்பியர்", "நன்னூலார்", "வீரமாமுனிவர்", "பெரியார்"], "answer": 1}, {"id": 67, "question": "\"பூ\" மற்றும் \"கா\" ஆகிய இரு ஓரெழுத்து மொழிகள் இணைந்து உருவான கலைச்சொல் எது?", "options": ["பூங்கா", "பூக்கடை", "கடற்பூ", "பூவனம்"], "answer": 0}, {"id": 68, "question": "\"ஆ\" மற்றும் \"மா\" இணைந்து உருவான கலைச்சொல் எது, அது எதைக் குறிக்கும்?", "options": ["ஆமா – காட்டுப் பசு", "மாமா – உறவினர்", "ஆமை – ஓர் உயிரினம்", "மாமரம் – ஒரு மரம்"], "answer": 0}, {"id": 69, "question": "நாட்டிலுள்ள பெருமக்கள் பெரிதும் கூடும் அவையை என்ன என்பர்?", "options": ["மாநிலம்", "மாநாடு", "மாஞாலம்", "மாநிறம்"], "answer": 1}, {"id": 70, "question": "பல குறு நிலங்களை உள்ளடக்கிய பெருநிலத்தை என்ன என்பர்?", "options": ["மாநாடு", "மாநிலம்", "மாஞாலம்", "மாநிறம்"], "answer": 1}, {"id": 71, "question": "உலகப் பெரும் பரப்பையும் இயக்கத்தையும் சுட்டும் சொல் எது?", "options": ["மாநாடு", "மாநிலம்", "மாஞாலம்", "மாநிறம்"], "answer": 2}, {"id": 72, "question": "\"மாநிறம்\" என்பது எந்த வண்ணத்தை ஒப்பிட்டுக் கூறுவதாகும்?", "options": ["மாந்தளிர் நிறம்", "கருமை நிறம்", "வெண்மை நிறம்", "செம்மை நிறம்"], "answer": 0}, {"id": 73, "question": "\"மா\" என்னும் சொல் எதைக் குறிக்கும்?", "options": ["மலரை மட்டும்", "விலங்கை", "நிலத்தை மட்டும்", "கடலை"], "answer": 1}, {"id": 74, "question": "\"ஈ\" எனும் பொதுப்பெயர் எதைக் காட்டி நிற்கிறது?", "options": ["ஓயாது ஒலி செய்யும் ஒலிக்குறிப்பு", "நிறத்தைக் காட்டும் குறிப்பு", "அளவைக் காட்டும் குறிப்பு", "இடத்தைக் காட்டும் குறிப்பு"], "answer": 0}, {"id": 75, "question": "\"மான்\" என்னும் சொல் காலவெள்ளத்தில் தேய்ந்து எவ்வாறு ஆனது?", "options": ["மா", "மான்", "மாய்", "மாறு"], "answer": 0}, {"id": 76, "question": "\"ஏய்\" என்னும் சொல்லின் பொருள் என்ன?", "options": ["தூங்குதல்", "என்னோடு கூடு, பொருந்து, சேர்", "விலகிச் செல்", "அமைதியாக இரு"], "answer": 1}, {"id": 77, "question": "\"அம்பு விடுதல்\" என்பதைக் குறிக்கும் சொல் எது?", "options": ["ஏவுதல்", "எய்தல்", "ஏகுதல்", "ஏற்றல்"], "answer": 0}, {"id": 78, "question": "அம்பு விடும் கலையை தமிழ் என்ன என்று அழைக்கிறது?", "options": ["எய்ப்பன்றி", "ஏகலை", "ஏவலன்", "எயினர்"], "answer": 1}, {"id": 79, "question": "\"செந்தமிழ் அந்தணர்\" என்று அழைக்கப்படுபவர் யார்?", "options": ["இரா. இளங்குமரனார்", "தமிழழகனார்", "தந்தை பெரியார்", "பாரதிதாசன்"], "answer": 0}, {"id": 80, "question": "எழுத்துகளின் பிறப்பு என்பது இரண்டு வகையாகப் பிரிக்கப்படுகிறது. அவை எவை?", "options": ["ஓவியப் பிறப்பு, ஒலிப் பிறப்பு", "இடப்பிறப்பு, முயற்சிப் பிறப்பு", "உயிர்ப்பிறப்பு, மெய்ப் பிறப்பு", "வாய்ப் பிறப்பு, மூக்குப் பிறப்பு"], "answer": 1}, {"id": 81, "question": "உயிர் எழுத்துகள் பன்னிரண்டும் எதை இடமாகக் கொண்டு பிறக்கின்றன?", "options": ["மார்பு", "கழுத்து", "மூக்கு", "தலை"], "answer": 1}, {"id": 82, "question": "வல்லின மெய் எழுத்துகள் ஆறும் எதை இடமாகக் கொண்டு பிறக்கின்றன?", "options": ["மார்பு", "கழுத்து", "மூக்கு", "தலை"], "answer": 0}, {"id": 83, "question": "மெல்லின மெய் எழுத்துகள் ஆறும் எதை இடமாகக் கொண்டு பிறக்கின்றன?", "options": ["மார்பு", "கழுத்து", "மூக்கு", "தலை"], "answer": 2}, {"id": 84, "question": "இடையின மெய் எழுத்துகள் ஆறும் எதை இடமாகக் கொண்டு பிறக்கின்றன?", "options": ["மார்பு", "கழுத்து", "மூக்கு", "தலை"], "answer": 1}, {"id": 85, "question": "ஆய்த எழுத்து எதை இடமாகக் கொண்டு பிறக்கிறது?", "options": ["மார்பு", "கழுத்து", "மூக்கு", "தலை"], "answer": 3}, {"id": 86, "question": "\"அ, ஆ\" ஆகிய இரண்டும் எந்த முயற்சியால் பிறக்கின்றன?", "options": ["உதடு குவித்தல்", "வாய் திறத்தல்", "நாக்கை மேல்வாயில் பொருந்தல்", "மூக்கு வழி காற்று செல்லுதல்"], "answer": 1}, {"id": 87, "question": "\"உ, ஊ, ஒ, ஓ, ஔ\" ஆகிய ஐந்தும் எந்த முயற்சியால் பிறக்கின்றன?", "options": ["வாய் திறத்தல் மட்டும்", "வாய்திறக்கும் முயற்சியுடன் உதடுகளைக் குவித்தல்", "நாக்கை மேல்வாயில் பொருந்தல்", "தலையை அசைத்தல்"], "answer": 1}, {"id": 88, "question": "\"க், ங்\" ஆகிய இருமெய்களும் எந்த முயற்சியால் பிறக்கின்றன?", "options": ["நாவின் முதற்பகுதி அண்ணத்தின் அடிப்பகுதியைப் பொருந்துதல்", "நாவின் நுனி அண்ணத்தின் நுனியைப் பொருந்துதல்", "மேல் உதடும் கீழ் உதடும் பொருந்துதல்", "மேல்வாய்ப் பல்லின் அடியை நாக்கின் நுனி பொருந்துதல்"], "answer": 0}, {"id": 89, "question": "\"ட், ண்\" ஆகிய இருமெய்களும் எந்த முயற்சியால் பிறக்கின்றன?", "options": ["நாவின் முதல் அண்ணத்தின் அடி பொருந்துதல்", "நாவின் நுனி அண்ணத்தின் நுனியைப் பொருந்துதல்", "மேல் உதடும் கீழ் உதடும் பொருந்துதல்", "நாவின் இடை நடு அண்ணத்தின் இடையைப் பொருந்துதல்"], "answer": 1}, {"id": 90, "question": "\"ப், ம்\" ஆகிய இருமெய்களும் எந்த முயற்சியால் பிறக்கின்றன?", "options": ["மேல் உதடும் கீழ் உதடும் பொருந்துதல்", "நாவின் நுனி அண்ணத்தின் நுனியைப் பொருந்துதல்", "உதடுகளைக் குவித்தல்", "மேல்வாய்ப் பல்லைக் கீழ் உதடு பொருந்துதல்"], "answer": 0}, {"id": 91, "question": "\"வ்\" எனும் எழுத்து எந்த முயற்சியால் பிறக்கிறது?", "options": ["மேல் உதடும் கீழ் உதடும் பொருந்துதல்", "மேல்வாய்ப் பல்லைக் கீழ் உதடு பொருந்துதல்", "நாவின் நுனி மேல்வாயை வருடுதல்", "நாக்கின் ஓரங்கள் தடித்து நெருங்குதல்"], "answer": 1}, {"id": 92, "question": "ஆய்த எழுத்து எந்த முயற்சியால் பிறக்கிறது?", "options": ["வாயைத் திறந்து ஒலிக்கும் முயற்சி", "உதடுகளைக் குவிக்கும் முயற்சி", "மூக்கால் காற்றை வெளியிடும் முயற்சி", "நாக்கை அண்ணத்தில் தட்டும் முயற்சி"], "answer": 0}, {"id": 93, "question": "\"ற், ன்\" ஆகிய இருமெய்களும் பிறக்க, மேல்வாயை எது மிகவும் பொருந்த வேண்டும்?", "options": ["நாக்கின் நுனி", "நாக்கின் அடிப்பகுதி", "நாக்கின் ஓரங்கள்", "நாக்கின் இடைப்பகுதி"], "answer": 0}, {"id": 94, "question": "\"பாவேந்தர்\" என்றும் \"புரட்சிக் கவிஞர்\" என்றும் போற்றப்படுபவர் யார்?", "options": ["பாரதியார்", "பாரதிதாசன்", "தமிழழகனார்", "இளங்குமரனார்"], "answer": 1}, {"id": 95, "question": "பாரதிதாசன் பிறந்த ஊர் எது?", "options": ["சென்னை", "புதுச்சேரி", "திருச்சி", "மதுரை"], "answer": 1}, {"id": 96, "question": "பாரதிதாசனுக்குப் பெற்றோர் இட்ட பெயர் என்ன?", "options": ["சுப்புரத்தினம்", "சுப்பிரமணியம்", "சண்முகம்", "இராமலிங்கம்"], "answer": 0}, {"id": 97, "question": "சுப்புரத்தினம் தமது பெயரை \"பாரதிதாசன்\" என்று மாற்றிக் கொள்ளக் காரணம் என்ன?", "options": ["பாரதியாரின் கவிதைகள்மீது கொண்ட பற்று", "பிறந்த ஊரின் பெயர்", "ஆசிரியர் இட்ட பெயர்", "அரசு விருது பெற்றதால்"], "answer": 0}, {"id": 98, "question": "பாரதிதாசன் நடத்திய இலக்கிய இதழ் எது?", "options": ["குயில்", "இந்தியா", "விஜயா", "கலைமகள்"], "answer": 0}, {"id": 99, "question": "பாரதிதாசன் எழுதி சாகித்திய அகாதமி பரிசு பெற்ற நாடகநூல் எது?", "options": ["பாண்டியன் பரிசு", "பிசிராந்தையார்", "அழகின் சிரிப்பு", "இருண்ட வீடு"], "answer": 1}, {"id": 100, "question": "\"பெண்ணடிமை தீராதவரை மண்ணடிமை தீராது\" என்னும் கருத்தை வலியுறுத்தியவர் யார்?", "options": ["பாரதியார்", "பாரதிதாசன்", "தந்தை பெரியார்", "இளங்குமரனார்"], "answer": 1}];
+
+let current = 0;
+let selections = new Array(QUESTIONS.length).fill(null); // stores chosen option index or null
+let answered = new Array(QUESTIONS.length).fill(false);
+let quizFinished = false;
+
+const mainCard = document.getElementById('mainCard');
+const letters = ['A','B','C','D','E','F'];
+
+function renderStart(){
+  mainCard.innerHTML = `
+    <div class="start-screen">
+      <h2>வரவேற்கிறோம்!</h2>
+      <p>இந்த வினாடி வினாவில் ${QUESTIONS.length} கேள்விகள் உள்ளன. ஒவ்வொரு கேள்விக்கும் விடையைத் தேர்ந்தெடுத்து, அடுத்த கேள்விக்குச் செல்லவும். இறுதியில் உங்கள் மதிப்பெண் மற்றும் விரிவான மதிப்பாய்வு காண்பிக்கப்படும்.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="num">${QUESTIONS.length}</div><div class="lbl">Questions</div></div>
+      </div>
+      <button class="btn-primary" style="width:100%;padding:16px;font-size:1.05rem;" onclick="startQuiz()">தொடங்குக / Start Quiz</button>
+    </div>
+  `;
+}
+
+function startQuiz(){
+  current = 0;
+  selections = new Array(QUESTIONS.length).fill(null);
+  answered = new Array(QUESTIONS.length).fill(false);
+  quizFinished = false;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  const total = QUESTIONS.length;
+  const pct = Math.round(((current+1)/total)*100);
+  const isAnswered = answered[current];
+  const selectedIdx = selections[current];
+
+  let optionsHtml = '';
+  q.options.forEach((opt, idx) => {
+    let cls = 'option';
+    if (isAnswered) {
+      cls += ' disabled';
+      if (idx === q.answer) cls += ' correct';
+      else if (idx === selectedIdx) cls += ' incorrect';
+    } else if (idx === selectedIdx) {
+      cls += ' selected';
+    }
+    optionsHtml += `
+      <div class="${cls}" onclick="selectOption(${idx})">
+        <div class="letter">${letters[idx]}</div>
+        <div>${escapeHtml(opt)}</div>
+      </div>
+    `;
+  });
+
+  let feedbackHtml = '';
+  if (isAnswered) {
+    if (selectedIdx === q.answer) {
+      feedbackHtml = `<div class="feedback show correct-fb">✓ சரியான விடை! (Correct!)</div>`;
+    } else {
+      feedbackHtml = `<div class="feedback show wrong-fb">✗ தவறான விடை. சரியான விடை: ${letters[q.answer]}) ${escapeHtml(q.options[q.answer])}</div>`;
+    }
+  }
+
+  let jumpHtml = '';
+  for (let i=0;i<total;i++){
+    let jcls = 'jump-btn';
+    if (answered[i]) jcls += ' answered';
+    if (i === current) jcls += ' current';
+    jumpHtml += `<button class="${jcls}" onclick="jumpTo(${i})">${i+1}</button>`;
+  }
+
+  mainCard.innerHTML = `
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Question ${current+1} of ${total}</span><span>${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="question-text">${escapeHtml(q.question)}</div>
+    <div class="options">${optionsHtml}</div>
+    ${feedbackHtml}
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="prevQuestion()" ${current===0?'disabled':''}>← முந்தையது</button>
+      ${current === total-1
+        ? `<button class="btn-primary" onclick="finishQuiz()" ${!isAnswered?'':''}>முடிவுகளைக் காண்க</button>`
+        : `<button class="btn-primary" onclick="nextQuestion()">அடுத்தது →</button>`
+      }
+    </div>
+    <div class="jump-row">${jumpHtml}</div>
+  `;
+}
+
+function selectOption(idx){
+  if (answered[current]) return;
+  selections[current] = idx;
+  answered[current] = true;
+  renderQuestion();
+}
+
+function nextQuestion(){
+  if (current < QUESTIONS.length - 1){
+    current++;
+    renderQuestion();
+  }
+}
+
+function prevQuestion(){
+  if (current > 0){
+    current--;
+    renderQuestion();
+  }
+}
+
+function jumpTo(idx){
+  current = idx;
+  renderQuestion();
+}
+
+function finishQuiz(){
+  quizFinished = true;
+  renderResults();
+}
+
+function renderResults(){
+  const total = QUESTIONS.length;
+  let score = 0;
+  QUESTIONS.forEach((q, i) => { if (selections[i] === q.answer) score++; });
+  const pct = Math.round((score/total)*100);
+
+  let reviewHtml = '';
+  QUESTIONS.forEach((q, i) => {
+    const userIdx = selections[i];
+    const isCorrect = userIdx === q.answer;
+    let optsHtml = '';
+    q.options.forEach((opt, idx) => {
+      let ocls = 'review-opt';
+      if (idx === q.answer) ocls += ' opt-correct';
+      else if (idx === userIdx) ocls += ' opt-user-wrong';
+      else ocls += ' opt-neutral';
+      optsHtml += `<div class="${ocls}">${letters[idx]}) ${escapeHtml(opt)}</div>`;
+    });
+    reviewHtml += `
+      <div class="review-item ${isCorrect?'correct-item':'wrong-item'}">
+        <div class="review-q">${i+1}. ${escapeHtml(q.question)} <span class="tag ${isCorrect?'tag-correct':'tag-wrong'}">${isCorrect?'✓ Correct':'✗ Wrong'}</span></div>
+        ${optsHtml}
+        ${userIdx === null ? '<div style="color:var(--muted);font-size:0.85rem;margin-top:4px;">(பதிலளிக்கப்படவில்லை / Not answered)</div>' : ''}
+      </div>
+    `;
+  });
+
+  mainCard.innerHTML = `
+    <div class="results-header">
+      <h2>வினாடி வினா முடிந்தது!</h2>
+      <div class="score-circle" style="--pct:${pct}">
+        <div class="score-circle-inner">
+          <div class="pct">${pct}%</div>
+          <div class="frac">${score} / ${total}</div>
+        </div>
+      </div>
+      <div class="summary-line">நீங்கள் ${total} கேள்விகளில் ${score} சரியாக பதிலளித்துள்ளீர்கள்.</div>
+    </div>
+    <button class="btn-primary restart-btn" onclick="restartQuiz()">🔄 மீண்டும் தொடங்குக (Restart Quiz)</button>
+    <h3 style="margin-top:28px;">மதிப்பாய்வு / Review</h3>
+    <div class="review-list">${reviewHtml}</div>
+    <button class="btn-primary restart-btn" onclick="restartQuiz()">🔄 மீண்டும் தொடங்குக (Restart Quiz)</button>
+  `;
+}
+
+function restartQuiz(){
+  renderStart();
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+renderStart();
+</script>
+</body>
+</html>
