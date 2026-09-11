@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7ஆம் வகுப்பு தமிழ் - இயல் 3 - வினா விடைகள்</title>
+<style>
+  :root{
+    --bg1:#0f2027;
+    --bg2:#20639b;
+    --card:#ffffff;
+    --text:#222;
+    --muted:#666;
+    --correct:#0f9d58;
+    --correct-bg:#e3f9ed;
+    --wrong:#e63946;
+    --wrong-bg:#fdeaec;
+    --accent:#ff6b35;
+    --accent-hover:#e2551f;
+    --border:#e0e0e0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Noto Sans Tamil', 'Segoe UI', Tahoma, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:20px;
+  }
+  .app{
+    width:100%;
+    max-width:720px;
+    margin-top:10px;
+  }
+  .header{
+    text-align:center;
+    color:#fff;
+    margin-bottom:16px;
+  }
+  .header h1{
+    font-size:1.4rem;
+    margin:0 0 4px 0;
+    font-weight:700;
+  }
+  .header p{
+    margin:0;
+    opacity:0.85;
+    font-size:0.9rem;
+  }
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    padding:24px;
+    min-height:360px;
+    display:flex;
+    flex-direction:column;
+  }
+  .progress-wrap{
+    margin-bottom:18px;
+  }
+  .progress-text{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.85rem;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .progress-bar-bg{
+    width:100%;
+    height:8px;
+    background:#eee;
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--bg1), var(--bg2));
+    border-radius:4px;
+    transition: width 0.3s ease;
+  }
+  .question-text{
+    font-size:1.15rem;
+    font-weight:600;
+    color:var(--text);
+    line-height:1.6;
+    margin-bottom:20px;
+    white-space:pre-wrap;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    flex:1;
+  }
+  .option{
+    border:2px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    cursor:pointer;
+    font-size:1rem;
+    line-height:1.5;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    transition: all 0.15s ease;
+    background:#fafafa;
+  }
+  .option:hover{
+    border-color:var(--accent);
+    background:#f0f4fb;
+  }
+  .option.selected{
+    border-color:var(--accent);
+    background:#e3ecfb;
+  }
+  .option .letter{
+    font-weight:700;
+    min-width:24px;
+    color:var(--accent);
+  }
+  .option.show-correct{
+    border-color:var(--correct);
+    background:var(--correct-bg);
+  }
+  .option.show-correct .letter{
+    color:var(--correct);
+  }
+  .option.show-wrong{
+    border-color:var(--wrong);
+    background:var(--wrong-bg);
+  }
+  .option.show-wrong .letter{
+    color:var(--wrong);
+  }
+  .option.disabled{
+    cursor:default;
+  }
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+    gap:10px;
+  }
+  button{
+    font-family:inherit;
+    font-size:0.95rem;
+    font-weight:600;
+    padding:12px 22px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-primary{
+    background: var(--accent);
+    color:#fff;
+  }
+  .btn-primary:hover{ background: var(--accent-hover); }
+  .btn-secondary{
+    background:#eee;
+    color:#333;
+  }
+  .btn-secondary:hover{ background:#ddd; }
+  button:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+  }
+  .feedback-banner{
+    margin-top:8px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:0.95rem;
+    line-height:1.5;
+  }
+  .feedback-correct{
+    background:var(--correct-bg);
+    color:var(--correct);
+  }
+  .feedback-wrong{
+    background:var(--wrong-bg);
+    color:var(--wrong);
+  }
+  .jump-hint{
+    font-size:0.8rem;
+    color:var(--muted);
+    text-align:center;
+    margin-top:10px;
+  }
+  /* Results screen */
+  .results-summary{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .results-score{
+    font-size:2.6rem;
+    font-weight:800;
+    color:var(--accent);
+    margin:6px 0;
+  }
+  .results-percent{
+    font-size:1.1rem;
+    color:var(--muted);
+    margin-bottom:14px;
+  }
+  .review-item{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .review-item.correct{ border-left:5px solid var(--correct); }
+  .review-item.incorrect{ border-left:5px solid var(--wrong); }
+  .review-q{
+    font-weight:600;
+    margin-bottom:8px;
+    line-height:1.5;
+  }
+  .review-line{
+    font-size:0.92rem;
+    margin:3px 0;
+    line-height:1.5;
+  }
+  .review-line.your-correct{ color:var(--correct); }
+  .review-line.your-wrong{ color:var(--wrong); }
+  .review-line.answer{ color:var(--correct); }
+  .review-line.unanswered{ color:var(--muted); font-style:italic; }
+  .tag{
+    display:inline-block;
+    font-size:0.75rem;
+    font-weight:700;
+    padding:2px 10px;
+    border-radius:20px;
+    margin-bottom:8px;
+  }
+  .tag.correct{ background:var(--correct-bg); color:var(--correct); }
+  .tag.incorrect{ background:var(--wrong-bg); color:var(--wrong); }
+  #review-container{
+    max-height:520px;
+    overflow-y:auto;
+    margin-top:10px;
+    padding-right:4px;
+  }
+  .hidden{ display:none !important; }
+  .footer-note{
+    text-align:center;
+    color:#fff;
+    opacity:0.7;
+    font-size:0.75rem;
+    margin-top:16px;
+  }
+  @media (max-width:480px){
+    .card{ padding:16px; border-radius:12px; }
+    .question-text{ font-size:1.05rem; }
+    .results-score{ font-size:2.1rem; }
+    button{ padding:11px 16px; font-size:0.9rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>7ஆம் வகுப்பு - தமிழ் பருவம் 3 - இயல் 3</h1>
+    <p>வினா விடைகள் - ஊடாடும் வினாடி வினா</p>
+  </div>
+
+  <div class="card" id="quiz-card">
+    <div class="progress-wrap">
+      <div class="progress-text">
+        <span id="progress-label">வினா 1 / 100</span>
+        <span id="score-live">மதிப்பெண்: 0</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width:1%;"></div>
+      </div>
+    </div>
+
+    <div class="question-text" id="question-text"></div>
+    <div class="options" id="options-container"></div>
+
+    <div class="nav-row">
+      <button class="btn-secondary" id="prev-btn">⟵ முந்தையது</button>
+      <button class="btn-primary" id="next-btn">அடுத்தது ⟶</button>
+    </div>
+    <div class="jump-hint">ஒரு விடையைத் தேர்ந்தெடுத்தவுடன் அது சரியா தவறா எனத் தெரியும். பின் அடுத்த வினாவிற்குச் செல்லவும்.</div>
+  </div>
+
+  <div class="card hidden" id="results-card">
+    <div class="results-summary">
+      <div style="font-size:1.1rem;color:var(--muted);">உங்கள் முடிவு</div>
+      <div class="results-score" id="final-score">0 / 100</div>
+      <div class="results-percent" id="final-percent">0%</div>
+      <button class="btn-primary" id="restart-btn">🔄 மீண்டும் தொடங்கு (Restart Quiz)</button>
+    </div>
+    <div id="review-container"></div>
+  </div>
+
+  <div class="footer-note">Vagai Sudar — 7th தமிழ் பருவம் 3 இயல் 3 வினா விடைகள் (100 வினாக்கள்)</div>
+</div>
+
+<script>
+// ============ QUESTION DATA ============
+// Extracted verbatim from the uploaded PDF. Every question has an explicit
+// correct answer as marked in the source ("சரியான விடை"), so none required
+// flagging as ambiguous/unmarked.
+const QUESTIONS = [
+{q:"'மலைப்பொழிவு' என்னும் பாடப்பகுதி எந்த நூலிலிருந்து எடுக்கப்பட்டுள்ளது?",o:["இயேசு காவியம்","தேம்பாவணி","சீறாப்புராணம்","ரட்சணிய யாத்திரிகம்"],c:0},
+{q:"இயேசு காவியம் என்னும் நூலை எழுதியவர் யார்?",o:["உமறுப்புலவர்","வீரமாமுனிவர்","கண்ணதாசன்","எச்.ஏ. கிருட்டிணனார்"],c:2},
+{q:"உலகம் எதனால் நிலைதடுமாறுகிறது என்று கண்ணதாசன் குறிப்பிடுகிறார்?",o:["வறுமையாலும் நோயாலும்","சாதிகளாலும் பேதங்களாலும்","மலையாலும் புயலாலும்","போர்களாலும் பஞ்சத்தாலும்"],c:1},
+{q:"'பேதங்கள்' என்னும் சொல்லின் பொருள் என்ன?",o:["உயர்வு","அறம்","வேறுபாடுகள்","கருணை"],c:2},
+{q:"'உன்னதம்' என்னும் சொல்லின் பொருள் என்ன?",o:["உயர்வு","அறம்","வேறுபாடுகள்","கருணை"],c:0},
+{q:"'இரக்கம்' என்னும் சொல்லின் பொருள் என்ன?",o:["அறம்","கருணை","உயர்வு","வேறுபாடு"],c:1},
+{q:"'தர்மம்' என்னும் சொல்லின் பொருள் என்ன?",o:["அறம்","கருணை","உயர்வு","வேறுபாடு"],c:0},
+{q:"எந்த ஒன்றை நம்பிய பிறகு சண்டைகள் நீங்கி உலகம் அடங்கிவிடும் என்று இயேசுநாதர் கூறுகிறார்?",o:["அன்பு","அறம் (தர்மம்)","செல்வம்","கல்வி"],c:1},
+{q:"பொருள் ஈட்டுவதிலும் எந்த வழியைப் பின்பற்ற வேண்டும் என்று 'மலைப்பொழிவு' பாடல் கூறுகிறது?",o:["குறுக்கு வழி","அறவழி","விரைவான வழி","பொருள்வழி"],c:1},
+{q:"எவ்விதமான வாழ்வை இவ்வுலகம் பெற வேண்டும் என இயேசுநாதர் கூறுகிறார்?",o:["ஏற்றத்தாழ்வு இல்லா வாழ்வு","செல்வம் மிகுந்த வாழ்வு","துன்பம் நிறைந்த வாழ்வு","தனிமையான வாழ்வு"],c:0},
+{q:"யாருக்கு இறைவனின் இரக்கம் பரிசாகக் கிடைக்கும் என்று இயேசுநாதர் கூறுகிறார்?",o:["செல்வம் உடையோருக்கு","கல்வி கற்றோருக்கு","இரக்கம் உடையோருக்கு (பிற உயிர்களின் மீது இரக்கம் காட்டுவோருக்கு)","வலிமை உடையோருக்கு"],c:2},
+{q:"மனிதன் எதில் விழுந்துவிட்டால் அவனது வாழ்க்கை பாலைவனம் போல் பயனற்றதாகிவிடும்?",o:["நதியில்","ஆசையில்","சினத்தில்","அறியாமையில்"],c:1},
+{q:"நல்ல உள்ளத்தோடு வாழ்ந்தால் மனிதனின் வாழ்க்கை எவ்வாறு மாறிவிடும்?",o:["பாலைவனம்","கடல்","மலர்ச்சோலை (சோலைவனம்)","வானம்"],c:2},
+{q:"மனிதர்கள் எதனால் தாமும் துன்புற்றுப் பிறரையும் துன்புறுத்துகின்றனர்?",o:["அறியாமையால்","சண்டை சச்சரவுகளால்","வறுமையால்","நோயால்"],c:1},
+{q:"மனிதர்கள் எத்தகைய பொய்யுறவுகளாக வாழ்கின்றனர் என்று கண்ணதாசன் குறிப்பிடுகிறார்?",o:["ஏழை என்றும் பணக்காரன் என்றும் பேசி","தன்னாடு என்றும் பிறர்நாடு என்றும் பேசி","உயர்ந்தவர் என்றும் தாழ்ந்தவர் என்றும் பேசி","தெரிந்தவர் என்றும் தெரியாதவர் என்றும் பேசி"],c:1},
+{q:"எத்தனை போட்டிகளால் பயனற்ற கனவுகள்தாம் தோன்றுகின்றன என்று பாடல் கூறுகிறது?",o:["நூறு போட்டிகள்","ஆயிரம் போட்டிகள்","பத்தாயிரம் போட்டிகள்","பல போட்டிகள்"],c:1},
+{q:"போட்டிகள் இல்லாமல் அமைதியாக வாழ்ந்தால் இதயம் எந்த அளவுக்கு உயர்ந்ததாக மாறும்?",o:["வானளவு","கடலளவு","மலையளவு","உலகளவு"],c:2},
+{q:"கண்ணதாசனின் இயற்பெயர் என்ன?",o:["முத்தையா","மாணிக்கம்","சுப்புரத்தினம்","ராசகோபாலன்"],c:0},
+{q:"கண்ணதாசன் எந்தச் சிறப்புப்பெயரால் அழைக்கப்படுகிறார்?",o:["கவிமணி","கவியரசு","கவிக்கோ","கவிப்பேரரசு"],c:1},
+{q:"கண்ணதாசன் எந்த மாநிலத்தின் அரசவைக்கவிஞராக இருந்துள்ளார்?",o:["கேரளா","ஆந்திரா","கர்நாடகா","தமிழகம்"],c:3},
+{q:"இயேசுவின் வாழ்க்கை வரலாற்றையும் அவரது அறிவுரைகளையும் கூறும் நூல் எது?",o:["திருவிவிலியம்","இயேசுகாவியம்","இரட்சணிய யாத்திரிகம்","தேம்பாவணி"],c:1},
+{q:"'இமைக்கும் போதில்' என்னும் தொடர் குறிப்பிடுவது எக்காலத்தை?",o:["தூங்கும் காலம்","விழித்திருக்கும் காலம்","குறுகிய காலம்","நீண்ட காலம்"],c:2},
+{q:"'மலையளவு' என்னும் சொல்லைப் பிரித்து எழுதக்கிடைப்பது எது?",o:["மலை + களவு","மலை + அளவு","மலையின் + அளவு","மலையில் + அளவு"],c:1},
+{q:"'தன்னாடு' என்னும் சொல்லைப் பிரித்து எழுதக்கிடைப்பது எது?",o:["தன் + னாடு","தன்மை + னாடு","தன் + நாடு","தன்மை + நாடு"],c:2},
+{q:"இவை + இல்லாது என்பதனைச் சேர்த்தெழுதக்கிடைக்கும் சொல் எது?",o:["இவையில்லாது","இவைஇல்லாது","இவயில்லாது","இவஇல்லாது"],c:0},
+{q:"'மலைப்பொழிவு' பாடலில் 'உலகம்' என்பதற்கு இணையாக அமைந்துள்ள சொல் எது?",o:["அறம்","ஜகம்","நிலம்","வனம்"],c:1},
+{q:"'பாலைவனம்' என்னும் சொல்லுக்கு முரணாக மலைப்பொழிவு பாடலில் அமைந்துள்ள சொல் எது?",o:["மலர்ச்சோலை","சோலைவனம்","காடு","நந்தவனம்"],c:1},
+{q:"'தன்னை அறிதல்' என்னும் கவிதையின் ஆசிரியர் யார்?",o:["ஜெ. பிருந்தா","ராஜம் கிருஷ்ணன்","உமா மகேஸ்வரி","சல்மா"],c:0},
+{q:"குயில் எதன் கூட்டில் முட்டையிடுகிறது எனப் பாடல் குறிப்பிடுகிறது?",o:["கிளி","மயில்","காக்கை","புறா"],c:2},
+{q:"முட்டையிலிருந்து வெளிவந்த குயில் குஞ்சு தன்னைக் காக்கைக் குஞ்சாக எண்ணி எவ்வாறு அழைக்க முயற்சி செய்தது?",o:["கூ கூ","கா","கீ கீ","கி கி"],c:1},
+{q:"குயில் குஞ்சிற்கு எது கட்டத் தெரியாது எனப் பாடல் கூறுகிறது?",o:["வலை","கூடு","மரம்","வீடு"],c:1},
+{q:"ஒரு விடியலில் குயில் குஞ்சு எவ்வாறு கூவியது?",o:["கா","கூ","குக்கு","கிரீச்"],c:1},
+{q:"ஜெ. பிருந்தா எழுதிய கவிதை நூல்களில் பொருந்தாதது எது?",o:["மலை பற்றிய பகிர்தல்கள்","வீடு முழுக்க வானம்","மகளுக்குச் சொன்ன கதை","இயேசுகாவியம்"],c:3},
+{q:"'தன்னை அறிதல்' என்னும் கவிதை எந்த நூலிலிருந்து எடுத்துத் தரப்பட்டுள்ளது?",o:["வீடு முழுக்க வானம்","மகளுக்குச் சொன்ன கதை","மலை பற்றிய பகிர்தல்கள்","இயேசுகாவியம்"],c:1},
+{q:"கூடு கட்டத் தெரியாத பறவை எது?",o:["காக்கை","குயில்","சிட்டுக்குருவி","தூக்கணாங்குருவி"],c:1},
+{q:"'தானொரு' என்னும் சொல்லைப் பிரித்து எழுதக்கிடைப்பது எது?",o:["தா + ஒரு","தான் + னொரு","தான் + ஒரு","தானே + ஒரு"],c:2},
+{q:"காந்தியடிகள் எந்த இயக்கத்தை அறிவித்து அதில் இளைஞர்கள் திரளாகக் கலந்து கொள்ளவேண்டும் என்று வேண்டுகோள் விடுத்தார்?",o:["வெள்ளையனே வெளியேறு இயக்கம்","ஒத்துழையாமை இயக்கம்","உப்பு சத்தியாகிரகம்","சுதேசி இயக்கம்"],c:1},
+{q:"ஒத்துழையாமை இயக்கப் போராட்டத்தின் போது காயித்தே மில்லத் எந்தக் கல்லூரியில் பயின்று கொண்டிருந்தார்?",o:["சென்னை மாநிலக் கல்லூரி","திருச்சி தூயவளனார் கல்லூரி","மதுரை அமெரிக்கன் கல்லூரி","திருநெல்வேலி ம.தி.தா. இந்துக் கல்லூரி"],c:1},
+{q:"காயித்தே மில்லத் பொது நிகழ்ச்சிகளில் கலந்து கொள்வதற்கு எத்தகைய ஊர்திகளையே பயன்படுத்துவார்?",o:["சொந்த மகிழுந்து","தொடர்வண்டி, பேருந்து போன்ற பொதுப் போக்குவரத்து","விமானம்","குதிரை வண்டி"],c:1},
+{q:"காயித்தே மில்லத்தனக்குப் பரிசளிக்கப்பட்ட மகிழுந்தையும் பேருந்தொகையையும் எதற்காக அளித்துவிட்டார்?",o:["தான் தொடங்கி வைத்த கல்லூரியின் மேன்பாட்டிற்கு","விடுதலைப் போராட்டத்திற்கு","ஏழை எளிய மக்களின் நல்வாழ்விற்கு","மருத்துவமனை கட்ட"],c:0},
+{q:"காயித்தே மில்லத் தம் ஒரே மகனுக்கு எவ்வித ஆடம்பரமும் இல்லாமல் எளிமையாகத் திருமணம் நடத்தினார். அத்திருமணத்தில் அவர் எதனைப் பெற மறுத்தார்?",o:["ஆடம்பரப் பரிசுகள்","மணக்கொடை","தங்க நகைகள்","நிலம்"],c:1},
+{q:"\"மணக்கொடை வாங்கும் திருமணங்களில் கலந்து கொள்ள மாட்டேன்\" என்று வெளிப்படையாக அறிவித்த தலைவர் யார்?",o:["காமராசர்","அண்ணா","காயித்தே மில்லத்","பெரியார்"],c:2},
+{q:"தனிப்பட்ட முறையில் அனுப்பும் கடிதத்திற்கு இயக்கப்பணத்தில் இருந்து வாங்கப்பட்ட அஞ்சல் தலைகளைப் பயன்படுத்துவது முறையாகாது என்று கூறிய தலைவர் யார்?",o:["காந்தியடிகள்","நேரு","காயித்தே மில்லத்","அண்ணா"],c:2},
+{q:"இந்தியா விடுதலை பெற்ற பிறகு அரசியல் நிர்ணய சபைக்கூட்டத்தில் எந்த மொழி குறித்த விவாதம் நடைபெற்றது?",o:["தொடர்பு மொழி","ஆட்சிமொழி","கல்வி மொழி","நீதி மன்ற மொழி"],c:1},
+{q:"\"பழமையான மொழிகளிலே ஒன்றைத்தான் ஆட்சிமொழி ஆக்க வேண்டும் என்றால், அது தமிழ்மொழிதான் என்று நான் உறுதியாகச் சொல்வேன்\" என்று கூறியவர் யார்?",o:["அண்ணா","காயித்தே மில்லத்","காமராசர்","பெரியார்"],c:1},
+{q:"காயித்தே மில்லத்தின் கூற்றுப்படி திராவிட மொழிகளுள் முதன்முதலாகப் பேசப்பட்ட மொழிகள் மற்றும் மிகவும் இலக்கியச் செறிவு கொண்ட மிகப் பழமையான மொழி எது?",o:["தெலுங்கு","மலையாளம்","தமிழ்மொழி","கன்னடம்"],c:2},
+{q:"இந்தியாவுக்கும் சீனாவுக்கும் இடையே எந்த ஆண்டு போர் மூண்டது?",o:["1947","1962","1965","1971"],c:1},
+{q:"சீனப் போரின் போது தனது ஒரே மகனைப் போர் முனைக்கு அனுப்ப ஆயத்தமாக இருப்பதாகத் தெரிவித்து காயித்தே மில்லத்தாருக்குக் கடிதம் எழுதினார்?",o:["காந்தியடிகள்","சர்தார் வல்லபாய் படேல்","லால் பகதூர் சாஸ்திரி","ஜவகர்லால் நேரு"],c:3},
+{q:"காயித்தே மில்லத்தின் இயற்பெயர் என்ன?",o:["முகம்மது இசுமாயில்","முகம்மது அலி","அபுல் கலாம்","ஜாகிர் உசேன்"],c:0},
+{q:"'காயித்தே மில்லத்' என்னும் அரபுச் சொல்லுக்கு என்ன பொருள்?",o:["தேசத்தந்தை","சமுதாய வழிகாட்டி","அமைதி விரும்பி","விடுதலைப் போராட்ட வீரர்"],c:1},
+{q:"\"தமிழக அரசியல் வானில் கவ்வியிருந்த காரிருளை அகற்ற வந்த ஒளிக்கதிராகக் காயித்தே மில்லத் முகமது இஸ்மாயில் அவர்கள் திகழ்கிறார்\" என்று கூறியவர் யார்?",o:["தந்தை பெரியார்","அறிஞர் அண்ணா","மு. கருணாநிதி","காமராசர்"],c:1},
+{q:"\"இப்படிப்பட்ட தலைவர் கிடைப்பது அரிது. அவர் நல்ல உத்தமமான மனிதர்\" என்று காயித்தே மில்லத்தை பாராட்டியவர் யார்?",o:["அறிஞர் அண்ணா","காமராசர்","தந்தை பெரியார்","ஜவகர்லால் நேரு"],c:2},
+{q:"காயித்தே மில்லத் எந்த ஆண்டுகள் வரை அப்போதைய சென்னை மாகாணச் சட்டமன்ற உறுப்பினராக இருந்து செயல்பட்டார்?",o:["1942 முதல் 1947 வரை","1946 முதல் 1952 வரை","1952 முதல் 1957 வரை","1962 முதல் 1967 வரை"],c:1},
+{q:"காயித்தே மில்லத் திருச்சியில் எந்தக் கல்லூரியைத் தொடங்கக் காரணமாக இருந்தார்?",o:["ஃபரூக் கல்லூரி","ஜமால் முகம்மது கல்லூரி","தூயவளனார் கல்லூரி","தேசியக் கல்லூரி"],c:1},
+{q:"காயித்தே மில்லத் கேரளாவில் எந்தக் கல்லூரியைத் தொடங்கக் காரணமாக இருந்தார்?",o:["ஜமால் முகம்மது கல்லூரி","ஃபரூக் கல்லூரி","தூயவளனார் கல்லூரி","அரசு கலைக் கல்லூரி"],c:1},
+{q:"காயித்தே மில்லத் நாடாளுமன்றத்தில் எந்த வளங்களைப் பற்றி எடுத்துரைத்தார்?",o:["நீர்வளங்கள்","கனிம வளங்கள்","வன வளங்கள்","மனித வளங்கள்"],c:1},
+{q:"காயித்தே மில்லத் ___________ பண்பிற்கு உதாரணமாகத் திகழ்ந்தார்.",o:["தண்மை","எளிமை","ஆடம்பரம்","பெருமை"],c:1},
+{q:"'காயித்தே மில்லத்' என்பது எந்த மொழிச்சொல்?",o:["பாரசீகம்","உருது","அரபு","இந்தி"],c:2},
+{q:"'எதிரொலித்தது' என்னும் சொல்லைப் பிரித்து எழுதக்கிடைப்பது எது?",o:["எதிர் + ரொலித்தது","எதில் + ஒலித்தது","எதிர் + ஒலித்தது","எதி + ரொலித்தது"],c:2},
+{q:"முதுமை + மொழி என்பதனைச் சேர்த்தெழுதக்கிடைக்கும் சொல் எது?",o:["முதுமொழி","முதுமைமொழி","முதிரமொழி","முதல் மொழி"],c:0},
+{q:"'கயமை' என்னும் சிறுகதையை எழுதியவர் யார்?",o:["ஜெயகாந்தன்","பாவண்ணன்","புதுமைப்பித்தன்","சுஜாதா"],c:1},
+{q:"'கயமை' சிறுகதையில் வரும் கதைசொல்லி எதன் வழியாக மங்களூரு செல்ல நீண்ட கால ஆசை கொண்டிருந்தார்?",o:["மைசூரு","பெங்களூரு","ஹாசன்","சக்லேஷ்பூர்"],c:2},
+{q:"கதைசொல்லி தனது மூன்றாவது சம்பளத்தில் என்ன வாங்கினார்?",o:["மோட்டார்சைக்கிள்","மிதிவண்டி","மகிழுந்து","கடிகாரம்"],c:1},
+{q:"'கயமை' கதையில் வரும் சிறுவன் எந்த ஊரில் மிதிவண்டி ஓட்டக் கற்றுக்கொண்டதாகக் கூறினான்?",o:["ஹாசன்","பெங்களூரு","சக்லேஷ்பூர்","அரிசிக்கேரை"],c:3},
+{q:"மிதிவண்டிக் கடை வைத்திருந்தவரின் பெயர் என்ன?",o:["சந்திரே கௌடா","முனிகாண்டி","ராமன்","கிருஷ்ணப்ப கௌடா"],c:0},
+{q:"பாவண்ணன் எந்த மொழியிலிருந்து பல நூல்களைத் தமிழில் மொழிபெயர்த்துள்ளார்?",o:["தெலுங்கு","மலையாளம்","கன்னடம்","ஆங்கிலம்"],c:2},
+{q:"'வேர்கள் தொலைவில் இருக்கின்றன' என்ற நூலை எழுதியவர் யார்?",o:["பாவண்ணன்","கண்ணதாசன்","ஜெயகாந்தன்","சுந்தர ராமசாமி"],c:0},
+{q:"கீழ்க்கண்டவற்றுள் பாவண்ணன் எழுதிய நூல் எது?",o:["நேற்று வாழ்ந்தவர்கள்","கடலோர வீடு","பாக்மரக்கப்பல்","இவை அனைத்தும்"],c:3},
+{q:"'மீசைக்கார பூனை' என்ற நூலை எழுதியவர் யார்?",o:["பாரதியார்","பாவண்ணன்","பாரதிதாசன்","நாஞ்சில் நாடன்"],c:1},
+{q:"'கயமை' என்னும் சிறுகதை எந்த நூலில் இடம் பெற்றுள்ளது?",o:["பாக்மரக்கப்பல்","கடலோர வீடு","பிரகாணம்","நேற்று வாழ்ந்தவர்கள்"],c:2},
+{q:"வினா எத்தனை வகைப்படும்?",o:["4","5","6","8"],c:2},
+{q:"தான் விடை அறிந்திருந்தும், அவ்விடை பிறருக்குத் தெரியுமா என்பதை அறியும் பொருட்டுக் கேட்பது எவ்வகை வினா?",o:["அறிவினா","அறியா வினா","ஐய வினா","கொள்ளல் வினா"],c:0},
+{q:"மாணவரிடம், 'இந்தக் கவிதையின் பொருள் காது?' என்று ஆசிரியர் கேட்பது எவ்வகை வினா?",o:["அறியா வினா","அறிவினா","கொள்ளல்வினா","ஏவல்வினா"],c:1},
+{q:"தான் அறியாத ஒன்றை அறிந்து கொள்வதற்காகக் கேட்பது எவ்வகை வினா?",o:["ஐய வினா","அறியா வினா","அறிவினா","கொடை வினா"],c:1},
+{q:"ஆசிரியரிடம், 'இந்தக் கவிதையின் பொருள் காது?' என்று மாணவர் கேட்பது எவ்வகை வினா?",o:["அறிவினா","அறியா வினா","ஐய வினா","கொள்ளல் வினா"],c:1},
+{q:"ஐயம் நீங்கித் தெளிவு பெறுவதற்காகக் கேட்கப்படுவது எவ்வகை வினா?",o:["அறியா வினா","ஐய வினா","கொள்ளல்வினா","கொடை வினா"],c:1},
+{q:"'இச்செயலைச் செய்தது மங்கையா? மணிமேகலையா?' எனக் கேட்பது எவ்வகை வினா?",o:["ஐய வினா","அறியா வினா","அறிவினா","ஏவல்வினா"],c:0},
+{q:"தான் ஒரு பொருளை வாங்கிக்கொள்ளும் பொருட்டுக் கேட்பது எவ்வகை வினா?",o:["கொடை வினா","ஏவல் வினா","கொள்ளல்வினா","அறியா வினா"],c:2},
+{q:"'ஜெயகாந்தன் சிறுகதைகள் இருக்கிறதா?' என்று நூலகரிடம் கேட்பது எவ்வகை வினா?",o:["கொடை வினா","கொள்ளல்வினா","ஐய வினா","அறிவினா"],c:1},
+{q:"பிறருக்கு ஒரு பொருளைக் கொடுத்து உதவும் பொருட்டுக் கேட்பது எவ்வகை வினா?",o:["கொள்ளல்வினா","கொடை வினா","ஏவல் வினா","ஐய வினா"],c:1},
+{q:"'என்னிடம் பாரதிதாசன் கவிதைகள் இரண்டு படிகள் உள்ளன. உன்னிடம் பாரதிதாசன் கவிதைகள் இருக்கிறதா?' என்று கேட்பது எவ்வகை வினா?",o:["கொடை வினா","கொள்ளல்வினா","அறிவினா","அறியா வினா"],c:0},
+{q:"ஒரு செயலைச் செய்யுமாறு ஏவுதற் பொருட்டுக் கேட்பது எவ்வகை வினா?",o:["கொடை வினா","ஏவல் வினா","கொள்ளல்வினா","ஐய வினா"],c:1},
+{q:"\"வீட்டில் தக்காளி இல்லை. நீ கடைக்குச் செல்கிறாயா?\" என்று அம்மா, தம்பியிடம் கேட்டு வேலையைச் சொல்லுதல் எவ்வகை வினா?",o:["கொள்ளல்வினா","கொடை வினா","ஏவல் வினா","அறியா வினா"],c:2},
+{q:"விடை எத்தனை வகைப்படும்?",o:["4","6","8","10"],c:2},
+{q:"வெளிப்படை விடைகள் என அழைக்கப்படுபவை எத்தனை?",o:["2","3","4","5"],c:1},
+{q:"'கடைத்தெரு எங்குள்ளது?' என்ற வினாவிற்கு, 'இந்தப் பக்கம் உள்ளது' எனக் கூறுவது எவ்வகை விடை?",o:["நேர்விடை","சுட்டு விடை","மறை விடை","இனமொழி விடை"],c:1},
+{q:"'கடைக்குப் போவாயா?' என்ற கேள்விக்குப் 'போகமாட்டேன்' என மறுத்துக் கூறுவது எவ்வகை விடை?",o:["மறை விடை","நேர்விடை","ஏவல் விடை","உற்றது உரைத்தல் விடை"],c:0},
+{q:"'கடைக்குப் போவாயா?' என்ற கேள்விக்குப் 'போவேன்' என்று உடன்பட்டுக் கூறுவது எவ்வகை விடை?",o:["மறை விடை","நேர்விடை","ஏவல் விடை","உறுவது கூறல் விடை"],c:1},
+{q:"\"இது செய்வாயா?\" என்று கேட்டால், \"நீயே செய்\" என்று ஏவிக் கூறுவது எவ்வகை விடை?",o:["நேர்விடை","சுட்டு விடை","ஏவல் விடை","மறை விடை"],c:2},
+{q:"'என்னுடன் ஊருக்கு வருவாயா?' என்ற வினாவிற்கு 'வராமல் இருப்பேனா?' என்று கேட்பது எவ்வகை விடை?",o:["வினா எதிர்வினாதல் விடை","உற்றது உரைத்தல் விடை","உறுவது கூறல் விடை","இனமொழி விடை"],c:0},
+{q:"நீ 'விளையாடவில்லையா?' என்ற வினாவிற்குக் 'கால் வலிக்கிறது' என்று நேர்ந்ததைக் கூறுவது எவ்வகை விடை?",o:["உற்றது உரைத்தல் விடை","உறுவது கூறல் விடை","ஏவல் விடை","நேர்விடை"],c:0},
+{q:"நீ 'விளையாடவில்லையா?' என்ற வினாவிற்குக் கால் 'வலிக்கும்' என்று இனிமேல் நேரப்போவதைக் கூறுவது எவ்வகை விடை?",o:["உற்றது உரைத்தல் விடை","உறுவது கூறல் விடை","இனமொழி விடை","வினா எதிர்வினாதல் விடை"],c:1},
+{q:"\"உனக்குக் கதை எழுதத் தெரியுமா?\" என்ற வினாவிற்கு \"கட்டுரை எழுதத் தெரியும்\" என்று இணையான மற்றொன்றைக் கூறுவது எவ்வகை விடை?",o:["உறுவது கூறல் விடை","உற்றது உரைத்தல் விடை","இனமொழி விடை","சுட்டு விடை"],c:2},
+{q:"எண்பொணக் உள்ள இடத்தில் ஏற்பட்ட தீயை அணைக்க எதைப் பயன்படுத்தக் கூடாது?",o:["நுரைப்பான்","உலர் இரசாயனப்பொடி","தண்ணீர்","மணல்"],c:2},
+{q:"தீக்காயம் பட்ட இடத்தில் உடனடியாக எதைக் கொண்டு குளிர வைக்க வேண்டும்?",o:["தண்ணீர்","எண்பொணக்","பென்யாலம்","பனிக்கட்டி"],c:0},
+{q:"உடுத்தியிருக்கும் ஆடையில் தீப்பிடித்தால் உடனே என்ன செய்ய வேண்டும்?",o:["ஓட வேண்டும்","தரையில் படுத்து உருள வேண்டும்","காற்று வரும் திசையில் நிற்க வேண்டும்","வேகமாக மூச்சு விட வேண்டும்"],c:1},
+{q:"'Philosophy' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["சமயம்","தத்துவம்","கொள்கை","நேர்மை"],c:1},
+{q:"'Charity' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["ஈகை","எளிமை","கண்ணியம்","நேர்மை"],c:0},
+{q:"'Sincerity' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["ஈகை","நேர்மை","வாய்மை","எளிமை"],c:2},
+{q:"'Astronomy' என்ற ஆங்கிலச் சொல்லுக்கு இணையான தமிழ்ச் சொல் எது?",o:["கொள்கை","தத்துவம்","சமயம்","வானியல்"],c:3}
+];
+
+const OPTION_LETTERS = ['A','B','C','D'];
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null); // stores selected index or null
+
+const questionText = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+const progressLabel = document.getElementById('progress-label');
+const scoreLive = document.getElementById('score-live');
+const progressFill = document.getElementById('progress-fill');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const quizCard = document.getElementById('quiz-card');
+const resultsCard = document.getElementById('results-card');
+const finalScore = document.getElementById('final-score');
+const finalPercent = document.getElementById('final-percent');
+const reviewContainer = document.getElementById('review-container');
+const restartBtn = document.getElementById('restart-btn');
+
+function liveScore(){
+  let s = 0;
+  answers.forEach((a,i)=>{ if(a !== null && a === QUESTIONS[i].c) s++; });
+  return s;
+}
+
+function renderQuestion(){
+  const item = QUESTIONS[current];
+  const answered = answers[current] !== null;
+
+  questionText.textContent = (current+1) + ". " + item.q;
+  optionsContainer.innerHTML = '';
+
+  item.o.forEach((optText, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'option';
+
+    if(answered){
+      div.classList.add('disabled');
+      if(idx === item.c){
+        // always reveal the correct answer once the question is answered
+        div.classList.add('show-correct');
+      }
+      if(idx === answers[current] && idx !== item.c){
+        div.classList.add('show-wrong');
+      }
+    }
+
+    div.innerHTML = '<span class="letter">' + OPTION_LETTERS[idx] + '.</span><span>' + optText + '</span>';
+    if(!answered){
+      div.addEventListener('click', ()=> selectOption(idx));
+    }
+    optionsContainer.appendChild(div);
+  });
+
+  // instant feedback banner
+  let feedback = document.getElementById('feedback-banner');
+  if(feedback) feedback.remove();
+  if(answered){
+    feedback = document.createElement('div');
+    feedback.id = 'feedback-banner';
+    const isCorrect = answers[current] === item.c;
+    feedback.className = 'feedback-banner ' + (isCorrect ? 'feedback-correct' : 'feedback-wrong');
+    feedback.textContent = isCorrect ? '✔ சரியான விடை!' : ('✘ தவறு. சரியான விடை: ' + OPTION_LETTERS[item.c] + '. ' + item.o[item.c]);
+    optionsContainer.appendChild(feedback);
+  }
+
+  progressLabel.textContent = 'வினா ' + (current+1) + ' / ' + QUESTIONS.length;
+  scoreLive.textContent = 'மதிப்பெண்: ' + liveScore();
+  progressFill.style.width = (((current+1)/QUESTIONS.length)*100) + '%';
+
+  prevBtn.disabled = current === 0;
+  nextBtn.textContent = (current === QUESTIONS.length - 1) ? 'முடிவுகளைக் காட்டு ✔' : 'அடுத்தது ⟶';
+}
+
+function selectOption(idx){
+  if(answers[current] !== null) return; // already answered, locked
+  answers[current] = idx;
+  renderQuestion();
+}
+
+prevBtn.addEventListener('click', ()=>{
+  if(current > 0){ current--; renderQuestion(); }
+});
+
+nextBtn.addEventListener('click', ()=>{
+  if(current < QUESTIONS.length - 1){
+    current++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults(){
+  quizCard.classList.add('hidden');
+  resultsCard.classList.remove('hidden');
+
+  const score = liveScore();
+  const total = QUESTIONS.length;
+  const pct = Math.round((score/total)*100);
+
+  finalScore.textContent = score + ' / ' + total;
+  finalPercent.textContent = pct + '%' + (pct >= 50 ? ' — நன்று!' : ' — மேலும் பயிற்சி தேவை');
+
+  reviewContainer.innerHTML = '';
+  QUESTIONS.forEach((item, i)=>{
+    const userAns = answers[i];
+    const isCorrect = userAns === item.c;
+    const wrap = document.createElement('div');
+    wrap.className = 'review-item ' + (isCorrect ? 'correct' : 'incorrect');
+
+    const tag = document.createElement('div');
+    tag.className = 'tag ' + (isCorrect ? 'correct' : 'incorrect');
+    tag.textContent = isCorrect ? 'சரி' : (userAns === null ? 'பதிலளிக்கவில்லை' : 'தவறு');
+    wrap.appendChild(tag);
+
+    const qDiv = document.createElement('div');
+    qDiv.className = 'review-q';
+    qDiv.textContent = (i+1) + '. ' + item.q;
+    wrap.appendChild(qDiv);
+
+    if(userAns !== null){
+      const yourLine = document.createElement('div');
+      yourLine.className = 'review-line ' + (isCorrect ? 'your-correct' : 'your-wrong');
+      yourLine.textContent = 'உங்கள் விடை: ' + OPTION_LETTERS[userAns] + '. ' + item.o[userAns];
+      wrap.appendChild(yourLine);
+    } else {
+      const noAns = document.createElement('div');
+      noAns.className = 'review-line unanswered';
+      noAns.textContent = 'நீங்கள் இந்த வினாவிற்குப் பதிலளிக்கவில்லை.';
+      wrap.appendChild(noAns);
+    }
+
+    if(!isCorrect){
+      const correctLine = document.createElement('div');
+      correctLine.className = 'review-line answer';
+      correctLine.textContent = 'சரியான விடை: ' + OPTION_LETTERS[item.c] + '. ' + item.o[item.c];
+      wrap.appendChild(correctLine);
+    }
+
+    reviewContainer.appendChild(wrap);
+  });
+}
+
+restartBtn.addEventListener('click', ()=>{
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  resultsCard.classList.add('hidden');
+  quizCard.classList.remove('hidden');
+  renderQuestion();
+});
+
+// init
+renderQuestion();
+</script>
+</body>
+</html>
