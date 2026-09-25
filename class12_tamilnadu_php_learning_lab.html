@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en" id="root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Class 12 PHP Learning Lab | Tamil Nadu</title>
+<style>
+:root{--p:#2563eb;--pd:#1d4ed8;--s:#7c3aed;--a:#06b6d4;--g:#10b981;--w:#f59e0b;--r:#ef4444;--bg:#f0f9ff;--sf:#fff;--sf2:#f8fafc;--tx:#0f172a;--txm:#64748b;--bd:#e2e8f0;--sh:rgba(0,0,0,.1);--cb:#1e1e2e;--ct:#cdd6f4}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;font-size:15px}
+a{color:var(--p)}
+/* Header */
+.hdr{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;padding:.8rem 1.5rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px var(--sh)}
+.hdr-title h1{font-size:1.1rem;font-weight:700}
+.hdr-title p{font-size:.75rem;opacity:.8}
+.hdr-right{margin-left:auto;display:flex;gap:.7rem;align-items:center}
+.lang-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:.35rem .9rem;border-radius:20px;cursor:pointer;font-size:.8rem}
+.lang-btn:hover{background:rgba(255,255,255,.35)}
+.menu-btn{background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;display:none}
+@media(max-width:768px){.menu-btn{display:block}}
+/* Layout */
+.layout{display:flex;height:calc(100vh - 52px)}
+/* Sidebar */
+.sidebar{width:240px;background:var(--sf);border-right:1px solid var(--bd);overflow-y:auto;flex-shrink:0;transition:transform .3s}
+@media(max-width:768px){.sidebar{position:fixed;top:52px;left:0;height:calc(100vh - 52px);z-index:50;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
+.sov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
+.sov.on{display:block}
+.sb-sec{padding:.8rem 0 .3rem}
+.sb-lbl{padding:.3rem 1rem;font-size:.7rem;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.06em}
+.sb-link{display:flex;align-items:center;padding:.45rem 1rem .45rem 1.3rem;color:var(--tx);text-decoration:none;font-size:.82rem;border-left:3px solid transparent;transition:all .15s;gap:.4rem}
+.sb-link:hover{background:var(--bg);color:var(--p);border-left-color:var(--p)}
+.sb-link.act{background:#eff6ff;color:var(--p);border-left-color:var(--p);font-weight:600}
+.sb-prog{padding:.2rem 1rem .2rem 1.3rem;display:flex;align-items:center;gap:.5rem}
+.pb{flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:var(--g);transition:width .4s}
+.pt{font-size:.65rem;color:var(--txm);min-width:28px;text-align:right}
+/* Main */
+.main{flex:1;overflow-y:auto;padding:1.5rem;scroll-behavior:smooth}
+.sec{display:none}.sec.on{display:block}
+/* Chapter header */
+.ch-hdr{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;padding:1.5rem;border-radius:10px;margin-bottom:1.2rem}
+.ch-hdr .badge{background:rgba(255,255,255,.2);padding:.15rem .7rem;border-radius:20px;font-size:.75rem;margin-bottom:.5rem;display:inline-block}
+.ch-hdr h2{font-size:1.6rem;font-weight:700;color:#fff}
+.ch-hdr p{opacity:.85;margin-top:.3rem;font-size:.9rem}
+/* Cards */
+.card{background:var(--sf);border-radius:10px;padding:1.3rem;margin-bottom:1.2rem;border:1px solid var(--bd);box-shadow:0 1px 3px var(--sh)}
+.card-title{font-size:1rem;font-weight:700;color:var(--p);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+/* Typography */
+h3{font-size:1.1rem;color:var(--p);margin:1rem 0 .4rem}
+h4{font-size:.95rem;color:var(--s);margin:.8rem 0 .3rem}
+p{margin-bottom:.7rem}
+ul,ol{padding-left:1.4rem;margin-bottom:.7rem}
+li{margin-bottom:.25rem}
+strong{color:var(--tx)}
+/* Code */
+.code{background:var(--cb);color:var(--ct);padding:.9rem 1.1rem;border-radius:7px;font-family:'Courier New',monospace;font-size:.85rem;overflow-x:auto;margin:.6rem 0;line-height:1.7;white-space:pre}
+.ck{color:#c792ea}.cs{color:#a5e844}.cv{color:#82aaff}.cn{color:#f78c6c}.cc{color:#6a9955}.co{color:#ffd700}
+/* Inline code */
+code{background:#f1f5f9;color:var(--s);padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.88em}
+/* Info boxes */
+.box{padding:.9rem 1.1rem;border-radius:7px;margin:.7rem 0;border-left:4px solid}
+.box.tip{background:#f0fdf4;border-color:var(--g)}
+.box.note{background:#eff6ff;border-color:var(--p)}
+.box.warn{background:#fffbeb;border-color:var(--w)}
+.box.exam{background:#fdf4ff;border-color:var(--s)}
+.box strong{display:block;margin-bottom:.3rem;font-size:.9rem}
+/* Table */
+table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem}
+th{background:var(--p);color:#fff;padding:.6rem .9rem;text-align:left}
+td{padding:.55rem .9rem;border-bottom:1px solid var(--bd)}
+tr:nth-child(even) td{background:var(--sf2)}
+/* Tabs */
+.tabs{display:flex;gap:.4rem;margin-bottom:.8rem;flex-wrap:wrap}
+.tb{padding:.45rem .9rem;border:2px solid var(--bd);background:var(--sf);border-radius:5px;cursor:pointer;font-size:.82rem;transition:all .15s}
+.tb.on{background:var(--p);color:#fff;border-color:var(--p)}
+.tc{display:none}.tc.on{display:block}
+/* Simulator */
+.sim{border:2px solid var(--p);border-radius:10px;overflow:hidden;margin:.8rem 0}
+.sim-hdr{background:var(--p);color:#fff;padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.sim-hdr span{font-weight:600;font-size:.88rem}
+.sim-btns{display:flex;gap:.4rem}
+.sbtn{padding:.28rem .7rem;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);color:#fff;border-radius:4px;cursor:pointer;font-size:.78rem}
+.sbtn:hover{background:rgba(255,255,255,.3)}
+.sbtn.run{background:var(--g);border-color:var(--g)}
+.sbtn.step{background:var(--w);border-color:var(--w);color:#000}
+.sbtn.reset{background:var(--r);border-color:var(--r)}
+.sim-body{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:600px){.sim-body{grid-template-columns:1fr}}
+.sim-code{background:var(--cb);padding:.9rem;font-family:'Courier New',monospace;font-size:.82rem;color:var(--ct);border-right:1px solid #333;overflow-x:auto}
+.sim-line{display:block;padding:2px 4px;border-radius:2px;cursor:pointer;transition:background .15s}
+.sim-line:hover{background:rgba(255,255,255,.05)}
+.sim-line.cur{background:rgba(255,255,0,.2);border-left:3px solid #ffd700;padding-left:1px}
+.sim-line.done{background:rgba(0,255,0,.07)}
+.sim-panel{padding:.9rem;background:var(--sf2)}
+.sim-panel h5{font-size:.72rem;color:var(--txm);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em}
+.sim-var{display:flex;gap:.4rem;margin-bottom:.25rem;font-size:.82rem;font-family:'Courier New',monospace;background:var(--sf);padding:.25rem .5rem;border-radius:4px;border:1px solid var(--bd)}
+.vn{color:var(--s);font-weight:700}.vv{color:var(--p)}
+.sim-out{background:#111;color:#0f0;padding:.5rem;border-radius:4px;font-family:'Courier New',monospace;font-size:.82rem;min-height:50px;white-space:pre-wrap}
+/* Quiz */
+.quiz-wrap{background:var(--sf);border:2px solid var(--a);border-radius:10px;padding:1.2rem}
+.qnum{background:var(--a);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;margin-right:.4rem;flex-shrink:0}
+.qtext{font-weight:600;margin-bottom:.8rem;display:flex;align-items:flex-start;gap:.3rem}
+.opts{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem}
+.opt{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .9rem;border:2px solid var(--bd);border-radius:7px;cursor:pointer;font-size:.88rem;transition:all .15s}
+.opt:hover{border-color:var(--p);background:#eff6ff}
+.opt.sel{border-color:var(--p);background:#eff6ff}
+.opt.ok{border-color:var(--g);background:#f0fdf4}
+.opt.no{border-color:var(--r);background:#fef2f2}
+.opt input{margin-top:3px;flex-shrink:0}
+.qfb{padding:.7rem .9rem;border-radius:7px;margin-bottom:.8rem;font-size:.88rem;display:none}
+.qfb.ok{background:#f0fdf4;color:#065f46;border:1px solid var(--g)}
+.qfb.no{background:#fef2f2;color:#7f1d1d;border:1px solid var(--r)}
+.qnav{display:flex;justify-content:space-between;align-items:center}
+.btn{padding:.55rem 1.1rem;border:none;border-radius:6px;cursor:pointer;font-size:.88rem;font-weight:500;transition:all .15s}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--pd)}
+.btn-s{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}.btn-s:hover{background:var(--bg)}
+.btn-g{background:var(--g);color:#fff}
+.q-score{text-align:center;padding:1.5rem;display:none}
+.sc{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--a));display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;font-size:1.6rem;font-weight:700;color:#fff}
+/* Memory/Array viz */
+.mem-box{border:2px solid var(--p);border-radius:7px;overflow:hidden;margin:.7rem 0;font-family:'Courier New',monospace}
+.mem-hdr{background:var(--p);color:#fff;padding:.3rem .8rem;font-size:.78rem;font-weight:700}
+.mem-row{display:flex;border-bottom:1px solid var(--bd)}
+.mem-row:last-child{border:none}
+.mc{flex:1;padding:.35rem .7rem;font-size:.82rem;border-right:1px solid var(--bd)}
+.mc:last-child{border:none}
+.mc.lbl{background:var(--sf2);font-weight:700;color:var(--p)}
+.mc.val{color:var(--g)}
+.arr-vis{display:flex;gap:4px;margin:.8rem 0;flex-wrap:wrap}
+.ac{border:2px solid var(--p);border-radius:4px;min-width:52px;text-align:center}
+.ai{background:var(--p);color:#fff;font-size:.68rem;padding:2px}
+.av{padding:.35rem;font-family:'Courier New',monospace;font-size:.82rem;font-weight:700}
+/* Diff badges */
+.diff{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .6rem;border-radius:20px;font-size:.72rem;font-weight:600;margin:.3rem .2rem .3rem 0}
+.d-b{background:#dcfce7;color:#166534}
+.d-p{background:#fef9c3;color:#854d0e}
+.d-c{background:#fee2e2;color:#7f1d1d}
+/* Accordion */
+.acc{margin:.4rem 0}
+.acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:.7rem .9rem;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;cursor:pointer;font-size:.88rem;font-weight:500;transition:all .15s;text-align:left}
+.acc-btn:hover{background:#eff6ff}
+.acc-btn.on{background:var(--p);color:#fff;border-color:var(--p);border-radius:6px 6px 0 0}
+.acc-body{display:none;padding:.9rem;border:1px solid var(--bd);border-top:none;border-radius:0 0 6px 6px;background:var(--sf)}
+.acc-body.on{display:block}
+/* Misc */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.8rem;margin:.8rem 0}
+.stat{text-align:center;background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:.9rem}
+.stat .n{font-size:1.8rem;font-weight:700;color:var(--p)}
+.stat .l{font-size:.72rem;color:var(--txm)}
+[data-lang=ta] .en{display:none!important}
+[data-lang=en] .ta{display:none!important}
+.kw{background:#fff3cd;color:#856404;padding:1px 4px;border-radius:3px;font-family:'Courier New',monospace;font-size:.9em}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <div class="hdr-title">
+    <h1>🐘 PHP Learning Lab</h1>
+    <p class="en">Class 12 Computer Applications — Tamil Nadu</p>
+    <p class="ta">12 ஆம் வகுப்பு கணினி பயன்பாடுகள் — தமிழ்நாடு</p>
+  </div>
+  <div class="hdr-right">
+    <button class="lang-btn" onclick="toggleLang()">🌐 தமிழ் / EN</button>
+  </div>
+</div>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sb-sec">
+    <div class="sb-lbl">Overview</div>
+    <a class="sb-link act" href="#" onclick="showSec('home')">🏠 <span class="en">Home</span><span class="ta">முகப்பு</span></a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-lbl">Chapters</div>
+    <a class="sb-link" href="#" onclick="showSec('ch4')">📘 Ch.4 Intro to PHP</a>
+    <div class="sb-prog"><div class="pb"><div class="pf" id="p4" style="width:0%"></div></div><span class="pt" id="pt4">0%</span></div>
+    <a class="sb-link" href="#" onclick="showSec('ch5')">⚙️ Ch.5 Operators</a>
+    <div class="sb-prog"><div class="pb"><div class="pf" id="p5" style="width:0%"></div></div><span class="pt" id="pt5">0%</span></div>
+    <a class="sb-link" href="#" onclick="showSec('ch6')">🔧 Ch.6 Functions</a>
+    <div class="sb-prog"><div class="pb"><div class="pf" id="p6" style="width:0%"></div></div><span class="pt" id="pt6">0%</span></div>
+    <a class="sb-link" href="#" onclick="showSec('ch7')">📦 Ch.7 Arrays</a>
+    <div class="sb-prog"><div class="pb"><div class="pf" id="p7" style="width:0%"></div></div><span class="pt" id="pt7">0%</span></div>
+    <a class="sb-link" href="#" onclick="showSec('ch8')">🔀 Ch.8 Control Structures</a>
+    <div class="sb-prog"><div class="pb"><div class="pf" id="p8" style="width:0%"></div></div><span class="pt" id="pt8">0%</span></div>
+    <a class="sb-link" href="#" onclick="showSec('ch9')">🌐 Ch.9 PHP &amp; Web</a>
+    <div class="sb-prog"><div class="pb"><div class="pf" id="p9" style="width:0%"></div></div><span class="pt" id="pt9">0%</span></div>
+  </div>
+</nav>
+<div class="sov" id="sov" onclick="toggleMenu()"></div>
+<main class="main">
+
+<!-- HOME -->
+<section class="sec on" id="home">
+<div class="ch-hdr">
+  <div class="badge">Tamil Nadu Class 12</div>
+  <h2>🐘 PHP Learning Lab</h2>
+  <p class="en">Interactive textbook for Computer Applications — based on the TN Board Class 12 PHP syllabus</p>
+  <p class="ta">கணினி பயன்பாடுகளுக்கான ஊடாடும் பாடப்புத்தகம் — TN Board Class 12 PHP பாடத்திட்டத்தின் அடிப்படையில்</p>
+</div>
+<div class="stat-grid">
+  <div class="stat"><div class="n">6</div><div class="l">Chapters</div></div>
+  <div class="stat"><div class="n">50+</div><div class="l">Examples</div></div>
+  <div class="stat"><div class="n">60+</div><div class="l">Quiz Q's</div></div>
+  <div class="stat"><div class="n">12</div><div class="l">Simulators</div></div>
+</div>
+<div class="card">
+  <div class="card-title">📚 <span class="en">Chapters Covered</span><span class="ta">அட்டவணை</span></div>
+  <table>
+    <tr><th>#</th><th>Chapter</th><th>Key Topics</th></tr>
+    <tr><td>4</td><td>Introduction to PHP</td><td>Tags, Variables, Data Types, Echo</td></tr>
+    <tr><td>5</td><td>Operators &amp; Expressions</td><td>Arithmetic, Comparison, Logical, String</td></tr>
+    <tr><td>6</td><td>Functions</td><td>Built-in, User-defined, Parameters</td></tr>
+    <tr><td>7</td><td>Arrays</td><td>Indexed, Associative, Multidimensional</td></tr>
+    <tr><td>8</td><td>Control Structures</td><td>if/else, switch, for, while, do-while, foreach</td></tr>
+    <tr><td>9</td><td>PHP &amp; Web</td><td>Forms, File Handling, MySQL</td></tr>
+  </table>
+</div>
+<div class="card">
+  <div class="card-title">🏆 Your Progress</div>
+  <p style="color:var(--txm);font-size:.88rem">Progress is saved automatically in your browser (no login needed).</p>
+  <div id="overall-prog"></div>
+  <button class="btn btn-s" onclick="resetProgress()" style="margin-top:.7rem;font-size:.8rem">🔄 Reset Progress</button>
+</div>
+<div class="box note">
+  <strong>📌 How to use this app</strong>
+  Click any chapter in the sidebar → Read the concept → Try the interactive simulator → Test yourself with the quiz.
+  All quizzes are based on the <em>Tamil Nadu Board Class 12 Computer Applications</em> textbook.
+</div>
+</section>
+
+<!-- CHAPTER 4 -->
+<section class="sec" id="ch4">
+<div class="ch-hdr">
+  <div class="badge">Chapter 4</div>
+  <h2>Introduction to PHP</h2>
+  <p class="en">PHP tags · Variables · Data types · Echo · Comments</p>
+  <p class="ta">PHP குறிச்சொற்கள் · மாறிகள் · தரவு வகைகள் · Echo · கருத்துரைகள்</p>
+</div>
+
+<div class="card">
+  <div class="card-title">📖 What is PHP?</div>
+  <p><strong>PHP</strong> stands for <strong>PHP: Hypertext Preprocessor</strong> (recursive acronym). It is a widely-used, open-source server-side scripting language designed primarily for web development.</p>
+  <ul>
+    <li>Created by <strong>Rasmus Lerdorf</strong> in <strong>1994</strong></li>
+    <li>Server-side scripting: code runs on the <em>server</em>, not the browser</li>
+    <li>Interpreted language (no compilation needed)</li>
+    <li>Embedded in HTML pages</li>
+    <li>Free and open-source</li>
+    <li>File extension: <code>.php</code></li>
+  </ul>
+  <div class="box note">
+    <strong>Easy Explanation 💡</strong>
+    Think of PHP like a chef in a restaurant kitchen. The customer (browser) orders food (requests a page). The chef (PHP server) prepares it and sends the finished dish (HTML) to the customer. The customer never sees the kitchen — only the final result.
+  </div>
+  <div class="box exam">
+    <strong>📝 Exam Point</strong>
+    PHP = PHP: Hypertext Preprocessor (recursive acronym). Created by Rasmus Lerdorf in 1994.
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🏷️ PHP Tags</div>
+  <p>PHP code must be enclosed in special tags. The parser looks for these opening/closing tags to identify PHP code blocks.</p>
+  <div class="tabs">
+    <button class="tb on" onclick="showTab(this,'tag1')">Default Tag</button>
+    <button class="tb" onclick="showTab(this,'tag2')">Short Tag</button>
+    <button class="tb" onclick="showTab(this,'tag3')">Script Tag</button>
+  </div>
+  <div class="tc on" id="tag1">
+    <div class="code"><span class="ck">&lt;?php</span>
+  <span class="ck">echo</span> <span class="cs">"Hello, World!"</span>;
+<span class="ck">?&gt;</span></div>
+    <p><strong>Default / Standard tag</strong> — most commonly used. Always works regardless of PHP configuration.</p>
+  </div>
+  <div class="tc" id="tag2">
+    <div class="code"><span class="ck">&lt;?</span>
+  <span class="ck">echo</span> <span class="cs">"Hello, World!"</span>;
+<span class="ck">?&gt;</span></div>
+    <p><strong>Short open tag</strong> — requires <code>short_open_tag = On</code> in php.ini. Not recommended for portability.</p>
+  </div>
+  <div class="tc" id="tag3">
+    <div class="code">&lt;<span class="ck">script</span> language=<span class="cs">"php"</span>&gt;
+  <span class="ck">echo</span> <span class="cs">"Hello, World!"</span>;
+&lt;/<span class="ck">script</span>&gt;</div>
+    <p><strong>HTML script tag</strong> — embeds PHP using the HTML script element with <code>language="php"</code> attribute.</p>
+  </div>
+  <div class="box exam">
+    <strong>📝 Exam Point — 3 types of PHP tags</strong>
+    1) <code>&lt;?php ... ?&gt;</code> (Default) &nbsp; 2) <code>&lt;? ... ?&gt;</code> (Short) &nbsp; 3) <code>&lt;script language="php"&gt; ... &lt;/script&gt;</code>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📦 Variables in PHP</div>
+  <p>A variable is a named storage location that holds a value which can change during program execution.</p>
+  <h3>Rules for PHP Variables</h3>
+  <ul>
+    <li>All variables start with a <strong>dollar sign (<code>$</code>)</strong></li>
+    <li>Variable name must start with a <strong>letter or underscore</strong> (not a digit)</li>
+    <li>Can contain letters, digits, and underscores</li>
+    <li><strong>Case-sensitive:</strong> <code>$Name</code> and <code>$name</code> are different variables</li>
+    <li>No type declaration needed — PHP determines type automatically</li>
+  </ul>
+  <div class="code"><span class="ck">&lt;?php</span>
+  <span class="cv">$name</span> = <span class="cs">"Balu"</span>;       <span class="cc">// String variable</span>
+  <span class="cv">$age</span> = <span class="cn">30</span>;           <span class="cc">// Integer variable</span>
+  <span class="cv">$price</span> = <span class="cn">99.50</span>;       <span class="cc">// Float variable</span>
+  <span class="cv">$is_admin</span> = <span class="ck">true</span>;   <span class="cc">// Boolean variable</span>
+<span class="ck">?&gt;</span></div>
+  <div class="mem-box">
+    <div class="mem-hdr">Memory Diagram — Variables</div>
+    <div class="mem-row">
+      <div class="mc lbl">Variable</div><div class="mc lbl">Value</div><div class="mc lbl">Type</div>
+    </div>
+    <div class="mem-row"><div class="mc lbl">$name</div><div class="mc val">"Balu"</div><div class="mc">String</div></div>
+    <div class="mem-row"><div class="mc lbl">$age</div><div class="mc val">30</div><div class="mc">Integer</div></div>
+    <div class="mem-row"><div class="mc lbl">$price</div><div class="mc val">99.50</div><div class="mc">Float</div></div>
+    <div class="mem-row"><div class="mc lbl">$is_admin</div><div class="mc val">true</div><div class="mc">Boolean</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🗂️ PHP Data Types</div>
+  <p>PHP supports <strong>8 data types</strong>. They are divided into three categories:</p>
+  <table>
+    <tr><th>Category</th><th>Data Type</th><th>Example</th></tr>
+    <tr><td rowspan="4"><strong>Scalar</strong></td><td>Integer</td><td><code>$x = 10;</code></td></tr>
+    <tr><td>Float (Double)</td><td><code>$x = 3.14;</code></td></tr>
+    <tr><td>String</td><td><code>$x = "Hello";</code></td></tr>
+    <tr><td>Boolean</td><td><code>$x = true;</code></td></tr>
+    <tr><td rowspan="2"><strong>Compound</strong></td><td>Array</td><td><code>$x = array(1,2,3);</code></td></tr>
+    <tr><td>Object</td><td>Instance of a class</td></tr>
+    <tr><td rowspan="2"><strong>Special</strong></td><td>Resource</td><td>File handle, DB connection</td></tr>
+    <tr><td>NULL</td><td><code>$x = NULL;</code></td></tr>
+  </table>
+  <div class="box exam">
+    <strong>📝 Exam Point — 8 PHP Data Types</strong>
+    Integer, Float, String, Boolean (Scalar) | Array, Object (Compound) | Resource, NULL (Special)
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📢 Echo Statement</div>
+  <p>The <code>echo</code> statement is used to output one or more strings to the browser.</p>
+  <div class="tabs">
+    <button class="tb on" onclick="showTab(this,'echo1')">String</button>
+    <button class="tb" onclick="showTab(this,'echo2')">Variable</button>
+    <button class="tb" onclick="showTab(this,'echo3')">Expression</button>
+    <button class="tb" onclick="showTab(this,'echo4')">Concat</button>
+  </div>
+  <div class="tc on" id="echo1">
+    <div class="code"><span class="ck">echo</span> <span class="cs">"Hello, World!"</span>;
+<span class="cc">// Output: Hello, World!</span></div>
+  </div>
+  <div class="tc" id="echo2">
+    <div class="code"><span class="cv">$name</span> = <span class="cs">"Kumar"</span>;
+<span class="ck">echo</span> <span class="cs">"My name is $name"</span>;
+<span class="cc">// Output: My name is Kumar</span></div>
+  </div>
+  <div class="tc" id="echo3">
+    <div class="code"><span class="cv">$x</span> = <span class="cn">10</span>; <span class="cv">$y</span> = <span class="cn">20</span>;
+<span class="ck">echo</span> <span class="cv">$x</span> + <span class="cv">$y</span>;
+<span class="cc">// Output: 30</span></div>
+  </div>
+  <div class="tc" id="echo4">
+    <div class="code"><span class="cv">$name</span> = <span class="cs">"Mani"</span>;
+<span class="ck">echo</span> <span class="cs">"My name is"</span> . <span class="cv">$name</span>;
+<span class="cc">// Output: My name isMani   (no space — use "is " with space)</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">💬 Comments in PHP</div>
+  <div class="code"><span class="ck">&lt;?php</span>
+  <span class="cc">// This is a single-line comment</span>
+  <span class="cc"># This is also a single-line comment</span>
+
+  <span class="cc">/* This is a
+     multi-line comment */</span>
+
+  <span class="ck">echo</span> <span class="cs">"Hello"</span>; <span class="cc">// inline comment</span>
+<span class="ck">?&gt;</span></div>
+  <table>
+    <tr><th>Type</th><th>Syntax</th><th>Use</th></tr>
+    <tr><td>Single-line</td><td><code>//</code> or <code>#</code></td><td>Brief note on one line</td></tr>
+    <tr><td>Multi-line</td><td><code>/* ... */</code></td><td>Longer explanations</td></tr>
+  </table>
+</div>
+
+<!-- CH4 Simulator -->
+<div class="card">
+  <div class="card-title">🖥️ Interactive Simulator — Variables &amp; Echo</div>
+  <p style="font-size:.82rem;color:var(--txm)">⚠️ Learning Simulation: This runs PHP logic in JavaScript. Click <b>Run</b> to see output, <b>Step</b> to go line by line.</p>
+  <div class="sim" id="sim-ch4">
+    <div class="sim-hdr">
+      <span>📟 PHP Simulator</span>
+      <div class="sim-btns">
+        <button class="sbtn step" onclick="simStep('ch4')">⏭ Step</button>
+        <button class="sbtn run" onclick="simRun('ch4')">▶ Run</button>
+        <button class="sbtn reset" onclick="simReset('ch4')">↺ Reset</button>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="sim-code" id="sim-ch4-code"></div>
+      <div class="sim-panel">
+        <h5>Variables</h5>
+        <div class="sim-vars" id="sim-ch4-vars"><span style="color:var(--txm);font-size:.8rem">No variables yet</span></div>
+        <h5 style="margin-top:.6rem">Output</h5>
+        <div class="sim-out" id="sim-ch4-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CH4 Quiz -->
+<div class="card">
+  <div class="card-title">✅ Chapter 4 Quiz</div>
+  <div class="quiz-wrap" id="quiz-ch4"></div>
+</div>
+</section>
+
+<!-- CHAPTER 5 -->
+<section class="sec" id="ch5">
+<div class="ch-hdr">
+  <div class="badge">Chapter 5</div>
+  <h2>Operators &amp; Expressions</h2>
+  <p>Arithmetic · Assignment · Comparison · Logical · Increment/Decrement · String</p>
+</div>
+
+<div class="card">
+  <div class="card-title">➕ Arithmetic Operators</div>
+  <p>Used to perform mathematical operations on numeric values.</p>
+  <table>
+    <tr><th>Operator</th><th>Name</th><th>Example</th><th>Result</th></tr>
+    <tr><td><code>+</code></td><td>Addition</td><td><code>$a + $b</code></td><td>Sum of a and b</td></tr>
+    <tr><td><code>-</code></td><td>Subtraction</td><td><code>$a - $b</code></td><td>Difference</td></tr>
+    <tr><td><code>*</code></td><td>Multiplication</td><td><code>$a * $b</code></td><td>Product</td></tr>
+    <tr><td><code>/</code></td><td>Division</td><td><code>$a / $b</code></td><td>Quotient</td></tr>
+    <tr><td><code>%</code></td><td>Modulus</td><td><code>$a % $b</code></td><td>Remainder</td></tr>
+  </table>
+  <div class="code"><span class="cv">$a</span> = <span class="cn">10</span>; <span class="cv">$b</span> = <span class="cn">3</span>;
+<span class="ck">echo</span> <span class="cv">$a</span> + <span class="cv">$b</span>; <span class="cc">// 13</span>
+<span class="ck">echo</span> <span class="cv">$a</span> - <span class="cv">$b</span>; <span class="cc">// 7</span>
+<span class="ck">echo</span> <span class="cv">$a</span> * <span class="cv">$b</span>; <span class="cc">// 30</span>
+<span class="ck">echo</span> <span class="cv">$a</span> / <span class="cv">$b</span>; <span class="cc">// 3.333...</span>
+<span class="ck">echo</span> <span class="cv">$a</span> % <span class="cv">$b</span>; <span class="cc">// 1</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">📋 Assignment Operators</div>
+  <table>
+    <tr><th>Operator</th><th>Example</th><th>Equivalent to</th></tr>
+    <tr><td><code>=</code></td><td><code>$a = 5</code></td><td>Assign 5 to $a</td></tr>
+    <tr><td><code>+=</code></td><td><code>$a += 3</code></td><td><code>$a = $a + 3</code></td></tr>
+    <tr><td><code>-=</code></td><td><code>$a -= 3</code></td><td><code>$a = $a - 3</code></td></tr>
+    <tr><td><code>*=</code></td><td><code>$a *= 3</code></td><td><code>$a = $a * 3</code></td></tr>
+    <tr><td><code>/=</code></td><td><code>$a /= 3</code></td><td><code>$a = $a / 3</code></td></tr>
+    <tr><td><code>%=</code></td><td><code>$a %= 3</code></td><td><code>$a = $a % 3</code></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-title">⚖️ Comparison Operators</div>
+  <p>Used to compare two values. Returns <code>true</code> or <code>false</code>.</p>
+  <table>
+    <tr><th>Operator</th><th>Name</th><th>Example</th><th>Returns true if...</th></tr>
+    <tr><td><code>==</code></td><td>Equal</td><td><code>$a == $b</code></td><td>values are equal</td></tr>
+    <tr><td><code>===</code></td><td>Identical</td><td><code>$a === $b</code></td><td>values AND types are equal</td></tr>
+    <tr><td><code>!=</code></td><td>Not equal</td><td><code>$a != $b</code></td><td>values are not equal</td></tr>
+    <tr><td><code>!==</code></td><td>Not identical</td><td><code>$a !== $b</code></td><td>values or types differ</td></tr>
+    <tr><td><code>&gt;</code></td><td>Greater than</td><td><code>$a &gt; $b</code></td><td>a is greater than b</td></tr>
+    <tr><td><code>&lt;</code></td><td>Less than</td><td><code>$a &lt; $b</code></td><td>a is less than b</td></tr>
+    <tr><td><code>&gt;=</code></td><td>Greater or equal</td><td><code>$a &gt;= $b</code></td><td>a is greater than or equal to b</td></tr>
+    <tr><td><code>&lt;=</code></td><td>Less or equal</td><td><code>$a &lt;= $b</code></td><td>a is less than or equal to b</td></tr>
+  </table>
+  <div class="box warn">
+    <strong>⚠️ == vs ===</strong>
+    <code>5 == "5"</code> is <code>true</code> (loose comparison, values match)<br>
+    <code>5 === "5"</code> is <code>false</code> (strict comparison, types differ: int vs string)
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🔗 Logical Operators</div>
+  <table>
+    <tr><th>Operator</th><th>Name</th><th>Example</th><th>Result</th></tr>
+    <tr><td><code>&amp;&amp;</code></td><td>AND</td><td><code>$a &amp;&amp; $b</code></td><td>true if BOTH are true</td></tr>
+    <tr><td><code>||</code></td><td>OR</td><td><code>$a || $b</code></td><td>true if EITHER is true</td></tr>
+    <tr><td><code>xor</code></td><td>XOR</td><td><code>$a xor $b</code></td><td>true if ONLY ONE is true</td></tr>
+    <tr><td><code>!</code></td><td>NOT</td><td><code>!$a</code></td><td>true if $a is false</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-title">🔢 Increment / Decrement Operators</div>
+  <table>
+    <tr><th>Operator</th><th>Name</th><th>Effect</th><th>Value Used</th></tr>
+    <tr><td><code>++$a</code></td><td>Pre-increment</td><td>Adds 1 to $a</td><td>After increment</td></tr>
+    <tr><td><code>$a++</code></td><td>Post-increment</td><td>Adds 1 to $a</td><td>Before increment</td></tr>
+    <tr><td><code>--$a</code></td><td>Pre-decrement</td><td>Subtracts 1 from $a</td><td>After decrement</td></tr>
+    <tr><td><code>$a--</code></td><td>Post-decrement</td><td>Subtracts 1 from $a</td><td>Before decrement</td></tr>
+  </table>
+  <div class="code"><span class="cv">$a</span> = <span class="cn">5</span>;
+<span class="ck">echo</span> ++<span class="cv">$a</span>; <span class="cc">// Output: 6 (increment first, then use)</span>
+<span class="cv">$b</span> = <span class="cn">5</span>;
+<span class="ck">echo</span> <span class="cv">$b</span>++; <span class="cc">// Output: 5 (use first, then increment)</span>
+<span class="ck">echo</span> <span class="cv">$b</span>;   <span class="cc">// Output: 6</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">🔤 String Operators</div>
+  <table>
+    <tr><th>Operator</th><th>Name</th><th>Example</th><th>Result</th></tr>
+    <tr><td><code>.</code></td><td>Concatenation</td><td><code>$a . $b</code></td><td>Joins two strings</td></tr>
+    <tr><td><code>.=</code></td><td>Concatenation assignment</td><td><code>$a .= $b</code></td><td>Appends $b to $a</td></tr>
+  </table>
+  <div class="code"><span class="cv">$first</span> = <span class="cs">"Hello"</span>;
+<span class="cv">$second</span> = <span class="cs">"World"</span>;
+<span class="ck">echo</span> <span class="cv">$first</span> . <span class="cs">" "</span> . <span class="cv">$second</span>; <span class="cc">// Hello World</span>
+
+<span class="cv">$msg</span> = <span class="cs">"Good "</span>;
+<span class="cv">$msg</span> .= <span class="cs">"Morning"</span>;
+<span class="ck">echo</span> <span class="cv">$msg</span>; <span class="cc">// Good Morning</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">🖥️ Simulator — Operators</div>
+  <div class="sim" id="sim-ch5">
+    <div class="sim-hdr">
+      <span>📟 PHP Operator Simulator</span>
+      <div class="sim-btns">
+        <button class="sbtn step" onclick="simStep('ch5')">⏭ Step</button>
+        <button class="sbtn run" onclick="simRun('ch5')">▶ Run</button>
+        <button class="sbtn reset" onclick="simReset('ch5')">↺ Reset</button>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="sim-code" id="sim-ch5-code"></div>
+      <div class="sim-panel">
+        <h5>Variables</h5>
+        <div class="sim-vars" id="sim-ch5-vars"><span style="color:var(--txm);font-size:.8rem">No variables yet</span></div>
+        <h5 style="margin-top:.6rem">Output</h5>
+        <div class="sim-out" id="sim-ch5-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">✅ Chapter 5 Quiz</div>
+  <div class="quiz-wrap" id="quiz-ch5"></div>
+</div>
+</section>
+
+<!-- CHAPTER 6 -->
+<section class="sec" id="ch6">
+<div class="ch-hdr">
+  <div class="badge">Chapter 6</div>
+  <h2>Functions</h2>
+  <p>Built-in functions · User-defined functions · Parameters &amp; Arguments</p>
+</div>
+
+<div class="card">
+  <div class="card-title">🔧 What is a Function?</div>
+  <p>A <strong>function</strong> is a self-contained block of code designed to perform a specific task. You define it once and call it multiple times — avoiding repetition.</p>
+  <div class="box note">
+    <strong>💡 Analogy</strong>
+    A function is like a recipe. You write the recipe once (define the function). Whenever you want to cook that dish (call the function), you follow the same steps. You can even make it differently by using different ingredients (parameters).
+  </div>
+  <h3>Two types of functions in PHP:</h3>
+  <table>
+    <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+    <tr><td><strong>Built-in</strong></td><td>Pre-defined by PHP</td><td><code>strlen()</code>, <code>strtoupper()</code></td></tr>
+    <tr><td><strong>User-defined</strong></td><td>Created by the programmer</td><td><code>function greet() { ... }</code></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-title">📦 Built-in Functions</div>
+  <p>PHP has thousands of built-in functions. Here are common string functions:</p>
+  <table>
+    <tr><th>Function</th><th>Purpose</th><th>Example</th></tr>
+    <tr><td><code>strlen()</code></td><td>Length of string</td><td><code>strlen("Hello") // 5</code></td></tr>
+    <tr><td><code>strtoupper()</code></td><td>Convert to uppercase</td><td><code>strtoupper("hello") // HELLO</code></td></tr>
+    <tr><td><code>strtolower()</code></td><td>Convert to lowercase</td><td><code>strtolower("HELLO") // hello</code></td></tr>
+    <tr><td><code>str_replace()</code></td><td>Replace in string</td><td><code>str_replace("a","b","cat") // cbt</code></td></tr>
+    <tr><td><code>substr()</code></td><td>Part of string</td><td><code>substr("Hello",1,3) // ell</code></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-title">✍️ User-defined Functions</div>
+  <h4>Syntax:</h4>
+  <div class="code"><span class="ck">function</span> <span class="co">functionName</span>() {
+  <span class="cc">// code to execute</span>
+}</div>
+  <h4>Function without parameters:</h4>
+  <div class="code"><span class="ck">function</span> <span class="co">printGreeting</span>() {
+  <span class="ck">echo</span> <span class="cs">"Hello, world!"</span>;
+}
+<span class="co">printGreeting</span>(); <span class="cc">// Call the function</span>
+<span class="cc">// Output: Hello, world!</span></div>
+
+  <h4>Function with parameters:</h4>
+  <div class="code"><span class="ck">function</span> <span class="co">greet</span>(<span class="cv">$name</span>) {
+  <span class="ck">echo</span> <span class="cs">"Hello, </span><span class="cv">$name</span><span class="cs">!"</span>;
+}
+<span class="co">greet</span>(<span class="cs">"Kumar"</span>);  <span class="cc">// Output: Hello, Kumar!</span>
+<span class="co">greet</span>(<span class="cs">"Priya"</span>);  <span class="cc">// Output: Hello, Priya!</span></div>
+
+  <h4>Function with multiple parameters:</h4>
+  <div class="code"><span class="ck">function</span> <span class="co">addNumbers</span>(<span class="cv">$x</span>, <span class="cv">$y</span>) {
+  <span class="ck">echo</span> <span class="cv">$x</span> + <span class="cv">$y</span>;
+}
+<span class="co">addNumbers</span>(<span class="cn">10</span>, <span class="cn">40</span>); <span class="cc">// Output: 50</span></div>
+
+  <div class="box exam">
+    <strong>📝 Exam Point — Parameters vs Arguments</strong>
+    <strong>Parameter:</strong> Variable in the function definition → <code>function greet($name)</code><br>
+    <strong>Argument:</strong> Actual value passed when calling the function → <code>greet("Kumar")</code>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🖥️ Simulator — Functions</div>
+  <div class="sim" id="sim-ch6">
+    <div class="sim-hdr">
+      <span>📟 Function Simulator</span>
+      <div class="sim-btns">
+        <button class="sbtn step" onclick="simStep('ch6')">⏭ Step</button>
+        <button class="sbtn run" onclick="simRun('ch6')">▶ Run</button>
+        <button class="sbtn reset" onclick="simReset('ch6')">↺ Reset</button>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="sim-code" id="sim-ch6-code"></div>
+      <div class="sim-panel">
+        <h5>Variables</h5>
+        <div class="sim-vars" id="sim-ch6-vars"><span style="color:var(--txm);font-size:.8rem">No variables yet</span></div>
+        <h5 style="margin-top:.6rem">Output</h5>
+        <div class="sim-out" id="sim-ch6-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">✅ Chapter 6 Quiz</div>
+  <div class="quiz-wrap" id="quiz-ch6"></div>
+</div>
+</section>
+
+<!-- CHAPTER 7 -->
+<section class="sec" id="ch7">
+<div class="ch-hdr">
+  <div class="badge">Chapter 7</div>
+  <h2>Arrays</h2>
+  <p>Indexed Arrays · Associative Arrays · Multidimensional Arrays</p>
+</div>
+
+<div class="card">
+  <div class="card-title">📦 What is an Array?</div>
+  <p>An <strong>array</strong> is a variable that can store <strong>multiple values</strong> in a single variable name. Each value is accessed using an index (number or string key).</p>
+  <div class="box note">
+    <strong>💡 Analogy</strong>
+    An array is like a row of lockers in school. Each locker has a number (index). You can store one item in each locker, and access any item by its locker number.
+  </div>
+  <h3>Three types of arrays in PHP:</h3>
+  <table>
+    <tr><th>Type</th><th>Keys</th><th>Example</th></tr>
+    <tr><td>Indexed</td><td>Numeric (0, 1, 2...)</td><td><code>$fruits[0]</code></td></tr>
+    <tr><td>Associative</td><td>String ("name", "age")</td><td><code>$ages["Arun"]</code></td></tr>
+    <tr><td>Multidimensional</td><td>Arrays within arrays</td><td><code>$arr[1][2]</code></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-title">1️⃣ Indexed Array</div>
+  <p>Uses <strong>numeric indices</strong> starting from <strong>0</strong>.</p>
+  <div class="code"><span class="cv">$fruits</span> = <span class="ck">array</span>(<span class="cs">'apple'</span>, <span class="cs">'banana'</span>, <span class="cs">'orange'</span>);
+<span class="ck">echo</span> <span class="cv">$fruits</span>[<span class="cn">0</span>]; <span class="cc">// apple</span>
+<span class="ck">echo</span> <span class="cv">$fruits</span>[<span class="cn">1</span>]; <span class="cc">// banana</span>
+<span class="ck">echo</span> <span class="cv">$fruits</span>[<span class="cn">2</span>]; <span class="cc">// orange</span></div>
+  <div class="arr-vis">
+    <div class="ac"><div class="ai">0</div><div class="av">apple</div></div>
+    <div class="ac"><div class="ai">1</div><div class="av">banana</div></div>
+    <div class="ac"><div class="ai">2</div><div class="av">orange</div></div>
+  </div>
+  <p style="font-size:.8rem;color:var(--txm)">↑ Visual: Each box = one array element. Top = index, Bottom = value</p>
+</div>
+
+<div class="card">
+  <div class="card-title">2️⃣ Associative Array</div>
+  <p>Uses <strong>string keys</strong> (named indices) with the <code>=&gt;</code> operator.</p>
+  <div class="code"><span class="cv">$ages</span> = <span class="ck">array</span>(
+  <span class="cs">"Arun"</span> => <span class="cn">25</span>,
+  <span class="cs">"Balu"</span> => <span class="cn">30</span>,
+  <span class="cs">"Naveen"</span> => <span class="cn">28</span>
+);
+<span class="ck">echo</span> <span class="cv">$ages</span>[<span class="cs">"Arun"</span>];   <span class="cc">// 25</span>
+<span class="ck">echo</span> <span class="cv">$ages</span>[<span class="cs">"Balu"</span>];   <span class="cc">// 30</span>
+<span class="ck">echo</span> <span class="cv">$ages</span>[<span class="cs">"Naveen"</span>]; <span class="cc">// 28</span></div>
+  <div class="mem-box">
+    <div class="mem-hdr">$ages — Associative Array</div>
+    <div class="mem-row"><div class="mc lbl">Key</div><div class="mc lbl">Value</div></div>
+    <div class="mem-row"><div class="mc">"Arun"</div><div class="mc val">25</div></div>
+    <div class="mem-row"><div class="mc">"Balu"</div><div class="mc val">30</div></div>
+    <div class="mem-row"><div class="mc">"Naveen"</div><div class="mc val">28</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">3️⃣ Multidimensional Array</div>
+  <p>An array containing one or more arrays. Think of it as a table/matrix.</p>
+  <div class="code"><span class="cv">$arr</span> = <span class="ck">array</span>(
+  <span class="ck">array</span>(<span class="cn">1</span>, <span class="cn">2</span>, <span class="cn">3</span>),  <span class="cc">// Row 0</span>
+  <span class="ck">array</span>(<span class="cn">4</span>, <span class="cn">5</span>, <span class="cn">6</span>),  <span class="cc">// Row 1</span>
+  <span class="ck">array</span>(<span class="cn">7</span>, <span class="cn">8</span>, <span class="cn">9</span>)   <span class="cc">// Row 2</span>
+);
+<span class="ck">echo</span> <span class="cv">$arr</span>[<span class="cn">1</span>][<span class="cn">2</span>]; <span class="cc">// Output: 6 (row 1, col 2)</span></div>
+  <table>
+    <tr><th></th><th>Col 0</th><th>Col 1</th><th>Col 2</th></tr>
+    <tr><th>Row 0</th><td>1</td><td>2</td><td>3</td></tr>
+    <tr><th>Row 1</th><td>4</td><td>5</td><td style="background:#fef9c3;font-weight:700">6 ← $arr[1][2]</td></tr>
+    <tr><th>Row 2</th><td>7</td><td>8</td><td>9</td></tr>
+  </table>
+  <div class="box exam">
+    <strong>📝 Exam Point</strong>
+    <code>$arr[1][2]</code> = Row index 1, Column index 2 = value 6
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🖥️ Simulator — Arrays</div>
+  <div class="sim" id="sim-ch7">
+    <div class="sim-hdr">
+      <span>📟 Array Simulator</span>
+      <div class="sim-btns">
+        <button class="sbtn step" onclick="simStep('ch7')">⏭ Step</button>
+        <button class="sbtn run" onclick="simRun('ch7')">▶ Run</button>
+        <button class="sbtn reset" onclick="simReset('ch7')">↺ Reset</button>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="sim-code" id="sim-ch7-code"></div>
+      <div class="sim-panel">
+        <h5>Variables</h5>
+        <div class="sim-vars" id="sim-ch7-vars"><span style="color:var(--txm);font-size:.8rem">No variables yet</span></div>
+        <h5 style="margin-top:.6rem">Output</h5>
+        <div class="sim-out" id="sim-ch7-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">✅ Chapter 7 Quiz</div>
+  <div class="quiz-wrap" id="quiz-ch7"></div>
+</div>
+</section>
+
+<!-- CHAPTER 8 -->
+<section class="sec" id="ch8">
+<div class="ch-hdr">
+  <div class="badge">Chapter 8</div>
+  <h2>Control Structures</h2>
+  <p>if · if-else · if-elseif-else · switch · for · while · do-while · foreach</p>
+</div>
+
+<div class="card">
+  <div class="card-title">🔀 Conditional Statements</div>
+  <div class="tabs">
+    <button class="tb on" onclick="showTab(this,'if1')">if</button>
+    <button class="tb" onclick="showTab(this,'if2')">if-else</button>
+    <button class="tb" onclick="showTab(this,'if3')">if-elseif-else</button>
+    <button class="tb" onclick="showTab(this,'if4')">switch</button>
+  </div>
+
+  <div class="tc on" id="if1">
+    <h4>if Statement</h4>
+    <p>Executes a block of code only if the condition is <code>true</code>.</p>
+    <div class="code"><span class="ck">$x</span> = <span class="cn">10</span>;
+<span class="ck">if</span> (<span class="cv">$x</span> > <span class="cn">5</span>) {
+  <span class="ck">echo</span> <span class="cs">"x is greater than 5"</span>;
+}
+<span class="cc">// Output: x is greater than 5</span></div>
+  </div>
+
+  <div class="tc" id="if2">
+    <h4>if-else Statement</h4>
+    <p>Executes one block if condition is true, another block if false.</p>
+    <div class="code"><span class="cv">$x</span> = <span class="cn">3</span>;
+<span class="ck">if</span> (<span class="cv">$x</span> > <span class="cn">5</span>) {
+  <span class="ck">echo</span> <span class="cs">"x is greater than 5"</span>;
+} <span class="ck">else</span> {
+  <span class="ck">echo</span> <span class="cs">"x is not greater than 5"</span>;
+}
+<span class="cc">// Output: x is not greater than 5</span></div>
+  </div>
+
+  <div class="tc" id="if3">
+    <h4>if-elseif-else Statement</h4>
+    <p>Tests multiple conditions in sequence.</p>
+    <div class="code"><span class="cv">$x</span> = <span class="cn">12</span>;
+<span class="ck">if</span> (<span class="cv">$x</span> > <span class="cn">20</span>) {
+  <span class="ck">echo</span> <span class="cs">"x is greater than 20"</span>;
+} <span class="ck">elseif</span> (<span class="cv">$x</span> > <span class="cn">15</span>) {
+  <span class="ck">echo</span> <span class="cs">"x is greater than 15 but not greater than 20"</span>;
+} <span class="ck">elseif</span> (<span class="cv">$x</span> > <span class="cn">10</span>) {
+  <span class="ck">echo</span> <span class="cs">"x is greater than 10 but not greater than 15"</span>;
+} <span class="ck">else</span> {
+  <span class="ck">echo</span> <span class="cs">"x is not greater than 10"</span>;
+}
+<span class="cc">// Output: x is greater than 10 but not greater than 15</span></div>
+  </div>
+
+  <div class="tc" id="if4">
+    <h4>switch Statement</h4>
+    <p>Tests a variable against multiple values. Uses <code>break</code> to stop execution, <code>default</code> as fallback.</p>
+    <div class="code"><span class="cv">$x</span> = <span class="cn">10</span>;
+<span class="ck">switch</span> (<span class="cv">$x</span>) {
+  <span class="ck">case</span> <span class="cn">5</span>:
+    <span class="ck">echo</span> <span class="cs">"x is equal to 5"</span>;
+    <span class="ck">break</span>;
+  <span class="ck">case</span> <span class="cn">10</span>:
+    <span class="ck">echo</span> <span class="cs">"x is equal to 10"</span>;
+    <span class="ck">break</span>;
+  <span class="ck">case</span> <span class="cn">15</span>:
+    <span class="ck">echo</span> <span class="cs">"x is equal to 15"</span>;
+    <span class="ck">break</span>;
+  <span class="ck">default</span>:
+    <span class="ck">echo</span> <span class="cs">"x is not equal to 5, 10, or 15"</span>;
+}
+<span class="cc">// Output: x is equal to 10</span></div>
+    <div class="box warn">
+      <strong>⚠️ Important: break keyword</strong>
+      Without <code>break</code>, execution "falls through" to the next case. Always use <code>break</code> at the end of each case unless fall-through is intentional.
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🔄 Loops</div>
+  <div class="tabs">
+    <button class="tb on" onclick="showTab(this,'lp1')">for</button>
+    <button class="tb" onclick="showTab(this,'lp2')">while</button>
+    <button class="tb" onclick="showTab(this,'lp3')">do-while</button>
+    <button class="tb" onclick="showTab(this,'lp4')">foreach</button>
+  </div>
+
+  <div class="tc on" id="lp1">
+    <h4>for Loop</h4>
+    <p><strong>Entry-controlled loop.</strong> Used when the number of iterations is known. Checks condition before executing the body.</p>
+    <p><strong>Syntax:</strong> <code>for(initialization; condition; update) { body }</code></p>
+    <div class="tabs" style="margin-top:.5rem">
+      <button class="tb on" onclick="showTab(this,'fa')">Ascending</button>
+      <button class="tb" onclick="showTab(this,'fd')">Descending</button>
+    </div>
+    <div class="tc on" id="fa">
+      <div class="code"><span class="ck">for</span> (<span class="cv">$i</span> = <span class="cn">1</span>; <span class="cv">$i</span> &lt;= <span class="cn">5</span>; <span class="cv">$i</span>++) {
+  <span class="ck">echo</span> <span class="cv">$i</span> . <span class="cs">"&lt;br&gt;"</span>;
+}
+<span class="cc">// Output: 1 2 3 4 5</span></div>
+    </div>
+    <div class="tc" id="fd">
+      <div class="code"><span class="ck">for</span> (<span class="cv">$i</span> = <span class="cn">5</span>; <span class="cv">$i</span> >= <span class="cn">1</span>; <span class="cv">$i</span>--) {
+  <span class="ck">echo</span> <span class="cv">$i</span> . <span class="cs">"&lt;br&gt;"</span>;
+}
+<span class="cc">// Output: 5 4 3 2 1</span></div>
+    </div>
+  </div>
+
+  <div class="tc" id="lp2">
+    <h4>while Loop</h4>
+    <p><strong>Entry-controlled loop.</strong> Checks condition <em>before</em> each iteration. May never execute if condition is initially false.</p>
+    <div class="code"><span class="cv">$i</span> = <span class="cn">1</span>;
+<span class="ck">while</span> (<span class="cv">$i</span> &lt;= <span class="cn">5</span>) {
+  <span class="ck">echo</span> <span class="cv">$i</span> . <span class="cs">"&lt;br&gt;"</span>;
+  <span class="cv">$i</span>++;
+}
+<span class="cc">// Output: 1 2 3 4 5</span></div>
+    <div class="box tip">
+      <strong>💡 while vs for</strong>
+      Use <code>while</code> when you don't know in advance how many times to loop (e.g., reading until end of file). Use <code>for</code> when you know the exact count.
+    </div>
+  </div>
+
+  <div class="tc" id="lp3">
+    <h4>do-while Loop</h4>
+    <p><strong>Exit-controlled loop.</strong> Executes the body <em>first</em>, then checks the condition. Always executes <em>at least once</em>.</p>
+    <div class="code"><span class="cv">$i</span> = <span class="cn">1</span>;
+<span class="ck">do</span> {
+  <span class="ck">echo</span> <span class="cv">$i</span> . <span class="cs">"&lt;br&gt;"</span>;
+  <span class="cv">$i</span>++;
+} <span class="ck">while</span> (<span class="cv">$i</span> &lt;= <span class="cn">5</span>);
+<span class="cc">// Output: 1 2 3 4 5</span></div>
+    <div class="box exam">
+      <strong>📝 Exam Point — do-while vs while</strong>
+      <code>do-while</code> always executes <strong>at least once</strong> even if condition is false from the start.<br>
+      <code>while</code> may <strong>never execute</strong> if condition is false initially.
+    </div>
+  </div>
+
+  <div class="tc" id="lp4">
+    <h4>foreach Loop</h4>
+    <p>Designed specifically for <strong>iterating over arrays</strong>.</p>
+    <div class="tabs" style="margin-top:.5rem">
+      <button class="tb on" onclick="showTab(this,'fei')">Indexed Array</button>
+      <button class="tb" onclick="showTab(this,'fea')">Associative Array</button>
+    </div>
+    <div class="tc on" id="fei">
+      <div class="code"><span class="cv">$array</span> = <span class="ck">array</span>(<span class="cn">1</span>, <span class="cn">2</span>, <span class="cn">3</span>, <span class="cn">4</span>, <span class="cn">5</span>);
+<span class="ck">foreach</span> (<span class="cv">$array</span> <span class="ck">as</span> <span class="cv">$value</span>) {
+  <span class="ck">echo</span> <span class="cv">$value</span> . <span class="cs">"&lt;br&gt;"</span>;
+}
+<span class="cc">// Output: 1 2 3 4 5</span></div>
+    </div>
+    <div class="tc" id="fea">
+      <div class="code"><span class="cv">$array</span> = <span class="ck">array</span>(<span class="cs">"a"</span> => <span class="cn">1</span>, <span class="cs">"b"</span> => <span class="cn">2</span>, <span class="cs">"c"</span> => <span class="cn">3</span>);
+<span class="ck">foreach</span> (<span class="cv">$array</span> <span class="ck">as</span> <span class="cv">$key</span> => <span class="cv">$value</span>) {
+  <span class="ck">echo</span> <span class="cv">$key</span> . <span class="cs">" => "</span> . <span class="cv">$value</span> . <span class="cs">"&lt;br&gt;"</span>;
+}
+<span class="cc">// Output: a => 1</span>
+<span class="cc">//         b => 2</span>
+<span class="cc">//         c => 3</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📊 Loop Comparison</div>
+  <table>
+    <tr><th>Loop</th><th>Type</th><th>Condition Check</th><th>Min Executions</th><th>Best Used When</th></tr>
+    <tr><td><code>for</code></td><td>Entry-controlled</td><td>Before each iteration</td><td>0</td><td>Count known</td></tr>
+    <tr><td><code>while</code></td><td>Entry-controlled</td><td>Before each iteration</td><td>0</td><td>Count unknown</td></tr>
+    <tr><td><code>do-while</code></td><td>Exit-controlled</td><td>After each iteration</td><td>1</td><td>Must run once</td></tr>
+    <tr><td><code>foreach</code></td><td>Special</td><td>Auto (array-driven)</td><td>0</td><td>Arrays only</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-title">🖥️ Loop Simulator</div>
+  <div class="sim" id="sim-ch8">
+    <div class="sim-hdr">
+      <span>📟 Loop Simulator</span>
+      <div class="sim-btns">
+        <button class="sbtn step" onclick="simStep('ch8')">⏭ Step</button>
+        <button class="sbtn run" onclick="simRun('ch8')">▶ Run</button>
+        <button class="sbtn reset" onclick="simReset('ch8')">↺ Reset</button>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="sim-code" id="sim-ch8-code"></div>
+      <div class="sim-panel">
+        <h5>Variables</h5>
+        <div class="sim-vars" id="sim-ch8-vars"><span style="color:var(--txm);font-size:.8rem">No variables yet</span></div>
+        <h5 style="margin-top:.6rem">Output</h5>
+        <div class="sim-out" id="sim-ch8-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">✅ Chapter 8 Quiz</div>
+  <div class="quiz-wrap" id="quiz-ch8"></div>
+</div>
+</section>
+
+<!-- CHAPTER 9 -->
+<section class="sec" id="ch9">
+<div class="ch-hdr">
+  <div class="badge">Chapter 9</div>
+  <h2>PHP &amp; Web</h2>
+  <p>HTML Forms · $_GET &amp; $_POST · File Handling · PHP with MySQL</p>
+</div>
+
+<div class="card">
+  <div class="card-title">📝 HTML Forms with PHP</div>
+  <p>PHP can collect data submitted through HTML forms using the <strong>superglobal arrays</strong> <code>$_POST</code> and <code>$_GET</code>.</p>
+  <h4>HTML Form (form.html):</h4>
+  <div class="code">&lt;<span class="ck">form</span> <span class="cv">action</span>=<span class="cs">"process.php"</span> <span class="cv">method</span>=<span class="cs">"post"</span>&gt;
+  Name: &lt;<span class="ck">input</span> <span class="cv">type</span>=<span class="cs">"text"</span> <span class="cv">name</span>=<span class="cs">"name"</span>&gt;
+  Email: &lt;<span class="ck">input</span> <span class="cv">type</span>=<span class="cs">"email"</span> <span class="cv">name</span>=<span class="cs">"email"</span>&gt;
+  &lt;<span class="ck">input</span> <span class="cv">type</span>=<span class="cs">"submit"</span> <span class="cv">value</span>=<span class="cs">"Submit"</span>&gt;
+&lt;/<span class="ck">form</span>&gt;</div>
+  <h4>PHP Processing (process.php):</h4>
+  <div class="code"><span class="ck">&lt;?php</span>
+  <span class="cv">$name</span> = <span class="cv">$_POST</span>[<span class="cs">"name"</span>];
+  <span class="cv">$email</span> = <span class="cv">$_POST</span>[<span class="cs">"email"</span>];
+  <span class="ck">echo</span> <span class="cs">"Name: "</span> . <span class="cv">$name</span>;
+  <span class="ck">echo</span> <span class="cs">"Email: "</span> . <span class="cv">$email</span>;
+<span class="ck">?&gt;</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">⚖️ GET vs POST</div>
+  <table>
+    <tr><th>Feature</th><th>$_GET</th><th>$_POST</th></tr>
+    <tr><td>Data visible?</td><td>Yes (in URL)</td><td>No (hidden)</td></tr>
+    <tr><td>Max data size</td><td>~2000 chars</td><td>No limit</td></tr>
+    <tr><td>Bookmarkable?</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Use case</td><td>Search, filter</td><td>Forms, login, passwords</td></tr>
+    <tr><td>Security</td><td>Less secure</td><td>More secure</td></tr>
+  </table>
+  <div class="box exam">
+    <strong>📝 Exam Point</strong>
+    Use <strong>POST</strong> for sensitive data (passwords, personal info). Use <strong>GET</strong> for non-sensitive data (search terms, page numbers).
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📁 File Handling in PHP</div>
+  <p>PHP provides functions to read from and write to files on the server.</p>
+  <h4>Key file functions:</h4>
+  <table>
+    <tr><th>Function</th><th>Purpose</th></tr>
+    <tr><td><code>fopen(filename, mode)</code></td><td>Opens a file</td></tr>
+    <tr><td><code>fread(file, length)</code></td><td>Reads from an open file</td></tr>
+    <tr><td><code>fwrite(file, text)</code></td><td>Writes to an open file</td></tr>
+    <tr><td><code>fclose(file)</code></td><td>Closes an open file</td></tr>
+    <tr><td><code>filesize(filename)</code></td><td>Returns file size in bytes</td></tr>
+  </table>
+  <h4>File Modes:</h4>
+  <table>
+    <tr><th>Mode</th><th>Meaning</th></tr>
+    <tr><td><code>r</code></td><td>Read only, from beginning</td></tr>
+    <tr><td><code>w</code></td><td>Write only, truncates file</td></tr>
+    <tr><td><code>a</code></td><td>Append — writes to end</td></tr>
+    <tr><td><code>r+</code></td><td>Read and write</td></tr>
+  </table>
+  <h4>Reading a file:</h4>
+  <div class="code"><span class="ck">&lt;?php</span>
+  <span class="cv">$myfile</span> = <span class="co">fopen</span>(<span class="cs">"Student.txt"</span>, <span class="cs">"r"</span>) <span class="ck">or</span> <span class="co">die</span>(<span class="cs">"Unable to open file!"</span>);
+  <span class="ck">echo</span> <span class="co">fread</span>(<span class="cv">$myfile</span>, <span class="co">filesize</span>(<span class="cs">"Student.txt"</span>));
+  <span class="co">fclose</span>(<span class="cv">$myfile</span>);
+<span class="ck">?&gt;</span></div>
+  <h4>Writing to a file:</h4>
+  <div class="code"><span class="ck">&lt;?php</span>
+  <span class="cv">$myfile</span> = <span class="co">fopen</span>(<span class="cs">"Student.txt"</span>, <span class="cs">"w"</span>) <span class="ck">or</span> <span class="co">die</span>(<span class="cs">"Unable to open file!"</span>);
+  <span class="cv">$txt</span> = <span class="cs">"John Doe\n"</span>;
+  <span class="co">fwrite</span>(<span class="cv">$myfile</span>, <span class="cv">$txt</span>);
+  <span class="co">fclose</span>(<span class="cv">$myfile</span>);
+<span class="ck">?&gt;</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">🗄️ PHP with MySQL</div>
+  <p>PHP connects to MySQL databases using the <strong>MySQLi extension</strong> (available since PHP 5.0).</p>
+  <h4>Key MySQL functions:</h4>
+  <table>
+    <tr><th>Function</th><th>Purpose</th></tr>
+    <tr><td><code>mysqli_connect(host, user, pass, db)</code></td><td>Opens database connection</td></tr>
+    <tr><td><code>mysqli_query(conn, sql)</code></td><td>Executes SQL query</td></tr>
+    <tr><td><code>mysqli_fetch_array(result)</code></td><td>Fetches result row as array</td></tr>
+    <tr><td><code>mysqli_num_rows(result)</code></td><td>Returns number of rows</td></tr>
+    <tr><td><code>mysqli_close(conn)</code></td><td>Closes connection</td></tr>
+  </table>
+  <h4>Connecting to MySQL:</h4>
+  <div class="code"><span class="ck">&lt;?php</span>
+  <span class="cv">$servername</span> = <span class="cs">"localhost"</span>;
+  <span class="cv">$username</span> = <span class="cs">"root"</span>;
+  <span class="cv">$password</span> = <span class="cs">""</span>;
+  <span class="cv">$DB_name</span> = <span class="cs">"students"</span>;
+
+  <span class="cv">$conn</span> = <span class="co">mysqli_connect</span>(<span class="cv">$servername</span>, <span class="cv">$username</span>, <span class="cv">$password</span>, <span class="cv">$DB_name</span>);
+
+  <span class="ck">if</span> (!<span class="cv">$conn</span>) {
+    <span class="ck">die</span>(<span class="cs">"Connection failed: "</span> . <span class="co">mysqli_connect_error</span>());
+  }
+  <span class="ck">echo</span> <span class="cs">"Connected successfully"</span>;
+<span class="ck">?&gt;</span></div>
+  <h4>Running a Query:</h4>
+  <div class="code"><span class="cv">$sql</span> = <span class="cs">"SELECT * FROM students"</span>;
+<span class="cv">$result</span> = <span class="co">mysqli_query</span>(<span class="cv">$conn</span>, <span class="cv">$sql</span>);
+
+<span class="ck">while</span> (<span class="cv">$row</span> = <span class="co">mysqli_fetch_array</span>(<span class="cv">$result</span>)) {
+  <span class="ck">echo</span> <span class="cv">$row</span>[<span class="cs">'name'</span>] . <span class="cs">" - "</span> . <span class="cv">$row</span>[<span class="cs">'email'</span>];
+}
+
+<span class="co">mysqli_close</span>(<span class="cv">$conn</span>);</div>
+  <div class="box exam">
+    <strong>📝 Exam Point — MySQLi</strong>
+    MySQLi = MySQL Improved. Available since PHP 5.0. Use <code>mysqli_connect()</code> to connect, <code>mysqli_query()</code> to execute SQL, <code>mysqli_close()</code> to disconnect.
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">✅ Chapter 9 Quiz</div>
+  <div class="quiz-wrap" id="quiz-ch9"></div>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+// ==================== DATA ====================
+const SIMS = {
+  ch4: {
+    lines: [
+      '<?php',
+      '$name = "Balu";',
+      '$age = 30;',
+      '$city = "Chennai";',
+      'echo "Name: " . $name;',
+      'echo "Age: " . $age;',
+      'echo "City: " . $city;',
+      '?>'
+    ],
+    exec: [
+      null,
+      (v,o)=>{ v.name='"Balu"'; },
+      (v,o)=>{ v.age=30; },
+      (v,o)=>{ v.city='"Chennai"'; },
+      (v,o)=>{ o.push('Name: Balu'); },
+      (v,o)=>{ o.push('Age: 30'); },
+      (v,o)=>{ o.push('City: Chennai'); },
+      null
+    ]
+  },
+  ch5: {
+    lines: [
+      '<?php',
+      '$a = 10;',
+      '$b = 3;',
+      'echo $a + $b;',
+      'echo $a - $b;',
+      'echo $a * $b;',
+      'echo $a % $b;',
+      '$str = "Hello";',
+      '$str .= " World";',
+      'echo $str;',
+      '?>'
+    ],
+    exec: [
+      null,
+      (v,o)=>{ v.a=10; },
+      (v,o)=>{ v.b=3; },
+      (v,o)=>{ o.push('13'); },
+      (v,o)=>{ o.push('7'); },
+      (v,o)=>{ o.push('30'); },
+      (v,o)=>{ o.push('1'); },
+      (v,o)=>{ v.str='"Hello"'; },
+      (v,o)=>{ v.str='"Hello World"'; },
+      (v,o)=>{ o.push('Hello World'); },
+      null
+    ]
+  },
+  ch6: {
+    lines: [
+      '<?php',
+      'function greet($name) {',
+      '  echo "Hello, " . $name . "!";',
+      '}',
+      'function addNumbers($x, $y) {',
+      '  echo $x + $y;',
+      '}',
+      'greet("Kumar");',
+      'greet("Priya");',
+      'addNumbers(10, 40);',
+      '?>'
+    ],
+    exec: [
+      null,
+      null,null,null,null,null,null,
+      (v,o)=>{ v['$name(call1)']='"Kumar"'; o.push('Hello, Kumar!'); },
+      (v,o)=>{ v['$name(call2)']='"Priya"'; o.push('Hello, Priya!'); },
+      (v,o)=>{ v['$x']=10; v['$y']=40; o.push('50'); },
+      null
+    ]
+  },
+  ch7: {
+    lines: [
+      '<?php',
+      '$fruits = array("apple","banana","orange");',
+      'echo $fruits[0];',
+      'echo $fruits[1];',
+      '$ages = array("Arun"=>25,"Balu"=>30);',
+      'echo $ages["Arun"];',
+      'echo $ages["Balu"];',
+      '?>'
+    ],
+    exec: [
+      null,
+      (v,o)=>{ v.fruits='["apple","banana","orange"]'; },
+      (v,o)=>{ o.push('apple'); },
+      (v,o)=>{ o.push('banana'); },
+      (v,o)=>{ v.ages='{"Arun":25,"Balu":30}'; },
+      (v,o)=>{ o.push('25'); },
+      (v,o)=>{ o.push('30'); },
+      null
+    ]
+  },
+  ch8: {
+    lines: [
+      '<?php',
+      '$i = 1;',
+      'while ($i <= 5) {',
+      '  echo $i;',
+      '  $i++;',
+      '}',
+      '// for loop',
+      'for ($j=1; $j<=3; $j++) {',
+      '  echo "j=" . $j;',
+      '}',
+      '?>'
+    ],
+    exec: [
+      null,
+      (v,o)=>{ v.i=1; },
+      (v,o)=>{ if(v.i<=5){ v._loopw=true; } },
+      (v,o)=>{ if(v.i<=5){ o.push(String(v.i)); } },
+      (v,o)=>{ if(v.i<=5){ v.i++; } },
+      null, null,
+      (v,o)=>{ v.j=1; },
+      (v,o)=>{ for(let j=1;j<=3;j++){ o.push('j='+j); } v.j=4; },
+      null, null
+    ]
+  }
+};
+
+const QUIZZES = {
+  ch4: [
+    { q:'What does PHP stand for?', opts:['PHP Hypertext Preprocessor','Preprocessor Hypertext PHP','Personal Home Page','Precompiled Hypertext Protocol'], ans:0, exp:'PHP is a recursive acronym: PHP: Hypertext Preprocessor.' },
+    { q:'Who created PHP?', opts:['Linus Torvalds','Rasmus Lerdorf','James Gosling','Guido van Rossum'], ans:1, exp:'PHP was created by Rasmus Lerdorf in 1994.' },
+    { q:'Which symbol is used to declare a variable in PHP?', opts:['@','#','$','%'], ans:2, exp:'All PHP variables start with a $ sign.' },
+    { q:'How many data types does PHP support?', opts:['4','6','8','10'], ans:2, exp:'PHP supports 8 data types: Integer, Float, String, Boolean, Array, Object, Resource, NULL.' },
+    { q:'Which of the following is the default PHP tag?', opts:['<? ?>','<?php ?>','<script language="php">','<php>'], ans:1, exp:'<?php ?> is the default and most recommended PHP tag.' },
+    { q:'What is the output of: echo "My name is" . "Kumar";', opts:['My name isKumar','My name is Kumar','Error','My name is . Kumar'], ans:0, exp:'The dot (.) concatenates strings directly without adding a space. There is no space between "is" and "Kumar".' },
+    { q:'Which comment style is used for single-line comments in PHP?', opts:['/* */','<!-- -->','// or #','**'], ans:2, exp:'PHP uses // or # for single-line comments and /* */ for multi-line comments.' }
+  ],
+  ch5: [
+    { q:'What is the result of 10 % 3?', opts:['3','1','0.33','3.33'], ans:1, exp:'10 % 3 = 1 (remainder when 10 is divided by 3).' },
+    { q:'What does $a += 5 mean?', opts:['$a = 5','$a = $a - 5','$a = $a + 5','$a + 5'], ans:2, exp:'+= is an assignment operator: $a += 5 means $a = $a + 5.' },
+    { q:'What is the difference between == and ===?', opts:['No difference','=== checks value only','=== checks value AND type','== checks type only'], ans:2, exp:'== compares values (loose), === compares both value and type (strict).' },
+    { q:'What does the . operator do in PHP?', opts:['Arithmetic addition','Logical AND','String concatenation','Array merge'], ans:2, exp:'The dot (.) operator concatenates (joins) two strings.' },
+    { q:'What is the output of: $a = 5; echo $a++;', opts:['5','6','4','Error'], ans:0, exp:'$a++ is post-increment: the current value (5) is used first, then $a becomes 6.' },
+    { q:'Which operator returns true only if BOTH operands are true?', opts:['||','xor','&&','!'], ans:2, exp:'&& (AND) returns true only if both operands are true.' }
+  ],
+  ch6: [
+    { q:'What keyword is used to define a function in PHP?', opts:['def','func','function','procedure'], ans:2, exp:'The keyword "function" is used to define a function in PHP.' },
+    { q:'What is a parameter in a function?', opts:['The function name','The value passed when calling','The variable in the definition','The return value'], ans:2, exp:'A parameter is the variable listed in the function definition. An argument is the actual value passed during the call.' },
+    { q:'What is the output of: function add($x,$y){ echo $x+$y; } add(10,40);', opts:['10','40','50','Error'], ans:2, exp:'add(10,40) adds 10 and 40, outputting 50.' },
+    { q:'Which function returns the length of a string?', opts:['strcount()','length()','strlen()','size()'], ans:2, exp:'strlen() returns the length (number of characters) of a string.' },
+    { q:'What is a built-in function?', opts:['A function you create','A function defined by PHP itself','A function inside a class','A recursive function'], ans:1, exp:'Built-in functions are pre-defined by PHP and ready to use without any definition.' }
+  ],
+  ch7: [
+    { q:'What is the index of the first element in an indexed array?', opts:['1','-1','0','None'], ans:2, exp:'PHP arrays (like most languages) use 0-based indexing. The first element has index 0.' },
+    { q:'What is the output of: $fruits=array("apple","banana","orange"); echo $fruits[1];', opts:['apple','banana','orange','Error'], ans:1, exp:'$fruits[1] refers to the second element (index 1), which is "banana".' },
+    { q:'What operator is used in associative arrays to assign a value to a key?', opts:['=>',':=','==',':'], ans:0, exp:'"=>" (double arrow) is used in PHP associative arrays: "key" => value.' },
+    { q:'What is the output of: $arr=array(array(1,2,3),array(4,5,6)); echo $arr[1][2];', opts:['3','5','6','4'], ans:2, exp:'$arr[1] is the second row (4,5,6). $arr[1][2] is index 2 of that row, which is 6.' },
+    { q:'Which type of array uses string keys?', opts:['Indexed','Associative','Multidimensional','Numeric'], ans:1, exp:'Associative arrays use string keys (like "name", "age") instead of numeric indices.' }
+  ],
+  ch8: [
+    { q:'Which loop always executes at least once?', opts:['for','while','do-while','foreach'], ans:2, exp:'do-while is exit-controlled: it checks condition AFTER executing the body, so it always runs at least once.' },
+    { q:'What is the output of: for($i=1; $i<=3; $i++) echo $i;', opts:['1','123','321','Error'], ans:1, exp:'The loop runs for i=1,2,3, echoing each value. Output: 123.' },
+    { q:'What keyword is used to exit a switch case?', opts:['exit','stop','break','end'], ans:2, exp:'"break" stops execution from falling through to the next case in a switch statement.' },
+    { q:'foreach loop is designed for:', opts:['Numbers only','Any loop','Arrays','While conditions'], ans:2, exp:'foreach is specifically designed to iterate over arrays (both indexed and associative).' },
+    { q:'In a for loop, what does $i++ do?', opts:['Initializes $i','Tests condition','Updates $i','Breaks loop'], ans:2, exp:'The third part of a for loop (after the second semicolon) is the update/increment expression.' },
+    { q:'What is the output of: $i=1; while($i<=3){ echo $i; $i++; }', opts:['1','12','123','Error'], ans:2, exp:'while loop runs while $i <= 3, echoing 1, 2, 3. Output: 123.' },
+    { q:'What is an entry-controlled loop?', opts:['Condition checked after body','Condition checked before body','No condition','Loop with arrays'], ans:1, exp:'Entry-controlled loops (for, while) check the condition BEFORE executing the loop body.' }
+  ],
+  ch9: [
+    { q:'Which superglobal is used to collect form data sent via POST method?', opts:['$_GET','$_FORM','$_POST','$_DATA'], ans:2, exp:'$_POST collects form data submitted via the HTTP POST method.' },
+    { q:'What function is used to open a file in PHP?', opts:['openfile()','file_open()','fopen()','open()'], ans:2, exp:'fopen(filename, mode) is used to open a file in PHP.' },
+    { q:'Which file mode opens a file for writing only and truncates (empties) it?', opts:['r','a','w','r+'], ans:2, exp:'"w" mode opens for writing only and truncates the file to zero length. Use "a" to append.' },
+    { q:'What is MySQLi?', opts:['MySQL Interface','MySQL Improved','MySQL Integrated','MySQL Interpreter'], ans:1, exp:'MySQLi stands for MySQL Improved. It is an improved extension for MySQL database operations, available from PHP 5.0.' },
+    { q:'Which function is used to close a MySQL connection?', opts:['mysql_end()','conn_close()','mysqli_close()','close_mysql()'], ans:2, exp:'mysqli_close($conn) closes the MySQL connection.' },
+    { q:'What is the main advantage of POST over GET?', opts:['Faster','Data not visible in URL','Supports more files','Bookmarkable'], ans:1, exp:'POST data is not visible in the URL, making it more secure for sensitive information like passwords.' }
+  ]
+};
+
+// ==================== STATE ====================
+const state = {
+  sims: {},
+  quizzes: {},
+  progress: {}
+};
+
+function loadProgress() {
+  try {
+    const p = localStorage.getItem('php_lab_progress');
+    if(p) Object.assign(state.progress, JSON.parse(p));
+  } catch(e) {}
+}
+
+function saveProgress() {
+  try { localStorage.setItem('php_lab_progress', JSON.stringify(state.progress)); } catch(e) {}
+}
+
+// ==================== NAVIGATION ====================
+function showSec(id) {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.sb-link').forEach(a=>a.classList.remove('act'));
+  const s = document.getElementById(id);
+  if(s) { s.classList.add('on'); markVisit(id); }
+  document.querySelectorAll('.sb-link').forEach(a=>{
+    if(a.getAttribute('onclick') && a.getAttribute('onclick').includes(id))
+      a.classList.add('act');
+  });
+  if(window.innerWidth <= 768) { toggleMenu(true); }
+  window.scrollTo(0,0);
+}
+
+function toggleMenu(forceClose) {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sov');
+  if(forceClose || sb.classList.contains('open')) {
+    sb.classList.remove('open'); ov.classList.remove('on');
+  } else {
+    sb.classList.add('open'); ov.classList.add('on');
+  }
+}
+
+function toggleLang() {
+  const r = document.getElementById('root');
+  const cur = r.getAttribute('data-lang') || 'en';
+  r.setAttribute('data-lang', cur === 'en' ? 'ta' : 'en');
+}
+
+function showTab(btn, id) {
+  const parent = btn.closest('.card, .tc');
+  if(!parent) return;
+  parent.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  parent.querySelectorAll('.tc').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  const tc = document.getElementById(id);
+  if(tc) tc.classList.add('on');
+}
+
+function accToggle(btn) {
+  const body = btn.nextElementSibling;
+  btn.classList.toggle('on');
+  body.classList.toggle('on');
+}
+
+// ==================== SIMULATOR ====================
+function initSim(id) {
+  if(state.sims[id]) return;
+  const sim = SIMS[id];
+  if(!sim) return;
+  state.sims[id] = { step: 0, vars: {}, output: [], done: false };
+  renderSimCode(id);
+}
+
+function renderSimCode(id) {
+  const sim = SIMS[id];
+  const el = document.getElementById('sim-'+id+'-code');
+  if(!el || !sim) return;
+  el.innerHTML = sim.lines.map((l,i) =>
+    `<span class="sim-line" id="sim-${id}-line-${i}">${escHTML(l)}</span>`
+  ).join('\n');
+}
+
+function simStep(id) {
+  if(!state.sims[id]) initSim(id);
+  const s = state.sims[id];
+  const sim = SIMS[id];
+  if(s.done || s.step >= sim.lines.length) { s.done=true; return; }
+
+  // Clear previous highlights
+  document.querySelectorAll(`#sim-${id}-code .sim-line`).forEach(l=>{
+    l.classList.remove('cur'); l.classList.add('done');
+  });
+
+  const lineEl = document.getElementById(`sim-${id}-line-${s.step}`);
+  if(lineEl) { lineEl.classList.add('cur'); lineEl.classList.remove('done'); }
+
+  const execFn = sim.exec[s.step];
+  if(execFn) execFn(s.vars, s.output);
+
+  s.step++;
+  renderSimVars(id, s.vars);
+  renderSimOut(id, s.output);
+
+  if(s.step >= sim.lines.length) s.done = true;
+}
+
+function simRun(id) {
+  if(!state.sims[id]) initSim(id);
+  const sim = SIMS[id];
+  const s = state.sims[id];
+  s.step = 0; s.vars = {}; s.output = []; s.done = false;
+  sim.exec.forEach((fn,i) => { if(fn) fn(s.vars, s.output); });
+  s.step = sim.lines.length; s.done = true;
+  document.querySelectorAll(`#sim-${id}-code .sim-line`).forEach(l=>l.classList.add('done'));
+  renderSimVars(id, s.vars);
+  renderSimOut(id, s.output);
+  markQuizVisit(id);
+}
+
+function simReset(id) {
+  state.sims[id] = { step: 0, vars: {}, output: [], done: false };
+  renderSimCode(id);
+  const vEl = document.getElementById('sim-'+id+'-vars');
+  const oEl = document.getElementById('sim-'+id+'-out');
+  if(vEl) vEl.innerHTML = '<span style="color:var(--txm);font-size:.8rem">No variables yet</span>';
+  if(oEl) oEl.textContent = '';
+}
+
+function renderSimVars(id, vars) {
+  const el = document.getElementById('sim-'+id+'-vars');
+  if(!el) return;
+  const keys = Object.keys(vars);
+  if(!keys.length) { el.innerHTML = '<span style="color:var(--txm);font-size:.8rem">No variables yet</span>'; return; }
+  el.innerHTML = keys.map(k =>
+    `<div class="sim-var"><span class="vn">$${k}</span><span class="vv"> = ${vars[k]}</span></div>`
+  ).join('');
+}
+
+function renderSimOut(id, output) {
+  const el = document.getElementById('sim-'+id+'-out');
+  if(el) el.textContent = output.join('\n');
+}
+
+function escHTML(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ==================== QUIZ ====================
+function initQuiz(chId) {
+  const qs = QUIZZES[chId];
+  if(!qs) return;
+  const el = document.getElementById('quiz-'+chId);
+  if(!el) return;
+  const s = { idx: 0, answered: false, score: 0 };
+  state.quizzes[chId] = s;
+  renderQuestion(chId);
+}
+
+function renderQuestion(chId) {
+  const qs = QUIZZES[chId];
+  const s = state.quizzes[chId];
+  const el = document.getElementById('quiz-'+chId);
+  if(!el || !qs || !s) return;
+
+  if(s.idx >= qs.length) { showScore(chId); return; }
+
+  const q = qs[s.idx];
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:.8rem;font-size:.82rem;color:var(--txm)">
+      <span class="diff d-b">📖 Textbook Based</span>
+      <span>Q ${s.idx+1} / ${qs.length}</span>
+    </div>
+    <div class="qtext"><span class="qnum">${s.idx+1}</span>${escHTML(q.q)}</div>
+    <div class="opts" id="qopts-${chId}">
+      ${q.opts.map((o,i)=>`
+        <label class="opt" id="qopt-${chId}-${i}">
+          <input type="radio" name="q-${chId}" value="${i}"> ${escHTML(o)}
+        </label>
+      `).join('')}
+    </div>
+    <div class="qfb" id="qfb-${chId}"></div>
+    <div class="qnav">
+      <span style="font-size:.8rem;color:var(--txm)">Score: ${s.score}/${s.idx}</span>
+      <button class="btn btn-p" onclick="submitAnswer('${chId}')">Check Answer</button>
+    </div>`;
+}
+
+function submitAnswer(chId) {
+  const qs = QUIZZES[chId];
+  const s = state.quizzes[chId];
+  if(!qs || !s || s.answered) return;
+  const q = qs[s.idx];
+  const sel = document.querySelector(`input[name="q-${chId}"]:checked`);
+  if(!sel) { alert('Please select an answer'); return; }
+  const chosen = parseInt(sel.value);
+  const correct = chosen === q.ans;
+  if(correct) s.score++;
+  s.answered = true;
+
+  document.querySelectorAll(`#qopts-${chId} .opt`).forEach((el,i) => {
+    if(i === q.ans) el.classList.add('ok');
+    else if(i === chosen && !correct) el.classList.add('no');
+    el.style.pointerEvents='none';
+  });
+
+  const fb = document.getElementById(`qfb-${chId}`);
+  fb.style.display='block';
+  fb.className = `qfb ${correct?'ok':'no'}`;
+  fb.innerHTML = (correct ? '✅ Correct! ' : '❌ Incorrect. ') + q.exp;
+
+  const nav = document.querySelector(`#quiz-${chId} .qnav`);
+  nav.innerHTML = `
+    <span style="font-size:.8rem;color:var(--txm)">Score: ${s.score}/${s.idx+1}</span>
+    <button class="btn btn-p" onclick="nextQuestion('${chId}')">Next →</button>`;
+}
+
+function nextQuestion(chId) {
+  const s = state.quizzes[chId];
+  s.idx++; s.answered = false;
+  if(s.idx >= QUIZZES[chId].length) { showScore(chId); }
+  else { renderQuestion(chId); }
+}
+
+function showScore(chId) {
+  const s = state.quizzes[chId];
+  const total = QUIZZES[chId].length;
+  const pct = Math.round(s.score/total*100);
+  const el = document.getElementById('quiz-'+chId);
+  el.innerHTML = `
+    <div class="q-score" style="display:block">
+      <div class="sc">${pct}%</div>
+      <h3 style="margin:.5rem 0">${pct>=80?'Excellent! 🎉':pct>=60?'Good Job! 👍':'Keep Practising! 📚'}</h3>
+      <p>You scored <strong>${s.score} out of ${total}</strong></p>
+      <p style="font-size:.85rem;color:var(--txm)">${pct>=80?'Ready for the exam!':'Review the chapter and try again.'}</p>
+      <button class="btn btn-p" onclick="retryQuiz('${chId}')" style="margin:.5rem .3rem">🔄 Retry</button>
+      <button class="btn btn-s" onclick="showSec('ch${chId.slice(-1)==='4'?'5':chId.slice(-1)==='5'?'6':chId.slice(-1)==='6'?'7':chId.slice(-1)==='7'?'8':chId.slice(-1)==='8'?'9':'4'}')" style="margin:.5rem .3rem">Next Chapter →</button>
+    </div>`;
+  updateChapterProgress(chId, pct);
+}
+
+function retryQuiz(chId) {
+  state.quizzes[chId] = { idx:0, answered:false, score:0 };
+  renderQuestion(chId);
+}
+
+// ==================== PROGRESS ====================
+function markVisit(secId) {
+  if(!state.progress[secId]) state.progress[secId] = { visited: true };
+  else state.progress[secId].visited = true;
+  saveProgress();
+  updateAllProgress();
+}
+
+function markQuizVisit(id) {
+  const chId = 'ch'+id.replace('ch','');
+  markVisit(chId);
+}
+
+function updateChapterProgress(chId, pct) {
+  const num = chId.replace('ch','');
+  if(!state.progress[chId]) state.progress[chId] = {};
+  state.progress[chId].quiz = pct;
+  saveProgress();
+  const pEl = document.getElementById('p'+num);
+  const ptEl = document.getElementById('pt'+num);
+  if(pEl) pEl.style.width = pct+'%';
+  if(ptEl) ptEl.textContent = pct+'%';
+  updateOverallProgress();
+}
+
+function updateAllProgress() {
+  ['4','5','6','7','8','9'].forEach(n => {
+    const chId = 'ch'+n;
+    const p = state.progress[chId];
+    if(p) {
+      const pct = p.quiz || (p.visited ? 10 : 0);
+      const pEl = document.getElementById('p'+n);
+      const ptEl = document.getElementById('pt'+n);
+      if(pEl) pEl.style.width = pct+'%';
+      if(ptEl) ptEl.textContent = pct+'%';
+    }
+  });
+  updateOverallProgress();
+}
+
+function updateOverallProgress() {
+  const nums = ['4','5','6','7','8','9'];
+  let total = 0;
+  nums.forEach(n => {
+    const p = state.progress['ch'+n];
+    total += p ? (p.quiz || (p.visited ? 10 : 0)) : 0;
+  });
+  const avg = Math.round(total / nums.length);
+  const el = document.getElementById('overall-prog');
+  if(el) el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="font-size:2rem;font-weight:700;color:var(--g)">${avg}%</div>
+      <div style="flex:1">
+        <div style="font-size:.82rem;color:var(--txm);margin-bottom:.3rem">Overall Progress (quiz scores)</div>
+        <div class="pb" style="height:8px"><div class="pf" style="width:${avg}%"></div></div>
+      </div>
+    </div>`;
+}
+
+function resetProgress() {
+  if(!confirm('Reset all progress?')) return;
+  state.progress = {};
+  saveProgress();
+  updateAllProgress();
+  document.getElementById('overall-prog').innerHTML = '<p style="color:var(--txm);font-size:.88rem">No progress yet. Start a chapter!</p>';
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  updateAllProgress();
+
+  // Init all simulators
+  Object.keys(SIMS).forEach(id => initSim(id));
+
+  // Init all quizzes
+  Object.keys(QUIZZES).forEach(id => initQuiz(id));
+});
+</script>
+</body>
+</html>
