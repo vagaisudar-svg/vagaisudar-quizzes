@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 – SQL Simulator</title>
+<style>
+:root {
+  --bg: #f8f7ff;
+  --surface: #ffffff;
+  --sidebar: #3b1f6e;
+  --sidebar-text: #e8e0ff;
+  --sidebar-active: #7c3aed;
+  --primary: #6d28d9;
+  --primary-light: #ede9fe;
+  --accent: #a78bfa;
+  --text: #1e1b4b;
+  --text2: #4b5563;
+  --border: #e0d9f7;
+  --code-bg: #1e1b4b;
+  --code-text: #c4b5fd;
+  --out-bg: #f0fdf4;
+  --out-border: #86efac;
+  --err-bg: #fef2f2;
+  --err-border: #fca5a5;
+  --info-bg: #eff6ff;
+  --info-border: #93c5fd;
+  --table-head: #6d28d9;
+  --table-stripe: #f5f3ff;
+  --btn: #7c3aed;
+  --btn-text: #fff;
+  --reset-btn: #dc2626;
+  --tag-bg: #ede9fe;
+  --tag-text: #6d28d9;
+}
+[data-theme="dark"] {
+  --bg: #0f0e1a;
+  --surface: #1a1830;
+  --sidebar: #110e22;
+  --sidebar-text: #c4b5fd;
+  --sidebar-active: #7c3aed;
+  --primary: #a78bfa;
+  --primary-light: #2e1065;
+  --accent: #c4b5fd;
+  --text: #e8e0ff;
+  --text2: #a0aec0;
+  --border: #2d2060;
+  --code-bg: #0d0b1a;
+  --code-text: #c4b5fd;
+  --out-bg: #052e16;
+  --out-border: #166534;
+  --err-bg: #3b0a0a;
+  --err-border: #991b1b;
+  --info-bg: #0c1a3b;
+  --info-border: #1e40af;
+  --table-head: #4c1d95;
+  --table-stripe: #1a1530;
+  --btn: #7c3aed;
+  --btn-text: #fff;
+  --reset-btn: #b91c1c;
+  --tag-bg: #2e1065;
+  --tag-text: #c4b5fd;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh;}
+header{background:var(--sidebar);color:var(--sidebar-text);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px #0006;}
+header h1{font-size:1.1rem;font-weight:700;letter-spacing:.01em;}
+header span{font-size:.8rem;opacity:.7;margin-left:8px;}
+.toggle-btn{background:var(--sidebar-active);border:none;color:#fff;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:background .2s;}
+.toggle-btn:hover{background:#5b21b6;}
+.layout{display:flex;flex:1;}
+aside{width:240px;background:var(--sidebar);color:var(--sidebar-text);overflow-y:auto;padding:12px 0;flex-shrink:0;position:sticky;top:53px;height:calc(100vh - 53px);}
+aside .section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);padding:12px 16px 4px;opacity:.8;}
+aside a{display:block;padding:7px 16px;font-size:.82rem;color:var(--sidebar-text);text-decoration:none;border-left:3px solid transparent;transition:all .15s;cursor:pointer;}
+aside a:hover{background:#ffffff12;border-left-color:var(--accent);}
+aside a.active{background:var(--sidebar-active)33;border-left-color:var(--accent);color:#fff;font-weight:600;}
+main{flex:1;padding:20px;overflow-y:auto;max-width:900px;}
+.db-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.db-bar label{font-size:.8rem;font-weight:600;color:var(--text2);}
+.db-indicator{font-size:.75rem;background:var(--tag-bg);color:var(--tag-text);padding:3px 10px;border-radius:12px;font-weight:600;}
+.btn{background:var(--btn);color:var(--btn-text);border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;transition:opacity .2s;}
+.btn:hover{opacity:.88;}
+.btn.reset{background:var(--reset-btn);}
+.btn.small{padding:4px 10px;font-size:.75rem;}
+.section-panel{display:none;}
+.section-panel.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;overflow:hidden;}
+.card-header{background:var(--primary-light);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:.92rem;font-weight:700;color:var(--primary);}
+.card-tag{font-size:.68rem;background:var(--tag-bg);color:var(--tag-text);padding:2px 8px;border-radius:10px;font-weight:600;}
+.card-body{padding:14px 16px;}
+.explanation{font-size:.83rem;color:var(--text2);margin-bottom:10px;line-height:1.6;}
+.sql-area{position:relative;}
+.sql-area label{font-size:.72rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px;}
+textarea.sql-input{width:100%;min-height:80px;background:var(--code-bg);color:var(--code-text);border:1px solid #4c1d95;border-radius:6px;padding:10px 12px;font-family:'Consolas','Courier New',monospace;font-size:.82rem;resize:vertical;line-height:1.5;outline:none;}
+textarea.sql-input:focus{border-color:var(--accent);}
+.run-row{display:flex;gap:8px;margin-top:8px;align-items:center;}
+.output-area{margin-top:12px;}
+.output-area label{font-size:.72rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px;}
+.output-box{background:var(--out-bg);border:1px solid var(--out-border);border-radius:6px;padding:10px 12px;font-size:.82rem;min-height:36px;}
+.output-box.error{background:var(--err-bg);border-color:var(--err-border);color:#991b1b;}
+.output-box.info{background:var(--info-bg);border-color:var(--info-border);color:#1e40af;}
+[data-theme="dark"] .output-box.error{color:#fca5a5;}
+[data-theme="dark"] .output-box.info{color:#93c5fd;}
+.result-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.result-table th{background:var(--table-head);color:#fff;padding:6px 10px;text-align:left;}
+.result-table td{padding:5px 10px;border-bottom:1px solid var(--border);}
+.result-table tr:nth-child(even) td{background:var(--table-stripe);}
+.result-table tr:hover td{background:var(--primary-light);}
+.multi-output .stmt-result{margin-bottom:8px;}
+.stmt-result .stmt-label{font-size:.72rem;color:var(--text2);margin-bottom:4px;font-style:italic;}
+.note-box{background:var(--info-bg);border-left:3px solid var(--primary);padding:8px 12px;border-radius:4px;font-size:.78rem;color:var(--text2);margin:8px 0;line-height:1.5;}
+.step-anim{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:10px;}
+.step-anim .step-header{background:var(--primary-light);padding:8px 12px;font-size:.78rem;font-weight:600;color:var(--primary);display:flex;justify-content:space-between;align-items:center;}
+.step-anim .step-body{padding:10px 12px;overflow-x:auto;}
+.anim-table{border-collapse:collapse;font-size:.75rem;}
+.anim-table th{background:var(--primary);color:#fff;padding:4px 8px;text-align:left;}
+.anim-table td{padding:4px 8px;border:1px solid var(--border);}
+.anim-table tr.highlight td{background:#fde68a;color:#78350f;}
+[data-theme="dark"] .anim-table tr.highlight td{background:#422006;color:#fde68a;}
+.anim-table tr.deleted td{background:#fee2e2;text-decoration:line-through;color:#991b1b;}
+[data-theme="dark"] .anim-table tr.deleted td{background:#3b0a0a;color:#fca5a5;}
+.anim-table tr.new-row td{background:#dcfce7;color:#166534;}
+[data-theme="dark"] .anim-table tr.new-row td{background:#052e16;color:#86efac;}
+.step-controls{display:flex;gap:6px;padding:8px 12px;background:var(--bg);border-top:1px solid var(--border);}
+.constraint-demo{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.constraint-badge{background:var(--tag-bg);color:var(--tag-text);padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600;}
+@media(max-width:700px){aside{display:none;}.layout{flex-direction:column;}main{padding:12px;max-width:100%;}}
+.table-viewer{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:14px;}
+.table-viewer h4{font-size:.8rem;font-weight:700;color:var(--primary);margin-bottom:8px;}
+.empty-state{color:var(--text2);font-size:.8rem;font-style:italic;padding:8px;}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+.chip{font-size:.72rem;background:var(--tag-bg);color:var(--tag-text);padding:2px 8px;border-radius:10px;}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Chapter 12 – Structured Query Language (SQL) <span>TN SCERT Class XII CS</span></h1></div>
+  <button class="toggle-btn" onclick="toggleTheme()">🌙 Dark / ☀️ Light</button>
+</header>
+<div class="layout">
+<aside id="sidebar">
+  <div class="section-label">Getting Started</div>
+  <a onclick="showSection('s0')" class="active">Database & Overview</a>
+  <div class="section-label">12.7.1 – DDL: CREATE TABLE</div>
+  <a onclick="showSection('s1')">Simple CREATE TABLE</a>
+  <a onclick="showSection('s2')">Constraints</a>
+  <div class="section-label">12.7.3 – DML Commands</div>
+  <a onclick="showSection('s3')">INSERT</a>
+  <a onclick="showSection('s4')">DELETE</a>
+  <a onclick="showSection('s5')">UPDATE</a>
+  <div class="section-label">12.7.4 – More DDL</div>
+  <a onclick="showSection('s6')">ALTER / TRUNCATE / DROP</a>
+  <div class="section-label">12.7.5 – DQL: SELECT</div>
+  <a onclick="showSection('s7')">Basic SELECT</a>
+  <a onclick="showSection('s8')">DISTINCT & ALL</a>
+  <a onclick="showSection('s9')">WHERE Clause</a>
+  <a onclick="showSection('s10')">BETWEEN & IN</a>
+  <a onclick="showSection('s11')">ORDER BY</a>
+  <a onclick="showSection('s12')">GROUP BY & HAVING</a>
+  <div class="section-label">12.7.6 – TCL</div>
+  <a onclick="showSection('s13')">COMMIT / SAVEPOINT / ROLLBACK</a>
+  <div class="section-label">Exercises</div>
+  <a onclick="showSection('s14')">Hands-on Experience</a>
+  <a onclick="showSection('s15')">Employee Table Queries</a>
+</aside>
+<main>
+  <div class="db-bar">
+    <label>Active DB:</label>
+    <span class="db-indicator" id="dbName">stud</span>
+    <label>Tables:</label>
+    <span class="db-indicator" id="tableList">none</span>
+    <button class="btn small" onclick="resetStudentTable()">Reset Student Table</button>
+    <button class="btn small reset" onclick="clearAll()">Clear All Tables</button>
+    <button class="btn small" onclick="showAllTables()">View Tables</button>
+  </div>
+  <div id="tableViewer" style="display:none"></div>
+
+  <!-- ===== SECTION 0: Overview ===== -->
+  <div class="section-panel active" id="s0">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.4 – Creating a Database</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">SQL begins with creating a database and selecting it for use. These are metadata-level commands. The simulator pre-selects the <code>stud</code> database.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s0_1">CREATE DATABASE stud;
+USE stud;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s0_1','out_s0_1')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box info" id="out_s0_1">Click Run to execute</div></div>
+        <div class="note-box">MySQL is an RDBMS. SQL is the language used to communicate with it. <code>CREATE DATABASE</code> makes a new database; <code>USE</code> selects it for subsequent commands.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">SQL Components Overview</span></div>
+      <div class="card-body">
+        <div class="chip-row">
+          <span class="chip">DDL – CREATE, ALTER, DROP, TRUNCATE</span>
+          <span class="chip">DML – INSERT, UPDATE, DELETE</span>
+          <span class="chip">DQL – SELECT</span>
+          <span class="chip">DCL – GRANT, REVOKE</span>
+          <span class="chip">TCL – COMMIT, ROLLBACK, SAVEPOINT</span>
+        </div>
+        <div class="note-box">DDL defines structure. DML manipulates data. DQL queries data. DCL controls access. TCL manages transactions.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 1: CREATE TABLE ===== -->
+  <div class="section-panel" id="s1">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.1 – Simple CREATE TABLE</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">Creates the Student table with five fields: Admno (integer), Name (char 20), Gender (char 1), Age (integer), Place (char 10). No constraints applied here.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s1_1">CREATE TABLE Student (
+  Admno integer,
+  Name char(20),
+  Gender char(1),
+  Age integer,
+  Place char(10)
+);</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s1_1','out_s1_1')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s1_1">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2: Constraints ===== -->
+  <div class="section-panel" id="s2">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.2 – NOT NULL + PRIMARY KEY</span><span class="card-tag">Column Constraint</span></div>
+      <div class="card-body">
+        <p class="explanation"><strong>NOT NULL</strong> enforces that a field must always have a value. <strong>PRIMARY KEY</strong> uniquely identifies each record and implies NOT NULL.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s2_1">DROP TABLE IF EXISTS Student;
+CREATE TABLE Student (
+  Admno integer NOT NULL PRIMARY KEY,
+  Name char(20) NOT NULL,
+  Gender char(1),
+  Age integer,
+  Place char(10)
+);</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s2_1','out_s2_1')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s2_1">Click Run to execute</div></div>
+        <div class="constraint-demo">
+          <span class="constraint-badge">NOT NULL – Admno</span>
+          <span class="constraint-badge">NOT NULL – Name</span>
+          <span class="constraint-badge">PRIMARY KEY – Admno</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">UNIQUE Constraint</span><span class="card-tag">Column Constraint</span></div>
+      <div class="card-body">
+        <p class="explanation">UNIQUE ensures no two rows have the same value in the specified column. Unlike PRIMARY KEY, multiple UNIQUE columns can exist in a table. Must be used with NOT NULL.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s2_2">DROP TABLE IF EXISTS Student;
+CREATE TABLE Student (
+  Admno integer NOT NULL UNIQUE,
+  Name char(20) NOT NULL,
+  Gender char(1),
+  Age integer,
+  Place char(10)
+);
+-- Test: Insert duplicate Admno (should fail)
+INSERT INTO Student VALUES (100, 'Ashish', 'M', 17, 'Chennai');
+INSERT INTO Student VALUES (100, 'Adarsh', 'M', 18, 'Delhi');</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s2_2','out_s2_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s2_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">DEFAULT Constraint</span><span class="card-tag">Column Constraint</span></div>
+      <div class="card-body">
+        <p class="explanation">DEFAULT assigns a value automatically when no value is provided for that field during INSERT. Here Age defaults to 17.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s2_3">DROP TABLE IF EXISTS Student;
+CREATE TABLE Student (
+  Admno integer PRIMARY KEY,
+  Name char(20) NOT NULL,
+  Gender char(1),
+  Age integer DEFAULT 17,
+  Place char(10)
+);
+-- Insert without specifying Age - should default to 17
+INSERT INTO Student (Admno, Name, Gender, Place) VALUES (100, 'Ashish', 'M', 'Chennai');
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s2_3','out_s2_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s2_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">CHECK Constraint</span><span class="card-tag">Column Constraint</span></div>
+      <div class="card-body">
+        <p class="explanation">CHECK restricts the values a field can accept. Here Age must be ≤ 19. Inserting Age = 20 will fail.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s2_4">DROP TABLE IF EXISTS Student;
+CREATE TABLE Student (
+  Admno integer PRIMARY KEY,
+  Name char(20) NOT NULL,
+  Gender char(1),
+  Age integer CHECK (Age <= 19),
+  Place char(10)
+);
+INSERT INTO Student VALUES (100, 'Ashish', 'M', 17, 'Chennai');
+INSERT INTO Student VALUES (101, 'Adarsh', 'M', 20, 'Delhi');
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s2_4','out_s2_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s2_4">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">TABLE Constraint – Composite Primary Key</span><span class="card-tag">Table Constraint</span></div>
+      <div class="card-body">
+        <p class="explanation">A table constraint applies to a group of columns. Here, the combination of Firstname + Lastname forms the primary key (Student1 table).</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s2_5">DROP TABLE IF EXISTS Student1;
+CREATE TABLE Student1 (
+  Admno integer NOT NULL,
+  Firstname char(20),
+  Lastname char(20),
+  Gender char(1),
+  Age integer,
+  Place char(10),
+  PRIMARY KEY (Firstname, Lastname)
+);
+INSERT INTO Student1 VALUES (100, 'Ashish', 'Kumar', 'M', 17, 'Chennai');
+INSERT INTO Student1 VALUES (101, 'Ashish', 'Sharma', 'M', 18, 'Delhi');
+SELECT * FROM Student1;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s2_5','out_s2_5')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s2_5">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: INSERT ===== -->
+  <div class="section-panel" id="s3">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.3.1 – INSERT Command</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">INSERT adds new rows to a table. You can specify all columns, or just some (omitted columns get NULL or DEFAULT).</p>
+        <div class="sql-area"><label>SQL – All columns specified</label>
+        <textarea class="sql-input" id="q_s3_1">DROP TABLE IF EXISTS Student;
+CREATE TABLE Student (
+  Admno integer PRIMARY KEY,
+  Name char(20) NOT NULL,
+  Gender char(1) DEFAULT 'M',
+  Age integer DEFAULT 18,
+  Place char(10)
+);
+INSERT INTO Student (Admno, Name, Gender, Age, Place)
+  VALUES (100, 'Ashish', 'M', 17, 'Chennai');
+INSERT INTO Student (Admno, Name, Gender, Age, Place)
+  VALUES (101, 'Adarsh', 'M', 18, 'Delhi');
+INSERT INTO Student VALUES (102, 'Akshith', 'M', 17, 'Bangalore');
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s3_1','out_s3_1')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s3_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">INSERT – Partial Columns (with DEFAULT)</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">When some columns are omitted, DEFAULT values are used. Gender defaults to 'M' and Age defaults to 18.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s3_2">-- Run INSERT section above first, then:
+INSERT INTO Student (Admno, Name, Place) VALUES (103, 'Ayush', 'Delhi');
+INSERT INTO Student (Admno, Name, Place) VALUES (104, 'Abinandh', 'Chennai');
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s3_2','out_s3_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s3_2">Click Run to execute</div></div>
+        <div class="note-box">Fields omitted in INSERT take the DEFAULT value if defined, otherwise NULL is stored.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Load Full Student Table (8 students)</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">Load the complete Student table used throughout the SELECT query examples in sections 12.7.5 onwards.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s3_3">DROP TABLE IF EXISTS Student;
+CREATE TABLE Student (
+  Admno integer PRIMARY KEY,
+  Name char(20) NOT NULL,
+  Gender char(1),
+  Age integer,
+  Place char(10)
+);
+INSERT INTO Student VALUES (100, 'Ashish', 'M', 17, 'Chennai');
+INSERT INTO Student VALUES (101, 'Adarsh', 'M', 18, 'Delhi');
+INSERT INTO Student VALUES (102, 'Akshith', 'M', 17, 'Bangalore');
+INSERT INTO Student VALUES (103, 'Ayush', 'M', 18, 'Delhi');
+INSERT INTO Student VALUES (104, 'Abinandh', 'M', 18, 'Chennai');
+INSERT INTO Student VALUES (105, 'Revathi', 'F', 19, 'Chennai');
+INSERT INTO Student VALUES (106, 'Devika', 'F', 19, 'Bangalore');
+INSERT INTO Student VALUES (107, 'Hema', 'F', 17, 'Chennai');
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s3_3','out_s3_3')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Quick Load</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s3_3">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4: DELETE ===== -->
+  <div class="section-panel" id="s4">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.3.2 – DELETE Command</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">DELETE removes entire rows from a table. Use WHERE to target specific rows. Without WHERE, all rows are deleted (table structure remains).</p>
+        <div class="sql-area"><label>SQL – Delete specific row</label>
+        <textarea class="sql-input" id="q_s4_1">-- First, ensure Student table exists
+-- Click "Reset Student Table" button above, then:
+DELETE FROM Student WHERE Admno = 104;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s4_1','out_s4_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Reset Table First</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s4_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">DELETE All Rows</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">DELETE without WHERE removes all rows. The table structure (columns) remains. Use DROP TABLE to remove the structure too.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s4_2">DELETE FROM Student;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s4_2','out_s4_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s4_2">Click Run to execute</div></div>
+        <div class="note-box"><strong>DELETE vs TRUNCATE vs DROP:</strong> DELETE removes rows (space not freed), TRUNCATE removes all rows and frees space (structure kept), DROP removes entire table including structure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5: UPDATE ===== -->
+  <div class="section-panel" id="s5">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.3.3 – UPDATE Command</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">UPDATE modifies existing data. The SET clause specifies new values. WHERE targets specific rows.</p>
+        <div class="sql-area"><label>SQL – Update single field</label>
+        <textarea class="sql-input" id="q_s5_1">-- Reset table first if needed
+UPDATE Student SET Age = 20 WHERE Place = 'Bangalore';
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s5_1','out_s5_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Reset Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s5_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">UPDATE – Multiple Fields</span><span class="card-tag">DML</span></div>
+      <div class="card-body">
+        <p class="explanation">Multiple fields can be updated in one statement using comma-separated SET assignments.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s5_2">UPDATE Student SET Age = 18, Place = 'Chennai' WHERE Admno = 102;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s5_2','out_s5_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s5_2">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6: ALTER/TRUNCATE/DROP ===== -->
+  <div class="section-panel" id="s6">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.4.1 – ALTER TABLE: Add Column</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">ALTER TABLE ADD adds a new column to an existing table.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s6_1">ALTER TABLE Student ADD Address char(25);
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s6_1','out_s6_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Reset Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s6_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">ALTER TABLE: Rename Column (CHANGE)</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">ALTER TABLE CHANGE renames an existing column and can also change its data type.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s6_2">-- Run ADD Address first, then rename to City:
+ALTER TABLE Student CHANGE Address City char(20);
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s6_2','out_s6_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s6_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">ALTER TABLE: DROP COLUMN</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">ALTER TABLE DROP COLUMN removes a column from the table permanently.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s6_3">ALTER TABLE Student DROP COLUMN City;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s6_3','out_s6_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s6_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.4.2 – TRUNCATE TABLE</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">TRUNCATE deletes all rows and frees table space, but the table structure remains intact.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s6_4">TRUNCATE TABLE Student;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s6_4','out_s6_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s6_4">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.4.3 – DROP TABLE</span><span class="card-tag">DDL</span></div>
+      <div class="card-body">
+        <p class="explanation">DROP TABLE permanently removes the entire table (structure + data). Cannot be undone.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s6_5">DROP TABLE Student;
+-- Table is gone - SELECT will now fail:
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s6_5','out_s6_5')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s6_5">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 7: Basic SELECT ===== -->
+  <div class="section-panel" id="s7">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5 – SELECT Specific Columns</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">SELECT retrieves data. Specify column names to show only those fields.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s7_1">SELECT Admno, Name FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s7_1','out_s7_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Student Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s7_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">SELECT * – All Columns</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">The asterisk (*) selects all columns from the table.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s7_2">SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s7_2','out_s7_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s7_2">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 8: DISTINCT & ALL ===== -->
+  <div class="section-panel" id="s8">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.1 – DISTINCT Keyword</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">DISTINCT eliminates duplicate values from the result. Only unique values are returned.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s8_1">SELECT DISTINCT Place FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s8_1','out_s8_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s8_1">Click Run to execute</div></div>
+        <div class="note-box">Chennai appears 4 times in Place but DISTINCT returns it only once. Compare with ALL below.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.2 – ALL Keyword</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">ALL (default behaviour) retains all rows including duplicates.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s8_2">SELECT ALL Place FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s8_2','out_s8_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s8_2">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 9: WHERE ===== -->
+  <div class="section-panel" id="s9">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.6 – WHERE Clause: Equality</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">WHERE filters rows. Only rows matching the condition are returned.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s9_1">SELECT Admno, Name, Place FROM Student WHERE Place = 'Chennai';</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s9_1','out_s9_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s9_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">WHERE with ≥ Operator</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s9_2">SELECT Admno, Name, Age FROM Student WHERE Age >= 18;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s9_2','out_s9_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s9_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">WHERE with AND</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">AND requires both conditions to be true.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s9_3">SELECT Admno, Name, Age, Place FROM Student
+WHERE (Age >= 18 AND Place = 'Delhi');</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s9_3','out_s9_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s9_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">WHERE with OR</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">OR returns rows where at least one condition is true.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s9_4">SELECT Admno, Name, Age, Place FROM Student
+WHERE (Age >= 18 OR Place = 'Delhi');</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s9_4','out_s9_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s9_4">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">WHERE with NOT</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">NOT negates the condition – returns rows where the condition is false.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s9_5">SELECT Admno, Name, Place FROM Student
+WHERE NOT Place = 'Delhi';</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s9_5','out_s9_5')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s9_5">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">IS NULL / IS NOT NULL</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">NULL values are searched using IS NULL. The = operator cannot detect NULL.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s9_6">-- Insert a row with no Age value
+INSERT INTO Student VALUES (108, 'TestNull', 'M', NULL, 'Mumbai');
+SELECT * FROM Student WHERE Age IS NULL;
+-- Cleanup:
+DELETE FROM Student WHERE Admno = 108;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s9_6','out_s9_6')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s9_6">Click Run to execute</div></div>
+        <div class="note-box">Non-NULL values can be found using IS NOT NULL.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 10: BETWEEN & IN ===== -->
+  <div class="section-panel" id="s10">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.3 – BETWEEN Keyword</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">BETWEEN selects rows where the column value falls within an inclusive range.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s10_1">SELECT Admno, Name, Age, Gender FROM Student
+WHERE Age BETWEEN 18 AND 19;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s10_1','out_s10_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s10_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">NOT BETWEEN Keyword</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">NOT BETWEEN returns rows outside the specified range.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s10_2">SELECT Admno, Name, Age FROM Student
+WHERE Age NOT BETWEEN 18 AND 19;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s10_2','out_s10_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s10_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.4 – IN Keyword</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">IN checks if a column value matches any value in a list. Equivalent to multiple OR conditions.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s10_3">SELECT Admno, Name, Place FROM Student
+WHERE Place IN ('Chennai', 'Delhi');</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s10_3','out_s10_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s10_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">NOT IN Keyword</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">NOT IN returns rows where the column value is NOT in the given list.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s10_4">SELECT Admno, Name, Place FROM Student
+WHERE Place NOT IN ('Chennai', 'Delhi');</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s10_4','out_s10_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s10_4">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 11: ORDER BY ===== -->
+  <div class="section-panel" id="s11">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.5 – ORDER BY (Ascending)</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">ORDER BY sorts results. Default order is ascending (ASC). Does NOT change the actual table.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s11_1">SELECT * FROM Student ORDER BY Name;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s11_1','out_s11_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s11_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">ORDER BY Descending</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">Use DESC keyword to sort in descending order.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s11_2">SELECT * FROM Student WHERE Age >= 18 ORDER BY Name DESC;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s11_2','out_s11_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s11_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">WHERE + ORDER BY</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s11_3">SELECT * FROM Student WHERE Age >= 18 ORDER BY Name;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s11_3','out_s11_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s11_3">Click Run to execute</div></div>
+        <div class="note-box">ORDER BY does not affect the original table. Sorting can be done on multiple fields.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 12: GROUP BY & HAVING ===== -->
+  <div class="section-panel" id="s12">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.7 – GROUP BY</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">GROUP BY groups rows with identical values in the specified column, collapsing them into single rows.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s12_1">SELECT Gender FROM Student GROUP BY Gender;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s12_1','out_s12_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s12_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">GROUP BY with COUNT(*)</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">Aggregate functions like COUNT(*) work on each group independently to produce summary data.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s12_2">SELECT Gender, count(*) FROM Student GROUP BY Gender;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s12_2','out_s12_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s12_2">Click Run to execute</div></div>
+        <div class="note-box">The * in COUNT(*) includes NULL values. M = 5 students, F = 3 students.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">GROUP BY – Count by Place</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s12_3">SELECT Place, count(*) FROM Student GROUP BY Place;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s12_3','out_s12_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s12_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.5.8 – HAVING Clause</span><span class="card-tag">DQL</span></div>
+      <div class="card-body">
+        <p class="explanation">HAVING filters groups after GROUP BY aggregation. WHERE filters individual rows; HAVING filters groups.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s12_4">SELECT Place, count(*) FROM Student
+GROUP BY Place HAVING Place = 'Chennai';</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s12_4','out_s12_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s12_4">Click Run to execute</div></div>
+        <div class="note-box"><strong>WHERE vs HAVING:</strong> WHERE filters rows before grouping. HAVING filters groups after COUNT/SUM/etc. is computed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 13: TCL ===== -->
+  <div class="section-panel" id="s13">
+    <div class="card">
+      <div class="card-header"><span class="card-title">12.7.6 – COMMIT, SAVEPOINT, ROLLBACK</span><span class="card-tag">TCL</span></div>
+      <div class="card-body">
+        <p class="explanation">TCL commands manage transactions. COMMIT makes changes permanent. SAVEPOINT marks a restore point. ROLLBACK TO undoes changes back to a savepoint.</p>
+        <div class="note-box">Run the statements one block at a time in order to see the effect of SAVEPOINT and ROLLBACK.</div>
+        <div class="sql-area"><label>Step 1: Initial data + COMMIT</label>
+        <textarea class="sql-input" id="q_s13_1">-- Step 1: Insert and commit
+INSERT INTO Student VALUES (107, 'Beena', 'F', 20, 'Cochin');
+COMMIT;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s13_1','out_s13_1')">▶ Run Step 1</button><button class="btn small" onclick="resetTCLTable()">Reset for TCL Demo</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s13_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Step 2: UPDATE + SAVEPOINT A</span><span class="card-tag">TCL</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s13_2">UPDATE Student SET Name = 'Mini' WHERE Admno = 105;
+SAVEPOINT A;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s13_2','out_s13_2')">▶ Run Step 2</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s13_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Step 3: INSERT + SAVEPOINT B</span><span class="card-tag">TCL</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s13_3">INSERT INTO Student VALUES (108, 'Jisha', 'F', 19, 'Delhi');
+SAVEPOINT B;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s13_3','out_s13_3')">▶ Run Step 3</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s13_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Step 4: ROLLBACK TO A</span><span class="card-tag">TCL</span></div>
+      <div class="card-body">
+        <p class="explanation">Rolling back to SAVEPOINT A undoes the INSERT (Jisha) but keeps the committed data and the UPDATE (Mini). Savepoint B is discarded.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s13_4">ROLLBACK TO A;
+SELECT * FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s13_4','out_s13_4')">▶ Run Step 4</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s13_4">Click Run to execute</div></div>
+        <div class="note-box">After ROLLBACK TO A: Jisha (inserted after savepoint A) is gone. Mini (updated before savepoint A) is still present.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 14: Hands-on ===== -->
+  <div class="section-panel" id="s14">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Hands-on 1 – Custom Column Order SELECT</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <p class="explanation">Create a query of the Student table in the order: Name, Age, Place, Admno.</p>
+        <div class="sql-area"><label>SQL (try it!)</label>
+        <textarea class="sql-input" id="q_s14_1">SELECT Name, Age, Place, Admno FROM Student;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s14_1','out_s14_1')">▶ Run</button><button class="btn small" onclick="resetStudentTable()">Load Table</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s14_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Hands-on 2 – Age > 18 with DISTINCT City</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <p class="explanation">Display students older than 18 with unique city names only.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s14_2">SELECT DISTINCT Place FROM Student WHERE Age > 18;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s14_2','out_s14_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s14_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Hands-on 3 – Create Employee Table</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <p class="explanation">Create an Employee table with fields: EmpNo, EmpName, Designation, DateOfJoining, BasicPay.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s14_3">CREATE TABLE Employee (
+  EmpNo integer PRIMARY KEY,
+  EmpName char(30) NOT NULL,
+  Designation char(20),
+  DateOfJoining char(12),
+  BasicPay decimal(10,2)
+);
+SELECT * FROM Employee;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s14_3','out_s14_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s14_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Hands-on 4 – Employee Table with Constraints</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <p class="explanation">Set EmpNo as PRIMARY KEY and add NOT NULL on all fields.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s14_4">DROP TABLE IF EXISTS Employee;
+CREATE TABLE Employee (
+  EmpNo integer NOT NULL PRIMARY KEY,
+  EmpName char(30) NOT NULL,
+  Designation char(20) NOT NULL,
+  DateOfJoining char(12) NOT NULL,
+  BasicPay decimal(10,2) NOT NULL
+);
+-- Test NOT NULL constraint:
+INSERT INTO Employee VALUES (1, 'Ravi', 'Manager', '2020-01-15', 45000.00);
+SELECT * FROM Employee;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s14_4','out_s14_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s14_4">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Hands-on 5 – List All Managers</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s14_5">INSERT INTO Employee VALUES (2, 'Priya', 'Manager', '2019-03-10', 50000.00);
+INSERT INTO Employee VALUES (3, 'Suresh', 'Clerk', '2021-06-01', 25000.00);
+INSERT INTO Employee VALUES (4, 'Meena', 'Manager', '2018-11-20', 55000.00);
+SELECT * FROM Employee WHERE Designation = 'Manager';</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s14_5','out_s14_5')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s14_5">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 15: Employee Table Queries (Part-IV Q2) ===== -->
+  <div class="section-panel" id="s15">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Part-IV Q2 – Load Employee Table</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <p class="explanation">Create and populate the EMP table from the textbook's Part-IV Question 2.</p>
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s15_0">DROP TABLE IF EXISTS EMP;
+CREATE TABLE EMP (
+  EmpCode char(10) PRIMARY KEY,
+  Name char(20) NOT NULL,
+  Desig char(20),
+  Pay integer,
+  Allowance integer
+);
+INSERT INTO EMP VALUES ('S1001', 'Hariharan', 'Supervisor', 29000, 12000);
+INSERT INTO EMP VALUES ('P1002', 'Shaji', 'Operator', 10000, 5500);
+INSERT INTO EMP VALUES ('P1003', 'Prasad', 'Operator', 12000, 6500);
+INSERT INTO EMP VALUES ('C1004', 'Manjima', 'Clerk', 8000, 4500);
+INSERT INTO EMP VALUES ('M1005', 'Ratheesh', 'Mechanic', 20000, 7000);
+SELECT * FROM EMP;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s15_0','out_s15_0')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s15_0">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">(i) Employees in Descending Order of Pay</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s15_1">SELECT * FROM EMP ORDER BY Pay DESC;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s15_1','out_s15_1')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s15_1">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">(ii) Employees with Allowance Between 5000 and 7000</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s15_2">SELECT * FROM EMP WHERE Allowance BETWEEN 5000 AND 7000;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s15_2','out_s15_2')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s15_2">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">(iii) Remove Mechanic Employees</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s15_3">DELETE FROM EMP WHERE Desig = 'Mechanic';
+SELECT * FROM EMP;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s15_3','out_s15_3')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s15_3">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">(iv) Add a New Row</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s15_4">INSERT INTO EMP VALUES ('A1006', 'Kavitha', 'Accountant', 18000, 8000);
+SELECT * FROM EMP;</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s15_4','out_s15_4')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s15_4">Click Run to execute</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">(v) Display All Operators</span><span class="card-tag">Exercise</span></div>
+      <div class="card-body">
+        <div class="sql-area"><label>SQL</label>
+        <textarea class="sql-input" id="q_s15_5">SELECT * FROM EMP WHERE Desig = 'Operator';</textarea></div>
+        <div class="run-row"><button class="btn" onclick="runQuery('q_s15_5','out_s15_5')">▶ Run</button></div>
+        <div class="output-area"><label>Output</label><div class="output-box" id="out_s15_5">Click Run to execute</div></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ==================== THEME ====================
+function toggleTheme() {
+  const d = document.documentElement;
+  d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+// ==================== SIDEBAR NAVIGATION ====================
+function showSection(id) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
+  event.target.classList.add('active');
+  updateTableList();
+}
+
+// ==================== MINI SQL ENGINE ====================
+const DB = {
+  tables: {},
+  savepoints: {},
+  committed: {}
+};
+
+function updateTableList() {
+  const names = Object.keys(DB.tables);
+  document.getElementById('tableList').textContent = names.length ? names.join(', ') : 'none';
+}
+
+function resetStudentTable() {
+  DB.tables['student'] = {
+    columns: [
+      { name: 'Admno', type: 'integer', constraints: ['PRIMARY KEY'] },
+      { name: 'Name', type: 'char', size: 20, constraints: ['NOT NULL'] },
+      { name: 'Gender', type: 'char', size: 1, constraints: [] },
+      { name: 'Age', type: 'integer', constraints: [] },
+      { name: 'Place', type: 'char', size: 10, constraints: [] }
+    ],
+    rows: [
+      { Admno: 100, Name: 'Ashish', Gender: 'M', Age: 17, Place: 'Chennai' },
+      { Admno: 101, Name: 'Adarsh', Gender: 'M', Age: 18, Place: 'Delhi' },
+      { Admno: 102, Name: 'Akshith', Gender: 'M', Age: 17, Place: 'Bangalore' },
+      { Admno: 103, Name: 'Ayush', Gender: 'M', Age: 18, Place: 'Delhi' },
+      { Admno: 104, Name: 'Abinandh', Gender: 'M', Age: 18, Place: 'Chennai' },
+      { Admno: 105, Name: 'Revathi', Gender: 'F', Age: 19, Place: 'Chennai' },
+      { Admno: 106, Name: 'Devika', Gender: 'F', Age: 19, Place: 'Bangalore' },
+      { Admno: 107, Name: 'Hema', Gender: 'F', Age: 17, Place: 'Chennai' }
+    ]
+  };
+  updateTableList();
+  alert('Student table loaded with 8 rows!');
+}
+
+function resetTCLTable() {
+  resetStudentTable();
+  // Remove Hema (107) to match TCL demo starting point
+  DB.tables['student'].rows = DB.tables['student'].rows.filter(r => r.Admno !== 107);
+  DB.savepoints = {};
+  DB.committed = JSON.parse(JSON.stringify(DB.tables));
+  alert('TCL demo table ready (5 students, committed).');
+}
+
+function clearAll() {
+  DB.tables = {};
+  DB.savepoints = {};
+  updateTableList();
+  alert('All tables cleared.');
+}
+
+function showAllTables() {
+  const v = document.getElementById('tableViewer');
+  const names = Object.keys(DB.tables);
+  if (!names.length) { v.style.display = 'none'; return; }
+  let html = '';
+  for (const name of names) {
+    const t = DB.tables[name];
+    html += `<div class="table-viewer"><h4>Table: ${name.toUpperCase()} (${t.rows.length} rows)</h4>`;
+    html += renderTable(t.columns.map(c => c.name), t.rows);
+    html += '</div>';
+  }
+  v.innerHTML = html;
+  v.style.display = v.style.display === 'block' ? 'none' : 'block';
+}
+
+// ==================== TOKENIZER ====================
+function tokenize(sql) {
+  const tokens = [];
+  let i = 0;
+  sql = sql.trim();
+  while (i < sql.length) {
+    if (/\s/.test(sql[i])) { i++; continue; }
+    // String literal (single or Unicode quotes)
+    if (sql[i] === "'" || sql[i] === '‘' || sql[i] === '’' || sql[i] === 'ʼ') {
+      let j = i + 1;
+      while (j < sql.length && sql[j] !== "'" && sql[j] !== '’') j++;
+      tokens.push({ type: 'string', value: sql.substring(i + 1, j) });
+      i = j + 1; continue;
+    }
+    // Comment
+    if (sql.substring(i, i + 2) === '--') {
+      while (i < sql.length && sql[i] !== '\n') i++; continue;
+    }
+    // 2-char operators
+    if (['<>', '<=', '>='].includes(sql.substring(i, i + 2))) {
+      tokens.push({ type: 'op', value: sql.substring(i, i + 2) }); i += 2; continue;
+    }
+    if (['<', '>', '='].includes(sql[i])) { tokens.push({ type: 'op', value: sql[i] }); i++; continue; }
+    if (['(', ')', ',', '*'].includes(sql[i])) { tokens.push({ type: 'punct', value: sql[i] }); i++; continue; }
+    // Number
+    if (/\d/.test(sql[i]) || (sql[i] === '-' && /\d/.test(sql[i + 1]))) {
+      let j = i; if (sql[j] === '-') j++;
+      while (j < sql.length && /[\d.]/.test(sql[j])) j++;
+      tokens.push({ type: 'number', value: parseFloat(sql.substring(i, j)) }); i = j; continue;
+    }
+    // Word/identifier
+    if (/[\w]/.test(sql[i])) {
+      let j = i;
+      while (j < sql.length && /[\w]/.test(sql[j])) j++;
+      tokens.push({ type: 'word', value: sql.substring(i, j) }); i = j; continue;
+    }
+    i++;
+  }
+  return tokens;
+}
+
+// ==================== STATEMENT SPLITTER ====================
+function splitSQL(sql) {
+  const stmts = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < sql.length; i++) {
+    if ((sql[i] === "'" || sql[i] === '‘') && !inQ) inQ = true;
+    else if ((sql[i] === "'" || sql[i] === '’') && inQ) inQ = false;
+    else if (sql[i] === '-' && sql[i+1] === '-' && !inQ) {
+      while (i < sql.length && sql[i] !== '\n') i++; continue;
+    }
+    else if (sql[i] === ';' && !inQ) { if (cur.trim()) stmts.push(cur.trim()); cur = ''; continue; }
+    cur += sql[i];
+  }
+  if (cur.trim()) stmts.push(cur.trim());
+  return stmts;
+}
+
+// ==================== MAIN EXECUTOR ====================
+function execSQL(sql) {
+  const stmts = splitSQL(sql);
+  const results = [];
+  for (const s of stmts) {
+    if (!s.trim()) continue;
+    try { results.push(execOne(s)); }
+    catch(e) { results.push({ type: 'error', message: e.message }); }
+  }
+  return results;
+}
+
+function execOne(sql) {
+  const up = sql.trim().toUpperCase().replace(/\s+/g, ' ');
+  if (up.startsWith('CREATE DATABASE')) return { type: 'success', message: 'Database created (simulated).' };
+  if (up.startsWith('USE ')) return { type: 'success', message: 'Database selected (simulated).' };
+  if (up.startsWith('CREATE TABLE')) return execCreate(sql);
+  if (up.startsWith('DROP TABLE IF EXISTS')) return execDropIfExists(sql);
+  if (up.startsWith('DROP TABLE')) return execDrop(sql);
+  if (up.startsWith('INSERT INTO')) return execInsert(sql);
+  if (up.startsWith('SELECT')) return execSelect(sql);
+  if (up.startsWith('UPDATE')) return execUpdate(sql);
+  if (up.startsWith('DELETE FROM')) return execDelete(sql);
+  if (up.startsWith('ALTER TABLE')) return execAlter(sql);
+  if (up.startsWith('TRUNCATE')) return execTruncate(sql);
+  if (up.startsWith('COMMIT')) return execCommit(sql);
+  if (up.startsWith('SAVEPOINT')) return execSavepoint(sql);
+  if (up.startsWith('ROLLBACK')) return execRollback(sql);
+  return { type: 'error', message: 'Unknown SQL: ' + sql.substring(0, 30) };
+}
+
+function getTable(name) {
+  const k = Object.keys(DB.tables).find(k => k.toLowerCase() === name.toLowerCase());
+  if (!k) throw new Error(`Table '${name}' does not exist.`);
+  return DB.tables[k];
+}
+
+function getTableKey(name) {
+  return Object.keys(DB.tables).find(k => k.toLowerCase() === name.toLowerCase());
+}
+
+// ==================== CREATE TABLE ====================
+function execCreate(sql) {
+  const tokens = tokenize(sql);
+  let i = 0;
+  const eat = () => tokens[i++];
+  const peek = () => tokens[i];
+  const eatWord = (w) => { if (tokens[i] && tokens[i].value.toUpperCase() === w.toUpperCase()) i++; };
+  eatWord('CREATE'); eatWord('TABLE');
+  const tableName = eat().value;
+  if (peek()?.value === '(') eat(); // (
+  const columns = [];
+  let tableConstraints = [];
+  while (i < tokens.length && !(tokens[i]?.value === ')')) {
+    // Check for table constraint
+    const up = tokens[i]?.value?.toUpperCase();
+    if (up === 'PRIMARY' || up === 'UNIQUE' || up === 'FOREIGN' || up === 'CHECK' || up === 'CONSTRAINT') {
+      // Table constraint
+      if (up === 'PRIMARY') {
+        eatWord('PRIMARY'); eatWord('KEY');
+        eat(); // (
+        const cols = [];
+        while (tokens[i]?.value !== ')') {
+          if (tokens[i]?.type === 'word') cols.push(tokens[i].value);
+          i++;
+        }
+        eat(); // )
+        tableConstraints.push({ type: 'PRIMARY KEY', cols });
+      } else { while (tokens[i] && tokens[i].value !== ',' && tokens[i].value !== ')') i++; }
+    } else {
+      // Column definition
+      const colName = eat().value;
+      const colType = eat().value;
+      let colSize = null;
+      if (tokens[i]?.value === '(') {
+        eat(); // (
+        colSize = [];
+        while (tokens[i]?.value !== ')') {
+          if (tokens[i]?.type === 'number' || tokens[i]?.type === 'word') colSize.push(tokens[i].value);
+          i++;
+        }
+        eat(); // )
+      }
+      const constraints = [];
+      let defaultVal = undefined;
+      while (tokens[i] && tokens[i].value !== ',' && tokens[i].value !== ')') {
+        const w = tokens[i].value.toUpperCase();
+        if (w === 'NOT') { i++; if (tokens[i]?.value?.toUpperCase() === 'NULL') { i++; constraints.push('NOT NULL'); } }
+        else if (w === 'NULL') { i++; constraints.push('NULL'); }
+        else if (w === 'PRIMARY') { i++; eatWord('KEY'); constraints.push('PRIMARY KEY'); }
+        else if (w === 'UNIQUE') { i++; constraints.push('UNIQUE'); }
+        else if (w === 'DEFAULT') {
+          i++;
+          if (tokens[i]) { defaultVal = tokens[i].type === 'number' ? tokens[i].value : tokens[i].value; i++; }
+        }
+        else if (w === 'CHECK') {
+          i++;
+          if (tokens[i]?.value === '(') {
+            let depth = 0, checkExpr = '';
+            while (i < tokens.length) {
+              if (tokens[i].value === '(') depth++;
+              else if (tokens[i].value === ')') { depth--; if (depth === 0) { i++; break; } }
+              checkExpr += tokens[i].value + ' ';
+              i++;
+            }
+            constraints.push('CHECK:' + checkExpr.trim());
+          }
+        }
+        else if (w === 'AUTO_INCREMENT') { i++; }
+        else { i++; }
+      }
+      columns.push({ name: colName, type: colType, size: colSize, constraints, defaultVal });
+    }
+    if (tokens[i]?.value === ',') i++;
+  }
+  // Apply table constraints
+  for (const tc of tableConstraints) {
+    if (tc.type === 'PRIMARY KEY') {
+      for (const col of columns) {
+        if (tc.cols.map(c=>c.toLowerCase()).includes(col.name.toLowerCase())) {
+          if (!col.constraints.includes('PRIMARY KEY')) col.constraints.push('PRIMARY KEY');
+        }
+      }
+    }
+  }
+  const existing = getTableKey(tableName);
+  if (existing) throw new Error(`Table '${tableName}' already exists. Use DROP TABLE first.`);
+  DB.tables[tableName] = { columns, rows: [] };
+  updateTableList();
+  return { type: 'success', message: `Table '${tableName}' created with ${columns.length} column(s).` };
+}
+
+// ==================== DROP TABLE ====================
+function execDropIfExists(sql) {
+  const tokens = tokenize(sql);
+  const name = tokens[tokens.length - 1].value;
+  const key = getTableKey(name);
+  if (key) { delete DB.tables[key]; updateTableList(); return { type: 'success', message: `Table '${name}' dropped.` }; }
+  return { type: 'success', message: `Table '${name}' does not exist (IF EXISTS).` };
+}
+
+function execDrop(sql) {
+  const tokens = tokenize(sql);
+  const name = tokens[2]?.value;
+  const key = getTableKey(name);
+  if (!key) throw new Error(`Table '${name}' does not exist.`);
+  delete DB.tables[key];
+  updateTableList();
+  return { type: 'success', message: `Table '${name}' dropped successfully.` };
+}
+
+// ==================== INSERT ====================
+function execInsert(sql) {
+  const tokens = tokenize(sql);
+  let i = 0;
+  const eatWord = (w) => { if (tokens[i]?.value?.toUpperCase() === w) i++; };
+  eatWord('INSERT'); eatWord('INTO');
+  const tableName = tokens[i++].value;
+  const table = getTable(tableName);
+  let colNames = null;
+  if (tokens[i]?.value === '(') {
+    i++; colNames = [];
+    while (tokens[i]?.value !== ')') {
+      if (tokens[i]?.type === 'word') colNames.push(tokens[i].value);
+      i++;
+    }
+    i++; // )
+  }
+  eatWord('VALUES');
+  if (tokens[i]?.value === '(') i++;
+  const vals = [];
+  while (tokens[i]?.value !== ')' && i < tokens.length) {
+    if (tokens[i]?.value === ',') { i++; continue; }
+    vals.push(tokens[i]?.type === 'number' ? tokens[i].value : (tokens[i]?.value === 'NULL' ? null : tokens[i]?.value));
+    i++;
+  }
+  // Build row
+  const row = {};
+  if (colNames) {
+    // Fill defaults first
+    for (const col of table.columns) {
+      row[col.name] = col.defaultVal !== undefined ? col.defaultVal : null;
+    }
+    for (let j = 0; j < colNames.length; j++) {
+      const col = table.columns.find(c => c.name.toLowerCase() === colNames[j].toLowerCase());
+      if (col) row[col.name] = vals[j] !== undefined ? vals[j] : null;
+    }
+  } else {
+    for (let j = 0; j < table.columns.length; j++) {
+      row[table.columns[j].name] = vals[j] !== undefined ? vals[j] : (table.columns[j].defaultVal !== undefined ? table.columns[j].defaultVal : null);
+    }
+  }
+  // Validate constraints
+  for (const col of table.columns) {
+    const v = row[col.name];
+    if (col.constraints.includes('NOT NULL') && (v === null || v === undefined)) {
+      throw new Error(`Column '${col.name}' cannot be NULL.`);
+    }
+    if (col.constraints.includes('PRIMARY KEY') || col.constraints.includes('UNIQUE')) {
+      if (v !== null && table.rows.some(r => String(r[col.name]).toLowerCase() === String(v).toLowerCase())) {
+        throw new Error(`Duplicate value '${v}' for ${col.constraints.includes('PRIMARY KEY') ? 'PRIMARY KEY' : 'UNIQUE'} column '${col.name}'.`);
+      }
+    }
+    // Check constraint
+    const chk = col.constraints.find(c => c.startsWith('CHECK:'));
+    if (chk && v !== null) {
+      const expr = chk.replace('CHECK:', '').trim();
+      if (!evalCheckExpr(expr, col.name, v)) {
+        throw new Error(`CHECK constraint failed for column '${col.name}': ${expr} (value: ${v}).`);
+      }
+    }
+  }
+  table.rows.push(row);
+  return { type: 'success', message: `1 row inserted into '${tableName}'.` };
+}
+
+function evalCheckExpr(expr, colName, val) {
+  // Handles: col op value patterns
+  const m = expr.match(/(\w+)\s*(<=|>=|<>|<|>|=)\s*(\S+)/);
+  if (!m) return true;
+  const [, , op, rhs] = m;
+  const lv = parseFloat(val), rv = parseFloat(rhs);
+  if (op === '<=') return lv <= rv;
+  if (op === '>=') return lv >= rv;
+  if (op === '<') return lv < rv;
+  if (op === '>') return lv > rv;
+  if (op === '=') return String(val) === String(rhs);
+  if (op === '<>') return String(val) !== String(rhs);
+  return true;
+}
+
+// ==================== DELETE ====================
+function execDelete(sql) {
+  const tokens = tokenize(sql);
+  let i = 0;
+  const eatWord = w => { if (tokens[i]?.value?.toUpperCase() === w) i++; };
+  eatWord('DELETE'); eatWord('FROM');
+  const tableName = tokens[i++].value;
+  const table = getTable(tableName);
+  const beforeCount = table.rows.length;
+  if (tokens[i]?.value?.toUpperCase() === 'WHERE') {
+    i++;
+    const condTokens = tokens.slice(i);
+    table.rows = table.rows.filter(row => !evalWhere(condTokens, row));
+  } else {
+    table.rows = [];
+  }
+  const deleted = beforeCount - table.rows.length;
+  return { type: 'success', message: `${deleted} row(s) deleted from '${tableName}'.` };
+}
+
+// ==================== UPDATE ====================
+function execUpdate(sql) {
+  const tokens = tokenize(sql);
+  let i = 0;
+  const eatWord = w => { if (tokens[i]?.value?.toUpperCase() === w) i++; };
+  eatWord('UPDATE');
+  const tableName = tokens[i++].value;
+  const table = getTable(tableName);
+  eatWord('SET');
+  const assignments = [];
+  while (i < tokens.length && tokens[i]?.value?.toUpperCase() !== 'WHERE') {
+    const col = tokens[i++].value;
+    i++; // =
+    const val = tokens[i]?.type === 'number' ? tokens[i++].value : (tokens[i]?.value === 'NULL' ? null : tokens[i++]?.value);
+    assignments.push({ col, val });
+    if (tokens[i]?.value === ',') i++;
+  }
+  let condTokens = null;
+  if (tokens[i]?.value?.toUpperCase() === 'WHERE') { i++; condTokens = tokens.slice(i); }
+  let count = 0;
+  for (const row of table.rows) {
+    if (!condTokens || evalWhere(condTokens, row)) {
+      for (const { col, val } of assignments) {
+        const colDef = table.columns.find(c => c.name.toLowerCase() === col.toLowerCase());
+        if (colDef) row[colDef.name] = val;
+      }
+      count++;
+    }
+  }
+  return { type: 'success', message: `${count} row(s) updated in '${tableName}'.` };
+}
+
+// ==================== SELECT ====================
+function execSelect(sql) {
+  const tokens = tokenize(sql);
+  let i = 0;
+  const eatWord = w => { if (tokens[i]?.value?.toUpperCase() === w) i++; };
+  const peekWord = () => tokens[i]?.value?.toUpperCase();
+  eatWord('SELECT');
+  let distinct = false, all = false;
+  if (peekWord() === 'DISTINCT') { distinct = true; i++; }
+  else if (peekWord() === 'ALL') { all = true; i++; }
+  // Columns
+  const selCols = [];
+  while (i < tokens.length && peekWord() !== 'FROM') {
+    if (tokens[i].value === ',') { i++; continue; }
+    // Aggregate: count(*)
+    if (tokens[i]?.value?.toUpperCase() === 'COUNT') {
+      i++;
+      if (tokens[i]?.value === '(') { i++; i++; i++; } // ( * )
+      selCols.push({ type: 'agg', fn: 'COUNT', alias: 'count(*)' });
+    } else {
+      selCols.push({ type: 'col', name: tokens[i].value });
+      i++;
+    }
+  }
+  eatWord('FROM');
+  const tableName = tokens[i++].value;
+  const table = getTable(tableName);
+  let condTokens = null, orderCols = [], orderDesc = false, groupCol = null, havingTokens = null;
+  while (i < tokens.length) {
+    const w = peekWord();
+    if (w === 'WHERE') { i++; condTokens = []; while (i < tokens.length && !['ORDER','GROUP','HAVING'].includes(tokens[i]?.value?.toUpperCase())) condTokens.push(tokens[i++]); }
+    else if (w === 'ORDER') { i++; eatWord('BY'); while (i < tokens.length && !['GROUP','HAVING','WHERE'].includes(peekWord())) { if (tokens[i]?.value?.toUpperCase() === 'DESC') { orderDesc = true; i++; } else if (tokens[i]?.value?.toUpperCase() === 'ASC') { i++; } else if (tokens[i]?.value === ',') { i++; } else { orderCols.push(tokens[i++].value); } } }
+    else if (w === 'GROUP') { i++; eatWord('BY'); groupCol = tokens[i++].value; }
+    else if (w === 'HAVING') { i++; havingTokens = tokens.slice(i); break; }
+    else i++;
+  }
+  // Filter rows
+  let rows = table.rows.slice();
+  if (condTokens) rows = rows.filter(r => evalWhere(condTokens, r));
+  // GROUP BY
+  if (groupCol) {
+    const colDef = table.columns.find(c => c.name.toLowerCase() === groupCol.toLowerCase());
+    const groupColName = colDef ? colDef.name : groupCol;
+    const groups = {};
+    for (const r of rows) {
+      const key = String(r[groupColName]);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    }
+    // Apply HAVING
+    const outRows = [];
+    const outCols = [];
+    for (const sc of selCols) {
+      if (sc.type === 'agg') outCols.push('count(*)');
+      else { const c = table.columns.find(col => col.name.toLowerCase() === sc.name.toLowerCase()); outCols.push(c ? c.name : sc.name); }
+    }
+    for (const [key, grpRows] of Object.entries(groups)) {
+      let include = true;
+      if (havingTokens) {
+        const repRow = { ...grpRows[0], 'count(*)': grpRows.length };
+        include = evalWhere(havingTokens, repRow);
+      }
+      if (!include) continue;
+      const outRow = {};
+      for (const sc of selCols) {
+        if (sc.type === 'agg') outRow['count(*)'] = grpRows.length;
+        else { const c = table.columns.find(col => col.name.toLowerCase() === sc.name.toLowerCase()); outRow[c ? c.name : sc.name] = grpRows[0][c ? c.name : sc.name]; }
+      }
+      outRows.push(outRow);
+    }
+    return { type: 'table', columns: outCols, rows: outRows };
+  }
+  // Order
+  if (orderCols.length > 0) {
+    rows.sort((a, b) => {
+      for (const oc of orderCols) {
+        const colDef = table.columns.find(c => c.name.toLowerCase() === oc.toLowerCase());
+        const cn = colDef ? colDef.name : oc;
+        const av = a[cn], bv = b[cn];
+        const numA = parseFloat(av), numB = parseFloat(bv);
+        let cmp = !isNaN(numA) && !isNaN(numB) ? numA - numB : String(av).localeCompare(String(bv));
+        if (cmp !== 0) return orderDesc ? -cmp : cmp;
+      }
+      return 0;
+    });
+  }
+  // Resolve column names
+  let outCols;
+  if (selCols.length === 1 && selCols[0]?.name === '*') {
+    outCols = table.columns.map(c => c.name);
+  } else {
+    outCols = selCols.map(sc => {
+      if (sc.type === 'agg') return 'count(*)';
+      if (sc.name === '*') return '*';
+      const found = table.columns.find(c => c.name.toLowerCase() === sc.name.toLowerCase());
+      return found ? found.name : sc.name;
+    });
+  }
+  // Project columns
+  let outRows = rows.map(r => {
+    const nr = {};
+    for (const col of outCols) {
+      if (col === '*') { Object.assign(nr, r); }
+      else nr[col] = r[col];
+    }
+    return nr;
+  });
+  if (outCols.includes('*')) {
+    outCols.splice(0, outCols.length, ...table.columns.map(c => c.name));
+    outRows = rows.map(r => ({ ...r }));
+  }
+  // DISTINCT
+  if (distinct) {
+    const seen = new Set();
+    outRows = outRows.filter(r => {
+      const key = JSON.stringify(outCols.map(c => r[c]));
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+  }
+  return { type: 'table', columns: outCols, rows: outRows };
+}
+
+// ==================== WHERE EVALUATOR ====================
+function evalWhere(tokens, row) {
+  return parseOr(tokens, row, { pos: 0 });
+}
+
+function parseOr(tokens, row, state) {
+  let left = parseAnd(tokens, row, state);
+  while (state.pos < tokens.length && tokens[state.pos]?.value?.toUpperCase() === 'OR') {
+    state.pos++;
+    const right = parseAnd(tokens, row, state);
+    left = left || right;
+  }
+  return left;
+}
+
+function parseAnd(tokens, row, state) {
+  let left = parseNot(tokens, row, state);
+  while (state.pos < tokens.length && tokens[state.pos]?.value?.toUpperCase() === 'AND') {
+    state.pos++;
+    const right = parseNot(tokens, row, state);
+    left = left && right;
+  }
+  return left;
+}
+
+function parseNot(tokens, row, state) {
+  if (tokens[state.pos]?.value?.toUpperCase() === 'NOT') {
+    state.pos++;
+    return !parseNot(tokens, row, state);
+  }
+  return parsePrimary(tokens, row, state);
+}
+
+function parsePrimary(tokens, row, state) {
+  if (tokens[state.pos]?.value === '(') {
+    state.pos++;
+    const v = parseOr(tokens, row, state);
+    if (tokens[state.pos]?.value === ')') state.pos++;
+    return v;
+  }
+  // column IS [NOT] NULL
+  if (state.pos + 2 < tokens.length &&
+      tokens[state.pos + 1]?.value?.toUpperCase() === 'IS') {
+    const colName = tokens[state.pos].value; state.pos += 2;
+    let negate = false;
+    if (tokens[state.pos]?.value?.toUpperCase() === 'NOT') { negate = true; state.pos++; }
+    if (tokens[state.pos]?.value?.toUpperCase() === 'NULL') state.pos++;
+    const colVal = getRowVal(row, colName);
+    const isNull = colVal === null || colVal === undefined;
+    return negate ? !isNull : isNull;
+  }
+  // column BETWEEN v1 AND v2
+  if (state.pos + 4 < tokens.length &&
+      tokens[state.pos + 1]?.value?.toUpperCase() === 'BETWEEN') {
+    const colName = tokens[state.pos].value; state.pos += 2;
+    const v1 = getTokenVal(tokens[state.pos++]);
+    state.pos++; // AND
+    const v2 = getTokenVal(tokens[state.pos++]);
+    const cv = getRowVal(row, colName);
+    const n = parseFloat(cv), n1 = parseFloat(v1), n2 = parseFloat(v2);
+    if (!isNaN(n) && !isNaN(n1) && !isNaN(n2)) return n >= n1 && n <= n2;
+    return String(cv) >= String(v1) && String(cv) <= String(v2);
+  }
+  // column NOT BETWEEN ...
+  if (state.pos + 5 < tokens.length &&
+      tokens[state.pos + 1]?.value?.toUpperCase() === 'NOT' &&
+      tokens[state.pos + 2]?.value?.toUpperCase() === 'BETWEEN') {
+    const colName = tokens[state.pos].value; state.pos += 3;
+    const v1 = getTokenVal(tokens[state.pos++]);
+    state.pos++; // AND
+    const v2 = getTokenVal(tokens[state.pos++]);
+    const cv = getRowVal(row, colName);
+    const n = parseFloat(cv), n1 = parseFloat(v1), n2 = parseFloat(v2);
+    if (!isNaN(n) && !isNaN(n1) && !isNaN(n2)) return !(n >= n1 && n <= n2);
+    return !(String(cv) >= String(v1) && String(cv) <= String(v2));
+  }
+  // column IN (...)
+  if (state.pos + 2 < tokens.length &&
+      tokens[state.pos + 1]?.value?.toUpperCase() === 'IN') {
+    const colName = tokens[state.pos].value; state.pos += 2;
+    state.pos++; // (
+    const vals = [];
+    while (tokens[state.pos]?.value !== ')') {
+      if (tokens[state.pos]?.value !== ',') vals.push(getTokenVal(tokens[state.pos]));
+      state.pos++;
+    }
+    state.pos++; // )
+    const cv = String(getRowVal(row, colName)).toLowerCase();
+    return vals.some(v => String(v).toLowerCase() === cv);
+  }
+  // column NOT IN (...)
+  if (state.pos + 3 < tokens.length &&
+      tokens[state.pos + 1]?.value?.toUpperCase() === 'NOT' &&
+      tokens[state.pos + 2]?.value?.toUpperCase() === 'IN') {
+    const colName = tokens[state.pos].value; state.pos += 3;
+    state.pos++; // (
+    const vals = [];
+    while (tokens[state.pos]?.value !== ')') {
+      if (tokens[state.pos]?.value !== ',') vals.push(getTokenVal(tokens[state.pos]));
+      state.pos++;
+    }
+    state.pos++; // )
+    const cv = String(getRowVal(row, colName)).toLowerCase();
+    return !vals.some(v => String(v).toLowerCase() === cv);
+  }
+  // column op value
+  if (state.pos + 2 < tokens.length && tokens[state.pos + 1]?.type === 'op') {
+    const colName = tokens[state.pos].value; state.pos++;
+    const op = tokens[state.pos++].value;
+    const rhs = getTokenVal(tokens[state.pos++]);
+    const lhs = getRowVal(row, colName);
+    return compare(lhs, op, rhs);
+  }
+  state.pos++;
+  return true;
+}
+
+function getRowVal(row, colName) {
+  const key = Object.keys(row).find(k => k.toLowerCase() === colName.toLowerCase());
+  return key !== undefined ? row[key] : null;
+}
+
+function getTokenVal(t) {
+  if (!t) return null;
+  if (t.type === 'number') return t.value;
+  if (t.type === 'string') return t.value;
+  if (t.value?.toUpperCase() === 'NULL') return null;
+  return t.value;
+}
+
+function compare(lhs, op, rhs) {
+  const nl = parseFloat(lhs), nr = parseFloat(rhs);
+  if (!isNaN(nl) && !isNaN(nr)) {
+    if (op === '=') return nl === nr;
+    if (op === '<>') return nl !== nr;
+    if (op === '<') return nl < nr;
+    if (op === '<=') return nl <= nr;
+    if (op === '>') return nl > nr;
+    if (op === '>=') return nl >= nr;
+  }
+  const sl = String(lhs).toLowerCase(), sr = String(rhs).toLowerCase();
+  if (op === '=') return sl === sr;
+  if (op === '<>') return sl !== sr;
+  if (op === '<') return sl < sr;
+  if (op === '<=') return sl <= sr;
+  if (op === '>') return sl > sr;
+  if (op === '>=') return sl >= sr;
+  return false;
+}
+
+// ==================== ALTER TABLE ====================
+function execAlter(sql) {
+  const tokens = tokenize(sql);
+  let i = 0;
+  const eatWord = w => { if (tokens[i]?.value?.toUpperCase() === w) i++; };
+  eatWord('ALTER'); eatWord('TABLE');
+  const tableName = tokens[i++].value;
+  const table = getTable(tableName);
+  const op = tokens[i++].value.toUpperCase();
+  if (op === 'ADD') {
+    const colName = tokens[i++].value;
+    const colType = tokens[i++].value;
+    let colSize = null;
+    if (tokens[i]?.value === '(') { i++; colSize = [tokens[i++].value]; i++; }
+    table.columns.push({ name: colName, type: colType, size: colSize, constraints: [], defaultVal: null });
+    for (const r of table.rows) r[colName] = null;
+    return { type: 'success', message: `Column '${colName}' added to '${tableName}'.` };
+  }
+  if (op === 'MODIFY') {
+    const colName = tokens[i++].value;
+    const colType = tokens[i++].value;
+    let colSize = null;
+    if (tokens[i]?.value === '(') { i++; colSize = [tokens[i++].value]; i++; }
+    const col = table.columns.find(c => c.name.toLowerCase() === colName.toLowerCase());
+    if (!col) throw new Error(`Column '${colName}' not found.`);
+    col.type = colType; col.size = colSize;
+    return { type: 'success', message: `Column '${colName}' modified in '${tableName}'.` };
+  }
+  if (op === 'CHANGE') {
+    const oldName = tokens[i++].value;
+    const newName = tokens[i++].value;
+    const colType = tokens[i++].value;
+    let colSize = null;
+    if (tokens[i]?.value === '(') { i++; colSize = [tokens[i++].value]; i++; }
+    const col = table.columns.find(c => c.name.toLowerCase() === oldName.toLowerCase());
+    if (!col) throw new Error(`Column '${oldName}' not found.`);
+    for (const r of table.rows) { r[newName] = r[col.name]; delete r[col.name]; }
+    col.name = newName; col.type = colType; col.size = colSize;
+    return { type: 'success', message: `Column renamed from '${oldName}' to '${newName}'.` };
+  }
+  if (op === 'DROP') {
+    const next = tokens[i++].value.toUpperCase(); // COLUMN
+    const colName = tokens[i++].value;
+    const idx = table.columns.findIndex(c => c.name.toLowerCase() === colName.toLowerCase());
+    if (idx === -1) throw new Error(`Column '${colName}' not found.`);
+    table.columns.splice(idx, 1);
+    for (const r of table.rows) delete r[colName];
+    return { type: 'success', message: `Column '${colName}' dropped from '${tableName}'.` };
+  }
+  return { type: 'error', message: 'Unknown ALTER operation.' };
+}
+
+// ==================== TRUNCATE ====================
+function execTruncate(sql) {
+  const tokens = tokenize(sql);
+  const name = tokens[tokens.length - 1].value;
+  const table = getTable(name);
+  const count = table.rows.length;
+  table.rows = [];
+  return { type: 'success', message: `Table '${name}' truncated (${count} rows removed).` };
+}
+
+// ==================== TCL ====================
+function execCommit() {
+  DB.committed = JSON.parse(JSON.stringify(DB.tables));
+  return { type: 'success', message: 'Transaction committed. Changes are now permanent.' };
+}
+
+function execSavepoint(sql) {
+  const tokens = tokenize(sql);
+  const name = tokens[1]?.value || 'SP';
+  DB.savepoints[name] = JSON.parse(JSON.stringify(DB.tables));
+  return { type: 'success', message: `Savepoint '${name}' created.` };
+}
+
+function execRollback(sql) {
+  const tokens = tokenize(sql);
+  if (tokens[1]?.value?.toUpperCase() === 'TO') {
+    const name = tokens[2]?.value;
+    if (!DB.savepoints[name]) throw new Error(`Savepoint '${name}' not found.`);
+    DB.tables = JSON.parse(JSON.stringify(DB.savepoints[name]));
+    // Remove savepoints after this one (simplified)
+    updateTableList();
+    return { type: 'success', message: `Rolled back to savepoint '${name}'.` };
+  }
+  if (DB.committed && Object.keys(DB.committed).length > 0) {
+    DB.tables = JSON.parse(JSON.stringify(DB.committed));
+    updateTableList();
+    return { type: 'success', message: 'Rolled back to last committed state.' };
+  }
+  return { type: 'info', message: 'Nothing to rollback.' };
+}
+
+// ==================== RENDER ====================
+function renderTable(columns, rows) {
+  if (!columns || columns.length === 0) return '<div class="empty-state">No columns defined.</div>';
+  let html = '<div style="overflow-x:auto"><table class="result-table"><thead><tr>';
+  for (const c of columns) html += `<th>${c}</th>`;
+  html += '</tr></thead><tbody>';
+  if (rows.length === 0) {
+    html += `<tr><td colspan="${columns.length}" style="text-align:center;color:var(--text2);font-style:italic;">0 rows returned</td></tr>`;
+  } else {
+    for (const r of rows) {
+      html += '<tr>';
+      for (const c of columns) {
+        const v = r[c];
+        html += `<td>${v === null || v === undefined ? '<em style="color:var(--text2)">NULL</em>' : v}</td>`;
+      }
+      html += '</tr>';
+    }
+  }
+  html += '</tbody></table></div>';
+  if (rows.length > 0) html += `<div style="font-size:.72rem;color:var(--text2);margin-top:4px">${rows.length} row(s) returned</div>`;
+  return html;
+}
+
+function renderResult(result, el) {
+  if (!result) return;
+  if (result.type === 'table') {
+    el.className = 'output-box';
+    el.innerHTML = renderTable(result.columns, result.rows);
+  } else if (result.type === 'success') {
+    el.className = 'output-box';
+    el.innerHTML = `<span style="color:#166534">✓ ${result.message}</span>`;
+  } else if (result.type === 'error') {
+    el.className = 'output-box error';
+    el.innerHTML = `<span>✗ ${result.message}</span>`;
+  } else if (result.type === 'info') {
+    el.className = 'output-box info';
+    el.innerHTML = result.message;
+  }
+}
+
+function runQuery(inputId, outputId) {
+  const sql = document.getElementById(inputId).value;
+  const outEl = document.getElementById(outputId);
+  const results = execSQL(sql);
+  if (results.length === 0) { outEl.className = 'output-box info'; outEl.textContent = 'No statements to execute.'; return; }
+  if (results.length === 1) { renderResult(results[0], outEl); }
+  else {
+    outEl.className = 'output-box multi-output';
+    outEl.innerHTML = results.map((r, idx) => {
+      let inner = '';
+      const tmp = document.createElement('div');
+      renderResult(r, tmp);
+      inner = tmp.outerHTML;
+      return `<div class="stmt-result"><div class="stmt-label">Statement ${idx + 1}:</div>${tmp.innerHTML}</div>`;
+    }).join('');
+  }
+  updateTableList();
+}
+</script>
+</body>
+</html>
