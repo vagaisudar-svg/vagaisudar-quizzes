@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 15 – Data Manipulation Through SQL</title>
+<style>
+:root {
+  --bg: #f8f4ff;
+  --surface: #ffffff;
+  --surface2: #f0eaff;
+  --border: #d4c5f0;
+  --text: #1a1030;
+  --text2: #4a3a70;
+  --accent: #6d28d9;
+  --accent2: #f97316;
+  --accent-light: #ede9fe;
+  --code-bg: #1e1530;
+  --code-text: #e8d5ff;
+  --green: #16a34a;
+  --red: #dc2626;
+  --yellow: #ca8a04;
+  --sidebar-w: 260px;
+  --radius: 10px;
+}
+[data-theme="dark"] {
+  --bg: #0f0a1e;
+  --surface: #1a1030;
+  --surface2: #251840;
+  --border: #3d2a6a;
+  --text: #f0e8ff;
+  --text2: #c4a8f0;
+  --accent: #a78bfa;
+  --accent2: #fb923c;
+  --accent-light: #2d1f50;
+  --code-bg: #0a0614;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;transition:background .3s,color .3s}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:'Courier New',monospace;background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:.88em}
+h1{font-size:1.7rem;font-weight:700}
+h2{font-size:1.35rem;font-weight:700;margin:1.5rem 0 .6rem;color:var(--accent)}
+h3{font-size:1.1rem;font-weight:600;margin:1.2rem 0 .4rem;color:var(--text2)}
+p{margin:.5rem 0}
+ul,ol{padding-left:1.4rem;margin:.4rem 0}
+li{margin:.2rem 0}
+/* TOP BAR */
+#topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:2px solid var(--accent);padding:.6rem 1rem;display:flex;align-items:center;gap:.8rem;box-shadow:0 2px 8px rgba(109,40,217,.15)}
+#topbar h1{flex:1;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#progress-bar-wrap{flex:2;background:var(--surface2);border-radius:99px;height:8px;min-width:60px}
+#progress-bar{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .4s}
+#progress-label{font-size:.75rem;color:var(--text2);white-space:nowrap}
+#theme-btn{background:none;border:2px solid var(--border);border-radius:8px;padding:.3rem .7rem;cursor:pointer;color:var(--text);font-size:.9rem}
+#theme-btn:hover{border-color:var(--accent)}
+#menu-btn{display:none;background:none;border:2px solid var(--border);border-radius:8px;padding:.3rem .7rem;cursor:pointer;color:var(--text);font-size:1.1rem}
+/* SEARCH */
+#search-wrap{position:relative;width:160px}
+#search-input{width:100%;padding:.3rem .7rem;border:2px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:.85rem}
+#search-results{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;z-index:200;max-height:220px;overflow-y:auto;display:none}
+#search-results div{padding:.4rem .7rem;cursor:pointer;font-size:.85rem}
+#search-results div:hover{background:var(--accent-light)}
+/* LAYOUT */
+#layout{display:flex;min-height:calc(100vh - 52px)}
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:.8rem 0;transition:transform .3s}
+#sidebar nav a{display:block;padding:.35rem 1rem .35rem 1.2rem;font-size:.82rem;color:var(--text2);border-left:3px solid transparent;transition:all .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sidebar nav a:hover,#sidebar nav a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-light)}
+#sidebar .sec-head{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);padding:.6rem 1rem .2rem;opacity:.6}
+/* MAIN */
+#main{flex:1;padding:1.5rem 2rem;max-width:900px;min-width:0}
+/* SECTIONS */
+.section{margin-bottom:2.5rem;scroll-margin-top:60px}
+/* CODE BLOCKS */
+.code-wrap{position:relative;margin:.8rem 0;border-radius:var(--radius);overflow:hidden}
+.code-label{background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:.25rem .7rem;display:inline-block;border-radius:4px 0 4px 0}
+pre.code{background:var(--code-bg);color:var(--code-text);padding:1rem 1rem 1rem 1rem;font-family:'Courier New',monospace;font-size:.82rem;line-height:1.6;overflow-x:auto;tab-size:4}
+.kw{color:#c084fc} .st{color:#86efac} .cm{color:#6b7280;font-style:italic} .fn{color:#67e8f9} .nm{color:#fca5a5} .op{color:#f0abfc} .num{color:#fbbf24}
+.copy-btn{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#ddd;padding:.2rem .6rem;border-radius:5px;cursor:pointer;font-size:.75rem}
+.copy-btn:hover{background:rgba(255,255,255,.2)}
+/* OUTPUT */
+.output-box{background:#0d1117;color:#86efac;font-family:'Courier New',monospace;font-size:.8rem;padding:.8rem 1rem;border-radius:var(--radius);margin:.5rem 0;border:1px solid #30363d;white-space:pre-wrap}
+/* CALLOUTS */
+.callout{border-radius:var(--radius);padding:.8rem 1rem;margin:.8rem 0;border-left:4px solid}
+.callout.note{background:#eff6ff;border-color:#3b82f6;color:#1e40af}
+.callout.tip{background:#f0fdf4;border-color:#16a34a;color:#14532d}
+.callout.warn{background:#fffbeb;border-color:#f59e0b;color:#78350f}
+.callout.fix{background:#fef2f2;border-color:#ef4444;color:#7f1d1d}
+.callout.good{background:#f0fdf4;border-color:#22c55e;color:#14532d}
+[data-theme="dark"] .callout.note{background:#1e3a5f;color:#93c5fd}
+[data-theme="dark"] .callout.tip{background:#14301f;color:#86efac}
+[data-theme="dark"] .callout.warn{background:#2d1f00;color:#fde68a}
+[data-theme="dark"] .callout.fix{background:#2d0f0f;color:#fca5a5}
+[data-theme="dark"] .callout.good{background:#0d2e14;color:#86efac}
+.fix-badge{background:#ef4444;color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:99px;vertical-align:middle;margin-left:.3rem}
+.good-badge{background:#22c55e;color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:99px;vertical-align:middle;margin-left:.3rem}
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem}
+th{background:var(--accent);color:#fff;padding:.5rem .8rem;text-align:left}
+td{padding:.45rem .8rem;border-bottom:1px solid var(--border)}
+tr:nth-child(even) td{background:var(--surface2)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.3rem;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.45rem 1rem;cursor:pointer;font-size:.88rem;font-weight:600;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn.secondary{background:var(--surface2);color:var(--text);border:2px solid var(--border)}
+.btn.sm{padding:.3rem .7rem;font-size:.8rem}
+/* PROGRESS MARKS */
+.mark-wrap{display:flex;align-items:center;gap:.5rem;margin-top:1rem;padding:.5rem 0;border-top:1px solid var(--border)}
+.mark-wrap label{font-size:.85rem;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:.4rem}
+/* INTERACTIVE WIDGETS */
+.widget{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:1.2rem;margin:1rem 0}
+.widget h3{margin-top:0}
+/* SQL PLAYGROUND */
+#playground textarea{width:100%;height:90px;background:var(--code-bg);color:var(--code-text);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-family:'Courier New',monospace;font-size:.83rem;resize:vertical}
+#playground-output{background:var(--code-bg);color:#e8d5ff;font-family:'Courier New',monospace;font-size:.8rem;padding:.8rem;border-radius:8px;margin-top:.6rem;min-height:50px;white-space:pre-wrap;max-height:300px;overflow-y:auto}
+.pg-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
+.eg-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:.25rem .6rem;border-radius:6px;cursor:pointer;font-size:.75rem}
+.eg-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* FETCH VISUALISER */
+#fetch-viz{display:flex;flex-direction:column;gap:.4rem;padding:.5rem 0}
+.fv-row{display:flex;gap:.4rem;align-items:center}
+.fv-cell{padding:.3rem .6rem;border-radius:5px;background:var(--surface2);border:2px solid var(--border);font-size:.78rem;font-family:'Courier New',monospace;transition:all .3s;min-width:80px;text-align:center}
+.fv-cell.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fv-cell.fetched{background:#16a34a;color:#fff;border-color:#16a34a}
+.fv-label{font-size:.75rem;color:var(--text2);width:80px;text-align:right}
+#fv-result{margin-top:.6rem;font-size:.82rem;background:var(--surface2);border-radius:8px;padding:.6rem;font-family:'Courier New',monospace;min-height:30px}
+#fv-many-n{width:60px;padding:.2rem;border:1px solid var(--border);border-radius:5px;background:var(--surface2);color:var(--text)}
+/* CSV DEMO */
+#csv-out{background:var(--code-bg);color:#86efac;font-family:'Courier New',monospace;font-size:.8rem;padding:.7rem;border-radius:8px;margin:.5rem 0;display:none;white-space:pre-wrap}
+/* QUIZ */
+.quiz-q{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:1rem;margin:.7rem 0}
+.quiz-q p{font-weight:600;margin-bottom:.5rem}
+.quiz-opt{display:block;padding:.3rem .6rem;margin:.2rem 0;cursor:pointer;border-radius:6px;border:1px solid var(--border);background:var(--surface2);transition:all .2s}
+.quiz-opt:hover{border-color:var(--accent);background:var(--accent-light)}
+.quiz-opt.correct{background:#dcfce7;border-color:#16a34a;color:#14532d}
+.quiz-opt.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+[data-theme="dark"] .quiz-opt.correct{background:#14301f;color:#86efac}
+[data-theme="dark"] .quiz-opt.wrong{background:#2d0f0f;color:#fca5a5}
+.quiz-exp{font-size:.82rem;color:var(--text2);margin-top:.4rem;padding:.3rem .5rem;background:var(--accent-light);border-radius:5px;display:none}
+#quiz-score{font-weight:700;font-size:1.1rem;margin:1rem 0;color:var(--accent)}
+/* FLASHCARDS */
+.fc-scene{perspective:600px;width:100%;max-width:420px;height:170px;margin:0 auto}
+.fc-card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.fc-card.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;border-radius:var(--radius);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;backface-visibility:hidden;font-size:.92rem;background:var(--surface)}
+.fc-back{transform:rotateY(180deg);background:var(--accent-light);color:var(--accent)}
+.fc-nav{display:flex;align-items:center;gap:.8rem;justify-content:center;margin:.7rem 0}
+.fc-counter{font-size:.82rem;color:var(--text2)}
+.fc-actions{display:flex;gap:.5rem;justify-content:center;margin:.3rem 0}
+/* COLLAPSIBLE PANELS */
+.panel{border:1px solid var(--border);border-radius:var(--radius);margin:.5rem 0}
+.panel-head{padding:.7rem 1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:.9rem;user-select:none}
+.panel-head:hover{background:var(--accent-light)}
+.panel-body{display:none;padding:0 1rem 1rem;border-top:1px solid var(--border)}
+.panel.open .panel-body{display:block}
+.panel-arrow{transition:transform .3s}
+.panel.open .panel-arrow{transform:rotate(180deg)}
+/* GLOSSARY */
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.6rem;margin:.7rem 0}
+.gterm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem;font-size:.85rem}
+.gterm strong{color:var(--accent);display:block;margin-bottom:.2rem}
+/* STEPPER */
+.stepper{display:flex;gap:0;margin:1rem 0;flex-wrap:wrap}
+.step{flex:1;min-width:130px;background:var(--surface2);border:2px solid var(--border);border-right:none;padding:.8rem;position:relative}
+.step:last-child{border-right:2px solid var(--border)}
+.step-num{background:var(--accent);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;margin-bottom:.4rem}
+.step h4{font-size:.85rem;margin-bottom:.3rem;color:var(--accent)}
+.step p{font-size:.78rem;color:var(--text2)}
+/* HANDS-ON */
+.ho-q{background:var(--surface2);border-left:4px solid var(--accent2);border-radius:0 var(--radius) var(--radius) 0;padding:.7rem 1rem;margin:.4rem 0;font-size:.88rem}
+/* RESPONSIVE */
+@media(max-width:700px){
+  #menu-btn{display:block}
+  #sidebar{position:fixed;top:52px;left:0;height:calc(100vh - 52px);z-index:90;transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{padding:1rem}
+  #layout{flex-direction:column}
+  #search-wrap{width:120px}
+  #topbar h1{font-size:.85rem}
+}
+</style>
+</head>
+<body>
+<!-- TOP BAR -->
+<div id="topbar">
+  <button id="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+  <h1>Ch.15 – Data Manipulation Through SQL</h1>
+  <div id="search-wrap">
+    <input id="search-input" type="search" placeholder="Search…" autocomplete="off" oninput="doSearch(this.value)">
+    <div id="search-results"></div>
+  </div>
+  <div id="progress-bar-wrap" title="Your progress"><div id="progress-bar"></div></div>
+  <span id="progress-label">0 / 0</span>
+  <button id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+</div>
+<!-- LAYOUT -->
+<div id="layout">
+<nav id="sidebar">
+  <div class="sec-head">Contents</div>
+  <a href="#objectives">Learning Objectives</a>
+  <a href="#s151">15.1 Introduction</a>
+  <a href="#s152">15.2 SQLite</a>
+  <a href="#s153">15.3 Creating Database</a>
+  <a href="#s154">15.4 SELECT Statement</a>
+  <a href="#s155">15.5 AND / OR / NOT</a>
+  <a href="#s156">15.6 Date Column</a>
+  <a href="#s157">15.7 Aggregate Functions</a>
+  <a href="#s158">15.8 UPDATE</a>
+  <a href="#s159">15.9 DELETE</a>
+  <a href="#s1510">15.10 User Input</a>
+  <a href="#s1511">15.11 Multiple Tables</a>
+  <a href="#s1512">15.12 CSV Integration</a>
+  <div class="sec-head">Interactive</div>
+  <a href="#playground">SQL Playground</a>
+  <a href="#fetch-viz-sec">Fetch Visualiser</a>
+  <a href="#csv-demo">CSV Demo</a>
+  <a href="#quiz-sec">Quiz</a>
+  <a href="#flashcards">Flashcards</a>
+  <div class="sec-head">Practice</div>
+  <a href="#part3">Part III (3-mark)</a>
+  <a href="#part4">Part IV (5-mark)</a>
+  <a href="#handson">Hands-on</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#points">Points to Remember</a>
+</nav>
+<main id="main">
+
+<!-- LEARNING OBJECTIVES -->
+<section class="section" id="objectives">
+  <h2>Learning Objectives</h2>
+  <p>After studying this chapter, you will be able to:</p>
+  <ul>
+    <li>Understand how Python connects to a SQLite database</li>
+    <li>Create tables and insert records using Python's <code>sqlite3</code> module</li>
+    <li>Retrieve data using SELECT with WHERE, GROUP BY, ORDER BY, HAVING, DISTINCT</li>
+    <li>Use AND, OR, NOT operators and date comparisons in queries</li>
+    <li>Apply aggregate functions: COUNT, AVG, SUM, MAX, MIN</li>
+    <li>Update and delete rows safely using WHERE clauses</li>
+    <li>Use <code>?</code> placeholders for safe user input</li>
+    <li>Query across multiple tables (JOIN)</li>
+    <li>Export query results to CSV files</li>
+  </ul>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="objectives"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.1 INTRODUCTION -->
+<section class="section" id="s151">
+  <h2>15.1 Introduction</h2>
+  <p>A <strong>database</strong> is an organised collection of related data. A <strong>Database Management System (DBMS)</strong> is software that manages these databases. A <strong>Relational DBMS (RDBMS)</strong> stores data in tables (rows and columns).</p>
+  <p>Python's built-in <code>sqlite3</code> module lets you create and interact with SQLite databases without any extra installation. SQLite stores the entire database in a single <code>.db</code> file.</p>
+  <p>In this chapter, we create <strong>Academy.db</strong> with a <strong>Student</strong> table to practise all SQL operations.</p>
+  <div class="callout note">The <code>sqlite3</code> module is part of Python's standard library — no <code>pip install</code> needed.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s151"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.2 SQLITE -->
+<section class="section" id="s152">
+  <h2>15.2 SQLite</h2>
+  <p>Every Python-SQLite program follows the same three steps:</p>
+  <div class="stepper">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h4>Connect</h4>
+      <p>Open (or create) the <code>.db</code> file with <code>sqlite3.connect()</code></p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h4>Cursor</h4>
+      <p>Create a cursor object — it executes SQL and holds results</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h4>Execute &amp; Commit</h4>
+      <p>Run SQL with <code>execute()</code>, save changes with <code>commit()</code>, then <code>close()</code></p>
+    </div>
+  </div>
+  <div class="code-wrap">
+    <span class="code-label">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)   <span class="cm"># creates file if not exists</span>
+cursor = conn.<span class="fn">cursor</span>()
+<span class="cm"># ... execute SQL ...</span>
+conn.<span class="fn">commit</span>()
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="callout tip"><strong>Tip:</strong> <code>sqlite3.connect(":memory:")</code> creates a temporary in-memory database — great for testing.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s152"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.3 CREATING DATABASE -->
+<section class="section" id="s153">
+  <h2>15.3 Creating Academy.db and the Student Table</h2>
+  <h3>15.3.1 CREATE TABLE</h3>
+  <p>The Student table stores roll number, name, section, gender, marks and date of birth:</p>
+  <div class="code-wrap">
+    <span class="code-label">Python – Ex 15.3.1</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+sql = <span class="st">"""CREATE TABLE Student(
+        Rollno INTEGER PRIMARY KEY,
+        Sname VARCHAR(20),
+        Section VARCHAR(5),
+        Gender VARCHAR(5),
+        Mark DECIMAL(5,2),
+        DOB DATE)"""</span>
+cursor.<span class="fn">execute</span>(sql)
+conn.<span class="fn">commit</span>()
+conn.<span class="fn">close</span>()
+<span class="fn">print</span>(<span class="st">"Table created"</span>)</pre>
+  </div>
+  <div class="callout note">
+    <strong>INTEGER PRIMARY KEY</strong> in SQLite automatically acts as an auto-increment column — if you omit the value during INSERT, SQLite assigns the next available integer.
+  </div>
+
+  <h3>15.3.2 INSERT Records</h3>
+  <p><strong>Method 1 – Direct values:</strong></p>
+  <div class="code-wrap">
+    <span class="code-label">Python – Ex 15.3.2 (single row)</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"INSERT INTO Student VALUES(1,'Akshay','B','M',87.8,'2001-12-12')"</span>)
+conn.<span class="fn">commit</span>()
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <p><strong>Method 2 – Loop with format string (textbook approach):</strong></p>
+  <div class="code-wrap">
+    <span class="code-label">Python – Ex 15.3.2 (loop)</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+records = [
+    (<span class="num">1</span>,<span class="st">'Akshay'</span>,<span class="st">'B'</span>,<span class="st">'M'</span>,<span class="num">87.8</span>,<span class="st">'2001-12-12'</span>),
+    (<span class="num">2</span>,<span class="st">'Aravind'</span>,<span class="st">'A'</span>,<span class="st">'M'</span>,<span class="num">92.5</span>,<span class="st">'2000-08-17'</span>),
+    (<span class="num">3</span>,<span class="st">'BASKAR'</span>,<span class="st">'C'</span>,<span class="st">'M'</span>,<span class="num">75.2</span>,<span class="st">'1998-05-17'</span>),
+    (<span class="num">4</span>,<span class="st">'SAJINI'</span>,<span class="st">'A'</span>,<span class="st">'F'</span>,<span class="num">95.6</span>,<span class="st">'2002-11-01'</span>),
+    (<span class="num">5</span>,<span class="st">'VARUN'</span>,<span class="st">'B'</span>,<span class="st">'M'</span>,<span class="num">80.6</span>,<span class="st">'2001-03-14'</span>),
+    (<span class="num">6</span>,<span class="st">'PRIYA'</span>,<span class="st">'A'</span>,<span class="st">'F'</span>,<span class="num">98.6</span>,<span class="st">'2002-01-01'</span>),
+    (<span class="num">7</span>,<span class="st">'TARUN'</span>,<span class="st">'D'</span>,<span class="st">'M'</span>,<span class="num">62.3</span>,<span class="st">'1999-02-01'</span>),
+]
+format_str = <span class="st">"INSERT INTO Student VALUES({0},'{1}','{2}','{3}',{4},'{5}')"</span>
+<span class="kw">for</span> rec <span class="kw">in</span> records:                       <span class="cm"># ← execute must be INSIDE the loop</span>
+    sql_command = format_str.<span class="fn">format</span>(*rec)
+    cursor.<span class="fn">execute</span>(sql_command)
+conn.<span class="fn">commit</span>()
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="callout warn"><strong>Note:</strong> The textbook loop example sometimes places <code>cursor.execute()</code> outside the loop body — that only inserts the last record. The corrected version above keeps <code>execute</code> inside the loop.</div>
+  <div class="callout good"><span class="good-badge">GOOD PRACTICE</span> <strong>Use <code>?</code> placeholders</strong> instead of <code>format()</code> for SQL — they prevent SQL injection: <code>cursor.executemany("INSERT INTO Student VALUES(?,?,?,?,?,?)", records)</code></div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s153"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.4 SELECT -->
+<section class="section" id="s154">
+  <h2>15.4 SELECT Statement</h2>
+  <p>The SELECT statement retrieves rows from a table. There are three fetch methods:</p>
+  <table>
+    <thead><tr><th>Method</th><th>Returns</th><th>Use when</th></tr></thead>
+    <tbody>
+      <tr><td><code>fetchall()</code></td><td>List of all rows (tuples)</td><td>Small result sets</td></tr>
+      <tr><td><code>fetchone()</code></td><td>Next single row (tuple) or None</td><td>Expect exactly one row</td></tr>
+      <tr><td><code>fetchmany(n)</code></td><td>Next <em>n</em> rows as a list</td><td>Paginating large results</td></tr>
+    </tbody>
+  </table>
+  <div class="code-wrap">
+    <span class="code-label">Python – SELECT all rows</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Student"</span>)
+rows = cursor.<span class="fn">fetchall</span>()
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="fn">print</span>(row)
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="output-box">(1, 'Akshay', 'B', 'M', 87.8, '2001-12-12')
+(2, 'Aravind', 'A', 'M', 92.5, '2000-08-17')
+(3, 'BASKAR', 'C', 'M', 75.2, '1998-05-17')
+(4, 'SAJINI', 'A', 'F', 95.6, '2002-11-01')
+(5, 'VARUN', 'B', 'M', 80.6, '2001-03-14')
+(6, 'PRIYA', 'A', 'F', 98.6, '2002-01-01')
+(7, 'TARUN', 'D', 'M', 62.3, '1999-02-01')</div>
+
+  <h3>15.4.2 Clauses</h3>
+  <p><strong>DISTINCT</strong> – removes duplicate values:</p>
+  <div class="code-wrap"><span class="code-label">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">SELECT DISTINCT</span> Section <span class="kw">FROM</span> Student</pre></div>
+  <div class="output-box">('B',)
+('A',)
+('C',)
+('D',)</div>
+  <p><strong>WHERE</strong> – filter rows:</p>
+  <div class="code-wrap"><span class="code-label">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">WHERE</span> Mark &gt; <span class="num">90</span></pre></div>
+  <div class="output-box">(2, 'Aravind', 'A', 'M', 92.5, '2000-08-17')
+(4, 'SAJINI', 'A', 'F', 95.6, '2002-11-01')
+(6, 'PRIYA', 'A', 'F', 98.6, '2002-01-01')</div>
+  <p><strong>GROUP BY</strong> – group rows sharing a value:</p>
+  <div class="code-wrap"><span class="code-label">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">SELECT</span> Section, <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> Student <span class="kw">GROUP BY</span> Section</pre></div>
+  <div class="output-box">('A', 3)
+('B', 2)
+('C', 1)
+('D', 1)</div>
+  <p><strong>ORDER BY</strong> – sort results (ASC default, DESC for reverse):</p>
+  <div class="code-wrap"><span class="code-label">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">ORDER BY</span> Mark <span class="kw">DESC</span></pre></div>
+  <p><strong>HAVING</strong> – filter groups (applied after GROUP BY):</p>
+  <div class="code-wrap"><span class="code-label">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">SELECT</span> Section, <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> Student
+<span class="kw">GROUP BY</span> Section <span class="kw">HAVING COUNT</span>(*) &gt; <span class="num">1</span></pre></div>
+  <div class="output-box">('A', 3)
+('B', 2)</div>
+  <div class="callout note"><strong>WHERE vs HAVING:</strong> WHERE filters <em>individual rows</em> before grouping. HAVING filters <em>groups</em> after aggregation. Both can be used together:<br><code>SELECT Section, AVG(Mark) FROM Student WHERE Gender='M' GROUP BY Section HAVING AVG(Mark)&gt;80</code></div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s154"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.5 AND OR NOT -->
+<section class="section" id="s155">
+  <h2>15.5 AND / OR / NOT</h2>
+  <table>
+    <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>AND</code></td><td>Both conditions true</td><td><code>WHERE Mark&gt;80 AND Gender='M'</code></td></tr>
+      <tr><td><code>OR</code></td><td>Either condition true</td><td><code>WHERE Section='A' OR Section='B'</code></td></tr>
+      <tr><td><code>NOT</code></td><td>Negate condition</td><td><code>WHERE NOT Gender='M'</code></td></tr>
+    </tbody>
+  </table>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.5</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code">cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Student WHERE Mark&gt;80 AND Gender='M'"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)</pre>
+  </div>
+  <div class="output-box">(1, 'Akshay', 'B', 'M', 87.8, '2001-12-12')
+(2, 'Aravind', 'A', 'M', 92.5, '2000-08-17')</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s155"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.6 DATE -->
+<section class="section" id="s156">
+  <h2>15.6 Date Column Querying</h2>
+  <p>SQLite stores dates as text in <strong>ISO 8601 format</strong> (YYYY-MM-DD). String comparison works correctly for this format, so <code>&gt;</code> and <code>&lt;</code> operators give the right chronological order.</p>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.6</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code">cursor.<span class="fn">execute</span>(<span class="st">"SELECT Sname,DOB FROM Student WHERE DOB&lt;'2001-01-01'"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)</pre>
+  </div>
+  <div class="output-box">('Aravind', '2000-08-17')
+('BASKAR', '1998-05-17')
+('TARUN', '1999-02-01')</div>
+  <div class="callout good"><span class="good-badge">GOOD PRACTICE</span> Always store dates as YYYY-MM-DD (ISO 8601). The textbook's GAMES table uses MM-DD-YYYY which breaks date comparisons — see Hands-on section.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s156"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.7 AGGREGATE FUNCTIONS -->
+<section class="section" id="s157">
+  <h2>15.7 Aggregate Functions</h2>
+  <table>
+    <thead><tr><th>Function</th><th>Returns</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>COUNT(*)</code></td><td>Total rows</td><td><code>SELECT COUNT(*) FROM Student</code> → 7</td></tr>
+      <tr><td><code>COUNT(col)</code></td><td>Non-NULL values in column</td><td><code>SELECT COUNT(Mark) FROM Student</code></td></tr>
+      <tr><td><code>AVG(col)</code></td><td>Average of numeric column</td><td><code>SELECT AVG(Mark) FROM Student</code></td></tr>
+      <tr><td><code>SUM(col)</code></td><td>Total of numeric column</td><td><code>SELECT SUM(Mark) FROM Student</code></td></tr>
+      <tr><td><code>MAX(col)</code></td><td>Largest value</td><td><code>SELECT MAX(Mark) FROM Student</code></td></tr>
+      <tr><td><code>MIN(col)</code></td><td>Smallest value</td><td><code>SELECT MIN(Mark) FROM Student</code></td></tr>
+    </tbody>
+  </table>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.7</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code">cursor.<span class="fn">execute</span>(<span class="st">"SELECT COUNT(*),AVG(Mark),MAX(Mark),MIN(Mark) FROM Student"</span>)
+<span class="fn">print</span>(cursor.<span class="fn">fetchone</span>())</pre>
+  </div>
+  <div class="output-box">(7, 84.64285714285714, 98.6, 62.3)</div>
+  <div class="callout fix">
+    <strong>Textbook Fix <span class="fix-badge">FIX</span></strong> Example 15.7.4-1 connects to <code>"Organization.db"</code> but queries the <code>Student</code> table — this causes an error. The correct database is <code>"Academy.db"</code>.<br>
+    <em>Textbook:</em> <code>conn = sqlite3.connect("Organization.db")</code><br>
+    <em>Corrected:</em> <code>conn = sqlite3.connect("Academy.db")</code>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s157"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.8 UPDATE -->
+<section class="section" id="s158">
+  <h2>15.8 UPDATE</h2>
+  <p>UPDATE changes existing rows. Always use WHERE to target specific rows — without it, every row is changed.</p>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.8</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"UPDATE Student SET Mark=90.0 WHERE Sname='Akshay'"</span>)
+conn.<span class="fn">commit</span>()
+<span class="fn">print</span>(<span class="st">"Rows changed:"</span>, conn.total_changes)
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="output-box">Rows changed: 1</div>
+  <div class="callout note"><code>conn.total_changes</code> returns the total number of rows modified since the connection was opened.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s158"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.9 DELETE -->
+<section class="section" id="s159">
+  <h2>15.9 DELETE</h2>
+  <p>DELETE removes rows. Without WHERE, it deletes all rows from the table.</p>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.9</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code">cursor.<span class="fn">execute</span>(<span class="st">"DELETE FROM Student WHERE Mark&lt;70"</span>)
+conn.<span class="fn">commit</span>()</pre>
+  </div>
+  <div class="callout warn">Always test your WHERE clause with SELECT before running DELETE or UPDATE — you can't easily undo a committed delete.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s159"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.10 USER INPUT -->
+<section class="section" id="s1510">
+  <h2>15.10 User Input with ? Placeholders</h2>
+  <p>Instead of building SQL strings with <code>format()</code>, use <strong>parameterised queries</strong>. The <code>?</code> placeholder lets SQLite safely handle user input and prevents SQL injection.</p>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.10</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+name = <span class="fn">input</span>(<span class="st">"Enter name: "</span>)
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Student WHERE Sname=?"</span>, (name,))   <span class="cm"># tuple!</span>
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="callout fix">
+    <strong>Textbook Fix <span class="fix-badge">FIX</span></strong> Ex 15.10-1 has <code>DROP TABLE person</code> which fails on the first run (table doesn't exist yet). Use <code>DROP TABLE IF EXISTS person</code>. The example also lacks <code>commit()</code> and <code>close()</code>.
+  </div>
+  <div class="callout good"><span class="good-badge">GOOD PRACTICE</span> <strong>Always use <code>?</code> placeholders</strong> for user input — they protect against SQL injection. Never concatenate user input directly into SQL strings.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s1510"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.11 MULTIPLE TABLES -->
+<section class="section" id="s1511">
+  <h2>15.11 Multiple Table Querying</h2>
+  <p>To query two tables together, list both in FROM and specify how they relate in WHERE. This is an <strong>implicit (comma) JOIN</strong>.</p>
+  <p>The <strong>Appointment</strong> table: <code>(Appno, Duty, Rollno)</code></p>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.11</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"""SELECT Student.Sname, Appointment.Duty
+               FROM Student, Appointment
+               WHERE Student.Rollno = Appointment.Rollno"""</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="output-box">('Aravind', 'Prefect')
+('BASKAR', 'Secretary')</div>
+  <div class="callout fix">
+    <strong>Textbook Fix <span class="fix-badge">FIX</span></strong> Ex 15.11-1 CREATE TABLE statement has typo <code>"rollnointprimarkey,Dutyvarchar(10)"</code>. Correct SQL:<br>
+    <code>Rollno INTEGER PRIMARY KEY, Duty VARCHAR(10), age INT</code><br>
+    Also, <code>DROP TABLE Appointment</code> fails on first run — use <code>DROP TABLE IF EXISTS Appointment</code>.
+  </div>
+  <p>You can also list all tables in the database using <code>sqlite_master</code>:</p>
+  <div class="code-wrap"><span class="code-label">Python – List tables</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code">cursor.<span class="fn">execute</span>(<span class="st">"SELECT name FROM sqlite_master WHERE type='table'"</span>)
+<span class="fn">print</span>(cursor.<span class="fn">fetchall</span>())</pre>
+  </div>
+  <div class="output-box">[('Student',), ('Appointment',)]</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s1511"> Mark as done</label>
+  </div>
+</section>
+
+<!-- 15.12 CSV -->
+<section class="section" id="s1512">
+  <h2>15.12 CSV Integration</h2>
+  <p>Python's <code>csv</code> module exports query results to a CSV file.</p>
+  <div class="code-wrap"><span class="code-label">Python – Ex 15.12</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="code"><span class="kw">import</span> sqlite3, csv
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Student ORDER BY Gender DESC, Sname"</span>)
+rows = cursor.<span class="fn">fetchall</span>()
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">'c:/pyprg/sql.csv'</span>, <span class="st">'w'</span>, newline=<span class="st">''</span>) <span class="kw">as</span> f:   <span class="cm"># newline='' is required</span>
+    writer = csv.<span class="fn">writer</span>(f)
+    writer.<span class="fn">writerow</span>([col[<span class="num">0</span>] <span class="kw">for</span> col <span class="kw">in</span> cursor.description])  <span class="cm"># header</span>
+    writer.<span class="fn">writerows</span>(rows)
+conn.<span class="fn">close</span>()</pre>
+  </div>
+  <div class="callout fix">
+    <strong>Textbook Fix <span class="fix-badge">FIX</span></strong> The textbook prints <code>open('c:/pyprg/sql.csv','w, newline= ' ')</code> — the quote is placed inside the string, making <code>newline</code> part of the filename. The correct syntax has <code>newline=''</code> as a separate keyword argument (see above).
+  </div>
+  <div class="callout note"><code>newline=''</code> is required on Windows to prevent csv.writer from adding extra blank lines between rows.</div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="s1512"> Mark as done</label>
+  </div>
+</section>
+
+<!-- SQL PLAYGROUND -->
+<section class="section" id="playground">
+  <h2>SQL Playground</h2>
+  <p>Run SQL queries against the Student table live in your browser. The table is preloaded with the chapter's 7 rows.</p>
+  <div class="widget" id="playground-widget">
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.5rem">
+      <strong style="font-size:.9rem">Student table preloaded</strong>
+      <button class="btn sm secondary" onclick="pgReset()">↺ Reset table</button>
+    </div>
+    <div class="pg-btns" id="pg-examples"></div>
+    <textarea id="pg-sql" spellcheck="false" placeholder="Type SQL here… e.g. SELECT * FROM Student WHERE Mark > 90"></textarea>
+    <div style="display:flex;gap:.5rem;margin:.5rem 0;flex-wrap:wrap">
+      <button class="btn" onclick="pgRun()">▶ Run</button>
+      <button class="btn secondary" onclick="document.getElementById('pg-sql').value=''">Clear</button>
+    </div>
+    <div id="playground-output">Results will appear here…</div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="playground"> Mark as done</label>
+  </div>
+</section>
+
+<!-- FETCH VISUALISER -->
+<section class="section" id="fetch-viz-sec">
+  <h2>Fetch Method Visualiser</h2>
+  <p>See how fetchone, fetchmany and fetchall work step by step. The rows below represent query results. Choose a method and click Fetch.</p>
+  <div class="widget">
+    <div id="fetch-viz"></div>
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.5rem 0">
+      <select id="fv-method" style="padding:.3rem;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text)">
+        <option>fetchone()</option>
+        <option>fetchmany(n)</option>
+        <option>fetchall()</option>
+      </select>
+      <label style="font-size:.85rem">n = <input id="fv-many-n" type="number" value="2" min="1" max="7"></label>
+      <button class="btn" onclick="fvFetch()">Fetch</button>
+      <button class="btn secondary" onclick="fvReset()">Reset</button>
+    </div>
+    <div id="fv-result">Click Fetch to start…</div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="fetch-viz-sec"> Mark as done</label>
+  </div>
+</section>
+
+<!-- CSV DEMO -->
+<section class="section" id="csv-demo">
+  <h2>CSV Export Demo</h2>
+  <p>Runs <code>ORDER BY Gender DESC, Sname</code> on the Student table and exports the result to CSV.</p>
+  <div class="widget">
+    <button class="btn" onclick="csvDemo()">▶ Generate CSV</button>
+    <div id="csv-out"></div>
+    <div id="csv-dl" style="display:none;margin-top:.5rem">
+      <button class="btn secondary" onclick="csvDownload()">⬇ Download sql.csv</button>
+    </div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="csv-demo"> Mark as done</label>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="section" id="quiz-sec">
+  <h2>Quiz – 10 Questions</h2>
+  <p>Test your understanding. Click an option to see instant feedback.</p>
+  <div style="display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap">
+    <button class="btn" onclick="quizStart()">▶ Start / Restart</button>
+    <button class="btn secondary" onclick="quizShuffle()">⇄ Shuffle</button>
+  </div>
+  <div id="quiz-score"></div>
+  <div id="quiz-container"></div>
+</section>
+
+<!-- FLASHCARDS -->
+<section class="section" id="flashcards">
+  <h2>Flashcards</h2>
+  <p>Click the card to flip it. Mark whether you knew it.</p>
+  <div class="fc-scene"><div class="fc-card" id="fc-card" onclick="fcFlip()">
+    <div class="fc-face" id="fc-front">Loading…</div>
+    <div class="fc-face fc-back" id="fc-back">…</div>
+  </div></div>
+  <div class="fc-nav">
+    <button class="btn sm secondary" onclick="fcPrev()">← Prev</button>
+    <span class="fc-counter" id="fc-counter">1 / 8</span>
+    <button class="btn sm secondary" onclick="fcNext()">Next →</button>
+  </div>
+  <div class="fc-actions">
+    <button class="btn sm" style="background:#16a34a" onclick="fcKnew()">✓ I knew it</button>
+    <button class="btn sm secondary" onclick="fcReview()">↺ Review again</button>
+  </div>
+  <p id="fc-stats" style="font-size:.82rem;color:var(--text2);text-align:center;margin-top:.4rem"></p>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="flashcards"> Mark as done</label>
+  </div>
+</section>
+
+<!-- PART III -->
+<section class="section" id="part3">
+  <h2>Part III – 3 Mark Questions</h2>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q1. Write a Python program to create Student table in Academy.db <span class="panel-arrow">▼</span></div>
+    <div class="panel-body">
+<pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"""CREATE TABLE Student(
+    Rollno INTEGER PRIMARY KEY, Sname VARCHAR(20),
+    Section VARCHAR(5), Gender VARCHAR(5),
+    Mark DECIMAL(5,2), DOB DATE)"""</span>)
+conn.<span class="fn">commit</span>(); conn.<span class="fn">close</span>()
+<span class="fn">print</span>(<span class="st">"Table created"</span>)</pre>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q2. Write SQL to display students with marks between 80 and 95 <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">WHERE</span> Mark <span class="kw">BETWEEN</span> <span class="num">80</span> <span class="kw">AND</span> <span class="num">95</span></pre>
+<div class="output-box">(1, 'Akshay', 'B', 'M', 87.8, '2001-12-12')
+(2, 'Aravind', 'A', 'M', 92.5, '2000-08-17')
+(4, 'SAJINI', 'A', 'F', 95.6, '2002-11-01')
+(5, 'VARUN', 'B', 'M', 80.6, '2001-03-14')</div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q3. Write a Python program to display section-wise student count <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0">cursor.<span class="fn">execute</span>(<span class="st">"SELECT Section, COUNT(*) FROM Student GROUP BY Section"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)</pre></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q4. Display department-wise records from organization.db <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"organization.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Employee ORDER BY Dept"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)
+conn.<span class="fn">close</span>()</pre></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q5. Display Employee records in descending order of Eno <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0">cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Employee ORDER BY Eno DESC"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)</pre></div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="part3"> Mark as done</label>
+  </div>
+</section>
+
+<!-- PART IV -->
+<section class="section" id="part4">
+  <h2>Part IV – 5 Mark Questions</h2>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q1. Python program: insert 5 records into ITEM table in ABC.db <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"ABC.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"""CREATE TABLE IF NOT EXISTS ITEM(
+    Icode INT PRIMARY KEY, ItemName VARCHAR(20), Rate INT)"""</span>)
+records = [(<span class="num">1003</span>,<span class="st">'Scanner'</span>,<span class="num">10500</span>),(<span class="num">1004</span>,<span class="st">'Speaker'</span>,<span class="num">3000</span>),
+           (<span class="num">1005</span>,<span class="st">'Printer'</span>,<span class="num">8000</span>),(<span class="num">1008</span>,<span class="st">'Monitor'</span>,<span class="num">15000</span>),(<span class="num">1010</span>,<span class="st">'Mouse'</span>,<span class="num">700</span>)]
+cursor.<span class="fn">executemany</span>(<span class="st">"INSERT INTO ITEM VALUES(?,?,?)"</span>, records)
+conn.<span class="fn">commit</span>(); conn.<span class="fn">close</span>()
+<span class="fn">print</span>(<span class="st">"5 records inserted"</span>)</pre></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q2. Python program: display ITEM table and insert (1008, Monitor, 15000) <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"ABC.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM ITEM"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)
+cursor.<span class="fn">execute</span>(<span class="st">"INSERT INTO ITEM VALUES(?,?,?)"</span>, (<span class="num">1008</span>,<span class="st">'Monitor'</span>,<span class="num">15000</span>))
+conn.<span class="fn">commit</span>(); conn.<span class="fn">close</span>()</pre></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q3. Python program using fetchone() and fetchmany(3) <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"Academy.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Student"</span>)
+<span class="fn">print</span>(<span class="st">"fetchone:"</span>, cursor.<span class="fn">fetchone</span>())
+<span class="fn">print</span>(<span class="st">"fetchmany(3):"</span>, cursor.<span class="fn">fetchmany</span>(<span class="num">3</span>))
+conn.<span class="fn">close</span>()</pre>
+<div class="output-box">fetchone: (1, 'Akshay', 'B', 'M', 87.8, '2001-12-12')
+fetchmany(3): [(2,'Aravind','A','M',92.5,'2000-08-17'),(3,'BASKAR','C','M',75.2,'1998-05-17'),(4,'SAJINI','A','F',95.6,'2002-11-01')]</div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q4. Python: display ITEM and SUPPLIER tables (ABC.db) <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"ABC.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+<span class="kw">for</span> tbl <span class="kw">in</span> [<span class="st">'ITEM'</span>,<span class="st">'SUPPLIER'</span>]:
+    <span class="fn">print</span>(<span class="st">f"--- {tbl} ---"</span>)
+    cursor.<span class="fn">execute</span>(<span class="st">f"SELECT * FROM {tbl}"</span>)
+    <span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)
+conn.<span class="fn">close</span>()</pre></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Q5. Python: JOIN Supplier+Item (exclude Delhi); UPDATE Akila's SuppQty <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"ABC.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+<span class="cm"># (i) JOIN excluding Delhi</span>
+cursor.<span class="fn">execute</span>(<span class="st">"""SELECT S.Name, S.City, I.ItemName
+    FROM SUPPLIER S, ITEM I
+    WHERE S.Icode=I.Icode AND S.City &lt;&gt; 'Delhi'"""</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.<span class="fn">fetchall</span>(): <span class="fn">print</span>(row)
+<span class="cm"># (ii) UPDATE Akila</span>
+cursor.<span class="fn">execute</span>(<span class="st">"UPDATE SUPPLIER SET SuppQty=SuppQty+40 WHERE Name='Akila'"</span>)
+conn.<span class="fn">commit</span>(); conn.<span class="fn">close</span>()</pre></div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="part4"> Mark as done</label>
+  </div>
+</section>
+
+<!-- HANDS-ON -->
+<section class="section" id="handson">
+  <h2>Hands-on Exercises</h2>
+  <h3>Exercise 1 – Customer Table CSV Program (DB1)</h3>
+  <div class="ho-q">Write a Python program to read records from a Customer table in DB1.db and write them to a CSV file.</div>
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel(this)">Show Solution <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">import</span> sqlite3, csv
+conn = sqlite3.<span class="fn">connect</span>(<span class="st">"DB1.db"</span>)
+cursor = conn.<span class="fn">cursor</span>()
+cursor.<span class="fn">execute</span>(<span class="st">"SELECT * FROM Customer"</span>)
+rows = cursor.<span class="fn">fetchall</span>()
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">'customer.csv'</span>, <span class="st">'w'</span>, newline=<span class="st">''</span>) <span class="kw">as</span> f:
+    w = csv.<span class="fn">writer</span>(f)
+    w.<span class="fn">writerow</span>([col[<span class="num">0</span>] <span class="kw">for</span> col <span class="kw">in</span> cursor.description])
+    w.<span class="fn">writerows</span>(rows)
+conn.<span class="fn">close</span>()
+<span class="fn">print</span>(<span class="st">"Exported to customer.csv"</span>)</pre></div>
+  </div>
+
+  <h3>Exercise 2 – GAMES Table</h3>
+  <p>The GAMES table has columns: <code>Gcode, Name, GameName, Number, PrizeMoney, ScheduleDate</code></p>
+  <table style="font-size:.82rem">
+    <thead><tr><th>Gcode</th><th>Name</th><th>GameName</th><th>Number</th><th>PrizeMoney</th><th>ScheduleDate</th></tr></thead>
+    <tbody>
+      <tr><td>101</td><td>Padmaja</td><td>Carom Board</td><td>2</td><td>5000</td><td>01-23-2014</td></tr>
+      <tr><td>102</td><td>Vidhya</td><td>Badminton</td><td>2</td><td>12000</td><td>12-12-2013</td></tr>
+      <tr><td>103</td><td>Guru</td><td>Table Tennis</td><td>4</td><td>8000</td><td>02-14-2014</td></tr>
+      <tr><td>105</td><td>Keerthana</td><td>Carom Board</td><td>2</td><td>9000</td><td>01-01-2014</td></tr>
+      <tr><td>108</td><td>Krishna</td><td>Table Tennis</td><td>4</td><td>25000</td><td>03-19-2014</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><strong>Note:</strong> The textbook stores dates as MM-DD-YYYY. This means date ordering (<code>ORDER BY ScheduleDate</code>) will not work correctly. For correct chronological ordering, dates should be stored as YYYY-MM-DD (ISO format).</div>
+
+  <div class="ho-q">(i) Display all records of players who play Carom Board</div>
+  <div class="panel"><div class="panel-head" onclick="togglePanel(this)">Show Solution <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">SELECT</span> * <span class="kw">FROM</span> GAMES <span class="kw">WHERE</span> GameName=<span class="st">'Carom Board'</span></pre>
+<div class="output-box">(101, 'Padmaja', 'Carom Board', 2, 5000, '01-23-2014')
+(105, 'Keerthana', 'Carom Board', 2, 9000, '01-01-2014')</div></div>
+  </div>
+
+  <div class="ho-q">(ii) Display the name and prize money of those who win more than Rs 8000</div>
+  <div class="panel"><div class="panel-head" onclick="togglePanel(this)">Show Solution <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">SELECT</span> Name, PrizeMoney <span class="kw">FROM</span> GAMES <span class="kw">WHERE</span> PrizeMoney&gt;<span class="num">8000</span></pre>
+<div class="output-box">('Vidhya', 12000)
+('Keerthana', 9000)
+('Krishna', 25000)</div></div>
+  </div>
+
+  <div class="ho-q">(iii) Display GameName-wise total PrizeMoney</div>
+  <div class="panel"><div class="panel-head" onclick="togglePanel(this)">Show Solution <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">SELECT</span> GameName, <span class="fn">SUM</span>(PrizeMoney) <span class="kw">FROM</span> GAMES <span class="kw">GROUP BY</span> GameName</pre>
+<div class="output-box">('Badminton', 12000)
+('Carom Board', 14000)
+('Table Tennis', 33000)</div></div>
+  </div>
+
+  <div class="ho-q">(iv) Count the number of players for each game</div>
+  <div class="panel"><div class="panel-head" onclick="togglePanel(this)">Show Solution <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">SELECT</span> GameName, <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> GAMES <span class="kw">GROUP BY</span> GameName</pre>
+<div class="output-box">('Badminton', 1)
+('Carom Board', 2)
+('Table Tennis', 2)</div></div>
+  </div>
+
+  <div class="ho-q">(v) Display details of games with total prize money > 15000</div>
+  <div class="panel"><div class="panel-head" onclick="togglePanel(this)">Show Solution <span class="panel-arrow">▼</span></div>
+    <div class="panel-body"><pre class="code" style="margin:.5rem 0"><span class="kw">SELECT</span> GameName, <span class="fn">SUM</span>(PrizeMoney) <span class="kw">FROM</span> GAMES
+<span class="kw">GROUP BY</span> GameName <span class="kw">HAVING SUM</span>(PrizeMoney)&gt;<span class="num">15000</span></pre>
+<div class="output-box">('Table Tennis', 33000)</div></div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="handson"> Mark as done</label>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section class="section" id="glossary">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="gterm"><strong>Database</strong>An organised collection of related structured data</div>
+    <div class="gterm"><strong>DBMS</strong>Software that creates, manages and secures databases (e.g. SQLite, MySQL)</div>
+    <div class="gterm"><strong>SQLite</strong>A lightweight, file-based RDBMS built into Python's standard library</div>
+    <div class="gterm"><strong>Connection</strong>The object returned by <code>sqlite3.connect()</code>; represents the open database file</div>
+    <div class="gterm"><strong>Cursor</strong>Object that executes SQL statements and holds query results</div>
+    <div class="gterm"><strong>Commit</strong><code>conn.commit()</code> — saves all pending changes permanently to disk</div>
+    <div class="gterm"><strong>Primary Key</strong>A column whose value uniquely identifies each row; no two rows may share it</div>
+    <div class="gterm"><strong>Tuple</strong>Each row returned by fetchall/fetchone is a Python tuple</div>
+    <div class="gterm"><strong>Placeholder (?)</strong>A <code>?</code> in SQL that SQLite replaces safely with a parameter value</div>
+    <div class="gterm"><strong>Aggregate Function</strong>A function that computes a single result from many rows: COUNT, SUM, AVG, MAX, MIN</div>
+    <div class="gterm"><strong>sqlite_master</strong>Built-in SQLite table listing all tables, indexes and views in the database</div>
+    <div class="gterm"><strong>CSV</strong>Comma-Separated Values — a plain-text format for tabular data, readable by Excel</div>
+  </div>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="glossary"> Mark as done</label>
+  </div>
+</section>
+
+<!-- POINTS TO REMEMBER -->
+<section class="section" id="points">
+  <h2>Points to Remember</h2>
+  <ul>
+    <li>Python's <code>sqlite3</code> module is part of the standard library — no installation needed</li>
+    <li>The sequence is: <strong>connect → cursor → execute → commit → close</strong></li>
+    <li><code>INTEGER PRIMARY KEY</code> auto-increments in SQLite</li>
+    <li><code>fetchall()</code> returns all rows; <code>fetchone()</code> returns the next row; <code>fetchmany(n)</code> returns next <em>n</em> rows</li>
+    <li><code>cursor.description</code> gives column names after a SELECT</li>
+    <li><strong>WHERE</strong> filters rows <em>before</em> grouping; <strong>HAVING</strong> filters groups <em>after</em> aggregation — both can be used together</li>
+    <li>Aggregate functions: COUNT, AVG, SUM, MAX, MIN — used with SELECT or HAVING</li>
+    <li>Always use <strong>WHERE</strong> with UPDATE and DELETE — without it, every row is affected</li>
+    <li>Use <code>?</code> placeholders (parameterised queries) instead of string formatting for user input</li>
+    <li>Store dates in <strong>YYYY-MM-DD</strong> format for correct sorting</li>
+    <li><code>conn.total_changes</code> returns rows modified since connection opened</li>
+    <li>Use <code>newline=''</code> when opening CSV files on Windows to avoid extra blank lines</li>
+    <li><code>sqlite_master</code> lists all tables: <code>SELECT name FROM sqlite_master WHERE type='table'</code></li>
+    <li>For multi-table queries, link tables via a WHERE condition on shared columns (implicit JOIN)</li>
+  </ul>
+  <div class="mark-wrap">
+    <label><input type="checkbox" class="mark-cb" data-sec="points"> Mark as done</label>
+  </div>
+</section>
+
+<div style="text-align:center;padding:1.5rem 0;color:var(--text2);font-size:.82rem;border-top:1px solid var(--border);margin-top:2rem">
+  Tamil Nadu Class 12 Computer Science · Chapter 15 · Interactive Study Page
+  <br><button class="btn secondary sm" onclick="resetProgress()" style="margin-top:.5rem">↺ Reset All Progress</button>
+</div>
+
+</main>
+</div>
+
+<script>
+// ─── THEME ───────────────────────────────────────────────────────────────────
+(function(){
+  let saved;
+  try { saved = localStorage.getItem('ch15-theme'); } catch(e){}
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+})();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+  try { localStorage.setItem('ch15-theme', next); } catch(e){}
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const sb = document.getElementById('sidebar');
+  if (sb.classList.contains('open') && !sb.contains(e.target) && e.target.id !== 'menu-btn')
+    sb.classList.remove('open');
+});
+
+// ─── SCROLL SPY ──────────────────────────────────────────────────────────────
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('#sidebar nav a');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`#sidebar nav a[href="#${en.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, {rootMargin: '-30% 0px -65% 0px'});
+sections.forEach(s => io.observe(s));
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
+const MARK_KEY = 'ch15-marks';
+function loadMarks(){
+  try { return JSON.parse(localStorage.getItem(MARK_KEY) || '{}'); } catch(e){ return {}; }
+}
+function saveMarks(m){ try { localStorage.setItem(MARK_KEY, JSON.stringify(m)); } catch(e){} }
+function updateProgressBar(){
+  const cbs = document.querySelectorAll('.mark-cb');
+  const done = [...cbs].filter(c => c.checked).length;
+  const pct = cbs.length ? Math.round(done/cbs.length*100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${done} / ${cbs.length}`;
+}
+function resetProgress(){
+  if (!confirm('Reset all progress checkmarks?')) return;
+  saveMarks({});
+  document.querySelectorAll('.mark-cb').forEach(c => c.checked = false);
+  updateProgressBar();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const marks = loadMarks();
+  document.querySelectorAll('.mark-cb').forEach(cb => {
+    cb.checked = !!marks[cb.dataset.sec];
+    cb.addEventListener('change', () => {
+      const m = loadMarks();
+      m[cb.dataset.sec] = cb.checked;
+      saveMarks(m);
+      updateProgressBar();
+    });
+  });
+  updateProgressBar();
+});
+
+// ─── SEARCH ───────────────────────────────────────────────────────────────────
+const searchIndex = [
+  {term:'Introduction', id:'s151'},
+  {term:'SQLite connect cursor', id:'s152'},
+  {term:'CREATE TABLE Student Academy.db', id:'s153'},
+  {term:'INSERT records loop format', id:'s153'},
+  {term:'SELECT fetchall fetchone fetchmany', id:'s154'},
+  {term:'DISTINCT WHERE GROUP BY ORDER BY HAVING', id:'s154'},
+  {term:'AND OR NOT', id:'s155'},
+  {term:'Date DOB comparison', id:'s156'},
+  {term:'COUNT AVG SUM MAX MIN aggregate', id:'s157'},
+  {term:'UPDATE SET WHERE', id:'s158'},
+  {term:'DELETE FROM WHERE', id:'s159'},
+  {term:'User input placeholder ? parameterised', id:'s1510'},
+  {term:'Multiple tables JOIN sqlite_master', id:'s1511'},
+  {term:'CSV export csv.writer newline', id:'s1512'},
+  {term:'SQL Playground interactive', id:'playground'},
+  {term:'Fetch Visualiser fetchone fetchmany', id:'fetch-viz-sec'},
+  {term:'CSV Demo download', id:'csv-demo'},
+  {term:'Quiz MCQ test', id:'quiz-sec'},
+  {term:'Flashcards flip', id:'flashcards'},
+  {term:'Part III 3 mark', id:'part3'},
+  {term:'Part IV 5 mark', id:'part4'},
+  {term:'Hands-on GAMES Customer', id:'handson'},
+  {term:'Glossary database DBMS cursor commit primary key', id:'glossary'},
+  {term:'Points to Remember summary', id:'points'},
+];
+function doSearch(q){
+  const box = document.getElementById('search-results');
+  if (!q.trim()){ box.style.display='none'; return; }
+  const low = q.toLowerCase();
+  const hits = searchIndex.filter(x => x.term.toLowerCase().includes(low)).slice(0,8);
+  if (!hits.length){ box.style.display='none'; return; }
+  box.innerHTML = hits.map(h => `<div onclick="goTo('${h.id}')">${h.term.split(' ').slice(0,4).join(' ')}</div>`).join('');
+  box.style.display = 'block';
+}
+function goTo(id){
+  document.getElementById('search-results').style.display = 'none';
+  document.getElementById('search-input').value = '';
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('search-wrap').contains(e.target))
+    document.getElementById('search-results').style.display = 'none';
+});
+
+// ─── COPY CODE ────────────────────────────────────────────────────────────────
+function copyCode(btn){
+  const pre = btn.parentElement.querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+// ─── COLLAPSIBLE PANELS ───────────────────────────────────────────────────────
+function togglePanel(head){
+  head.parentElement.classList.toggle('open');
+}
+
+// ─── IN-BROWSER SQL ENGINE ────────────────────────────────────────────────────
+const DB = {
+  Student: {
+    cols: ['Rollno','Sname','Section','Gender','Mark','DOB'],
+    rows: [
+      [1,'Akshay','B','M',87.8,'2001-12-12'],
+      [2,'Aravind','A','M',92.5,'2000-08-17'],
+      [3,'BASKAR','C','M',75.2,'1998-05-17'],
+      [4,'SAJINI','A','F',95.6,'2002-11-01'],
+      [5,'VARUN','B','M',80.6,'2001-03-14'],
+      [6,'PRIYA','A','F',98.6,'2002-01-01'],
+      [7,'TARUN','D','M',62.3,'1999-02-01'],
+    ]
+  },
+  GAMES: {
+    cols: ['Gcode','Name','GameName','Number','PrizeMoney','ScheduleDate'],
+    rows: [
+      [101,'Padmaja','Carom Board',2,5000,'01-23-2014'],
+      [102,'Vidhya','Badminton',2,12000,'12-12-2013'],
+      [103,'Guru','Table Tennis',4,8000,'02-14-2014'],
+      [105,'Keerthana','Carom Board',2,9000,'01-01-2014'],
+      [108,'Krishna','Table Tennis',4,25000,'03-19-2014'],
+    ]
+  }
+};
+let pgDB = null;
+function pgCloneDB(){ pgDB = JSON.parse(JSON.stringify(DB)); }
+function pgReset(){ pgCloneDB(); pgOut('Table reset to original 7 rows.'); }
+pgCloneDB();
+
+function pgOut(msg){ document.getElementById('playground-output').textContent = msg; }
+
+function evalCondition(row, cols, expr) {
+  // Build an object mapping col names to values
+  const env = {};
+  cols.forEach((c,i) => env[c.toUpperCase()] = row[i]);
+  // Replace column refs and operators
+  let e = expr.toUpperCase()
+    .replace(/\bAND\b/g,'&&').replace(/\bOR\b/g,'||').replace(/\bNOT\b/g,'!')
+    .replace(/<>/g,'!=');
+  // Now replace col names with values (quoted strings and numbers)
+  cols.forEach((c,i) => {
+    const val = row[i];
+    const re = new RegExp('\\b' + c.toUpperCase() + '\\b', 'g');
+    if (typeof val === 'string') e = e.replace(re, JSON.stringify(val));
+    else e = e.replace(re, val);
+  });
+  try { return Function('"use strict"; return (' + e + ')')(); }
+  catch(x){ return true; }
+}
+
+function parseSQL(sql) {
+  const s = sql.trim().replace(/\s+/g,' ');
+  const up = s.toUpperCase();
+
+  // INSERT
+  if (up.startsWith('INSERT INTO')) {
+    const m = s.match(/INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((.+)\)/i);
+    if (!m) return {err:'Cannot parse INSERT'};
+    const tbl = m[1].toUpperCase();
+    if (!pgDB[tbl]) return {err:`Table ${tbl} not found`};
+    const vals = m[2].split(',').map(v => {
+      v = v.trim();
+      if ((v.startsWith("'") && v.endsWith("'")) || (v.startsWith('"') && v.endsWith('"'))) return v.slice(1,-1);
+      return isNaN(v) ? v : Number(v);
+    });
+    pgDB[tbl].rows.push(vals);
+    return {msg:`1 row inserted. Total rows: ${pgDB[tbl].rows.length}`};
+  }
+
+  // UPDATE
+  if (up.startsWith('UPDATE')) {
+    const m = s.match(/UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?$/i);
+    if (!m) return {err:'Cannot parse UPDATE'};
+    const tbl = m[1].toUpperCase();
+    if (!pgDB[tbl]) return {err:`Table ${tbl} not found`};
+    const setClauses = m[2].split(',').map(c => {
+      const [col, val] = c.split('=').map(x => x.trim());
+      let v = val.replace(/^['"]|['"]$/g,'');
+      if (!isNaN(v) && v !== '') v = Number(v);
+      return [col.trim().toUpperCase(), v];
+    });
+    const whereExpr = m[3];
+    let count = 0;
+    const cols = pgDB[tbl].cols;
+    pgDB[tbl].rows.forEach(row => {
+      if (!whereExpr || evalCondition(row, cols, whereExpr)) {
+        setClauses.forEach(([col, val]) => {
+          const idx = cols.findIndex(c => c.toUpperCase() === col);
+          if (idx >= 0) row[idx] = val;
+        });
+        count++;
+      }
+    });
+    return {msg:`${count} row(s) updated.`};
+  }
+
+  // DELETE
+  if (up.startsWith('DELETE')) {
+    const m = s.match(/DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(.+))?$/i);
+    if (!m) return {err:'Cannot parse DELETE'};
+    const tbl = m[1].toUpperCase();
+    if (!pgDB[tbl]) return {err:`Table ${tbl} not found`};
+    const whereExpr = m[2];
+    const cols = pgDB[tbl].cols;
+    const before = pgDB[tbl].rows.length;
+    pgDB[tbl].rows = pgDB[tbl].rows.filter(r => whereExpr ? !evalCondition(r, cols, whereExpr) : false);
+    return {msg:`${before - pgDB[tbl].rows.length} row(s) deleted. Remaining: ${pgDB[tbl].rows.length}`};
+  }
+
+  // SELECT
+  if (up.startsWith('SELECT')) {
+    return execSelect(s);
+  }
+  return {err:'Unsupported statement. Try SELECT, INSERT, UPDATE, DELETE.'};
+}
+
+function execSelect(s) {
+  // Extract parts
+  const havingM = s.match(/\bHAVING\b\s+(.+?)(?:\s+ORDER BY|\s+LIMIT|$)/i);
+  const havingExpr = havingM ? havingM[1].trim() : null;
+  const orderM = s.match(/\bORDER\s+BY\b\s+(.+?)(?:\s+LIMIT|$)/i);
+  const orderStr = orderM ? orderM[1].trim() : null;
+  const limitM = s.match(/\bLIMIT\b\s+(\d+)/i);
+  const limitN = limitM ? parseInt(limitM[1]) : null;
+  const groupM = s.match(/\bGROUP\s+BY\b\s+(.+?)(?:\s+HAVING|\s+ORDER BY|\s+LIMIT|$)/i);
+  const groupStr = groupM ? groupM[1].trim() : null;
+  const whereM = s.match(/\bWHERE\b\s+(.+?)(?:\s+GROUP BY|\s+HAVING|\s+ORDER BY|\s+LIMIT|$)/i);
+  const whereExpr = whereM ? whereM[1].trim() : null;
+  const fromM = s.match(/\bFROM\b\s+(\w+)/i);
+  if (!fromM) return {err:'No FROM clause'};
+  const tbl = fromM[1].toUpperCase();
+  if (!pgDB[tbl]) return {err:`Table "${tbl}" not found. Available: ${Object.keys(pgDB).join(', ')}`};
+
+  const allCols = pgDB[tbl].cols;
+  // Parse columns
+  const selPart = s.match(/^\s*SELECT\s+(.*?)\s+FROM\b/i);
+  if (!selPart) return {err:'Cannot parse SELECT columns'};
+  let colsStr = selPart[1].trim();
+  const distinct = /^DISTINCT\b/i.test(colsStr);
+  if (distinct) colsStr = colsStr.replace(/^DISTINCT\s+/i,'');
+
+  // Detect aggregate mode
+  const aggRe = /\b(COUNT|AVG|SUM|MAX|MIN)\s*\(/i;
+  const hasAgg = aggRe.test(colsStr);
+
+  let rows = pgDB[tbl].rows.filter(r => whereExpr ? evalCondition(r, allCols, whereExpr) : true);
+
+  if (!hasAgg && !groupStr) {
+    // Simple select
+    let resultCols, resultRows;
+    if (colsStr === '*') {
+      resultCols = allCols;
+      resultRows = rows.map(r => [...r]);
+    } else {
+      const names = colsStr.split(',').map(c => c.trim());
+      const idxs = names.map(n => allCols.findIndex(c => c.toUpperCase() === n.toUpperCase()));
+      resultCols = names;
+      resultRows = rows.map(r => idxs.map(i => i>=0 ? r[i] : '?'));
+    }
+    if (distinct) {
+      const seen = new Set();
+      resultRows = resultRows.filter(r => {
+        const k = JSON.stringify(r);
+        if (seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+    }
+    if (orderStr) resultRows = applyOrder(resultRows, resultCols, orderStr);
+    if (limitN !== null) resultRows = resultRows.slice(0, limitN);
+    return {cols: resultCols, rows: resultRows};
+  }
+
+  // Aggregate / GROUP BY
+  function evalAgg(groupRows, expr) {
+    const e = expr.trim();
+    const m = e.match(/^(COUNT|AVG|SUM|MAX|MIN)\(([^)]*)\)$/i);
+    if (!m) return '?';
+    const fn = m[1].toUpperCase(), col = m[2].trim();
+    if (fn === 'COUNT') {
+      if (col === '*') return groupRows.length;
+      const idx = allCols.findIndex(c => c.toUpperCase() === col.toUpperCase());
+      return groupRows.filter(r => r[idx] !== null && r[idx] !== undefined).length;
+    }
+    const idx = allCols.findIndex(c => c.toUpperCase() === col.toUpperCase());
+    const vals = groupRows.map(r => r[idx]);
+    if (fn === 'SUM') return vals.reduce((a,b)=>a+(+b),0);
+    if (fn === 'AVG') return vals.length ? vals.reduce((a,b)=>a+(+b),0)/vals.length : 0;
+    if (fn === 'MAX') return vals.reduce((a,b) => b > a ? b : a, vals[0]);
+    if (fn === 'MIN') return vals.reduce((a,b) => b < a ? b : a, vals[0]);
+  }
+
+  const colExprs = colsStr.split(',').map(c => c.trim());
+  let groups;
+  if (groupStr) {
+    const groupIdx = allCols.findIndex(c => c.toUpperCase() === groupStr.toUpperCase());
+    const map = {};
+    rows.forEach(r => { const k = r[groupIdx]; (map[k] = map[k]||[]).push(r); });
+    groups = Object.entries(map).map(([k,gr]) => ({key:k, rows:gr}));
+  } else {
+    groups = [{key:null, rows}];
+  }
+
+  let resultRows = groups.map(g => colExprs.map(expr => {
+    if (aggRe.test(expr)) return evalAgg(g.rows, expr);
+    const idx = allCols.findIndex(c => c.toUpperCase() === expr.toUpperCase());
+    return idx >= 0 ? g.rows[0][idx] : expr;
+  }));
+
+  if (havingExpr) {
+    resultRows = resultRows.filter(row => {
+      let e = havingExpr.toUpperCase()
+        .replace(/\bAND\b/g,'&&').replace(/\bOR\b/g,'||').replace(/<>/g,'!=');
+      colExprs.forEach((expr, i) => {
+        const safe = expr.toUpperCase().replace(/[()*/+]/g, c => '\\'+c);
+        try { e = e.replace(new RegExp(safe.replace(/\\\(/g,'\\(').replace(/\\\)/g,'\\)'), 'g'), JSON.stringify(row[i])); } catch(x){}
+      });
+      try { return Function('"use strict"; return (' + e + ')')(); } catch(x){ return true; }
+    });
+  }
+
+  if (orderStr) resultRows = applyOrder(resultRows, colExprs, orderStr);
+  if (limitN !== null) resultRows = resultRows.slice(0, limitN);
+  return {cols: colExprs, rows: resultRows};
+}
+
+function applyOrder(rows, cols, orderStr) {
+  const parts = orderStr.split(',').map(p => p.trim()).map(p => {
+    const tk = p.split(/\s+/);
+    const col = tk[0];
+    const dir = (tk[1]||'ASC').toUpperCase() === 'DESC' ? -1 : 1;
+    const idx = cols.findIndex(c => c.toUpperCase() === col.toUpperCase());
+    return {idx, dir};
+  });
+  return [...rows].sort((a,b) => {
+    for (const {idx,dir} of parts) {
+      if (idx < 0) continue;
+      const av = a[idx], bv = b[idx];
+      if (av < bv) return -dir;
+      if (av > bv) return dir;
+    }
+    return 0;
+  });
+}
+
+function formatResult(res) {
+  if (res.err) return '❌ Error: ' + res.err;
+  if (res.msg) return '✓ ' + res.msg;
+  if (!res.rows || !res.rows.length) return '(no rows)';
+  // Table format
+  const maxW = res.cols.map((c,i) => Math.max(c.length, ...res.rows.map(r => String(r[i]).length)));
+  const sep = maxW.map(w => '─'.repeat(w+2)).join('┼');
+  const head = res.cols.map((c,i) => ' '+c.padEnd(maxW[i])+' ').join('│');
+  const body = res.rows.map(r => r.map((v,i) => ' '+String(v).padEnd(maxW[i])+' ').join('│')).join('\n');
+  // Python tuple form
+  const tuples = res.rows.map(r => '(' + r.map(v => typeof v === 'string' ? `'${v}'` : v).join(', ') + ')').join('\n');
+  return `${head}\n${sep}\n${body}\n\n── Python tuples ──\n${tuples}\n\n${res.rows.length} row(s)`;
+}
+
+function pgRun(){
+  const sql = document.getElementById('pg-sql').value.trim();
+  if (!sql) return;
+  const res = parseSQL(sql);
+  pgOut(formatResult(res));
+}
+
+// Example queries
+const examples = [
+  ['SELECT *', 'SELECT * FROM Student'],
+  ['WHERE Mark>90', "SELECT * FROM Student WHERE Mark>90"],
+  ['DISTINCT Section', 'SELECT DISTINCT Section FROM Student'],
+  ['ORDER BY Mark DESC', 'SELECT * FROM Student ORDER BY Mark DESC'],
+  ['GROUP BY Section', 'SELECT Section,COUNT(*) FROM Student GROUP BY Section'],
+  ['HAVING COUNT>1', 'SELECT Section,COUNT(*) FROM Student GROUP BY Section HAVING COUNT(*)>1'],
+  ['AVG Mark', 'SELECT AVG(Mark) FROM Student'],
+  ['AND', "SELECT * FROM Student WHERE Mark>80 AND Gender='M'"],
+  ['UPDATE', "UPDATE Student SET Mark=99.9 WHERE Rollno=1"],
+  ['DELETE', "DELETE Student WHERE Rollno=7"],
+  ['GAMES', 'SELECT * FROM GAMES'],
+];
+window.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('pg-examples');
+  examples.forEach(([label, sql]) => {
+    const b = document.createElement('button');
+    b.className = 'eg-btn';
+    b.textContent = label;
+    b.onclick = () => { document.getElementById('pg-sql').value = sql; pgRun(); };
+    btn.appendChild(b);
+  });
+});
+
+// ─── FETCH VISUALISER ─────────────────────────────────────────────────────────
+const FV_ROWS = [
+  "(1, 'Akshay', 'B', 'M', 87.8, '2001-12-12')",
+  "(2, 'Aravind', 'A', 'M', 92.5, '2000-08-17')",
+  "(3, 'BASKAR', 'C', 'M', 75.2, '1998-05-17')",
+  "(4, 'SAJINI', 'A', 'F', 95.6, '2002-11-01')",
+  "(5, 'VARUN', 'B', 'M', 80.6, '2001-03-14')",
+  "(6, 'PRIYA', 'A', 'F', 98.6, '2002-01-01')",
+  "(7, 'TARUN', 'D', 'M', 62.3, '1999-02-01')",
+];
+let fvPtr = 0;
+function fvRender(){
+  const box = document.getElementById('fetch-viz');
+  box.innerHTML = FV_ROWS.map((r,i) => `
+    <div class="fv-row">
+      <span class="fv-label">Row ${i+1} ${i===fvPtr ? '← ptr' : ''}</span>
+      <div class="fv-cell ${i<fvPtr ? 'fetched' : i===fvPtr ? 'active' : ''}" id="fv-r${i}">${'Row '+(i+1)}</div>
+    </div>`).join('');
+}
+function fvReset(){ fvPtr=0; fvRender(); document.getElementById('fv-result').textContent='Pointer reset. Click Fetch.'; }
+function fvFetch(){
+  const method = document.getElementById('fv-method').value;
+  const n = parseInt(document.getElementById('fv-many-n').value)||2;
+  if (fvPtr >= FV_ROWS.length){ document.getElementById('fv-result').textContent='No more rows (returns None / [])'; return; }
+  let result, fetched;
+  if (method === 'fetchone()'){
+    result = FV_ROWS[fvPtr];
+    fetched = [fvPtr];
+    fvPtr++;
+    document.getElementById('fv-result').textContent = `fetchone() → ${result}`;
+  } else if (method === 'fetchmany(n)'){
+    const end = Math.min(fvPtr+n, FV_ROWS.length);
+    fetched = [];
+    for(let i=fvPtr;i<end;i++) fetched.push(i);
+    result = FV_ROWS.slice(fvPtr, end);
+    fvPtr = end;
+    document.getElementById('fv-result').textContent = `fetchmany(${n}) → [\n  ${result.join(',\n  ')}\n]`;
+  } else {
+    fetched = [];
+    for(let i=fvPtr;i<FV_ROWS.length;i++) fetched.push(i);
+    result = FV_ROWS.slice(fvPtr);
+    fvPtr = FV_ROWS.length;
+    document.getElementById('fv-result').textContent = `fetchall() → [\n  ${result.join(',\n  ')}\n]`;
+  }
+  fvRender();
+}
+window.addEventListener('DOMContentLoaded', fvRender);
+
+// ─── CSV DEMO ─────────────────────────────────────────────────────────────────
+let csvData = '';
+function csvDemo(){
+  const rows = [...pgDB.Student.rows].sort((a,b) => {
+    if (a[3] < b[3]) return 1; if (a[3] > b[3]) return -1;
+    if (a[1] < b[1]) return -1; if (a[1] > b[1]) return 1; return 0;
+  });
+  const header = pgDB.Student.cols.join(',');
+  const lines = rows.map(r => r.map(v => typeof v==='string'?`"${v}"`:v).join(','));
+  csvData = [header, ...lines].join('\n');
+  const box = document.getElementById('csv-out');
+  box.textContent = csvData;
+  box.style.display = 'block';
+  document.getElementById('csv-dl').style.display = 'block';
+}
+function csvDownload(){
+  const blob = new Blob([csvData], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sql.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ─── QUIZ ─────────────────────────────────────────────────────────────────────
+const quizData = [
+  {q:"An organised collection of related data is called a ___", opts:["Database","Array","Dictionary","File"], ans:0, exp:"A database is an organised collection of related data managed by a DBMS."},
+  {q:"SQLite is an example of a ___ DBMS", opts:["Hierarchical","Relational","Network","Object"], ans:1, exp:"SQLite stores data in tables (rows and columns), making it a Relational DBMS."},
+  {q:"Which object executes SQL statements in Python's sqlite3 module?", opts:["Connection","Table","Cursor","Row"], ans:2, exp:"The cursor object (conn.cursor()) executes SQL and holds results."},
+  {q:"Which method permanently saves changes to an SQLite database?", opts:["save()","flush()","commit()","write()"], ans:2, exp:"conn.commit() saves all pending changes to disk."},
+  {q:"Which method runs a single SQL command in sqlite3?", opts:["execute()","run()","query()","fetch()"], ans:0, exp:"cursor.execute(sql) runs one SQL statement."},
+  {q:"Which aggregate function returns the average of a column?", opts:["COUNT()","SUM()","AVG()","MEAN()"], ans:2, exp:"AVG(col) computes the arithmetic mean of a numeric column."},
+  {q:"Which aggregate function returns the largest value in a column?", opts:["MAX()","TOP()","HIGH()","LARGEST()"], ans:0, exp:"MAX(col) returns the maximum value."},
+  {q:"Which table in SQLite lists all tables in a database?", opts:["db_info","schema_tables","sqlite_master","sys_tables"], ans:2, exp:"SELECT name FROM sqlite_master WHERE type='table' lists all tables."},
+  {q:"The SQL command to retrieve records from a table is:", opts:["GET","fetch","select","retrieve"], ans:2, exp:"SELECT is the SQL command for retrieving data."},
+  {q:"Which keyword removes duplicate values from SELECT results?", opts:["Distinct","Unique","NoDuplicate","Single"], ans:0, exp:"SELECT DISTINCT removes duplicate values from the result."},
+];
+let quizOrder = [], quizAnswered = {};
+function quizShuffle(){ quizOrder = [...quizData.keys()].sort(()=>Math.random()-.5); quizStart(true); }
+function quizStart(shuffled=false){
+  if (!shuffled) quizOrder = [...quizData.keys()];
+  quizAnswered = {};
+  document.getElementById('quiz-score').textContent = '';
+  const c = document.getElementById('quiz-container');
+  c.innerHTML = quizOrder.map((qi, n) => {
+    const q = quizData[qi];
+    return `<div class="quiz-q" id="qq${n}">
+      <p>Q${n+1}. ${q.q}</p>
+      ${q.opts.map((o,i) => `<button class="quiz-opt" onclick="quizAnswer(${n},${qi},${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+      <div class="quiz-exp" id="qe${n}">${q.exp}</div>
+    </div>`;
+  }).join('');
+}
+function quizAnswer(n, qi, chosen){
+  if (quizAnswered[n]) return;
+  quizAnswered[n] = true;
+  const q = quizData[qi];
+  const box = document.getElementById(`qq${n}`);
+  box.querySelectorAll('.quiz-opt').forEach((btn,i) => {
+    btn.disabled = true;
+    if (i === q.ans) btn.classList.add('correct');
+    else if (i === chosen) btn.classList.add('wrong');
+  });
+  document.getElementById(`qe${n}`).style.display='block';
+  const done = Object.keys(quizAnswered).length;
+  if (done === quizOrder.length) {
+    const correct = quizOrder.filter((qi2,n2) => {
+      const q2 = quizData[qi2];
+      const btns = document.getElementById(`qq${n2}`).querySelectorAll('.quiz-opt');
+      return btns[q2.ans].classList.contains('correct') && quizAnswered[n2];
+    }).length;
+    document.getElementById('quiz-score').textContent = `Score: ${correct} / ${done}`;
+  }
+}
+window.addEventListener('DOMContentLoaded', quizStart);
+
+// ─── FLASHCARDS ───────────────────────────────────────────────────────────────
+const cards = [
+  {q:"Who are the users of a database system?", a:"End users (who run applications), application programmers (who build apps), and DBAs (who maintain the database)."},
+  {q:"Write the Python statement to connect to Academy.db", a:"import sqlite3\nconn = sqlite3.connect('Academy.db')"},
+  {q:"What is the advantage of INTEGER PRIMARY KEY in SQLite?", a:"It auto-increments — if you insert a row without specifying the key, SQLite assigns the next available integer automatically."},
+  {q:"How do you insert a row using cursor.execute()?", a:"cursor.execute(\"INSERT INTO Student VALUES(1,'Akshay','B','M',87.8,'2001-12-12')\")"},
+  {q:"What does fetchall() return?", a:"A list of all remaining rows as tuples. Returns an empty list [] if no rows remain."},
+  {q:"What is the difference between WHERE and HAVING?", a:"WHERE filters individual rows before grouping. HAVING filters groups after GROUP BY + aggregation."},
+  {q:"Why use ? placeholders instead of format()?", a:"? placeholders prevent SQL injection attacks — SQLite handles quoting and escaping, so malicious input cannot alter the SQL."},
+  {q:"What does cursor.description contain?", a:"A sequence of 7-tuples, one per column, where index [0] is the column name. Useful for writing CSV headers."},
+];
+let fcIdx = 0, fcKnewSet = new Set(), fcReviewSet = new Set();
+function fcRender(){
+  const c = cards[fcIdx];
+  const card = document.getElementById('fc-card');
+  card.classList.remove('flipped');
+  document.getElementById('fc-front').textContent = c.q;
+  document.getElementById('fc-back').textContent = c.a;
+  document.getElementById('fc-counter').textContent = `${fcIdx+1} / ${cards.length}`;
+  document.getElementById('fc-stats').textContent =
+    `Knew: ${fcKnewSet.size} | Review: ${fcReviewSet.size} | Remaining: ${cards.length - fcKnewSet.size}`;
+}
+function fcFlip(){ document.getElementById('fc-card').classList.toggle('flipped'); }
+function fcNext(){ fcIdx=(fcIdx+1)%cards.length; fcRender(); }
+function fcPrev(){ fcIdx=(fcIdx+cards.length-1)%cards.length; fcRender(); }
+function fcKnew(){ fcKnewSet.add(fcIdx); fcReviewSet.delete(fcIdx); fcNext(); }
+function fcReview(){ fcReviewSet.add(fcIdx); fcKnewSet.delete(fcIdx); fcNext(); }
+window.addEventListener('DOMContentLoaded', fcRender);
+</script>
+</body>
+</html>
