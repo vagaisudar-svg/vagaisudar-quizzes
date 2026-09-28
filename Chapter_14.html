@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 14 – Importing C++ Programs in Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf7f4;--surface:#fff;--surface2:#f3ece2;--border:#e4d5c0;
+  --text:#1a1008;--text2:#5a3a18;--text3:#9a7050;
+  --purple:#6c3fa8;--purple-d:#4a2878;--purple-l:#ede5f8;
+  --peach:#e8734a;--peach-l:#fdeee8;
+  --teal:#2a9d8f;--teal-l:#d8f0ee;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --rose:#e05a5a;--rose-l:#fde8e8;
+  --green:#16a34a;--green-l:#dcfce7;
+  --blue:#2563eb;--blue-l:#dbeafe;
+  --navy:#1c2340;
+  --code-bg:#12100e;--code-fg:#e8d8c0;
+  --sidebar-w:260px;--r:10px;--sh:0 2px 14px rgba(0,0,0,.08)
+}
+[data-theme="dark"]{
+  --bg:#100e0c;--surface:#1c1814;--surface2:#252018;--border:#3a2e20;
+  --text:#f0e0cc;--text2:#c09060;--text3:#806040;
+  --purple-l:#2d1a4a;--peach-l:#3d1f12;--teal-l:#0a2420;
+  --amber-l:#2a1800;--rose-l:#2a1010;--green-l:#082014;--blue-l:#0a1430;
+  --code-bg:#080604
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(--text);line-height:1.75;min-height:100vh}
+
+/* Progress bar */
+#prog-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--peach));width:0%;z-index:999;transition:width .1s}
+
+/* Layout */
+.layout{display:flex;min-height:100vh}
+.sidebar{position:fixed;top:3px;left:0;width:var(--sidebar-w);height:calc(100vh - 3px);background:var(--navy);color:#fff;overflow-y:auto;z-index:100;transition:transform .3s;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:2px}
+.main{margin-left:var(--sidebar-w);flex:1;padding:2rem 2.5rem 5rem;max-width:920px}
+
+/* Sidebar */
+.sb-top{padding:1.3rem 1.1rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-ch{font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.4;margin-bottom:.2rem}
+.sb-title{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:700;opacity:.88}
+.sb-nav{padding:.6rem 0 2rem;flex:1}
+.sb-sec{margin-bottom:.1rem}
+.sb-lbl{font-family:'Space Grotesk',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;padding:.65rem 1.1rem .2rem;opacity:.33}
+.nav-a{display:flex;align-items:center;gap:.5rem;padding:.4rem 1.1rem;font-family:'Space Grotesk',sans-serif;font-size:.78rem;color:rgba(255,255,255,.65);cursor:pointer;border-left:3px solid transparent;transition:all .13s;text-decoration:none}
+.nav-a:hover{color:#fff;background:rgba(255,255,255,.06);border-left-color:rgba(255,255,255,.2)}
+.nav-a.active{color:#fff;background:rgba(255,255,255,.11);border-left-color:var(--peach)}
+.ndot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0}
+.nav-a.active .ndot,.nav-a:hover .ndot{background:var(--peach)}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;padding-bottom:.9rem;border-bottom:1px solid var(--border)}
+.bc{font-family:'Space Grotesk',sans-serif;font-size:.77rem;color:var(--text3);display:flex;align-items:center;gap:.3rem}
+.bc strong{color:var(--purple)}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.88rem;transition:all .13s}
+.icon-btn:hover{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+
+/* Typography */
+h1{font-family:'Space Grotesk',sans-serif;font-size:1.85rem;font-weight:700;color:var(--text);margin-bottom:.35rem}
+h2{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;color:var(--purple);margin:2rem 0 .65rem;padding-bottom:.35rem;border-bottom:2px solid var(--purple-l)}
+h3{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;color:var(--text);margin:1.4rem 0 .4rem}
+h4{font-family:'Space Grotesk',sans-serif;font-size:.92rem;font-weight:600;color:var(--text2);margin:1rem 0 .3rem}
+p{margin-bottom:.85rem;color:var(--text2)}
+ul,ol{margin:.4rem 0 .85rem 1.5rem;color:var(--text2)}
+li{margin-bottom:.3rem}
+strong{color:var(--text);font-weight:600}
+code{font-family:'JetBrains Mono',monospace;font-size:.82em;background:var(--surface2);padding:.1em .35em;border-radius:4px;color:var(--rose)}
+
+/* Sections */
+.section-lead{color:var(--text3);font-family:'Space Grotesk',sans-serif;font-size:.87rem;margin-bottom:1.2rem}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;margin:1rem 0;border-radius:var(--r);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{background:var(--purple);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:.78rem;font-weight:600;padding:.55rem .9rem;text-align:left}
+td{padding:.5rem .9rem;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:var(--surface2)}
+
+/* Code blocks */
+.code-wrap{position:relative;margin:.75rem 0}
+.code-label{font-family:'Space Grotesk',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:.3rem}
+pre{background:var(--code-bg);border-radius:var(--r);padding:1.1rem 1.4rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.65;color:var(--code-fg);border:1px solid rgba(255,255,255,.05)}
+.copy-btn{position:absolute;top:.6rem;right:.6rem;padding:.22rem .55rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:rgba(255,255,255,.45);font-family:'Space Grotesk',sans-serif;font-size:.68rem;cursor:pointer;transition:all .13s;z-index:2}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+.copy-btn.ok{background:rgba(42,157,143,.22);border-color:rgba(42,157,143,.3);color:#4adcc8}
+
+/* Syntax */
+.kw{color:#c792ea}.str{color:#c3e88d}.cm{color:#546e7a;font-style:italic}.fn{color:#82aaff}.num{color:#f78c6c}.op{color:#89ddff}.inc{color:#ffcb6b}
+
+/* Callouts */
+.callout{border-radius:var(--r);padding:.9rem 1.1rem;margin:.85rem 0;border-left:4px solid}
+.callout-note{background:var(--blue-l);border-color:var(--blue)}.callout-note .ct{color:var(--blue)}
+.callout-know{background:var(--amber-l);border-color:var(--amber)}.callout-know .ct{color:var(--amber)}
+.callout-tip{background:var(--teal-l);border-color:var(--teal)}.callout-tip .ct{color:var(--teal)}
+.callout-warn{background:var(--rose-l);border-color:var(--rose)}.callout-warn .ct{color:var(--rose)}
+.ct{font-family:'Space Grotesk',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+.callout p{margin-bottom:0;font-size:.9rem}
+
+/* Accordion */
+.acc{border:1px solid var(--border);border-radius:var(--r);margin:.7rem 0;overflow:hidden}
+.acc-h{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;cursor:pointer;background:var(--surface);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem;color:var(--text);user-select:none;transition:background .13s}
+.acc-h:hover{background:var(--surface2)}
+.acc-arr{font-size:.72rem;color:var(--text3);transition:transform .2s}
+.acc-b{display:none;padding:1rem 1.2rem;border-top:1px solid var(--border);background:var(--surface)}
+.acc.open .acc-b{display:block}
+.acc.open .acc-arr{transform:rotate(180deg)}
+
+/* Terminal */
+.terminal{background:#0d1117;border-radius:var(--r);padding:1rem 1.3rem;font-family:'JetBrains Mono',monospace;font-size:.81rem;line-height:1.7;color:#8b9ab0;margin:.85rem 0;border:1px solid rgba(255,255,255,.06)}
+.terminal .prompt{color:#4adcc8}
+.terminal .input-line{color:#e8d8c0}
+.terminal .output-line{color:#a0b4a0}
+.terminal .error-line{color:#e07070}
+.terminal-bar{background:#2a2520;border-radius:var(--r) var(--r) 0 0;padding:.4rem .9rem;display:flex;gap:.4rem;align-items:center;border:1px solid rgba(255,255,255,.06);border-bottom:none}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.td-r{background:#e05a5a}.td-y{background:#e9a228}.td-g{background:#2a9d8f}
+
+/* Flip cards */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem;margin:1rem 0}
+.flip-card{height:130px;perspective:600px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.75rem;text-align:center;border:1px solid var(--border)}
+.flip-front{background:var(--purple);color:#fff}
+.flip-front h4{color:#fff;margin:0;font-family:'Space Grotesk',sans-serif;font-size:.88rem}
+.flip-front p{color:rgba(255,255,255,.7);font-size:.72rem;margin:.3rem 0 0}
+.flip-back{background:var(--surface);transform:rotateY(180deg)}
+.flip-back p{font-size:.8rem;color:var(--text2);margin:0}
+.flip-hint{font-family:'Space Grotesk',sans-serif;font-size:.65rem;color:var(--text3);text-align:center;margin-bottom:.5rem}
+
+/* Step diagram */
+.steps{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0}
+.step{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.step-num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;min-width:28px;height:28px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-text{font-size:.9rem;color:var(--text2);padding-top:.1rem}
+
+/* Dot diagram for module.fact */
+.dot-diagram{display:flex;align-items:center;justify-content:center;gap:0;margin:1.25rem auto;max-width:420px}
+.dot-part{background:var(--surface2);border:1.5px solid var(--border);padding:.55rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:600;color:var(--text);position:relative;text-align:center}
+.dot-part:first-child{border-radius:var(--r) 0 0 var(--r)}
+.dot-part:last-child{border-radius:0 var(--r) var(--r) 0}
+.dot-mid{background:var(--purple);color:#fff;padding:.55rem .6rem;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700}
+.dot-label{font-family:'Space Grotesk',sans-serif;font-size:.65rem;color:var(--text3);position:absolute;bottom:-1.3rem;left:50%;transform:translateX(-50%);white-space:nowrap}
+
+/* 6/9 illustration */
+.six-nine{display:flex;align-items:center;justify-content:center;gap:2rem;margin:1.25rem 0;padding:1.25rem;background:var(--surface2);border-radius:var(--r);border:1px solid var(--border)}
+.six-nine-num{font-family:'Space Grotesk',sans-serif;font-size:5rem;font-weight:900;line-height:1;user-select:none}
+.six-nine-label{font-family:'Space Grotesk',sans-serif;font-size:.75rem;color:var(--text3);text-align:center;margin-top:.3rem}
+.six-nine-arrow{font-size:1.5rem;color:var(--purple)}
+
+/* Command builder */
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin:1.25rem 0}
+.widget-header{background:var(--purple);color:#fff;padding:.65rem 1.1rem;font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700}
+.widget-body{padding:1rem 1.1rem}
+.w-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:.65rem}
+.w-row label{font-family:'Space Grotesk',sans-serif;font-size:.78rem;color:var(--text2);min-width:90px}
+.w-row input{flex:1;min-width:130px;padding:.35rem .65rem;border:1px solid var(--border);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.83rem;background:var(--surface);color:var(--text);outline:none}
+.w-row input:focus{border-color:var(--purple)}
+.w-out{background:var(--code-bg);border-radius:6px;padding:.75rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--code-fg);margin-top:.5rem;min-height:40px;word-break:break-all}
+.w-out-label{font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--peach);margin-bottom:.3rem}
+
+/* Explainer table */
+.explain-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+.explain-table th{background:var(--purple);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:.78rem;padding:.5rem .9rem;text-align:left}
+.explain-table td{padding:.55rem .9rem;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text2);cursor:pointer;transition:background .13s}
+.explain-table tr:last-child td{border-bottom:none}
+.explain-table tr:hover td{background:var(--purple-l)}
+.explain-table tr.active-row td{background:var(--purple-l)}
+.explain-table .code-cell{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--code-fg);background:#12100e;padding:.5rem .9rem}
+.explain-table tr.active-row .code-cell{background:#1e1a30;color:#c792ea}
+
+/* PTR checklist */
+.ptr-list{list-style:none;margin:0}
+.ptr-list li{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem .8rem;border-bottom:1px solid var(--border);font-size:.9rem;color:var(--text2);cursor:pointer;transition:background .1s;border-radius:4px}
+.ptr-list li:last-child{border-bottom:none}
+.ptr-list li.checked{color:var(--green);text-decoration:line-through;opacity:.65}
+.ptr-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;margin-top:.15rem;display:flex;align-items:center;justify-content:center;font-size:.7rem;background:var(--surface);transition:all .13s}
+.ptr-list li.checked .ptr-check{background:var(--green);border-color:var(--green);color:#fff}
+
+/* Quiz */
+.quiz-pb{height:5px;background:var(--border);border-radius:3px;margin-bottom:1.4rem;overflow:hidden}
+.quiz-pf{height:100%;background:var(--purple);border-radius:3px;transition:width .3s}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.3rem;margin:.75rem 0}
+.quiz-q{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem;color:var(--text);margin-bottom:.9rem}
+.quiz-q span{color:var(--purple);margin-right:.35rem}
+.quiz-opts{display:flex;flex-direction:column;gap:.4rem}
+.quiz-opt{padding:.5rem .9rem;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.88rem;color:var(--text2);transition:all .13s;display:flex;align-items:center;gap:.55rem}
+.quiz-opt:hover:not(.disabled){border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-l);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--rose);background:var(--rose-l);color:var(--rose)}
+.quiz-opt.disabled{cursor:default}
+.opt-letter{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.74rem;width:20px;height:20px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quiz-fb{margin-top:.65rem;font-size:.82rem;padding:.45rem .7rem;border-radius:6px;display:none}
+.quiz-fb.correct{background:var(--green-l);color:var(--green);display:block}
+.quiz-fb.wrong{background:var(--rose-l);color:var(--rose);display:block}
+.score-box{background:var(--purple-l);border:1px solid var(--purple);border-radius:var(--r);padding:1.5rem;text-align:center;margin:1.5rem 0;display:none}
+.score-box.show{display:block}
+.score-box h3{font-family:'Space Grotesk',sans-serif;color:var(--purple);font-size:1.3rem}
+.score-box p{color:var(--text2);margin-top:.5rem}
+.btn-retry{margin-top:1rem;padding:.5rem 1.25rem;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .13s}
+.btn-retry:hover{background:var(--purple-d)}
+
+/* Objectives list */
+.obj-list{list-style:none;margin:.75rem 0}
+.obj-list li{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;color:var(--text2);font-size:.92rem}
+.obj-list li::before{content:'✦';color:var(--purple);font-size:.7rem;flex-shrink:0}
+
+/* Back to top */
+#back-top{position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--purple);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.05rem;display:none;align-items:center;justify-content:center;box-shadow:var(--sh);z-index:200}
+#back-top.show{display:flex}
+#back-top:hover{background:var(--purple-d)}
+
+/* Mobile */
+.menu-toggle{display:none;position:fixed;top:.5rem;left:.5rem;z-index:200;width:36px;height:36px;border-radius:8px;background:var(--navy);color:#fff;border:none;cursor:pointer;font-size:1rem;align-items:center;justify-content:center}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:1rem 1.1rem 3rem}
+  .menu-toggle{display:flex}
+  .topbar{margin-top:2.5rem}
+  .dot-diagram{flex-wrap:wrap;gap:.3rem}
+  .six-nine{flex-direction:column;gap:.75rem}
+  .flip-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog-bar"></div>
+<button class="menu-toggle" id="menuToggle">☰</button>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-ch">Class 12 CS · Chapter 14</div>
+    <div class="sb-title">Importing C++ in Python</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">
+      <div class="sb-lbl">Overview</div>
+      <a class="nav-a active" href="#intro"><span class="ndot"></span>Learning Objectives</a>
+      <a class="nav-a" href="#s141"><span class="ndot"></span>14.1 Introduction</a>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Scripting</div>
+      <a class="nav-a" href="#s142"><span class="ndot"></span>14.2 Scripting Language</a>
+      <a class="nav-a" href="#s143"><span class="ndot"></span>14.3 Applications</a>
+      <a class="nav-a" href="#s144"><span class="ndot"></span>14.4 Python Features</a>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Importing C++</div>
+      <a class="nav-a" href="#s145"><span class="ndot"></span>14.5 Importing C++ Files</a>
+      <a class="nav-a" href="#s146"><span class="ndot"></span>14.6 Python Program</a>
+      <a class="nav-a" href="#s147"><span class="ndot"></span>14.7 Executing C++</a>
+      <a class="nav-a" href="#s148"><span class="ndot"></span>14.8 Error Handling</a>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Practice</div>
+      <a class="nav-a" href="#ptr"><span class="ndot"></span>Points to Remember</a>
+      <a class="nav-a" href="#hands"><span class="ndot"></span>Hands on Experience</a>
+      <a class="nav-a" href="#widgets"><span class="ndot"></span>Interactive Tools</a>
+      <a class="nav-a" href="#quiz"><span class="ndot"></span>Quiz (Part I)</a>
+      <a class="nav-a" href="#revision"><span class="ndot"></span>Revision Questions</a>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <div class="bc">Chapter 14 › <strong id="bcTitle">Learning Objectives</strong></div>
+    <button class="icon-btn" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
+  </div>
+
+  <!-- ===== INTRO ===== -->
+  <section id="intro">
+    <h1>Chapter 14 – Importing C++ Programs in Python</h1>
+    <p class="section-lead">Unit V &nbsp;·&nbsp; Tamil Nadu SCERT Class 12 Computer Science</p>
+    <h2>Learning Objectives</h2>
+    <p>After the completion of this chapter, the student will be able to:</p>
+    <ul class="obj-list">
+      <li>Understand what is <strong>wrapping</strong></li>
+      <li>Import C++ functions and classes into Python programs</li>
+      <li>Create an environment to work with both languages</li>
+      <li>Execute and debug Python programs</li>
+    </ul>
+  </section>
+
+  <!-- ===== 14.1 ===== -->
+  <section id="s141">
+    <h2>14.1 Introduction</h2>
+    <p>Python and C++ are both general-purpose programming languages, yet they differ significantly:</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>S.No</th><th>Python</th><th>C++</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Typically an <strong>interpreted</strong> language</td><td>Typically a <strong>compiled</strong> language</td></tr>
+          <tr><td>2</td><td><strong>Dynamically typed</strong> language</td><td><strong>Statically typed</strong> language</td></tr>
+          <tr><td>3</td><td>Data type <em>not required</em> while declaring a variable</td><td>Data type <em>required</em> while declaring a variable</td></tr>
+          <tr><td>4</td><td>Can act as both <strong>scripting</strong> and general-purpose language</td><td>It is a general purpose language</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-know">
+      <div class="ct">💡 Glue Language</div>
+      <p>These two languages complement one another perfectly. Python is mostly used as a scripting or <strong>"glue" language</strong> — the top-level program mostly calls routines written in C or C++. This is useful when the logic can be written in terms of existing C++ code that can be called and manipulated through a Python program.</p>
+    </div>
+  </section>
+
+  <!-- ===== 14.2 ===== -->
+  <section id="s142">
+    <h2>14.2 Scripting Language</h2>
+    <p>A <strong>scripting language</strong> is a programming language designed for integrating and communicating with other programming languages. Some of the most widely used scripting languages are:</p>
+    <p><strong>JavaScript, VBScript, PHP, Perl, Python, Ruby, ASP,</strong> and <strong>Tcl</strong></p>
+    <p>Since a scripting language is normally used in conjunction with another programming language, they are often found alongside HTML, Java, or C++.</p>
+
+    <h3>14.2.1 Difference between Scripting and Programming Languages</h3>
+    <p>The relationship between scripting and programming languages can be illustrated with the classic <em>perspective puzzle</em>:</p>
+    <div class="six-nine">
+      <div>
+        <div class="six-nine-num" style="color:var(--purple)">6</div>
+        <div class="six-nine-label">Scripting Language<br><span style="font-size:.6rem;color:var(--text3)">View from above</span></div>
+      </div>
+      <div class="six-nine-arrow">⟷</div>
+      <div>
+        <div class="six-nine-num" style="color:var(--peach);transform:rotate(180deg)">6</div>
+        <div class="six-nine-label">Programming Language<br><span style="font-size:.6rem;color:var(--text3)">View from below</span></div>
+      </div>
+    </div>
+    <div class="callout callout-note">
+      <div class="ct">📌 Key Concept</div>
+      <p>Basically, all scripting languages <em>are</em> programming languages. The theoretical difference is that scripting languages do not require a compilation step — they are interpreted. A C++ program needs to be compiled before running; JavaScript or Python need not. <strong>A language can be called scripting or programming depending on the environment in which it is used.</strong></p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Scripting Language</th><th>Programming Language</th></tr></thead>
+        <tbody>
+          <tr><td>Requires an <strong>interpreter</strong></td><td>Requires a <strong>compiler</strong></td></tr>
+          <tr><td>No separate compilation step</td><td>Must be compiled before execution</td></tr>
+          <tr><td>Often embedded in or glued to another language</td><td>Standalone programs</td></tr>
+          <tr><td>Examples: Python, JavaScript, PHP</td><td>Examples: C++, Java, FORTRAN</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 14.3 ===== -->
+  <section id="s143">
+    <h2>14.3 Applications of Scripting Languages</h2>
+    <ol>
+      <li>To <strong>automate certain tasks</strong> in a program</li>
+      <li><strong>Extracting information</strong> from a data set</li>
+      <li><strong>Less code intensive</strong> as compared to traditional programming languages</li>
+      <li>Can <strong>bring new functions to applications</strong> and glue complex systems together</li>
+    </ol>
+    <div class="callout callout-tip">
+      <div class="ct">✅ About Python</div>
+      <p>Python is an <strong>interpreted, high-level, general-purpose</strong> programming language that can be used on any modern computer operating system. It processes text, numbers, images, scientific data, and more. Nowadays, large applications are written almost exclusively in Python.</p>
+    </div>
+  </section>
+
+  <!-- ===== 14.4 ===== -->
+  <section id="s144">
+    <h2>14.4 Features of Python over C++</h2>
+    <ul>
+      <li>Python uses <strong>Automatic Garbage Collection</strong> whereas C++ does not.</li>
+      <li>C++ is a <strong>statically typed</strong> language, while Python is a <strong>dynamically typed</strong> language.</li>
+      <li>Python runs through an <strong>interpreter</strong>, while C++ is <strong>pre-compiled</strong>.</li>
+      <li>Python code tends to be <strong>5 to 10 times shorter</strong> than equivalent C++ code.</li>
+      <li>In Python, there is <strong>no need to declare types explicitly</strong> — in C++ this is required.</li>
+      <li>In Python, a function may accept an argument of <strong>any type</strong> and <strong>return multiple values</strong> without declaration. In C++, a return statement can return only one value.</li>
+    </ul>
+    <div class="callout callout-note">
+      <div class="ct">📌 Garbage Collection</div>
+      <p>Python deletes unwanted objects (built-in types or class instances) automatically to free memory. The process by which Python periodically frees and reclaims blocks of memory no longer in use is called <strong>Garbage Collection</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ===== 14.5 ===== -->
+  <section id="s145">
+    <h2>14.5 Importing C++ Files in Python</h2>
+    <p>Importing a C++ program in a Python program is called <strong>wrapping up of C++ in Python</strong>. Wrapping or creating Python interfaces for C++ programs can be done in many ways. The commonly used interfaces are:</p>
+    <p class="flip-hint">(Click each card to see details)</p>
+    <div class="flip-grid">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><h4>Python-C-API</h4><p>Click to learn more</p></div>
+          <div class="flip-back"><p><strong>Application Programming Interface</strong> for interfacing Python with C programs</p></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><h4>Ctypes</h4><p>Click to learn more</p></div>
+          <div class="flip-back"><p>For interfacing with C programs. Provides C-compatible data types and allows calling functions in DLLs/shared libraries.</p></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><h4>SWIG</h4><p>Click to learn more</p></div>
+          <div class="flip-back"><p><strong>Simplified Wrapper and Interface Generator</strong> — works with both C and C++</p></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><h4>Cython</h4><p>Click to learn more</p></div>
+          <div class="flip-back"><p>A Python-like language for writing C-extensions. Compiles Python-like code to C for speed.</p></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><h4>Boost.Python</h4><p>Click to learn more</p></div>
+          <div class="flip-back"><p>A <strong>framework for interfacing Python and C++</strong>. Part of the Boost C++ Libraries.</p></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front" style="background:var(--peach)"><h4>MinGW</h4><p>Click to learn more</p></div>
+          <div class="flip-back"><p><strong>Minimalist GNU for Windows</strong> — used in this chapter for compiling and executing C++ via Python</p></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>14.5.1 MinGW Interface</h3>
+    <p>MinGW refers to a set of runtime header files used in compiling and linking the code of C, C++, and FORTRAN to run on Windows Operating System.</p>
+    <p><strong>MinGW-W64</strong> (a version of MinGW) is the best compiler for C++ on Windows. To compile and execute a C++ program, you need <code>g++</code> for Windows. MinGW allows compiling and executing C++ programs dynamically through Python using <code>g++</code>.</p>
+    <div class="callout callout-know">
+      <div class="ct">💡 g++ explained</div>
+      <p><code>g++</code> is a program that calls <strong>GCC (GNU C Compiler)</strong> and automatically links the required C++ library files to the object code.</p>
+    </div>
+
+    <h3>14.5.2 Executing a C++ Program through Python</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Double-click on the <strong>command prompt</strong> or the <strong>run terminal</strong>. The prompt shows <code>C:\&gt;</code></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">To change directory, use the <code>cd</code> command. For example: <code>cd pyprg</code> to go to the pyprg directory.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Execute the Python program using the syntax shown below:</div></div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">Command Syntax</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>Python  &lt;filename.py&gt;  -i  &lt;C++ filename without cpp extension&gt;</pre>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Part</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>Python</code></td><td>Keyword to execute the Python program from command-line</td></tr>
+          <tr><td><code>filename.py</code></td><td>Name of the Python program to be executed</td></tr>
+          <tr><td><code>-i</code></td><td>Input mode</td></tr>
+          <tr><td><code>C++ filename without cpp extension</code></td><td>Name of the C++ file to be compiled and executed</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="ct">📌 Note</div>
+      <p>The input file doesn't require its extension. For example, it is enough to mention just the name <code>pali</code> instead of <code>pali.cpp</code>.</p>
+    </div>
+    <div class="callout callout-note">
+      <div class="ct">📌 Note</div>
+      <p>Use the <code>cls</code> command to clear the screen in the command window.</p>
+    </div>
+
+    <h4>Fig 14.2 — Terminal Output (pali example)</h4>
+    <div class="terminal-bar"><div class="terminal-dot td-r"></div><div class="terminal-dot td-y"></div><div class="terminal-dot td-g"></div><span style="font-family:'Space Grotesk',sans-serif;font-size:.75rem;color:rgba(255,255,255,.4);margin-left:.5rem">Command Prompt</span></div>
+    <div class="terminal" style="border-radius:0 0 var(--r) var(--r);margin-top:0">
+<span class="output-line">Microsoft Windows [Version 6.1.7601]</span>
+<span class="output-line">Copyright (c) 2009 Microsoft Corporation. All rights reserved.</span>
+<br>
+<span class="prompt">C:\&gt;</span><span class="input-line">cd Pyprg</span>
+<br>
+<span class="prompt">C:\Pyprg&gt;</span> <span class="input-line">Python c:\pyprg\pycpp.py -i c:\pyprg\pali</span>
+<span class="output-line">Enter a positive number: <strong style="color:#e8d8c0">232</strong></span>
+<span class="output-line">The reverse of the number is: 232</span>
+<span class="output-line" style="color:#4adcc8">The number is a palindrome</span>
+<br>
+<span class="prompt">C:\Pyprg&gt;</span> <span class="input-line">Python c:\pyprg\pycpp.py -i c:\pyprg\pali</span>
+<span class="output-line">Enter a positive number: <strong style="color:#e8d8c0">234</strong></span>
+<span class="output-line">The reverse of the number is: 432</span>
+<span class="output-line" style="color:#e07070">The number is not a palindrome</span>
+<br>
+<span class="prompt">C:\Pyprg&gt;</span>
+    </div>
+  </section>
+
+  <!-- ===== 14.6 ===== -->
+  <section id="s146">
+    <h2>14.6 Python Program to Import C++</h2>
+    <p>Python contains many modules. Since our program is an integration of two different languages, we must import modules like <code>os</code>, <code>sys</code>, and <code>getopt</code>.</p>
+
+    <h3>14.6.1 Module</h3>
+    <p><strong>Modular programming</strong> is a software design technique to split your code into separate parts called <em>modules</em>. The focus is on minimizing dependencies between modules.</p>
+    <p>A module is a file containing Python statements and definitions. For example, a file <code>factorial.py</code> is a module whose function name is <code>fact()</code>. We use modules to break down large programs into small, manageable, organized parts and to enable <strong>code reusability</strong>.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">Example: factorial.py</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><span class="kw">def</span> <span class="fn">fact</span>(n):
+    f = <span class="num">1</span>
+    <span class="kw">if</span> n == <span class="num">0</span>:
+        <span class="kw">return</span> <span class="num">0</span>
+    <span class="kw">elif</span> n == <span class="num">1</span>:
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">else</span>:
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, n+<span class="num">1</span>):
+            f = f * i
+        <span class="fn">print</span>(f)</pre>
+    </div>
+    <div class="terminal" style="padding:.6rem 1rem">
+      <span style="color:#4adcc8">&gt;&gt;&gt; </span><span class="input-line">fact(5)</span><br>
+      <span class="output-line">120</span>
+    </div>
+
+    <h3>14.6.2 How to Import Modules in Python</h3>
+    <p>We can import definitions from a module into another using the <code>import</code> keyword:</p>
+    <div class="terminal" style="padding:.6rem 1rem">
+      <span style="color:#4adcc8">&gt;&gt;&gt; </span><span class="input-line">import factorial</span>
+    </div>
+    <p>The <strong>dot (.) operator</strong> is used to access the functions defined inside the module:</p>
+    <div class="terminal" style="padding:.6rem 1rem">
+      <span style="color:#4adcc8">&gt;&gt;&gt; </span><span class="input-line">factorial.fact(5)</span><br>
+      <span class="output-line">120</span>
+    </div>
+
+    <div class="dot-diagram">
+      <div class="dot-part" style="background:var(--purple-l);border-color:var(--purple)">factorial<div class="dot-label" style="color:var(--purple)">Module name</div></div>
+      <div class="dot-mid">.<div class="dot-label" style="color:rgba(255,255,255,.7)">Dot operator</div></div>
+      <div class="dot-part" style="background:var(--peach-l);border-color:var(--peach)">fact(5)<div class="dot-label" style="color:var(--peach)">Function call</div></div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-h" onclick="toggleAcc(this)">14.6.2.1 — sys module and sys.argv <span class="acc-arr">▼</span></div>
+      <div class="acc-b">
+        <p>The <code>sys</code> module provides access to built-in variables used by the interpreter. One such variable is <code>argv</code>.</p>
+        <p><strong>sys.argv</strong> is the list of command-line arguments passed to the Python program. <code>argv</code> holds all items that come via command-line input.</p>
+        <ul>
+          <li><code>sys.argv[0]</code> — contains the name of the Python program (e.g., <code>pali.py</code>)</li>
+          <li><code>sys.argv[1]</code> — the next argument passed (here it is the C++ file)</li>
+        </ul>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="fn">main</span>(sys.argv[<span class="num">1</span>:])</pre>
+        </div>
+        <p>The input C++ file is sent along with its path as a list using <code>argv[1]</code>. <code>argv[0]</code> contains the Python program which need not be passed because by default <code>__main__</code> contains the source code reference.</p>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-h" onclick="toggleAcc(this)">14.6.2.2 — os module and os.system() <span class="acc-arr">▼</span></div>
+      <div class="acc-b">
+        <p>The <code>os</code> module in Python provides a way of using operating system dependent functionality. It allows you to interface with the Windows operating system.</p>
+        <p><strong>os.system()</strong> executes the C++ compiling command — a string containing a Unix/C command (which also supports C++ commands) in the shell (Command Window).</p>
+        <div class="code-wrap">
+          <div class="code-label">Syntax</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>os.system(<span class="str">'g++ '</span> + &lt;variable_name1&gt; + <span class="str">' -o '</span> + &lt;variable_name2&gt;)</pre>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Part</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>os.system</code></td><td>Function defined in <code>os</code> module to interact with the operating system</td></tr>
+            <tr><td><code>g++</code></td><td>General compiler to compile C++ program under Windows</td></tr>
+            <tr><td><code>variable_name1</code></td><td>Name of the C++ file along with its path and without extension (string format)</td></tr>
+            <tr><td><code>-o</code></td><td>Specifies output mode; output prefix with hyphen</td></tr>
+            <tr><td><code>variable_name2</code></td><td>Name of the executable file without extension (string format)</td></tr>
+          </tbody>
+        </table></div>
+        <div class="code-wrap">
+          <div class="code-label">Example</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>os.system(<span class="str">'g++ '</span> + cpp_file + <span class="str">' -o '</span> + exe_file)</pre>
+        </div>
+        <div class="callout callout-note">
+          <div class="ct">📌 Note</div>
+          <p>The <code>'+'</code> in <code>os.system()</code> indicates string concatenation. <strong>Give a space after each word</strong> — e.g., <code>'g++ '</code> (with trailing space) to ensure correct command formation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-h" onclick="toggleAcc(this)">14.6.2.3 — getopt module <span class="acc-arr">▼</span></div>
+      <div class="acc-b">
+        <p>The <code>getopt</code> module helps you <strong>parse (split) command-line options and arguments</strong>. It provides the <code>getopt()</code> method for command-line argument parsing.</p>
+        <div class="code-wrap">
+          <div class="code-label">Syntax</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>opts, args = getopt.getopt(argv, options, [long_options])</pre>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Parameter</th><th>Explanation</th></tr></thead>
+          <tbody>
+            <tr><td><code>argv</code></td><td>The argument list to be parsed (split). In our program, the complete command is passed as a list: e.g., <code>c:\pyprg\pali.py -i c:\pyprg\pali_cpp</code></td></tr>
+            <tr><td><code>options</code></td><td>String of option letters the program recognises (like <code>'i'</code> or <code>'o'</code>). Options followed by a <strong>colon (:)</strong> denote a mode argument.</td></tr>
+            <tr><td><code>long_options</code></td><td>List of strings. Long option arguments must be followed by an equals sign <code>=</code>. The C++ filename along with its path is passed as string; <code>'i'</code> is passed to indicate it as the input file.</td></tr>
+          </tbody>
+        </table></div>
+        <p><code>getopt()</code> returns <strong>two elements</strong>:</p>
+        <ul>
+          <li><code>opts</code> — list of (option, value) tuples: e.g., <code>[('-i', 'c:\\pyprg\\p4')]</code></li>
+          <li><code>args</code> — error string; <strong>empty list <code>[]</code> if no error</strong></li>
+        </ul>
+        <div class="code-wrap">
+          <div class="code-label">Example</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>opts, args = getopt.getopt(argv, <span class="str">"i:"</span>, [<span class="str">'ifile='</span>])</pre>
+        </div>
+        <p>Here: <code>opts = [('-i', 'c:\\pyprg\\p4')]</code> and <code>args = []</code> (no error)</p>
+        <div class="terminal" style="padding:.6rem 1rem">
+          <span style="color:#4adcc8">&gt;&gt;&gt; </span><span class="input-line">print(args)</span><br>
+          <span class="output-line">[]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-h" onclick="toggleAcc(this)">__name__ Special Variable <span class="acc-arr">▼</span></div>
+      <div class="acc-b">
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:
+    <span class="fn">main</span>(sys.argv[<span class="num">1</span>:])</pre>
+        </div>
+        <p>Since there is no <code>main()</code> function in Python, when the interpreter runs a program, code at level 0 indentation is executed first. Before doing that, the interpreter defines special variables.</p>
+        <p><code>__name__</code> is one such variable — it stores the name of the current Python file. If the source file is executed as the main program, the interpreter sets <code>__name__</code> to <code>"__main__"</code>.</p>
+        <p>When the condition <code>if __name__ == '__main__':</code> is true, the <code>main()</code> function is called.</p>
+        <div class="callout callout-note">
+          <div class="ct">📌 Note</div>
+          <p><code>sys.argv[1:]</code> — gets everything <em>after</em> the script name (file name). <code>sys.argv[0]</code> is the script name (Python program). Remember <strong>string slicing</strong> from Chapter 8.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 14.7 ===== -->
+  <section id="s147">
+    <h2>14.7 Python Program Executing a C++ Program</h2>
+    <p>The steps to execute a C++ program (palindrome check) through Python:</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Type the C++ program to check whether the input number is palindrome or not in notepad and save it as <strong>"pali_cpp.cpp"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Type the Python program and save it as <strong>pali.py</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Click the Run Terminal and open the command window</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Type the command: <code>Python pali.py -i pali_cpp</code></div></div>
+    </div>
+
+    <h3>Example 14.7.1 — C++ Palindrome Program</h3>
+    <div class="code-wrap">
+      <div class="code-label">pali_cpp.cpp</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><span class="cm">/* To check whether the number is palindrome or not using while loop. */</span>
+<span class="cm">// Now select File-&gt;New in Notepad and type the C++ program</span>
+<span class="inc">#include &lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> n, num, digit, rev = <span class="num">0</span>;
+    cout &lt;&lt; <span class="str">"Enter a positive number: "</span>;
+    cin &gt;&gt; num;
+    n = num;
+    <span class="kw">while</span>(num)
+    {
+        digit = num % <span class="num">10</span>;
+        rev = (rev * <span class="num">10</span>) + digit;
+        num = num / <span class="num">10</span>;
+    }
+    cout &lt;&lt; <span class="str">"The reverse of the number is: "</span> &lt;&lt; rev &lt;&lt; endl;
+    <span class="kw">if</span> (n == rev)
+        cout &lt;&lt; <span class="str">"The number is a palindrome"</span>;
+    <span class="kw">else</span>
+        cout &lt;&lt; <span class="str">"The number is not a palindrome"</span>;
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+<span class="cm">// Save this file as pali_cpp.cpp</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">pali.py — Python program to compile and execute pali_cpp.cpp</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><span class="cm"># Now select File-&gt;New in Notepad and type the Python program</span>
+<span class="cm"># Save the File as pali.py</span>
+<span class="cm"># Program that compiles and executes a .cpp file</span>
+<span class="cm"># Python c:\pyprg\pali.py -i c:\pyprg\pali_cpp</span>
+<span class="kw">import</span> sys, os, getopt
+
+<span class="kw">def</span> <span class="fn">main</span>(argv):
+    opts, args = getopt.<span class="fn">getopt</span>(argv, <span class="str">"i:"</span>)
+    <span class="kw">for</span> o, a <span class="kw">in</span> opts:
+        <span class="kw">if</span> o <span class="kw">in</span> <span class="str">"-i"</span>:
+            <span class="fn">run</span>(a)
+
+<span class="kw">def</span> <span class="fn">run</span>(a):
+    inp_file = a + <span class="str">'.cpp'</span>
+    exe_file = a + <span class="str">'.exe'</span>
+    os.<span class="fn">system</span>(<span class="str">'g++  '</span> + inp_file + <span class="str">'  -o  '</span> + exe_file)
+    os.<span class="fn">system</span>(exe_file)
+
+<span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:
+    <span class="fn">main</span>(sys.argv[<span class="num">1</span>:])</pre>
+    </div>
+
+    <h4>Output 1 — Palindrome</h4>
+    <div class="terminal-bar"><div class="terminal-dot td-r"></div><div class="terminal-dot td-y"></div><div class="terminal-dot td-g"></div></div>
+    <div class="terminal" style="border-radius:0 0 var(--r) var(--r);margin-top:0">
+<span class="prompt">C:\Users\Dell&gt;</span><span class="input-line">python c:\pyprg\pali.py -i c:\pyprg\pali_cpp</span>
+<span class="output-line">Enter a positive number: <strong style="color:#e8d8c0">56765</strong></span>
+<span class="output-line">The reverse of the number is: 56765</span>
+<span class="output-line" style="color:#4adcc8">The number is a palindrome</span>
+    </div>
+
+    <h4>Output 2 — Not a Palindrome</h4>
+    <div class="terminal-bar"><div class="terminal-dot td-r"></div><div class="terminal-dot td-y"></div><div class="terminal-dot td-g"></div></div>
+    <div class="terminal" style="border-radius:0 0 var(--r) var(--r);margin-top:0">
+<span class="prompt">C:\Users\Dell&gt;</span><span class="input-line">python c:\pyprg\pali.py -i c:\pyprg\pali_cpp</span>
+<span class="output-line">Enter a positive number: <strong style="color:#e8d8c0">56756</strong></span>
+<span class="output-line">The reverse of the number is: 65765</span>
+<span class="output-line" style="color:#e07070">The number is not a palindrome</span>
+    </div>
+
+    <h3>How Does It Work? — Interactive Line Explainer</h3>
+    <p style="font-size:.85rem;color:var(--text3)">Click any row to highlight its explanation.</p>
+    <table class="explain-table">
+      <thead><tr><th>Python Code</th><th>Explanation</th></tr></thead>
+      <tbody id="explainBody">
+        <tr onclick="highlightRow(this)"><td class="code-cell">import sys, os, getopt</td><td>Include sys, os and getopt modules to use the required functions</td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">def main(argv):</td><td>Function <code>main()</code> is defined and <code>argv</code> contains the input mode and the C++ program file in the form of a list: <code>['-i', 'c:\pyprg\pali_cpp']</code></td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">opts, args = getopt.getopt(argv, "i:")</td><td><code>getopt()</code> splits the command as option and argument. <code>opts</code> contains <code>[('-i', 'c:\pyprg\pali_cpp')]</code>; since no error, <code>args</code> shows <code>[]</code></td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">for o, a in opts:</td><td><code>o</code> contains the mode; <code>a</code> contains the path of the C++ program. Printing shows: <code>o = -i</code> and <code>a = c:\pyprg\pali_cpp</code></td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">if o in "-i":</td><td>Checks if <code>o == 'i'</code>; if true, proceeds</td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">run(a)</td><td>Calls the function <code>run()</code> passing along the C++ program path</td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">def run(a):</td><td>Definition of <code>run()</code> function begins here</td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">inp_file = a + '.cpp'</td><td>Variable <code>inp_file</code> contains the joined C++ program name and <code>.cpp</code> — shows: <code>c:\pyprg\pali_cpp.cpp</code></td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">exe_file = a + '.exe'</td><td>Variable <code>exe_file</code> contains the joined C++ program name and <code>.exe</code> — shows: <code>c:\pyprg\pali_cpp.exe</code></td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">os.system('g++ ' + inp_file + ' -o ' + exe_file)</td><td><code>g++</code> compiler compiles the C++ program in <code>inp_file</code> and stores the executable file in <code>exe_file</code></td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">os.system(exe_file)</td><td>Executes the <code>.exe</code> file — the desired output appears on screen</td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">if __name__ == '__main__':</td><td><code>__name__</code> stores the name of the Python program. <code>__main__</code> also stores the name of the Python program. When they are equal, <code>main()</code> is called.</td></tr>
+        <tr onclick="highlightRow(this)"><td class="code-cell">main(sys.argv[1:])</td><td>Passed with the command-line argument omitting the Python program name. <code>argv[1:]</code> contains: <code>-i c:\pyprg\pali_cpp</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-note">
+      <div class="ct">📌 How the script works</div>
+      <p>The variable <code>inp_file</code> stores the C++ file with its extension; <code>exe_file</code> stores the executable file with <code>.exe</code>. The <code>'+'</code> in the program concatenates the filename with the extensions. <code>os.system()</code> along with <code>'g++'</code> compiles <code>inp_file</code>. Mode <code>'-o'</code> sends the executable to <code>exe_file</code>. Because the file extensions are added by the Python script, it is even possible to execute C programs this way.</p>
+    </div>
+  </section>
+
+  <!-- ===== 14.8 ===== -->
+  <section id="s148">
+    <h2>14.8 How Python Handles Errors in C++</h2>
+    <p>Python not only executes successful C++ programs — it also displays errors if any occur during C++ compilation.</p>
+
+    <h3>Example 14.8.1 — Missing Semicolon</h3>
+    <div class="code-wrap">
+      <div class="code-label">hello.cpp — C++ program with error (missing semicolon)</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><span class="cm">// C++ program to print the message Hello</span>
+<span class="cm">// Now select File -&gt; New in Notepad and type the C++ program</span>
+<span class="inc">#include&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    std::cout &lt;&lt; <span class="str">"hello"</span>   <span class="cm">// ← Missing semicolon here!</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+<span class="cm">// Save this file as hello.cpp</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">main.py — Python program to execute hello.cpp</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><span class="cm"># Program that compiles and executes a .cpp file</span>
+<span class="cm"># Python main.py -i hello</span>
+<span class="kw">import</span> sys, os, getopt
+
+<span class="kw">def</span> <span class="fn">main</span>(argv):
+    opts, args = getopt.<span class="fn">getopt</span>(argv, <span class="str">"i:"</span>)
+    <span class="kw">for</span> o, a <span class="kw">in</span> opts:
+        <span class="kw">if</span> o <span class="kw">in</span> <span class="str">"-i"</span>:
+            <span class="fn">run</span>(a)
+
+<span class="kw">def</span> <span class="fn">run</span>(a):
+    inp_file = a + <span class="str">'.cpp'</span>
+    exe_file = a + <span class="str">'.exe'</span>
+    os.<span class="fn">system</span>(<span class="str">'g++  '</span> + inp_file + <span class="str">'  -o  '</span> + exe_file)
+    os.<span class="fn">system</span>(exe_file)
+
+<span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:
+    <span class="fn">main</span>(sys.argv[<span class="num">1</span>:])</pre>
+    </div>
+
+    <h4>Error Output</h4>
+    <div class="terminal-bar"><div class="terminal-dot td-r"></div><div class="terminal-dot td-y"></div><div class="terminal-dot td-g"></div></div>
+    <div class="terminal" style="border-radius:0 0 var(--r) var(--r);margin-top:0">
+<span class="prompt">C:\Users\Dell&gt;</span><span class="input-line">python c:\pyprg\main.py -i c:\pyprg\hello</span>
+<br>
+<span class="error-line">c:\pyprg\hello.cpp: In function 'int main()':</span>
+<span class="error-line">c:\pyprg\hello.cpp:7:19: error: expected ';' before 'return'</span>
+<span class="error-line">    std::cout&lt;&lt;"hello"</span>
+<span class="error-line">                   ^</span>
+<span class="error-line">                   ;</span>
+<span class="error-line">    return 0;</span>
+<span class="error-line">    ~~~~~~</span>
+<br>
+<span class="error-line">'c:\pyprg\hello.exe' is not recognized as an internal or external command,</span>
+<span class="error-line">operable program or batch file.</span>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="ct">📌 Note</div>
+      <p>Python displays the error along with its <strong>line number</strong>. The line numbering starts from the beginning of the C++ program. Since compilation failed, the <code>.exe</code> was never created, so the second <code>os.system()</code> call also gives an error.</p>
+    </div>
+  </section>
+
+  <!-- ===== PTR ===== -->
+  <section id="ptr">
+    <h2>Points to Remember</h2>
+    <p style="font-size:.83rem;color:var(--text3)">Click each point to tick it off as you revise.</p>
+    <ul class="ptr-list" id="ptrList">
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>C++ is a compiler-based language while Python is an interpreter-based language.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>C++ is compiled statically whereas Python is interpreted dynamically.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>A statically typed language like C++ requires the programmer to explicitly tell the computer the data type of each data value.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>A dynamically typed language like Python doesn't require explicit data types — Python manipulates the variable based on the type of value.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>A scripting language is a programming language designed for integrating and communicating with other programming languages.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>MinGW refers to a set of runtime header files used in compiling and linking the code of C, C++, and FORTRAN to run on Windows.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>The dot (.) operator is used to access the functions of an imported module.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>The <code>sys</code> module provides access to some variables used by the interpreter and functions that interact with the interpreter.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>The <code>os</code> module in Python provides a way of using operating system dependent functionality.</li>
+      <li onclick="togglePtr(this)"><span class="ptr-check">✓</span>The <code>getopt</code> module of Python helps you to parse (split) command-line options and arguments.</li>
+    </ul>
+  </section>
+
+  <!-- ===== HANDS ON ===== -->
+  <section id="hands">
+    <h2>Hands on Experience</h2>
+
+    <div class="acc open">
+      <div class="acc-h" onclick="toggleAcc(this)">Exercise 1 — Multilevel &amp; Multiple Inheritance (hybrid.cpp) <span class="acc-arr">▼</span></div>
+      <div class="acc-b">
+        <p>Write a C++ program to create the following class hierarchy:</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Class</th><th>Inheritance</th><th>Members</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Student</strong></td><td>Base</td><td>Protected: <code>Rno</code> (int); Public: <code>Readno(int)</code>, <code>Writeno()</code></td></tr>
+            <tr><td><strong>Test</strong></td><td>Public from Student</td><td>Protected: <code>Mark1</code>, <code>Mark2</code> (float); Public: <code>Readmark(float,float)</code>, <code>Writemark()</code></td></tr>
+            <tr><td><strong>Sports</strong></td><td>Base</td><td>Protected: <code>score</code> (int); Public: <code>Readscore(int)</code>, <code>Writescore()</code></td></tr>
+            <tr><td><strong>Result</strong></td><td>Public from Test &amp; Sports</td><td>Private: <code>Total</code> (float); Public: <code>display()</code> — sums mark1+mark2+score, invokes all write functions and displays total</td></tr>
+          </tbody>
+        </table></div>
+        <p>Save the C++ program in a file called <strong>hybrid.cpp</strong>. Then write a Python program to execute <code>hybrid.cpp</code>.</p>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-h" onclick="toggleAcc(this)">Exercise 2 — Boundary Elements of a Matrix (Border.cpp) <span class="acc-arr">▼</span></div>
+      <div class="acc-b">
+        <p>Write a C++ program to print the <strong>boundary elements of a matrix</strong> and name the file as <strong>Border.cpp</strong>.</p>
+        <p>Then write a Python program to execute <code>Border.cpp</code>.</p>
+        <div class="callout callout-tip">
+          <div class="ct">💡 Hint</div>
+          <p>Boundary elements are those in the first row, last row, first column, or last column of the matrix. Use nested loops and print an element if it is at any boundary position.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WIDGETS ===== -->
+  <section id="widgets">
+    <h2>Interactive Tools</h2>
+
+    <div class="widget">
+      <div class="widget-header">🔧 Command Builder</div>
+      <div class="widget-body">
+        <p style="font-size:.85rem;color:var(--text2);margin-bottom:.75rem">Type the filenames to build the execution command and see the variables your Python script generates.</p>
+        <div class="w-row">
+          <label>Python file (.py):</label>
+          <input type="text" id="wb-py" placeholder="pali.py" oninput="buildCmd()">
+        </div>
+        <div class="w-row">
+          <label>C++ file (no .cpp):</label>
+          <input type="text" id="wb-cpp" placeholder="pali_cpp" oninput="buildCmd()">
+        </div>
+        <div class="w-row">
+          <label>Path:</label>
+          <input type="text" id="wb-path" placeholder="c:\pyprg" oninput="buildCmd()">
+        </div>
+        <div class="w-out-label">Generated Command</div>
+        <div class="w-out" id="wb-cmd">Fill in the fields above</div>
+        <div class="w-out-label" style="margin-top:.6rem">Python Variables</div>
+        <div class="w-out" id="wb-vars">—</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">⚙ getopt() Parser Simulator</div>
+      <div class="widget-body">
+        <p style="font-size:.85rem;color:var(--text2);margin-bottom:.75rem">Enter a command-line like <code>-i c:\pyprg\pali_cpp</code> and see what <code>opts</code> and <code>args</code> would contain.</p>
+        <div class="w-row">
+          <label>Command line:</label>
+          <input type="text" id="go-input" placeholder="-i c:\pyprg\pali_cpp" oninput="simulateGetopt()">
+        </div>
+        <div class="w-out-label">opts</div>
+        <div class="w-out" id="go-opts">—</div>
+        <div class="w-out-label" style="margin-top:.5rem">args (errors)</div>
+        <div class="w-out" id="go-args">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QUIZ ===== -->
+  <section id="quiz">
+    <h2>Evaluation — Part I (MCQ Quiz)</h2>
+    <p class="section-lead">10 questions · 1 mark each · instant feedback</p>
+    <div class="quiz-pb"><div class="quiz-pf" id="qpf" style="width:0%"></div></div>
+    <div id="quizContainer"></div>
+    <div class="score-box" id="scoreBox">
+      <h3 id="scoreText"></h3>
+      <p id="scoreMsg"></p>
+      <button class="btn-retry" onclick="buildQuiz()">Restart Quiz</button>
+    </div>
+  </section>
+
+  <!-- ===== REVISION ===== -->
+  <section id="revision">
+    <h2>Revision Questions</h2>
+
+    <h3>Part II — Answer the following (2 Marks)</h3>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">1. What is the theoretical difference between a scripting language and other programming languages? <span class="acc-arr">▼</span></div><div class="acc-b"><p>The theoretical difference is that scripting languages do not require the compilation step and are instead interpreted. A programming language like C++ must be compiled before running, whereas a scripting language like Python does not. A scripting language requires an <strong>interpreter</strong>, while a programming language requires a <strong>compiler</strong>. A given language can be called scripting or programming depending on the environment in which it is used.</p></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">2. Differentiate compiler and interpreter. <span class="acc-arr">▼</span></div><div class="acc-b"><div class="tbl-wrap"><table><thead><tr><th>Compiler</th><th>Interpreter</th></tr></thead><tbody><tr><td>Translates the entire program at once</td><td>Translates line by line</td></tr><tr><td>Creates an executable file</td><td>Does not create an executable file</td></tr><tr><td>Errors reported after full compilation</td><td>Errors reported immediately line by line</td></tr><tr><td>Faster execution</td><td>Slower execution</td></tr><tr><td>Used by C, C++</td><td>Used by Python, JavaScript</td></tr></tbody></table></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">3. Write the expansion of (i) GCC (ii) MinGW <span class="acc-arr">▼</span></div><div class="acc-b"><p>(i) <strong>GCC</strong> — GNU C Compiler<br>(ii) <strong>MinGW</strong> — Minimalist GNU for Windows</p></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">4. What is the use of modules? <span class="acc-arr">▼</span></div><div class="acc-b"><p>Modules are used to break down large programs into small, manageable, and organized pieces. They enable <strong>code reusability</strong> — you can define frequently used functions in a module and import it, instead of copying definitions into every program. Modules also help achieve modularity and minimize dependencies.</p></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">5. What is the use of the cd command? Give an example. <span class="acc-arr">▼</span></div><div class="acc-b"><p>The <code>cd</code> (change directory) command is used to navigate to a different directory in the command prompt. Example: to go to the directory <code>pyprg</code>, type <code>cd pyprg</code> in the command prompt. To specify a full path: <code>cd c:\pyprg</code>.</p></div></div>
+
+    <h3>Part III — Answer the following (3 Marks)</h3>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">1. Differentiate Python and C++ <span class="acc-arr">▼</span></div><div class="acc-b"><div class="tbl-wrap"><table><thead><tr><th>Python</th><th>C++</th></tr></thead><tbody><tr><td>Interpreted language</td><td>Compiled language</td></tr><tr><td>Dynamically typed</td><td>Statically typed</td></tr><tr><td>No data type needed when declaring variables</td><td>Data type required</td></tr><tr><td>Shorter code (5–10× shorter)</td><td>More verbose</td></tr><tr><td>Automatic garbage collection</td><td>Manual memory management</td></tr><tr><td>Can act as scripting + general purpose</td><td>General purpose only</td></tr></tbody></table></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">2. What are the applications of scripting languages? <span class="acc-arr">▼</span></div><div class="acc-b"><ol><li>To automate certain tasks in a program</li><li>Extracting information from a data set</li><li>Less code intensive as compared to traditional programming languages</li><li>Can bring new functions to applications and glue complex systems together</li></ol></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">3. What is MinGW? What is its use? <span class="acc-arr">▼</span></div><div class="acc-b"><p>MinGW (Minimalist GNU for Windows) refers to a set of runtime header files used in compiling and linking the code of C, C++, and FORTRAN to run on the Windows Operating System. MinGW-W64 is the best compiler for C++ on Windows. It allows compiling and executing C++ programs dynamically through Python using <code>g++</code>. The <code>g++</code> tool calls GCC (GNU C Compiler) and automatically links the required C++ library files to the object code.</p></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">4. Identify the module, operator, and definition name for: welcome.display() <span class="acc-arr">▼</span></div><div class="acc-b"><div class="tbl-wrap"><table><tbody><tr><td><strong>Module name</strong></td><td><code>welcome</code></td></tr><tr><td><strong>Operator</strong></td><td><code>.</code> (dot operator)</td></tr><tr><td><strong>Definition name (function call)</strong></td><td><code>display()</code></td></tr></tbody></table></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">5. What is sys.argv? What does it contain? <span class="acc-arr">▼</span></div><div class="acc-b"><p><code>sys.argv</code> is the list of command-line arguments passed to the Python program. It holds all items that come via command-line input. <code>sys.argv[0]</code> contains the name of the Python program itself (e.g., <code>pali.py</code>) and <code>sys.argv[1]</code> contains the next argument (e.g., the C++ file path). To use it, <code>import sys</code> must be included.</p></div></div>
+
+    <h3>Part IV — Answer the following (5 Marks)</h3>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">1. Write any 5 features of Python <span class="acc-arr">▼</span></div><div class="acc-b"><ol><li>Python uses <strong>Automatic Garbage Collection</strong> — C++ does not</li><li>C++ is statically typed; Python is <strong>dynamically typed</strong> — no need to declare variable types</li><li>Python runs through an interpreter; C++ is pre-compiled — Python code is often 5–10× shorter</li><li>A Python function may accept arguments of any type and <strong>return multiple values</strong> — C++ return can only return one value</li><li>Python is an <strong>interpreted, high-level, general-purpose</strong> language that can process text, numbers, images, and scientific data on any modern OS</li></ol></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">2. Explain each word of: Python &lt;filename.py&gt; -i &lt;C++ filename without cpp extension&gt; <span class="acc-arr">▼</span></div><div class="acc-b"><div class="tbl-wrap"><table><thead><tr><th>Part</th><th>Explanation</th></tr></thead><tbody><tr><td><code>Python</code></td><td>Keyword to execute the Python program from the command line</td></tr><tr><td><code>&lt;filename.py&gt;</code></td><td>Name of the Python program to be executed</td></tr><tr><td><code>-i</code></td><td>Specifies the <strong>input mode</strong> — indicates the next argument is the input C++ file</td></tr><tr><td><code>&lt;C++ filename without cpp extension&gt;</code></td><td>Name of the C++ file to be compiled and executed (no <code>.cpp</code> needed)</td></tr></tbody></table></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">3. What is the purpose of sys, os, getopt modules in Python? <span class="acc-arr">▼</span></div><div class="acc-b"><p><strong>sys module:</strong> Provides access to built-in variables used by the interpreter, including <code>sys.argv</code> — the list of command-line arguments passed to the program.</p><p><strong>os module:</strong> Provides a way to use operating system dependent functionality. The <code>os.system()</code> function executes shell commands — used here to run <code>g++</code> to compile C++ files and then execute the resulting <code>.exe</code> file.</p><p><strong>getopt module:</strong> Helps parse (split) command-line options and arguments. The <code>getopt.getopt()</code> function splits the command into options (<code>opts</code>) and any leftover arguments (<code>args</code>), making it easy to handle flags like <code>-i</code> and associated values.</p></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">4. Write the syntax for getopt() and explain its arguments and return values <span class="acc-arr">▼</span></div><div class="acc-b"><div class="code-wrap"><pre>opts, args = getopt.getopt(argv, options, [long_options])</pre></div><p><strong>argv</strong> — the argument list to be parsed. In the program, the complete command line is passed as a list.</p><p><strong>options</strong> — string of option letters the program recognises. Options followed by a colon (<code>:</code>) require an argument. Example: <code>"i:"</code></p><p><strong>long_options</strong> — list of strings for long options; long options needing arguments must be followed by <code>=</code>. Example: <code>['ifile=']</code></p><p><strong>Return values:</strong><br>• <code>opts</code> — list of (option, value) tuples: e.g., <code>[('-i', 'c:\\pyprg\\p4')]</code><br>• <code>args</code> — empty list <code>[]</code> if no error; contains error string otherwise</p></div></div>
+    <div class="acc"><div class="acc-h" onclick="toggleAcc(this)">5. Write a Python program to execute the following C++ code (welcome.cpp) <span class="acc-arr">▼</span></div><div class="acc-b">
+      <div class="code-wrap"><div class="code-label">welcome.cpp</div><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="inc">#include &lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    cout &lt;&lt; <span class="str">"WELCOME"</span>;
+    <span class="kw">return</span>(<span class="num">0</span>);
+}</pre></div>
+      <div class="code-wrap"><div class="code-label">welcome.py — Python program to execute welcome.cpp</div><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="cm"># Python program to execute welcome.cpp</span>
+<span class="cm"># Command: Python welcome.py -i welcome</span>
+<span class="kw">import</span> sys, os, getopt
+
+<span class="kw">def</span> <span class="fn">main</span>(argv):
+    opts, args = getopt.<span class="fn">getopt</span>(argv, <span class="str">"i:"</span>)
+    <span class="kw">for</span> o, a <span class="kw">in</span> opts:
+        <span class="kw">if</span> o <span class="kw">in</span> <span class="str">"-i"</span>:
+            <span class="fn">run</span>(a)
+
+<span class="kw">def</span> <span class="fn">run</span>(a):
+    inp_file = a + <span class="str">'.cpp'</span>
+    exe_file = a + <span class="str">'.exe'</span>
+    os.<span class="fn">system</span>(<span class="str">'g++ '</span> + inp_file + <span class="str">' -o '</span> + exe_file)
+    os.<span class="fn">system</span>(exe_file)
+
+<span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:
+    <span class="fn">main</span>(sys.argv[<span class="num">1</span>:])</pre></div>
+      <div class="terminal-bar"><div class="terminal-dot td-r"></div><div class="terminal-dot td-y"></div><div class="terminal-dot td-g"></div></div>
+      <div class="terminal" style="border-radius:0 0 var(--r) var(--r);margin-top:0"><span class="prompt">C:\pyprg&gt;</span><span class="input-line">Python welcome.py -i welcome</span><br><span class="output-line" style="color:#4adcc8">WELCOME</span></div>
+    </div></div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <section>
+    <div style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+      <h3>References</h3>
+      <ol style="color:var(--text2);font-size:.9rem">
+        <li><em>Learn Python The Hard Way</em> by Zed Shaw</li>
+        <li><em>Python Programming Advanced</em> by Adam Stuart &amp; <em>Powerful Python</em> by Aaron Maxwell</li>
+        <li><a href="https://docs.python.org" target="_blank" rel="noopener" style="color:var(--purple)">https://docs.python.org</a></li>
+      </ol>
+      <p style="margin-top:1rem;font-family:'Space Grotesk',sans-serif;font-size:.78rem;color:var(--text3)">XII Std Computer Science · Tamil Nadu SCERT · Chapter 14</p>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<button id="back-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ===== Quiz Data =====
+const qData = [
+  {q:"Which of the following is NOT a scripting language?", opts:["JavaScript","PHP","Perl","HTML"], ans:3, expl:"HTML is a markup language, not a scripting language."},
+  {q:"Importing a C++ program into a Python program is called:", opts:["Wrapping","Downloading","Interconnecting","Parsing"], ans:0, expl:"Importing C++ in Python is called wrapping (wrapping up of C++ in Python)."},
+  {q:"The expansion of API is:", opts:["Application Programming Interpreter","Application Programming Interface","Application Performing Interface","Application Programming Interlink"], ans:1, expl:"API stands for Application Programming Interface."},
+  {q:"A framework for interfacing Python and C++ is:", opts:["Ctypes","SWIG","Cython","Boost"], ans:3, expl:"Boost.Python is a framework for interfacing Python and C++."},
+  {q:"Which is a software design technique to split your code into separate parts?", opts:["Object Oriented Programming","Modular programming","Low Level Programming","Procedure Oriented Programming"], ans:1, expl:"Modular programming is the technique to split code into separate modules."},
+  {q:"The module which allows you to interface with the Windows operating system is:", opts:["sys module","sys module","sys module","getopt module"], ans:0, expl:"The OS module (os) allows interfacing with the Windows operating system."},
+  {q:"getopt() will return an empty array if there is no error in splitting strings to:", opts:["argv variable","opts variable","args variable","ifile variable"], ans:2, expl:"The args variable will be an empty list [] if there is no error."},
+  {q:"Identify the function call statement in the snippet: if __name__ == '__main__': main(sys.argv[1:])", opts:["main(sys.argv[1:])","__name__","__main__","argv"], ans:0, expl:"main(sys.argv[1:]) is the function call statement."},
+  {q:"Which of the following can be used for processing text, numbers, images, and scientific data?", opts:["HTML","C","C++","PYTHON"], ans:3, expl:"Python is an interpreted, high-level, general-purpose language for processing text, numbers, images, and scientific data."},
+  {q:"What does __name__ contain?", opts:["filename","main() name","Python filename","Module name"], ans:2, expl:"__name__ contains the name of the Python file (program). When executed as the main program it contains '__main__'."}
+];
+
+let qAnswered = 0, qScore = 0;
+
+function buildQuiz() {
+  qAnswered = 0; qScore = 0;
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('qpf').style.width = '0%';
+  const c = document.getElementById('quizContainer');
+  c.innerHTML = qData.map((q,qi)=>`
+    <div class="quiz-card" id="qc${qi}">
+      <div class="quiz-q"><span>Q${qi+1}.</span>${esc(q.q)}</div>
+      <div class="quiz-opts">${q.opts.map((o,oi)=>`
+        <div class="quiz-opt" id="qo${qi}_${oi}" onclick="pickQ(${qi},${oi})">
+          <span class="opt-letter">${'ABCD'[oi]}</span>${esc(o)}
+        </div>`).join('')}
+      </div>
+      <div class="quiz-fb" id="qf${qi}"></div>
+    </div>`).join('');
+}
+
+function pickQ(qi, oi) {
+  if (document.getElementById(`qo${qi}_0`).classList.contains('disabled')) return;
+  const correct = qData[qi].ans;
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById(`qo${qi}_${i}`);
+    el.classList.add('disabled');
+    if (i===correct) el.classList.add('correct');
+    else if (i===oi) el.classList.add('wrong');
+  }
+  const fb = document.getElementById(`qf${qi}`);
+  if (oi===correct) { qScore++; fb.className='quiz-fb correct'; fb.textContent='✓ Correct! '+qData[qi].expl; }
+  else { fb.className='quiz-fb wrong'; fb.textContent='✗ '+qData[qi].expl; }
+  qAnswered++;
+  document.getElementById('qpf').style.width = (qAnswered/qData.length*100)+'%';
+  if (qAnswered===qData.length) setTimeout(showScore,500);
+}
+
+function showScore() {
+  const pct = Math.round(qScore/qData.length*100);
+  document.getElementById('scoreText').textContent = `Score: ${qScore}/${qData.length} (${pct}%)`;
+  const msgs = ['Keep studying! Review the chapter carefully.','Good effort! A bit more practice needed.','Well done! You understand most of the chapter.','Perfect! Outstanding performance!'];
+  document.getElementById('scoreMsg').textContent = msgs[pct<40?0:pct<60?1:pct<100?2:3];
+  document.getElementById('scoreBox').classList.add('show');
+}
+
+// ===== Utilities =====
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toggleAcc(h) { h.parentElement.classList.toggle('open'); }
+
+function copyCode(btn) {
+  const pre = btn.nextElementSibling;
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='Copied!'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1800);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=pre.innerText;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    btn.textContent='Copied!'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1800);
+  });
+}
+
+function toggleDark() {
+  const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ch14_theme',t);}catch(e){}
+}
+
+function togglePtr(li) { li.classList.toggle('checked'); }
+
+function highlightRow(tr) {
+  document.querySelectorAll('#explainBody tr').forEach(r=>r.classList.remove('active-row'));
+  tr.classList.add('active-row');
+}
+
+// ===== Command Builder =====
+function buildCmd() {
+  const py = document.getElementById('wb-py').value.trim() || 'pali.py';
+  const cpp = document.getElementById('wb-cpp').value.trim() || 'pali_cpp';
+  const path = document.getElementById('wb-path').value.trim() || 'c:\\pyprg';
+  const sep = path.endsWith('\\') ? '' : '\\';
+  document.getElementById('wb-cmd').textContent =
+    `Python ${path}${sep}${py} -i ${path}${sep}${cpp}`;
+  document.getElementById('wb-vars').textContent =
+    `inp_file = '${path}${sep}${cpp}.cpp'\nexe_file = '${path}${sep}${cpp}.exe'\nos.system('g++ ' + inp_file + ' -o ' + exe_file)`;
+}
+
+// ===== getopt Simulator =====
+function simulateGetopt() {
+  const val = document.getElementById('go-input').value.trim();
+  if (!val) { document.getElementById('go-opts').textContent='—'; document.getElementById('go-args').textContent='—'; return; }
+  const parts = val.split(/\s+/);
+  const opts = [], args = [];
+  let i = 0;
+  while (i < parts.length) {
+    if (parts[i].startsWith('-') && parts[i].length===2) {
+      const flag = parts[i];
+      const nextVal = (i+1<parts.length && !parts[i+1].startsWith('-')) ? parts[++i] : '';
+      opts.push([flag, nextVal]);
+    } else { args.push(parts[i]); }
+    i++;
+  }
+  document.getElementById('go-opts').textContent = opts.length
+    ? '[' + opts.map(o=>`('${o[0]}', '${o[1]}')`).join(', ') + ']' : '[]';
+  document.getElementById('go-args').textContent = args.length ? '[' + args.map(a=>`'${a}'`).join(', ') + ']' : '[]';
+}
+
+// ===== Progress bar & nav =====
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const pct = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('back-top').classList.toggle('show', doc.scrollTop > 400);
+
+  // Active nav
+  const sections = document.querySelectorAll('section[id]');
+  let current = '';
+  sections.forEach(s => {
+    if (s.getBoundingClientRect().top < 120) current = s.id;
+  });
+  document.querySelectorAll('.nav-a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+// ===== Smooth scroll nav =====
+document.querySelectorAll('.nav-a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({behavior:'smooth'});
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+
+document.getElementById('menuToggle').addEventListener('click', () =>
+  document.getElementById('sidebar').classList.toggle('open'));
+
+// ===== Init =====
+(function(){
+  try{ const t=localStorage.getItem('ch14_theme'); if(t) document.documentElement.setAttribute('data-theme',t); }catch(e){}
+  buildQuiz();
+  buildCmd();
+  document.querySelector('.acc.open .acc-h')?.dispatchEvent && null;
+})();
+</script>
+</body>
+</html>
