@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 16 – Data Visualization using Pyplot</title>
+<script>
+/* Set theme before first paint: saved choice, else the system preference. */
+(function(){
+  var t=null;
+  try{ t=localStorage.getItem('ch16_theme'); }catch(e){}
+  if(t!=='dark'&&t!=='light'){ t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'; }
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<style>
+:root{
+  --bg:#f8f4ff; --surface:#ffffff; --surface2:#f0eaff; --border:#d4c5f0;
+  --text:#1a1030; --text2:#4a3a70; --accent:#6d28d9; --accent2:#f97316; --accent-light:#ede9fe;
+  --peach:#ffe8d6; --peach-b:#f6b78a; --peach-t:#7a3b0c;
+  --code-bg:#1e1530; --code-text:#e8d5ff;
+  --green:#15803d; --red:#dc2626; --yellow:#a16207;
+  --ok-bg:#dcfce7; --bad-bg:#fee2e2; --chartbg:#ffffff;
+  --sidebar-w:264px; --radius:10px; --top-h:56px;
+}
+[data-theme="dark"]{
+  --bg:#0f0a1e; --surface:#1a1030; --surface2:#251840; --border:#3d2a6a;
+  --text:#f0e8ff; --text2:#c9b4f5; --accent:#a78bfa; --accent2:#fb923c; --accent-light:#2d1f50;
+  --peach:#3a2314; --peach-b:#8a5a34; --peach-t:#ffd9b8;
+  --code-bg:#0a0614; --green:#4ade80; --red:#f87171; --yellow:#facc15;
+  --ok-bg:#12351f; --bad-bg:#421515; --chartbg:#1a1030;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;font-size:16px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent2);outline-offset:2px;border-radius:4px}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace}
+code.i{background:var(--surface2);padding:1px 6px;border-radius:4px;font-size:.88em}
+h1{font-size:1.15rem;font-weight:700}
+h2{font-size:1.45rem;margin-bottom:.5rem;color:var(--accent);line-height:1.25}
+h3{font-size:1.1rem;margin:1.2rem 0 .4rem;color:var(--text2)}
+p{margin:.5rem 0}
+ul,ol{padding-left:1.4rem;margin:.4rem 0}
+li{margin:.25rem 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:.45rem .9rem;font-weight:600}
+[data-theme="dark"] .btn{color:#1a0d3a}
+.btn:hover{filter:brightness(1.1)}
+.btn.alt{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn.peach{background:var(--peach);color:var(--peach-t);border:1px solid var(--peach-b)}
+.btn.sm{padding:.25rem .6rem;font-size:.85rem}
+
+/* ---------- top bar ---------- */
+#topbar{position:sticky;top:0;z-index:100;height:var(--top-h);background:var(--surface);border-bottom:3px solid var(--accent);padding:0 .9rem;display:flex;align-items:center;gap:.7rem;box-shadow:0 2px 8px rgba(109,40,217,.15)}
+#topbar h1{flex:0 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#topbar h1 small{display:block;font-size:.68rem;font-weight:500;color:var(--text2)}
+.tb-btn{background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:.25rem .65rem;line-height:1.4}
+.tb-btn:hover{border-color:var(--accent)}
+#menu-btn{display:none;font-size:1.2rem}
+#prog-wrap{flex:1 1 120px;display:flex;align-items:center;gap:.5rem;min-width:70px}
+#prog{flex:1;height:10px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;overflow:hidden}
+#prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+#prog-label{font-size:.75rem;color:var(--text2);white-space:nowrap}
+#search-wrap{position:relative;width:170px}
+#search{width:100%;padding:.32rem .7rem;border:2px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;font-size:.85rem}
+#search-res{position:absolute;top:110%;right:0;width:260px;max-height:300px;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:none;z-index:300}
+#search-res.open{display:block}
+#search-res button{display:block;width:100%;text-align:left;background:none;border:0;padding:.45rem .7rem;font-size:.85rem;border-bottom:1px solid var(--border)}
+#search-res button:hover,#search-res button:focus{background:var(--accent-light)}
+#search-res small{color:var(--text2);display:block}
+
+/* ---------- layout ---------- */
+#layout{display:flex;align-items:flex-start}
+#sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:var(--top-h);height:calc(100vh - var(--top-h));overflow-y:auto;padding:.8rem 0}
+#sidebar a{display:block;padding:.38rem 1rem .38rem 1.1rem;font-size:.86rem;color:var(--text2);text-decoration:none;border-left:4px solid transparent}
+#sidebar a:hover{background:var(--accent-light)}
+#sidebar a.active{border-left-color:var(--accent2);background:var(--accent-light);color:var(--accent);font-weight:700}
+#sidebar a .ck{display:inline-block;width:1.1em;color:var(--green);font-weight:700}
+#sidebar .grp{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);padding:.8rem 1.1rem .2rem;font-weight:700}
+#sidebar .side-foot{padding:1rem 1.1rem;font-size:.78rem;color:var(--text2)}
+#store-note{color:var(--yellow);margin-bottom:.5rem}
+main{flex:1;min-width:0;padding:1.2rem clamp(.8rem,3vw,2rem) 4rem;max-width:1000px;margin:0 auto}
+#scrim{display:none}
+@media (max-width:860px){
+  #menu-btn{display:block}
+  #sidebar{position:fixed;left:0;top:var(--top-h);z-index:150;transform:translateX(-105%);transition:transform .25s;box-shadow:6px 0 24px rgba(0,0,0,.3);width:min(80vw,300px)}
+  #sidebar.open{transform:none}
+  #scrim.open{display:block;position:fixed;inset:var(--top-h) 0 0 0;background:rgba(0,0,0,.4);z-index:140}
+  #search-wrap{width:110px}
+  #topbar h1 small{display:none}
+  #prog-label{display:none}
+}
+
+/* ---------- cards / sections ---------- */
+.hero{background:linear-gradient(135deg,var(--accent),#9b5de5 55%,var(--accent2));color:#fff;border-radius:16px;padding:1.6rem 1.4rem;margin-bottom:1.2rem}
+.hero .unit{display:inline-block;background:rgba(255,255,255,.22);border-radius:99px;padding:.1rem .8rem;font-size:.8rem;font-weight:700;letter-spacing:.06em}
+.hero h2{color:#fff;font-size:clamp(1.4rem,4vw,2rem);margin:.5rem 0 .2rem}
+.hero p{opacity:.95}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem clamp(.9rem,2.5vw,1.5rem);margin-bottom:1.3rem;scroll-margin-top:calc(var(--top-h) + 10px)}
+.card>h2::before{content:attr(data-num);display:inline-block;background:var(--peach);color:var(--peach-t);border:1px solid var(--peach-b);border-radius:6px;font-size:.7em;padding:0 .5em;margin-right:.5rem;vertical-align:middle}
+.card>h2[data-num=""]::before{display:none}
+.pg{font-size:.72rem;color:var(--text2);font-weight:600;margin-left:.4rem;white-space:nowrap}
+.donebar{margin-top:1.2rem;padding-top:.8rem;border-top:1px dashed var(--border);display:flex;justify-content:flex-end}
+.donebar label{display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:600;font-size:.9rem;color:var(--text2)}
+.donebar input{width:1.15rem;height:1.15rem;accent-color:var(--accent)}
+.def{background:var(--accent-light);border-left:5px solid var(--accent);border-radius:0 8px 8px 0;padding:.7rem 1rem;margin:.7rem 0}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0}
+.chips li{background:var(--peach);color:var(--peach-t);border:1px solid var(--peach-b);border-radius:99px;padding:.15rem .9rem;font-weight:600;font-size:.92rem}
+.note{background:var(--peach);color:var(--peach-t);border:1px solid var(--peach-b);border-radius:8px;padding:.6rem .9rem;margin:.8rem 0;font-size:.92rem}
+.note b:first-child{text-transform:uppercase;letter-spacing:.05em;font-size:.8em}
+.acc{background:var(--surface2);border:1px dashed var(--border);border-radius:8px;padding:.55rem .9rem;margin:.8rem 0;font-size:.88rem;color:var(--text2)}
+.acc b{color:var(--accent)}
+
+/* Do You Know */
+.dyk{border:2px solid var(--accent);border-radius:12px;margin:1.1rem 0;overflow:hidden;background:var(--surface)}
+.dyk-h{background:var(--accent);color:#fff;display:flex;align-items:center;gap:.6rem;padding:.35rem .9rem;font-weight:800;letter-spacing:.03em}
+[data-theme="dark"] .dyk-h{color:#1a0d3a}
+.dyk-h svg{width:30px;height:30px;flex-shrink:0;background:var(--peach);border-radius:50%;padding:4px;color:var(--peach-t)}
+.dyk-b{padding:.6rem 1rem .8rem;background:linear-gradient(180deg,var(--peach),var(--surface) 70%)}
+.dyk-b dt{font-weight:800;color:var(--accent);margin-top:.4rem}
+.dyk-b dd{margin:0 0 .3rem}
+
+/* ---------- code ---------- */
+.cb{border-radius:10px;overflow:hidden;border:1px solid #3d2a6a;margin:.7rem 0;background:var(--code-bg)}
+.cb-h{display:flex;align-items:center;gap:.5rem;background:#2b1d4d;color:#cbb8f5;padding:.3rem .7rem;font-size:.78rem}
+.cb-h .sp{flex:1}
+.badge{display:inline-block;border-radius:99px;padding:0 .6rem;font-weight:700;font-size:.72rem;background:#f97316;color:#2a1200}
+.badge.fix{background:#86efac;color:#052e16}
+.copy{background:#3d2a6a;color:#efe4ff;border:1px solid #5b44a0;border-radius:6px;padding:.1rem .6rem;font-size:.78rem}
+.copy:hover{background:#5b3fb0}
+.cb pre{padding:.7rem 0;overflow-x:auto;color:var(--code-text);font-size:.88rem;line-height:1.55;counter-reset:l}
+.cb .ln{display:block;padding:0 1rem 0 0;white-space:pre}
+.cb .ln::before{counter-increment:l;content:counter(l);display:inline-block;width:2.4em;text-align:right;margin-right:1em;color:#8b78b8;user-select:none}
+.cb .ln.hot{background:rgba(249,115,22,.25)}
+.tk-kw{color:#ff9ac8;font-weight:600}.tk-st{color:#a7f3a0}.tk-nu{color:#ffcb7a}.tk-cm{color:#9d8cc4;font-style:italic}.tk-fn{color:#8ecbff}.tk-mod{color:#ffb482}
+.exp{margin:.6rem 0}
+.exp-row{display:grid;grid-template-columns:minmax(0,38%) 1fr;gap:.2rem .8rem;padding:.45rem .6rem;border-radius:8px;border:1px solid transparent;align-items:start}
+.exp-row:hover,.exp-row:focus,.exp-row.hot{background:var(--accent-light);border-color:var(--border)}
+.exp-row code{font-size:.8rem;background:var(--surface2);padding:.15rem .4rem;border-radius:4px;word-break:break-word;white-space:pre-wrap}
+.exp-row p{margin:0;font-size:.93rem}
+@media (max-width:640px){.exp-row{grid-template-columns:1fr}}
+
+/* ---------- charts ---------- */
+.fig{margin:1rem 0}
+.mplwin{border:1px solid var(--border);border-radius:10px;overflow:hidden;max-width:700px;background:var(--surface)}
+.mplbar{display:flex;align-items:center;gap:.35rem;background:var(--surface2);padding:.3rem .7rem;font-size:.75rem;color:var(--text2);border-bottom:1px solid var(--border)}
+.mplbar i{width:10px;height:10px;border-radius:50%;background:var(--peach-b)}
+.mplbar span{margin-left:.5rem}
+.chart{display:block;width:100%;height:auto;background:var(--chartbg)}
+.chart text{fill:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.chart .ax{stroke:var(--text2);fill:none;stroke-width:1}
+.chart .tk{stroke:var(--text2);stroke-width:1}
+.chart .gd{stroke:var(--border);stroke-width:1;stroke-dasharray:3 3}
+.chart .pt{opacity:0;cursor:pointer;stroke:var(--chartbg);stroke-width:1.5}
+.chart.mk .pt{opacity:1}
+.chart .pt:hover,.chart .pt:focus{opacity:1;outline:none;stroke:var(--text)}
+.chart .bar{cursor:pointer}
+.chart .bar:hover,.chart .bar:focus{filter:brightness(1.18);stroke:var(--text);stroke-width:1.5;outline:none}
+.chart .slice{cursor:pointer;transition:filter .15s}
+.chart .slice:hover,.chart .slice:focus{filter:brightness(1.15);stroke:var(--text);outline:none}
+.chart .pct{fill:#fff;stroke:rgba(0,0,0,.55);stroke-width:3px;paint-order:stroke;font-weight:700;pointer-events:none}
+.chart .lg{fill:var(--chartbg);fill-opacity:.9;stroke:var(--border)}
+.chart.anim .ln1{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+figcaption{font-size:.85rem;color:var(--text2);margin-top:.4rem}
+figcaption b{color:var(--accent)}
+.figrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem;align-items:start}
+#tip{position:fixed;z-index:500;pointer-events:none;background:#1e1530;color:#fff;border:1px solid var(--accent2);border-radius:6px;padding:.25rem .55rem;font-size:.82rem;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.toggle{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem;font-weight:600;margin:.3rem 0;cursor:pointer}
+.toggle input{width:1.05rem;height:1.05rem;accent-color:var(--accent)}
+
+/* ---------- toolbar diagram ---------- */
+.tbwrap{max-width:700px}
+.tbsvg{width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:10px;background:var(--chartbg)}
+.tbsvg text{fill:var(--text);font-family:system-ui,sans-serif}
+.tbsvg .tbb{cursor:pointer}
+.tbsvg .tbb rect{fill:var(--surface2);stroke:var(--border);stroke-width:1.5}
+.tbsvg .tbb path,.tbsvg .tbb circle.ic{stroke:var(--text);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tbsvg .tbb:hover rect,.tbsvg .tbb:focus rect,.tbsvg .tbb.on rect{fill:var(--peach);stroke:var(--accent2);stroke-width:2.5}
+.tbsvg .tbb:focus{outline:none}
+.tbsvg .lbl{font-size:11px;fill:var(--text2)}
+.tbsvg .lead{stroke:var(--peach-b);stroke-width:1;stroke-dasharray:3 3}
+#tbInfo{border:2px solid var(--accent);border-radius:10px;padding:.7rem 1rem;margin-top:.8rem;background:var(--accent-light);min-height:5.2rem}
+#tbInfo b{color:var(--accent)}
+
+/* ---------- tables ---------- */
+.tblwrap{overflow-x:auto;margin:.8rem 0}
+table.cmp{border-collapse:collapse;width:100%;min-width:520px}
+.cmp th,.cmp td{border:1px solid var(--border);padding:.5rem .7rem;text-align:left;vertical-align:top;font-size:.92rem}
+.cmp thead th{background:var(--accent);color:#fff}
+[data-theme="dark"] .cmp thead th{color:#1a0d3a}
+.cmp tbody tr:nth-child(even){background:var(--surface2)}
+.cmp td:first-child{font-weight:700;color:var(--accent);width:2.4rem;text-align:center}
+
+/* ---------- sorter ---------- */
+.sortgrid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.6rem 0}
+.sortcol,.sortpool{border:2px dashed var(--border);border-radius:10px;padding:.5rem;min-height:110px;background:var(--surface2)}
+.sortcol h4,.sortpool h4{font-size:.85rem;color:var(--accent);margin-bottom:.4rem}
+.sortcol.over,.sortpool.over{border-color:var(--accent2);background:var(--peach)}
+.sortpool{margin-top:.8rem}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.35rem .5rem;margin:.3rem 0;font-size:.86rem;display:flex;gap:.5rem;align-items:center;cursor:grab}
+.chip .t{flex:1}
+.chip .mv{display:flex;gap:.25rem;flex-shrink:0}
+.chip .mv button{border:1px solid var(--border);background:var(--surface2);border-radius:5px;font-size:.72rem;padding:.05rem .4rem;font-weight:700}
+.chip .mv button:hover{background:var(--peach)}
+.chip.ok{background:var(--ok-bg);border-color:var(--green)}
+.chip.bad{background:var(--bad-bg);border-color:var(--red)}
+.chip .n{font-size:.7rem;font-weight:800;color:var(--accent2)}
+@media (max-width:560px){.sortgrid{grid-template-columns:1fr}}
+
+/* ---------- builder ---------- */
+.builder{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:1.2rem;align-items:start}
+@media (max-width:900px){.builder{grid-template-columns:1fr}}
+.form label{display:block;font-size:.82rem;font-weight:700;color:var(--text2);margin-top:.6rem}
+.form input[type=text],.form select,.form textarea{width:100%;padding:.4rem .6rem;border:2px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:.9rem}
+.form textarea{resize:vertical;min-height:2.6rem}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.form .chk{display:flex;align-items:center;gap:.5rem;font-weight:600}
+.form .chk input{width:1.1rem;height:1.1rem;accent-color:var(--accent)}
+.presets{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0}
+#bmsg{font-size:.85rem;color:var(--red);min-height:1.3rem;margin:.4rem 0}
+.hint{background:var(--peach);border:1px solid var(--peach-b);color:var(--peach-t);border-radius:8px;padding:.4rem .7rem;font-size:.86rem;margin-bottom:.6rem}
+.hop{border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;margin:.8rem 0;background:var(--surface2)}
+.hop h3{margin-top:0}
+.hop .acts{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+.hop .model{margin-top:.6rem}
+
+/* ---------- matcher / quiz ---------- */
+.mtabs{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0}
+.mtabs button[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
+[data-theme="dark"] .mtabs button[aria-pressed=true]{color:#1a0d3a}
+.mopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:.7rem;margin:.7rem 0}
+.mopt,.opt{background:var(--surface);border:2px solid var(--border);border-radius:10px;text-align:left;padding:.5rem;position:relative}
+.mopt:hover:not(:disabled),.opt:hover:not(:disabled){border-color:var(--accent)}
+.mopt svg{display:block;width:100%;height:auto;border-radius:6px}
+.mopt .letter,.opt .letter{display:inline-block;background:var(--accent);color:#fff;font-weight:800;border-radius:50%;width:1.6em;height:1.6em;text-align:center;line-height:1.6em;margin-right:.4rem;font-size:.85rem}
+[data-theme="dark"] .letter{color:#1a0d3a}
+.mopt.ok,.opt.ok{border-color:var(--green);background:var(--ok-bg)}
+.mopt.bad,.opt.bad{border-color:var(--red);background:var(--bad-bg)}
+.fb{margin-top:.6rem;padding:.6rem .9rem;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:.92rem}
+.q{border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;margin:.9rem 0;background:var(--surface)}
+.q legend,.q .qt{font-weight:700;padding:0 .3rem}
+.q .qn{color:var(--accent2)}
+.opts{display:grid;gap:.5rem;margin:.6rem 0}
+.opts.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.opt{width:100%;display:block}
+.opt svg{display:block;width:100%;height:auto;margin:.4rem 0;border-radius:6px}
+.opt small{display:block;color:var(--text2)}
+.scorebar{position:sticky;top:calc(var(--top-h) + 4px);z-index:20;background:var(--peach);border:1px solid var(--peach-b);color:var(--peach-t);border-radius:8px;padding:.35rem .8rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap}
+.flashes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;margin:.8rem 0}
+.flip{background:none;border:0;padding:0;perspective:900px;text-align:left;width:100%}
+.flip .in{display:grid;transition:transform .55s;transform-style:preserve-3d;min-height:190px}
+.flip[aria-pressed=true] .in{transform:rotateY(180deg)}
+.flip .f,.flip .b{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;padding:1rem;border:2px solid var(--accent);display:flex;flex-direction:column;justify-content:center}
+.flip .f{background:var(--surface);}
+.flip .b{background:var(--peach);color:var(--peach-t);border-color:var(--peach-b);transform:rotateY(180deg);font-size:.92rem}
+.flip .tag{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2);margin-bottom:.3rem}
+.flip .hintx{font-size:.75rem;color:var(--text2);margin-top:.5rem}
+details.ans{border:1px solid var(--border);border-radius:10px;margin:.8rem 0;background:var(--surface)}
+details.ans>summary{cursor:pointer;padding:.7rem 1rem;font-weight:700;list-style:none;display:flex;gap:.6rem;align-items:flex-start}
+details.ans>summary::-webkit-details-marker{display:none}
+details.ans>summary::before{content:"▸";color:var(--accent2);transition:transform .2s;flex-shrink:0}
+details.ans[open]>summary::before{transform:rotate(90deg)}
+details.ans>summary .sm{display:block;font-weight:500;color:var(--text2);font-size:.85rem}
+details.ans .body{padding:.2rem 1rem 1rem;border-top:1px dashed var(--border)}
+.marks{display:inline-block;background:var(--peach);color:var(--peach-t);border:1px solid var(--peach-b);border-radius:99px;font-size:.72rem;padding:0 .6rem;margin-left:.4rem;font-weight:700}
+.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:.8rem;margin:.6rem 0}
+.tp>div{border:1px solid var(--border);border-radius:10px;padding:.5rem .7rem;background:var(--surface2)}
+.tp svg{width:100%;height:80px;display:block}
+.tp svg *{vector-effect:non-scaling-stroke}
+.tp b{color:var(--accent)}
+
+/* glossary */
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:.7rem}
+.gl>div{border:1px solid var(--border);border-left:5px solid var(--accent2);border-radius:8px;padding:.5rem .8rem;background:var(--surface)}
+.gl dt{font-weight:800;color:var(--accent)}
+.gl dd{margin:0;font-size:.92rem}
+#gl-empty{display:none;color:var(--text2)}
+mark{background:#fde68a;color:#1a1030;border-radius:3px}
+footer.site{text-align:center;color:var(--text2);font-size:.8rem;margin-top:2rem}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 21h6M10 18h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h5M8 16h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-dash" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="8" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="13" width="8" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13" y="10" width="8" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-scat" viewBox="0 0 24 24"><path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="2"/><g fill="currentColor"><circle cx="8" cy="15" r="1.6"/><circle cx="11" cy="11" r="1.6"/><circle cx="14" cy="13" r="1.6"/><circle cx="17" cy="7" r="1.6"/></g></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M8 7h8M8 17h8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="6" y="9" width="12" height="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 12h12" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-bar" viewBox="0 0 24 24"><path d="M3 21h18" stroke="currentColor" stroke-width="2"/><rect x="5" y="12" width="3" height="9" fill="currentColor"/><rect x="10.5" y="6" width="3" height="15" fill="currentColor"/><rect x="16" y="9" width="3" height="12" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<header id="topbar">
+  <button id="menu-btn" class="tb-btn" aria-label="Toggle contents menu" aria-expanded="false" aria-controls="sidebar">☰</button>
+  <h1>Chapter 16 · Data Visualization using Pyplot<small>Unit V · XII Std Computer Science · pp. 307–320</small></h1>
+  <div id="prog-wrap">
+    <div id="prog" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="prog-fill"></div></div>
+    <span id="prog-label">0/0</span>
+  </div>
+  <div id="search-wrap">
+    <label class="sr" for="search">Search sections and glossary</label>
+    <input id="search" type="search" placeholder="Search…" autocomplete="off">
+    <div id="search-res" role="listbox" aria-label="Search results"></div>
+  </div>
+  <button id="theme-btn" class="tb-btn" aria-label="Switch colour theme" title="Light / dark theme">🌓</button>
+</header>
+<div id="scrim"></div>
+
+<div id="layout">
+  <aside id="sidebar" aria-label="Chapter contents">
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <p id="store-note" hidden>Progress can’t be saved in this browser (storage is blocked). It will reset when you close the page.</p>
+      <button id="reset-btn" class="btn alt sm" type="button">Reset progress</button>
+    </div>
+  </aside>
+
+<main id="main">
+  <div class="hero">
+    <span class="unit">UNIT V · CHAPTER 16</span>
+    <h2>Data Visualization using Pyplot: Line Chart, Pie Chart and Bar Chart</h2>
+    <p>Learn to turn numbers into pictures with Matplotlib. Every chart in this page is drawn live in SVG from the textbook’s own data, so you can compare it with the figures on pages 307–320.</p>
+  </div>
+
+  <!-- ===== Objectives ===== -->
+  <section class="card" id="objectives" data-nav="Learning Objectives" data-group="Learn">
+    <h2 data-num="">Learning Objectives</h2>
+    <p>After learning this chapter, you will be able to:</p>
+    <ul>
+      <li>Define the term <b>Data Visualization</b>.</li>
+      <li>List the <b>types</b> of Data Visualization.</li>
+      <li>List the <b>uses</b> of Data Visualization.</li>
+      <li>List the types of visualizations in <b>Matplotlib</b>.</li>
+      <li>Explore <b>importing</b> Matplotlib.</li>
+      <li>Classify the types of Data Visualization plots.</li>
+      <li>Practise creating various plots using Matplotlib.</li>
+    </ul>
+  </section>
+
+  <!-- ===== 16.1 ===== -->
+  <section class="card" id="s161" data-nav="Data Visualization" data-group="Learn">
+    <h2 data-num="16.1">Data Visualization Definition <span class="pg">p. 307</span></h2>
+    <div class="def"><b>Data Visualization</b> is the graphical representation of information and data. Its objective is to <b>communicate information visually</b> to users. For this, it uses <b>statistical graphics</b>. Numerical data may be encoded using <b>dots, lines, or bars</b> to visually communicate a quantitative message.</div>
+    <h3>General types of Data Visualization</h3>
+    <ul class="chips"><li>Charts</li><li>Tables</li><li>Graphs</li><li>Maps</li><li>Infographics</li><li>Dashboards</li></ul>
+
+    <div class="dyk"><div class="dyk-h"><svg><use href="#i-bulb"/></svg>Do You Know? · Infographics &amp; Dashboards <span class="pg" style="color:inherit">p. 308</span></div>
+      <div class="dyk-b"><dl>
+        <dt><svg width="18" height="18" style="vertical-align:-3px"><use href="#i-info"/></svg> Infographic</dt>
+        <dd>An infographic (<i>information graphic</i>) is the representation of information in a graphic format.</dd>
+        <dt><svg width="18" height="18" style="vertical-align:-3px"><use href="#i-dash"/></svg> Dashboard</dt>
+        <dd>A dashboard is a collection of resources assembled to create a single unified visual display. Data visualizations and dashboards translate complex ideas and concepts into a simple visual format. Patterns and relationships that are undetectable in text become detectable <b>at a glance</b> using a dashboard.</dd>
+      </dl></div></div>
+
+    <h3>Uses of Data Visualization</h3>
+    <ul>
+      <li>Helps users to <b>analyze and interpret</b> the data easily.</li>
+      <li>Makes <b>complex data understandable</b> and usable.</li>
+      <li>Various charts help to show the <b>relationship in the data</b> for one or more variables.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="mpl" data-nav="Introduction to Matplotlib" data-group="Learn">
+    <h2 data-num="">Introduction to Matplotlib — Data Visualization in Python <span class="pg">p. 308</span></h2>
+    <div class="def"><b>Matplotlib</b> is the most popular data visualization library in Python. It allows you to create <b>two-dimensional (2D) charts</b> in a few lines of code.</div>
+    <h3>Types of Visualizations in Matplotlib</h3>
+    <ul class="chips"><li>Line plot</li><li>Scatter plot</li><li>Histogram</li><li>Box plot</li><li>Bar chart</li><li>Pie chart</li></ul>
+
+    <div class="dyk"><div class="dyk-h"><svg><use href="#i-scat"/></svg>Do You Know? · Scatter plot &amp; Box plot</div>
+      <div class="dyk-b"><dl>
+        <dt><svg width="18" height="18" style="vertical-align:-3px"><use href="#i-scat"/></svg> Scatter plot</dt>
+        <dd>A scatter plot shows the data as a <b>collection of points</b>. The position of a point depends on its two-dimensional value, where each value is a position on either the horizontal or vertical dimension.</dd>
+        <dt><svg width="18" height="18" style="vertical-align:-3px"><use href="#i-box"/></svg> Box plot</dt>
+        <dd>The box plot is a standardized way of displaying the <b>distribution of data</b> based on the <b>five-number summary</b>: minimum, first quartile, median, third quartile, and maximum.</dd>
+      </dl></div></div>
+
+    <h3>Installing Matplotlib</h3>
+    <p>You can install Matplotlib using <b>pip</b>. Pip is a package manager software for installing Python packages.</p>
+    <div class="cb" data-static-code="pip install matplotlib"></div>
+    <div class="note"><b>Note</b> · Detailed installation procedures are given in <b>Annexure – II</b> of the textbook.</div>
+  </section>
+
+  <!-- ===== 16.2 ===== -->
+  <section class="card" id="s162" data-nav="Getting Started" data-group="Plot">
+    <h2 data-num="16.2">Getting Started <span class="pg">pp. 309–311</span></h2>
+    <p>After installing Matplotlib, start coding by importing it:</p>
+    <div class="cb" data-static-code="import matplotlib.pyplot as plt"></div>
+    <p>Now Matplotlib is imported in your workspace. You still need to <i>display</i> the plot. When using Matplotlib from a Python script, add <code class="i">plt.show()</code> to show your plot.</p>
+
+    <h3>Example 1 — one list</h3>
+    <div data-ex="ex1"></div>
+    <div class="def"><b>Why does x run 0–3 while y runs 1–4?</b> If you give a <b>single list</b> to <code class="i">plot()</code>, Matplotlib assumes it is a sequence of <b>y values</b> and generates the x values for you. Python counts from 0, so the default x vector has the <b>same length as y but starts at 0</b>. Hence the x data are <code class="i">[0, 1, 2, 3]</code>.</div>
+    <p>This window is a <i>matplotlib window</i>. Hover over the graph and you can see the coordinates at the bottom right. <span style="color:var(--text2)">(Try hovering the chart above!)</span></p>
+
+    <h3>Example 2 — explicit (x, y) pairs</h3>
+    <p><code class="i">plot()</code> is a versatile command and takes an arbitrary number of arguments. To plot x and y, give both lists:</p>
+    <div data-ex="ex2"></div>
+    <p>The first two arguments are the <b>x</b> and <b>y</b> coordinates. So you have 4 points: <b>(1,1), (2,4), (3,9)</b> and <b>(4,16)</b>.</p>
+
+    <h3>Plotting Two Lines</h3>
+    <div data-ex="ex3"></div>
+    <p>With <code class="i">plt.xlabel</code> and <code class="i">plt.ylabel</code> you give names to the axes. Next you set the plot’s title with <code class="i">plt.title</code>, and switch on the default legend with <code class="i">plt.legend()</code>.</p>
+    <div class="note"><b>Remember</b> · The legend text comes from the <code class="i">label=</code> argument of each <code class="i">plt.plot()</code> call.</div>
+  </section>
+
+  <section class="card" id="buttons" data-nav="Matplotlib Window Buttons" data-group="Plot">
+    <h2 data-num="">Buttons in the Output Window <span class="pg">p. 312 · Fig. 16.4</span></h2>
+    <p>In the output figure you can see a few buttons at the bottom-left corner. <b>Click, tap or focus a button</b> in the diagram to read what it does.</p>
+    <div class="tbwrap">
+      <svg class="tbsvg" id="tbsvg" viewBox="0 0 640 320" role="group" aria-label="Figure 16.4: matplotlib window toolbar. Use Tab to move between buttons."></svg>
+      <div id="tbInfo" aria-live="polite"><b>Tip:</b> select a toolbar button above.</div>
+    </div>
+    <figcaption>Fig. 16.4 — recreated matplotlib window toolbar.</figcaption>
+  </section>
+
+  <!-- ===== 16.3 ===== -->
+  <section class="card" id="line" data-nav="Line Chart" data-group="Plot">
+    <h2 data-num="16.3">Special Plot Types — Line Chart <span class="pg">pp. 312–313</span></h2>
+    <p>Matplotlib can create many kinds of plots, from histograms and scatter plots to bar graphs and bar charts.</p>
+    <div class="def">A <b>Line Chart</b> (or Line Graph) displays information as a series of data points called <b>‘markers’</b> connected by <b>straight line segments</b>. It is often used to visualize a <b>trend over intervals of time</b> (a time series) — so the line is often drawn <b>chronologically</b>.</div>
+    <div data-ex="ex5"></div>
+    <label class="toggle"><input type="checkbox" id="mk-toggle"> Show the markers (in code: add <code class="i">marker='o'</code> to <code class="i">plt.plot</code>)</label>
+    <div class="acc"><b>Accuracy note.</b> The printed Fig. 16.5 shows uneven x-axis tick labels (2014.4, 2014.5, 2015.0 …). That is an artefact of how the textbook image was captured; here we use clean year ticks 2014–2018.</div>
+  </section>
+
+  <section class="card" id="bar" data-nav="Bar Chart" data-group="Plot">
+    <h2 data-num="">Bar Chart <span class="pg">pp. 313–314</span></h2>
+    <div class="def">A <b>BarPlot</b> (or BarChart) shows the relationship between <b>numerical data</b> and <b>categorical values</b>. It represents categorical data with <b>rectangular bars</b>; each bar’s <b>height</b> corresponds to the value it represents. Bars can be plotted vertically or horizontally. It is useful to <b>compare a numeric value across categories</b>. Use <code class="i">plt.bar()</code>.</div>
+    <div data-ex="ex6"></div>
+    <div class="dyk"><div class="dyk-h"><svg><use href="#i-bar"/></svg>Do You Know? · Bar Graph and Histogram <span class="pg" style="color:inherit">p. 315</span></div>
+      <div class="dyk-b"><p style="margin:0">Bar Graph and Histogram are the <b>two ways to display data in the form of a diagram</b>.</p></div></div>
+  </section>
+
+  <section class="card" id="histbar" data-nav="Histogram vs Bar Graph" data-group="Plot">
+    <h2 data-num="">Key Differences: Histogram vs Bar Graph <span class="pg">p. 315</span></h2>
+    <div class="figrow" id="hbfigs" aria-label="Illustrations of a histogram and a bar graph"></div>
+    <div class="tblwrap"><table class="cmp">
+      <caption class="sr">Seven differences between a histogram and a bar graph</caption>
+      <thead><tr><th scope="col">#</th><th scope="col">Histogram</th><th scope="col">Bar Graph</th></tr></thead>
+      <tbody id="hbtable"></tbody>
+    </table></div>
+    <h3>🎯 Sorting game</h3>
+    <p>Sort all 14 statements into the right column. <b>Drag</b> a card onto a column, or use the <b>H</b> / <b>B</b> buttons on each card (keyboard friendly). Then press <b>Check</b>.</p>
+    <div id="sorter"></div>
+  </section>
+
+  <section class="card" id="pie" data-nav="Pie Chart" data-group="Plot">
+    <h2 data-num="">Pie Chart <span class="pg">pp. 315–316</span></h2>
+    <div class="def">A <b>Pie Chart</b> is a circular graphic divided into <b>slices</b> to illustrate <b>numerical proportion</b>. Its point is to show the relationship of <b>parts out of a whole</b>. Use <code class="i">plt.pie()</code>. The <code class="i">autopct</code> parameter displays the <b>percentage value</b> using Python string formatting.</div>
+    <div data-ex="ex7"></div>
+    <label class="toggle"><input type="checkbox" id="pct-toggle"> Show a % sign (uses <code class="i">autopct="%.2f%%"</code>)</label>
+    <div class="acc"><b>Accuracy note.</b> The book’s code, <code class="i">autopct = "%.2f"</code>, runs without error and gives exactly the numbers printed in Fig. 16.7 — but with <b>no % sign</b>. In Python’s string formatting <code class="i">%.2f</code> means “a decimal number with 2 places”, and a literal percent sign must be written as <code class="i">%%</code>. So the tweak above is an optional improvement, not a bug fix.</div>
+  </section>
+
+  <!-- ===== Practice ===== -->
+  <section class="card" id="builder" data-nav="Chart Builder" data-group="Practise">
+    <h2 data-num="">🛠 Chart Builder Playground</h2>
+    <p>Pick a chart type, type your own data, and watch the <b>matplotlib code</b> and the <b>chart</b> update together. Use a <b>Load example</b> button to jump to the book’s own numbers.</p>
+    <div class="presets" id="presets" role="group" aria-label="Load example"></div>
+    <div id="bhint" class="hint" hidden></div>
+    <div class="builder">
+      <form class="form" id="bform" onsubmit="return false" autocomplete="off">
+        <label for="b-type">Chart type</label>
+        <select id="b-type">
+          <option value="line">Line chart (1 or 2 series)</option>
+          <option value="bar">Bar chart</option>
+          <option value="bar2">Two-series bar chart</option>
+          <option value="pie">Pie chart</option>
+        </select>
+        <label for="b-labels">Labels / x-values <small>(comma-separated; leave empty for automatic 0, 1, 2 …)</small></label>
+        <textarea id="b-labels" rows="2"></textarea>
+        <div class="two">
+          <div><label for="b-s1n">Series 1 name</label><input type="text" id="b-s1n"></div>
+          <div></div>
+        </div>
+        <label for="b-s1">Series 1 values <small>(numbers)</small></label>
+        <textarea id="b-s1" rows="2"></textarea>
+        <div id="b-s2wrap">
+          <label for="b-s2n">Series 2 name</label><input type="text" id="b-s2n">
+          <label for="b-s2">Series 2 values</label><textarea id="b-s2" rows="2"></textarea>
+        </div>
+        <label for="b-title">Title</label><input type="text" id="b-title">
+        <div id="b-axes" class="two">
+          <div><label for="b-xl">x-axis label</label><input type="text" id="b-xl"></div>
+          <div><label for="b-yl">y-axis label</label><input type="text" id="b-yl"></div>
+        </div>
+        <label class="chk"><input type="checkbox" id="b-leg"> Show legend</label>
+        <p style="margin-top:.6rem"><button type="button" class="btn alt sm" id="b-clear">Clear all</button></p>
+      </form>
+      <div>
+        <div id="bmsg" role="status" aria-live="polite"></div>
+        <div class="cb"><div class="cb-h"><span>Generated code</span><span class="sp"></span><button class="copy" data-code="builder" type="button">Copy</button></div><pre><code id="bcode"></code></pre></div>
+        <div id="bchart"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="hands" data-nav="Hands on Practice" data-group="Practise">
+    <h2 data-num="">Hands on Practice <span class="pg">p. 316</span></h2>
+    <p>Try each task in the Chart Builder first, then reveal the model chart and code. For open-ended tasks the model uses <b>sample numbers</b> — replace them with your own.</p>
+    <div id="hop"></div>
+  </section>
+
+  <section class="card" id="matcher" data-nav="Code → Chart Matcher" data-group="Practise">
+    <h2 data-num="">🔍 Code → Chart Matcher</h2>
+    <p>Read the snippet and predict the chart it draws. Look closely at the <b>axes</b> — that is what tricks people (remember: one list means x starts at <b>0</b>).</p>
+    <div class="mtabs" role="group" aria-label="Chart type filter" id="mtabs"></div>
+    <div class="scorebar"><span id="mscore">Score: 0 / 0</span><button class="btn alt sm" id="mnext" type="button">Next question →</button></div>
+    <div id="mq" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== Evaluation ===== -->
+  <section class="card" id="eval1" data-nav="Part I · MCQ (1 mark)" data-group="Evaluation">
+    <h2 data-num="Part I">Choose the best answer <span class="marks">1 mark</span> <span class="pg">pp. 317–318</span></h2>
+    <div class="scorebar"><span id="qscore" aria-live="polite">Score: 0 / 9</span><button class="btn peach sm" id="qshuffle" type="button">🔀 Shuffle and retry</button></div>
+    <div id="mcq"></div>
+  </section>
+
+  <section class="card" id="eval2" data-nav="Part II · 2 marks" data-group="Evaluation">
+    <h2 data-num="Part II">Answer the following questions <span class="marks">2 marks</span> <span class="pg">p. 319</span></h2>
+    <p>Think of your answer, then <b>flip the card</b> (click or press Enter).</p>
+    <div class="flashes" id="flashes"></div>
+  </section>
+
+  <section class="card" id="eval3" data-nav="Part III · 3 marks" data-group="Evaluation">
+    <h2 data-num="Part III">Answer the following questions <span class="marks">3 marks</span> <span class="pg">p. 319</span></h2>
+    <div id="p3"></div>
+  </section>
+
+  <section class="card" id="eval4" data-nav="Part IV · 5 marks" data-group="Evaluation">
+    <h2 data-num="Part IV">Answer the following questions <span class="marks">5 marks</span> <span class="pg">p. 320</span></h2>
+    <div id="p4"></div>
+  </section>
+
+  <section class="card" id="glossary" data-nav="Glossary" data-group="Revise">
+    <h2 data-num="">Glossary</h2>
+    <p style="color:var(--text2);font-size:.9rem">Tip: the search box at the top also filters this list.</p>
+    <dl class="gl" id="gl"></dl>
+    <p id="gl-empty">No glossary term matches your search.</p>
+  </section>
+
+  <section class="card" id="refs" data-nav="References" data-group="Revise">
+    <h2 data-num="">References <span class="pg">p. 320</span></h2>
+    <p style="color:var(--text2);font-size:.9rem">As printed in the chapter (not checked live):</p>
+    <ol>
+      <li>towardsdatascience.com — <i>data-science-with-python-intro-to-data-visualization-and-matplotlib</i></li>
+      <li>heartbeat.fritz.ai — <i>introduction-to-matplotlib-data-visualization-in-python</i></li>
+      <li>pythonprogramming.net — <i>legends-titles-labels-matplotlib-tutorial</i></li>
+      <li>keydifferences.com — <i>difference-between-histogram-and-bar-graph</i></li>
+    </ol>
+  </section>
+  <footer class="site">Chapter 16 study page · works fully offline · charts drawn in SVG by hand-written JavaScript</footer>
+</main>
+</div>
+<div id="tip" role="tooltip" hidden></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   0. Small helpers
+   ===================================================================== */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const rint = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+
+/* Storage wrapper: every access is guarded; falls back to memory. */
+const store = (() => {
+  const mem = {}; let ok = true;
+  try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); } catch(e){ ok = false; }
+  return {
+    ok,
+    get(k){ if(ok){ try{ return localStorage.getItem(k); }catch(e){ ok=false; } } return k in mem ? mem[k] : null; },
+    set(k,v){ mem[k]=v; if(ok){ try{ localStorage.setItem(k,v); }catch(e){ ok=false; } } },
+    del(k){ delete mem[k]; if(ok){ try{ localStorage.removeItem(k); }catch(e){ ok=false; } } }
+  };
+})();
+
+/* =====================================================================
+   1. Python syntax highlighter (hand-rolled)
+   ===================================================================== */
+const PY_KW = new Set(['import','as','from','for','in','def','return','if','else','range','True','False','None']);
+const PY_RE = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][A-Za-z_0-9]*)(?=\s*\()|([A-Za-z_][A-Za-z_0-9]*)/g;
+function hlLine(line){
+  let out='', last=0, m; PY_RE.lastIndex = 0;
+  while ((m = PY_RE.exec(line))) {
+    out += esc(line.slice(last, m.index));
+    const t = m[0]; let c = null;
+    if (m[1]) c='cm'; else if (m[2]) c='st'; else if (m[3]) c='nu'; else if (m[4]) c='fn';
+    else c = PY_KW.has(t) ? 'kw' : (t==='plt' ? 'mod' : null);
+    out += c ? `<span class="tk-${c}">${esc(t)}</span>` : esc(t);
+    last = PY_RE.lastIndex;
+  }
+  return out + esc(line.slice(last));
+}
+const CODES = {};                 // id -> raw code (used by Copy buttons)
+let codeSeq = 0;
+function codeBlock(code, {badge='', title='Python'}={}){
+  const id = 'c' + (++codeSeq); CODES[id] = code;
+  const lines = code.split('\n').map((l,i)=>`<span class="ln" data-ln="${i+1}">${hlLine(l)||' '}</span>`).join('');
+  return `<div class="cb"><div class="cb-h"><span>${esc(title)}</span>${badge}<span class="sp"></span><button class="copy" data-code="${id}" type="button">Copy</button></div><pre><code>${lines}</code></pre></div>`;
+}
+function copyText(text, btn){
+  const done = () => { const o=btn.textContent; btn.textContent='Copied ✓'; setTimeout(()=>btn.textContent=o,1400); };
+  const fallback = () => { const t=document.createElement('textarea'); t.value=text; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); done(); }catch(e){ btn.textContent='Press Ctrl+C'; } t.remove(); };
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.copy'); if(!b) return;
+  const id = b.dataset.code;
+  copyText(id==='builder' ? $('#bcode').textContent : CODES[id], b);
+});
+
+/* =====================================================================
+   2. SVG chart engine (line / bar / pie) — no libraries
+   ===================================================================== */
+/* Matplotlib default colour cycle + 'g' (green) etc. */
+const COL = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b'];
+const MPL = {b:'#0000ff', g:'#008000', r:'#ff0000', c:'#00bfbf', m:'#bf00bf'};
+
+function niceTicks(lo, hi, maxN){
+  const range = hi - lo;
+  for (let k = Math.floor(Math.log10(range/maxN)) - 1; ; k++) {
+    for (const m of [1,2,2.5,5]) {
+      const step = m * Math.pow(10,k);
+      const t0 = Math.ceil(lo/step - 1e-9), t1 = Math.floor(hi/step + 1e-9);
+      if (t1 - t0 + 1 <= maxN) {
+        const ticks=[]; for(let i=t0;i<=t1;i++) ticks.push(+(i*step).toFixed(10));
+        return {ticks, step};
+      }
+    }
+  }
+}
+function decimals(step){ let d=0; while(d<6 && Math.abs(step*Math.pow(10,d)-Math.round(step*Math.pow(10,d)))>1e-9) d++; return d; }
+const tickFmt = (v,step) => v.toFixed(decimals(step));
+const numStr = v => String(+(+v).toPrecision(8));
+function padDomain(lo, hi){
+  if (lo === hi) { const d = lo===0 ? 0.055 : Math.abs(lo)*0.05; return [lo-d, hi+d]; }
+  const m = (hi-lo)*0.05; return [lo-m, hi+m];
+}
+
+/* Generic Cartesian chart. o.kind = 'line' | 'bar'.
+   series: [{name, x?, y, color?}]   cats: optional category labels placed at x = 0..n-1 */
+function chartXY(o){
+  const mini = !!o.mini, W = o.w || (mini?250:640), H = o.h || (mini?180:400), fs = mini?9.5:12.5;
+  const bar = o.kind === 'bar', S = o.series, n = S.length;
+  S.forEach((s,i)=>{ if(!s.x) s.x = s.y.map((_,k)=>k); if(!s.color) s.color = COL[i % COL.length]; });
+  const grouped = bar && o.grouped && n>1, bw = bar ? (grouped ? 0.8/n : 0.8) : 0;
+  const off = i => grouped ? (i-(n-1)/2)*bw : 0;
+
+  /* data domains */
+  const xs=[], ys=[];
+  S.forEach((s,i)=>s.x.forEach((x,k)=>{ const c=x+off(i); if(bar){xs.push(c-bw/2,c+bw/2);} else xs.push(x); ys.push(s.y[k]); }));
+  const [x0,x1] = padDomain(Math.min(...xs), Math.max(...xs));
+  let y0,y1;
+  if (bar) { const lo=Math.min(0,...ys), hi=Math.max(0,...ys), m=(hi-lo)*0.05||1; y0 = lo<0?lo-m:0; y1 = hi>0?hi+m:0; }
+  else [y0,y1] = padDomain(Math.min(...ys), Math.max(...ys));
+
+  /* ticks */
+  const yt = niceTicks(y0,y1, mini?5:9);
+  const ylabs = yt.ticks.map(v=>tickFmt(v,yt.step));
+  let xt, xlabs;
+  if (o.cats) { xt = o.cats.map((_,i)=>i); xlabs = o.cats.slice(); }
+  else if (o.xticks) { xt = o.xticks; xlabs = xt.map(numStr); }
+  else { const t = niceTicks(x0,x1, mini?5:9); xt = t.ticks; xlabs = xt.map(v=>tickFmt(v,t.step)); }
+
+  /* margins */
+  const tl = (o.title||'').split('\n');
+  const mL = Math.max(...ylabs.map(s=>s.length))*fs*0.62 + (o.ylabel ? fs*2.2 : fs*0.6) + 10;
+  const mR = 14, pw = W-mL-mR;
+  const rot = !!o.cats && o.cats.some(c=>String(c).length*fs*0.6 > pw/o.cats.length*0.95);
+  const maxLab = Math.max(...xlabs.map(s=>String(s).length));
+  const mT = o.title ? 14 + tl.length*(fs+7) : 12;
+  const mB = fs*2 + (o.xlabel ? fs*2 : 0) + (rot ? maxLab*fs*0.32 + 4 : 0) + 6;
+  const ph = H-mT-mB;
+  const X = v => mL + (v-x0)/(x1-x0)*pw, Y = v => mT + ph - (v-y0)/(y1-y0)*ph;
+
+  let g = '';
+  /* gridlines (light) + axes box */
+  yt.ticks.forEach(v=>{ g += `<line class="gd" x1="${mL}" x2="${mL+pw}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" opacity=".35"/>`; });
+  g += `<rect class="ax" x="${mL}" y="${mT}" width="${pw}" height="${ph}"/>`;
+  yt.ticks.forEach((v,i)=>{ const y=Y(v).toFixed(1);
+    g += `<line class="tk" x1="${mL-4}" x2="${mL}" y1="${y}" y2="${y}"/><text x="${mL-7}" y="${y}" font-size="${fs}" text-anchor="end" dominant-baseline="central">${ylabs[i]}</text>`; });
+  xt.forEach((v,i)=>{ const x=X(v).toFixed(1);
+    g += `<line class="tk" x1="${x}" x2="${x}" y1="${mT+ph}" y2="${mT+ph+4}"/>`;
+    g += rot ? `<text x="${x}" y="${mT+ph+fs+4}" font-size="${fs}" text-anchor="end" transform="rotate(-30 ${x} ${mT+ph+fs+4})">${esc(xlabs[i])}</text>`
+             : `<text x="${x}" y="${mT+ph+fs+5}" font-size="${fs}" text-anchor="middle">${esc(xlabs[i])}</text>`; });
+
+  /* data marks */
+  const sw = mini?1.6:2.2;
+  S.forEach((s,i)=>{
+    if (bar) {
+      s.x.forEach((x,k)=>{
+        const c=x+off(i), v=s.y[k], top=Math.min(Y(v),Y(0)), h=Math.abs(Y(v)-Y(0));
+        const tip = `${s.name?s.name+' · ':''}${o.cats?o.cats[x]:'x = '+numStr(x)}: ${numStr(v)}`;
+        g += `<rect class="bar" x="${(X(c-bw/2)).toFixed(1)}" y="${top.toFixed(1)}" width="${(X(c+bw/2)-X(c-bw/2)).toFixed(1)}" height="${h.toFixed(1)}" fill="${s.color}"${mini?'':` tabindex="0" data-tip="${esc(tip)}" aria-label="${esc(tip)}"`}/>`;
+      });
+    } else {
+      if (s.x.length > 1) {
+        const d = s.x.map((x,k)=>(k?'L':'M')+X(x).toFixed(1)+' '+Y(s.y[k]).toFixed(1)).join(' ');
+        g += `<path class="ln1" pathLength="1" d="${d}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      }
+      if (!mini || o.markers) s.x.forEach((x,k)=>{
+        const tip = `${s.name?s.name+' · ':''}(${o.cats?o.cats[x]:numStr(x)}, ${numStr(s.y[k])})`;
+        g += `<circle class="pt" cx="${X(x).toFixed(1)}" cy="${Y(s.y[k]).toFixed(1)}" r="${mini?3:5}" fill="${s.color}"${mini?'':` tabindex="0" data-tip="${esc(tip)}" aria-label="${esc(tip)}"`}/>`;
+      });
+    }
+  });
+
+  /* legend */
+  const named = S.filter(s=>s.name);
+  if (o.legend && named.length) {
+    const lh = fs+8, lw = Math.max(...named.map(s=>s.name.length))*fs*0.6 + 46, lx = o.legendPos==='ur' ? mL+pw-lw-8 : mL+8, ly = mT+8;
+    g += `<rect class="lg" x="${lx}" y="${ly}" width="${lw}" height="${named.length*lh+6}" rx="4"/>`;
+    named.forEach((s,i)=>{ const yy = ly+3+i*lh+lh/2;
+      g += bar ? `<rect x="${lx+8}" y="${yy-5}" width="16" height="10" fill="${s.color}"/>`
+               : `<line x1="${lx+6}" x2="${lx+26}" y1="${yy}" y2="${yy}" stroke="${s.color}" stroke-width="2.4"/>`;
+      g += `<text x="${lx+32}" y="${yy}" font-size="${fs}" dominant-baseline="central">${esc(s.name)}</text>`; });
+  }
+  /* titles */
+  if (o.title) tl.forEach((t,i)=>{ g += `<text x="${mL+pw/2}" y="${14+(i+1)*(fs+7)-6}" font-size="${fs+3}" text-anchor="middle" font-weight="600">${esc(t)}</text>`; });
+  if (o.xlabel) g += `<text x="${mL+pw/2}" y="${H-6}" font-size="${fs+.5}" text-anchor="middle">${esc(o.xlabel)}</text>`;
+  if (o.ylabel) g += `<text transform="translate(${fs+1} ${mT+ph/2}) rotate(-90)" font-size="${fs+.5}" text-anchor="middle">${esc(o.ylabel)}</text>`;
+
+  const alt = o.alt || `${bar?'Bar':'Line'} chart${o.title?' titled '+o.title.replace(/\n/g,' – '):''}. ` +
+    S.map(s=>(s.name?s.name+': ':'')+s.x.map((x,k)=>`(${o.cats?o.cats[x]:numStr(x)}, ${numStr(s.y[k])})`).join(' ')).join('; ');
+  return `<svg class="chart${o.anim?' anim':''}${o.markers&&!mini?' mk':''}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(alt)}"><title>${esc(alt)}</title>${g}</svg>`;
+}
+const chartLine = o => chartXY(Object.assign({kind:'line'}, o));
+const chartBar  = o => chartXY(Object.assign({kind:'bar'},  o));
+
+/* Python-style % formatting for autopct */
+function pyfmt(f, v){
+  return f.replace(/%(%|(-?\d*)(?:\.(\d+))?([fd]))/g, (m,a,w,p,t)=>{
+    if (a==='%') return '%';
+    const s = t==='d' ? String(Math.trunc(v)) : v.toFixed(p===undefined?6:+p);
+    return w ? s.padStart(Math.abs(+w)) : s;
+  });
+}
+/* Pie chart. o: {sizes, labels, colors, explode[], autopct, title, startangle, mini} — counter-clockwise like Matplotlib */
+function chartPie(o){
+  const mini=!!o.mini, W=o.w||(mini?250:640), H=o.h||(mini?180:420), fs=mini?9.5:12.5;
+  const sizes=o.sizes, total=sizes.reduce((a,b)=>a+b,0), ex=o.explode||[];
+  const tl=(o.title||'').split('\n'), mT = o.title ? 12+tl.length*(fs+7) : 8;
+  const maxEx = Math.max(0,...ex);
+  const r = Math.min((H-mT)/2 - fs*2.6, W/2 - (mini?52:95)) / (1+maxEx);
+  const cx=W/2, cy=mT+(H-mT)/2, rad=Math.PI/180;
+  let a0 = o.startangle||0, g='';
+  const P = (t,rr,ox,oy)=>[cx+ox+rr*Math.cos(t*rad), cy+oy-rr*Math.sin(t*rad)];
+  sizes.forEach((v,i)=>{
+    const frac=v/total, a1=a0+frac*360, mid=(a0+a1)/2, e=(ex[i]||0)*r;
+    const ox=e*Math.cos(mid*rad), oy=-e*Math.sin(mid*rad);
+    const col=(o.colors&&o.colors[i])||COL[i%COL.length], name=o.labels?o.labels[i]:'';
+    const pct=frac*100, tip=`${name}: ${numStr(v)} (${pct.toFixed(2)}%)`;
+    let d;
+    if (frac>=0.9999) d=`M${cx+ox-r} ${cy+oy} a${r} ${r} 0 1 0 ${2*r} 0 a${r} ${r} 0 1 0 ${-2*r} 0`;
+    else { const [sx,sy]=P(a0,r,ox,oy), [ex2,ey2]=P(a1,r,ox,oy); d=`M${cx+ox} ${cy+oy} L${sx.toFixed(1)} ${sy.toFixed(1)} A${r} ${r} 0 ${frac>0.5?1:0} 0 ${ex2.toFixed(1)} ${ey2.toFixed(1)} Z`; }
+    g += `<path class="slice" d="${d}" fill="${col}" stroke="var(--chartbg)" stroke-width="1.5"${mini?'':` tabindex="0" data-tip="${esc(tip)}" aria-label="${esc(tip)}"`}/>`;
+    if (name!=='') { const [lx,ly]=P(mid,r*1.1,ox,oy), c=Math.cos(mid*rad);
+      g += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="${fs}" text-anchor="${c>0.15?'start':c<-0.15?'end':'middle'}" dominant-baseline="${Math.sin(mid*rad)>0.5?'auto':Math.sin(mid*rad)<-0.5?'hanging':'central'}">${esc(name)}</text>`; }
+    if (o.autopct && frac>0.005) { const [px,py]=P(mid,r*0.6,ox,oy);
+      g += `<text class="pct" x="${px.toFixed(1)}" y="${py.toFixed(1)}" font-size="${fs}" text-anchor="middle" dominant-baseline="central">${esc(pyfmt(o.autopct,pct))}</text>`; }
+    a0=a1;
+  });
+  tl.forEach((t,i)=>{ if(o.title) g += `<text x="${W/2}" y="${12+(i+1)*(fs+7)-6}" font-size="${fs+3}" text-anchor="middle" font-weight="600">${esc(t)}</text>`; });
+  const alt = `Pie chart${o.title?' titled '+o.title.replace(/\n/g,' – '):''}. `+sizes.map((v,i)=>`${o.labels?o.labels[i]:'slice '+(i+1)} ${(v/total*100).toFixed(2)} percent`).join(', ');
+  return `<svg class="chart${o.anim?' anim':''}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(alt)}"><title>${esc(alt)}</title>${g}</svg>`;
+}
+const figure = (svg, cap) => `<figure class="fig"><div class="mplwin"><div class="mplbar"><i></i><i></i><i></i><span>Figure 1</span></div>${svg}</div><figcaption>${cap}</figcaption></figure>`;
+
+/* Tooltip (delegated; works for mouse, touch and keyboard focus) */
+(() => {
+  const tip = $('#tip');
+  const show = (el,x,y) => { tip.textContent = el.dataset.tip; tip.hidden=false;
+    const w=tip.offsetWidth, h=tip.offsetHeight; let px=x+14, py=y-h-10; if(px+w>innerWidth-6) px=x-w-14; if(py<4) py=y+18; tip.style.left=Math.max(4,px)+'px'; tip.style.top=py+'px'; };
+  const hide = () => { tip.hidden=true; };
+  const over = e => { const t=e.target.closest && e.target.closest('[data-tip]'); if(t) show(t,e.clientX,e.clientY); else hide(); };
+  document.addEventListener('pointerover', over);
+  document.addEventListener('pointermove', over);
+  document.addEventListener('pointerdown', over);
+  document.addEventListener('focusin', e=>{ const t=e.target.closest && e.target.closest('[data-tip]'); if(t){ const r=t.getBoundingClientRect(); show(t,r.left+r.width/2,r.top); } });
+  document.addEventListener('focusout', hide);
+  document.addEventListener('scroll', hide, true);
+})();
+
+/* =====================================================================
+   3. Worked examples (exact code + line-by-line explanation + live chart)
+   ===================================================================== */
+const EX = {
+ ex1:{ code:String.raw`import matplotlib.pyplot as plt
+plt.plot([1,2,3,4])
+plt.show()`,
+  exp:[[[1],'Import the pyplot module and give it the short name plt.'],
+       [[2],'One list only → Matplotlib treats it as the y values and makes x = [0, 1, 2, 3] automatically.'],
+       [[3],'Open the matplotlib window and display the plot.']],
+  chart:()=>chartLine({series:[{y:[1,2,3,4]}],anim:1}),
+  cap:'<b>Figure 16.1</b> (p. 309) — x auto-ranges 0–3, y runs 1–4.'},
+ ex2:{ code:String.raw`import matplotlib.pyplot as plt
+plt.plot([1,2,3,4], [1,4,9,16])
+plt.show()`,
+  exp:[[[1],'Import pyplot as plt.'],
+       [[2],'Two lists: the first is x, the second is y. Points: (1,1), (2,4), (3,9), (4,16).'],
+       [[3],'Display the plot.']],
+  chart:()=>chartLine({series:[{x:[1,2,3,4],y:[1,4,9,16]}],anim:1}),
+  cap:'<b>Figure 16.2</b> (p. 310) — explicit (x, y) pairs.'},
+ ex3:{ code:String.raw`import matplotlib.pyplot as plt
+x = [1,2,3]
+y = [5,7,4]
+x2 = [1,2,3]
+y2 = [10,14,12]
+plt.plot(x, y, label='Line 1')
+plt.plot(x2, y2, label='Line 2')
+plt.xlabel('X-Axis')
+plt.ylabel('Y-Axis')
+plt.title('LINE GRAPH')
+plt.legend()
+plt.show()`,
+  exp:[[[2,3],'x and y hold the x-values and y-values of the first line.'],
+       [[4,5],'x2 and y2 hold the second line’s data (same x, bigger y).'],
+       [[6,7],'Draw each line; label= is the name that will appear in the legend.'],
+       [[8],'plt.xlabel names the x-axis.'],
+       [[9],'plt.ylabel names the y-axis.'],
+       [[10],'plt.title sets the title of the chart.'],
+       [[11],'plt.legend() shows the legend box built from the label= values.'],
+       [[12],'Display the figure.']],
+  chart:()=>chartLine({series:[{name:'Line 1',x:[1,2,3],y:[5,7,4]},{name:'Line 2',x:[1,2,3],y:[10,14,12]}],title:'LINE GRAPH',xlabel:'X-Axis',ylabel:'Y-Axis',legend:1,legendPos:'ul',anim:1}),
+  cap:'<b>Figure 16.3</b> (p. 311) — two lines: Line 1 (blue), Line 2 (orange).'},
+ ex5:{ code:String.raw`import matplotlib.pyplot as plt
+years = [2014, 2015, 2016, 2017, 2018]
+total_populations = [8939007, 8954518, 8960387, 8956741, 8943721]
+plt.plot (years, total_populations)
+plt.title ("Year vs Population in India")
+plt.xlabel ("Year")
+plt.ylabel ("Total Population")
+plt.show()`,
+  exp:[[[2],'years — the x-values (one per year).'],
+       [[3],'total_populations — the y-values for those years.'],
+       [[4],'Draw the line: population against year.'],
+       [[5],'plt.title() → specifies the title of the graph.'],
+       [[6],'plt.xlabel() → specifies the label for the X-axis.'],
+       [[7],'plt.ylabel() → specifies the label for the Y-axis.'],
+       [[8],'Display the chart. It rises to 2016, then falls.']],
+  chart:()=>chartLine({series:[{x:[2014,2015,2016,2017,2018],y:[8939007,8954518,8960387,8956741,8943721]}],xticks:[2014,2015,2016,2017,2018],title:'Year vs Population in India',xlabel:'Year',ylabel:'Total Population',anim:1,id:'fig165'}),
+  cap:'<b>Figure 16.5</b> (p. 313) — a rising-then-falling trend. Hover a point for its value.'},
+ ex6:{ code:String.raw`import matplotlib.pyplot as plt
+# Our data
+labels = ["TAMIL", "ENGLISH", "MATHS", "PHYSICS", "CHEMISTRY", "CS"]
+usage = [79.8, 67.3, 77.8, 68.4, 70.2, 88.5]
+# Generating the y positions. Later, we'll use them to replace them with labels.
+y_positions = range (len(labels))
+# Creating our bar plot
+plt.bar (y_positions, usage)
+plt.xticks (y_positions, labels)
+plt.ylabel ("RANGE")
+plt.title ("MARKS")
+plt.show()`,
+  exp:[[[3],'labels → specifies the labels for the bars.'],
+       [[4],'usage → assigns a value to each of the labels above.'],
+       [[6],'range() → creates a sequence of numbers: 0, 1, 2, 3, 4, 5 (one position per bar).'],
+       [[8],'plt.bar() draws one bar at each position; the bar’s height is the usage value.'],
+       [[9],'xticks → displays tick marks along the x-axis at those positions, then gives each tick its label.'],
+       [[10,11],'ylabel and title, as before.'],
+       [[12],'Display the chart. CS has the tallest bar (88.5).']],
+  chart:()=>chartBar({cats:["TAMIL","ENGLISH","MATHS","PHYSICS","CHEMISTRY","CS"],series:[{y:[79.8,67.3,77.8,68.4,70.2,88.5]}],title:'MARKS',ylabel:'RANGE'}),
+  cap:'<b>Figure 16.6</b> (p. 314) — six subjects. Hover or focus a bar for its value.'},
+ ex7:{ code:String.raw`import matplotlib.pyplot as plt
+sizes = [89, 80, 90, 100, 75]
+labels = ["Tamil",  "English",  "Maths",  "Science",  "Social"]
+plt.pie (sizes, labels = labels, autopct = "%.2f")
+plt.show()`,
+  exp:[[[2],'sizes → the value of each slice (e.g. marks). Total = 434.'],
+       [[3],'labels → the name written next to each slice.'],
+       [[4],'plt.pie() draws the slices. autopct = "%.2f" writes each slice’s percentage with 2 decimal places, using Python string formatting.'],
+       [[5],'Display the chart.']],
+  chart:()=>chartPie({sizes:[89,80,90,100,75],labels:["Tamil","English","Maths","Science","Social"],autopct:'%.2f',anim:1,id:'fig167'}),
+  cap:'<b>Figure 16.7</b> (p. 316) — Tamil 20.51, English 18.43, Maths 20.74, Science 23.04, Social 17.28. Hover a slice.',
+  extra:()=> codeBlock(String.raw`plt.pie (sizes, labels = labels, autopct = "%.2f%%")`,{title:'Optional tweak — adds the % sign',badge:'<span class="badge fix">Tip</span>'})}
+};
+function renderExample(id){
+  const e = EX[id], lines = e.code.split('\n');
+  let h = codeBlock(e.code,{badge: id==='ex7' ? '<span class="badge">As printed</span>' : ''});
+  h += `<div class="exp" role="list" aria-label="Line-by-line explanation">` + e.exp.map(([ln,t])=>
+     `<div class="exp-row" role="listitem" tabindex="0" data-ln="${ln.join(',')}"><code>${esc(ln.map(n=>lines[n-1].trim()).join('\n'))}</code><p>${t}</p></div>`).join('') + `</div>`;
+  h += `<div data-figslot="${id}">${figure(e.chart(), e.cap)}</div>`;
+  if (e.extra) h += e.extra();
+  return h;
+}
+$$('[data-ex]').forEach(el => { el.innerHTML = renderExample(el.dataset.ex); });
+$$('[data-static-code]').forEach(el => { const t=el.dataset.staticCode; el.outerHTML = codeBlock(t); });
+/* explanation row ⇄ code line highlighting */
+document.addEventListener('mouseover', hotLines); document.addEventListener('focusin', hotLines);
+function hotLines(e){
+  $$('.ln.hot,.exp-row.hot').forEach(x=>x.classList.remove('hot'));
+  const row = e.target.closest && e.target.closest('.exp-row'); if(!row) return;
+  const cb = row.closest('[data-ex]'); if(!cb) return;
+  row.dataset.ln.split(',').forEach(n => { const l = $(`.ln[data-ln="${n}"]`, cb); if(l) l.classList.add('hot'); });
+}
+/* Fig 16.5 marker toggle, Fig 16.7 % toggle */
+$('#mk-toggle').addEventListener('change', e => { const s=$('[data-figslot="ex5"] svg'); s.classList.toggle('mk', e.target.checked); s.classList.remove('anim'); });
+$('#pct-toggle').addEventListener('change', e => {
+  const c = EX.ex7.chart; const svg = chartPie({sizes:[89,80,90,100,75],labels:["Tamil","English","Maths","Science","Social"],autopct:e.target.checked?'%.2f%%':'%.2f'});
+  $('[data-figslot="ex7"] .mplwin svg').outerHTML = svg;
+});
+
+/* =====================================================================
+   4. Figure 16.4 — matplotlib window toolbar hotspots
+   ===================================================================== */
+(() => {
+  const BTN = [
+    {k:'home', name:'Home Button', icon:'M3 11 12 3l9 8M5 10v10h5v-6h4v6h5V10',
+     txt:'The Home button helps once you have begun navigating your chart. If you ever want to return to the original view, click on this.'},
+    {k:'back', name:'Back Button', icon:'M20 12H5M11 5l-7 7 7 7', group:'Forward / Back buttons',
+     txt:'These buttons can be used like the Forward and Back buttons in your browser. Click them to move back to the previous point you were at, or forward again.'},
+    {k:'fwd', name:'Forward Button', icon:'M4 12h15M13 5l7 7-7 7', group:'Forward / Back buttons',
+     txt:'These buttons can be used like the Forward and Back buttons in your browser. Click them to move back to the previous point you were at, or forward again.'},
+    {k:'pan', name:'Pan Axis Button', icon:'M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3',
+     txt:'This cross-looking button allows you to click it, and then click and drag your graph around.'},
+    {k:'zoom', name:'Zoom Button', icon:'M10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM15 15l6 6M8 10h4M10 8v4',
+     txt:'The Zoom button lets you click on it, then click and drag a square that you would like to zoom into specifically. Zooming in will require a left click and drag. You can alternatively zoom out with a right click and drag.'},
+    {k:'cfg', name:'Configure Subplots Button', icon:'M4 7h16M4 12h16M4 17h16M9 5v4M15 10v4M8 15v4',
+     txt:'This button allows you to configure various spacing options with your figure and plot.'},
+    {k:'save', name:'Save Figure Button', icon:'M4 4h13l3 3v13H4zM8 4v5h7V4M7 20v-6h10v6',
+     txt:'This button will allow you to save your figure in various forms.'}
+  ];
+  window.TOOLBAR = BTN;
+  const svg = $('#tbsvg'); let h='';
+  /* mini plot inside the "window" */
+  h += `<rect x="10" y="8" width="620" height="304" rx="8" fill="none" stroke="var(--border)" stroke-width="2"/>`;
+  h += `<rect x="10" y="8" width="620" height="24" rx="8" fill="var(--surface2)"/><text x="24" y="25" font-size="12" class="lbl">Figure 1</text>`;
+  const inner = chartLine({series:[{x:[1,2,3],y:[5,7,4]},{x:[1,2,3],y:[10,14,12]}],w:640,h:290,title:'LINE GRAPH'}).replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'').replace(/<title>.*?<\/title>/,'');
+  h += `<g class="chart" transform="translate(128 38) scale(.6)">${inner}</g>`;
+  h += `<rect x="20" y="216" width="360" height="46" rx="6" fill="var(--surface)" stroke="var(--border)"/>`;
+  const xs = BTN.map((_,i)=>30+i*50);
+  /* labels sit below the toolbar on three staggered rows, joined by leader lines */
+  [{i:0,t:'Home Button',r:0,cx:18},{i:1,t:'Forward / Back Buttons',r:1,cx:43,x:105},{i:3,t:'Pan Axis Button',r:2,cx:18,x:150},
+   {i:4,t:'Zoom Button',r:0,cx:18,x:230},{i:5,t:'Configure Subplots Button',r:1,cx:18,x:285},{i:6,t:'Save the Figure Button',r:2,cx:18,x:335}].forEach(l=>{
+    const bx = xs[l.i]+l.cx, ty = 274+l.r*16, tx = l.x||bx-8;
+    h += `<line class="lead" x1="${bx}" y1="262" x2="${bx}" y2="${ty-4}"/>`;
+    h += `<text class="lbl" x="${tx}" y="${ty+4}">${l.t}</text>`;
+  });
+  BTN.forEach((b,i)=>{
+    h += `<g class="tbb" data-k="${b.k}" tabindex="0" role="button" aria-label="${b.name}" transform="translate(${xs[i]} 220)"><rect width="36" height="38" rx="6"/><path transform="translate(6 7) scale(1)" d="${b.icon}"/></g>`;
+  });
+  svg.innerHTML = h;
+  const info = $('#tbInfo');
+  const pick = k => { const b = BTN.find(x=>x.k===k);
+    $$('.tbb',svg).forEach(g=>g.classList.toggle('on', g.dataset.k===k || (b.group && BTN.find(x=>x.k===g.dataset.k).group===b.group)));
+    info.innerHTML = `<b>${esc(b.group||b.name)}</b> → ${esc(b.txt)}`; };
+  svg.addEventListener('click', e=>{ const g=e.target.closest('.tbb'); if(g) pick(g.dataset.k); });
+  svg.addEventListener('mouseover', e=>{ const g=e.target.closest('.tbb'); if(g) pick(g.dataset.k); });
+  svg.addEventListener('focusin', e=>{ const g=e.target.closest('.tbb'); if(g) pick(g.dataset.k); });
+  svg.addEventListener('keydown', e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.tbb')){ e.preventDefault(); pick(e.target.closest('.tbb').dataset.k); } });
+})();
+
+/* =====================================================================
+   5. Histogram vs Bar graph — table, illustrations and sorting game
+   ===================================================================== */
+const DIFF = [
+  ['Displays data by way of bars to show the <b>frequency of numerical data</b>.', 'Uses bars to <b>compare different categories</b> of data.'],
+  ['Represents the frequency distribution of <b>continuous variables</b>.', 'A diagrammatic comparison of <b>discrete variables</b>.'],
+  ['Presents <b>numerical</b> data.', 'Shows <b>categorical</b> data.'],
+  ['Drawn with <b>no gap</b> between the bars.', 'There is <b>proper spacing</b> between bars, indicating discontinuity.'],
+  ['Items are numbers, <b>categorised together</b> to represent ranges of data.', 'Items are considered as <b>individual entities</b>.'],
+  ['Blocks <b>cannot be rearranged</b> — they are shown in the sequence of classes.', 'It is common to <b>rearrange</b> the blocks from highest to lowest.'],
+  ['Width of the blocks <b>may or may not be the same</b>.', 'Width of the bars is <b>always the same</b>.']
+];
+$('#hbtable').innerHTML = DIFF.map((d,i)=>`<tr><td>${i+1}</td><td>${d[0]}</td><td>${d[1]}</td></tr>`).join('');
+(() => { /* two small illustrations */
+  const hist = [3,7,12,9,5,2], bars=[8,12,6,10];
+  let a = `<svg class="chart" viewBox="0 0 300 170" role="img" aria-label="Histogram: touching bars of different heights, one per range">`;
+  hist.forEach((v,i)=>{ a += `<rect x="${30+i*40}" y="${140-v*10}" width="40" height="${v*10}" fill="${COL[0]}" stroke="var(--chartbg)" stroke-width="1"/><text x="${50+i*40}" y="154" font-size="9" text-anchor="middle">${i*10}-${i*10+10}</text>`; });
+  a += `<line class="ax" x1="30" x2="270" y1="140" y2="140"/><text x="150" y="14" font-size="12" text-anchor="middle" font-weight="600">Histogram — no gaps</text></svg>`;
+  let b = `<svg class="chart" viewBox="0 0 300 170" role="img" aria-label="Bar graph: separated equal-width bars, one per category">`;
+  ['A','B','C','D'].forEach((c,i)=>{ b += `<rect x="${45+i*56}" y="${140-bars[i]*10}" width="36" height="${bars[i]*10}" fill="${COL[1]}"/><text x="${63+i*56}" y="154" font-size="10" text-anchor="middle">${c}</text>`; });
+  b += `<line class="ax" x1="30" x2="270" y1="140" y2="140"/><text x="150" y="14" font-size="12" text-anchor="middle" font-weight="600">Bar graph — spaced, equal width</text></svg>`;
+  $('#hbfigs').innerHTML = `<figure class="mplwin">${a}</figure><figure class="mplwin">${b}</figure>`;
+})();
+(() => { /* sorter */
+  const items = []; DIFF.forEach((d,i)=>{ items.push({id:'H'+i,t:d[0],c:'H',n:i+1}); items.push({id:'B'+i,t:d[1],c:'B',n:i+1}); });
+  let place = {}, checked = false, order = [];
+  const init = () => { order = shuffle(items.map(x=>x.id)); place = {}; items.forEach(x=>place[x.id]='pool'); checked=false; draw(); };
+  const chip = it => { const st = checked && place[it.id]!=='pool' ? (place[it.id]===it.c?'ok':'bad') : '';
+    return `<div class="chip ${st}" draggable="true" data-id="${it.id}"><span class="t">${it.t}${checked&&st?` <span class="n">(#${it.n})</span>`:''}</span><span class="mv"><button type="button" data-mv="H" aria-label="Move to Histogram column">H</button><button type="button" data-mv="B" aria-label="Move to Bar Graph column">B</button>${place[it.id]!=='pool'?'<button type="button" data-mv="pool" aria-label="Move back to unsorted">↩</button>':''}</span></div>`; };
+  const draw = () => {
+    const by = z => order.map(id=>items.find(x=>x.id===id)).filter(x=>place[x.id]===z).map(chip).join('');
+    const right = items.filter(x=>place[x.id]===x.c).length;
+    $('#sorter').innerHTML = `<div class="sortgrid"><div class="sortcol" data-z="H"><h4>Histogram</h4>${by('H')}</div><div class="sortcol" data-z="B"><h4>Bar Graph</h4>${by('B')}</div></div>
+      <div class="sortpool" data-z="pool"><h4>Unsorted statements</h4>${by('pool')}</div>
+      <p style="margin-top:.7rem"><button class="btn" id="s-check" type="button">Check</button> <button class="btn alt" id="s-reset" type="button">Shuffle &amp; restart</button> <span id="s-res" role="status" aria-live="polite" style="font-weight:700;margin-left:.5rem">${checked?`${right} / 14 correct`+(right===14?' 🎉':' — red cards are in the wrong column; (#n) is the row number in the table above'):''}</span></p>`;
+  };
+  const sorter = $('#sorter');
+  sorter.addEventListener('click', e => {
+    const mv = e.target.closest('[data-mv]');
+    if (mv) { place[mv.closest('.chip').dataset.id] = mv.dataset.mv; checked=false; draw(); return; }
+    if (e.target.id==='s-check') { checked=true; draw(); }
+    if (e.target.id==='s-reset') init();
+  });
+  sorter.addEventListener('dragstart', e => { const c=e.target.closest('.chip'); if(c){ e.dataTransfer.setData('text/plain', c.dataset.id); e.dataTransfer.effectAllowed='move'; } });
+  sorter.addEventListener('dragover', e => { const z=e.target.closest('[data-z]'); if(z){ e.preventDefault(); $$('.over',sorter).forEach(x=>x.classList.remove('over')); z.classList.add('over'); } });
+  sorter.addEventListener('dragleave', e => { const z=e.target.closest('[data-z]'); if(z) z.classList.remove('over'); });
+  sorter.addEventListener('drop', e => { const z=e.target.closest('[data-z]'); if(!z) return; e.preventDefault(); const id=e.dataTransfer.getData('text/plain'); if(place[id]!==undefined){ place[id]=z.dataset.z; checked=false; draw(); } });
+  init();
+})();
+
+/* =====================================================================
+   6. Chart Builder
+   ===================================================================== */
+const PRESETS = {
+  ex1:{label:'Fig 16.1',type:'line',labels:'',s1n:'',s1:'1,2,3,4',s2n:'',s2:'',title:'',xl:'',yl:'',leg:false},
+  ex2:{label:'Fig 16.2',type:'line',labels:'1,2,3,4',s1n:'',s1:'1,4,9,16',s2n:'',s2:'',title:'',xl:'',yl:'',leg:false},
+  ex3:{label:'Fig 16.3',type:'line',labels:'1,2,3',s1n:'Line 1',s1:'5,7,4',s2n:'Line 2',s2:'10,14,12',title:'LINE GRAPH',xl:'X-Axis',yl:'Y-Axis',leg:true},
+  ex5:{label:'Fig 16.5',type:'line',labels:'2014,2015,2016,2017,2018',s1n:'',s1:'8939007,8954518,8960387,8956741,8943721',s2n:'',s2:'',title:'Year vs Population in India',xl:'Year',yl:'Total Population',leg:false},
+  ex6:{label:'Fig 16.6',type:'bar',labels:'TAMIL,ENGLISH,MATHS,PHYSICS,CHEMISTRY,CS',s1n:'',s1:'79.8,67.3,77.8,68.4,70.2,88.5',s2n:'',s2:'',title:'MARKS',xl:'',yl:'RANGE',leg:false},
+  ex7:{label:'Fig 16.7',type:'pie',labels:'Tamil,English,Maths,Science,Social',s1n:'',s1:'89,80,90,100,75',s2n:'',s2:'',title:'',xl:'',yl:'',leg:false},
+  h1:{label:'Practice 1',type:'line',labels:'80,85,90,95,100',s1n:'',s1:'240,250,260,270,280',s2n:'',s2:'',title:'Average Pulse vs Calorie Burnage',xl:'Average Pulse',yl:'Calorie Burnage',leg:false},
+  h2:{label:'Practice 2',type:'pie',labels:'Tamil,English,Maths,Physics,Chemistry,CS',s1n:'',s1:'78,72,85,69,74,91',s2n:'',s2:'',title:'My marks in the recent examination',xl:'',yl:'',leg:false},
+  h3:{label:'Practice 3',type:'line',labels:'2014,2015,2016,2017,2018,2019,2020,2021,2022,2023',s1n:'',s1:'72,75,74,79,81,80,86,88,87,91',s2n:'',s2:'',title:'Class 12 Computer Science – academic performance',xl:'Year',yl:'Average marks (%)',leg:false},
+  h4:{label:'Practice 4',type:'bar',labels:'Mon,Tue,Wed,Thu,Fri,Sat',s1n:'',s1:'1,2,1,2,1,1',s2n:'',s2:'',title:'Computer Science periods in a week',xl:'Day',yl:'Number of periods',leg:false}
+};
+const BLANK = {type:'line',labels:'',s1n:'',s1:'',s2n:'',s2:'',title:'',xl:'',yl:'',leg:false};
+const pyStr = s => JSON.stringify(String(s));
+const nums = s => s.split(',').map(x=>x.trim()).filter(x=>x!=='');
+/* Build code + chart from a state object. Returns {ok, msg, code, svg}. */
+function buildFrom(st){
+  const labs = nums(st.labels), v1 = nums(st.s1), v2 = nums(st.s2);
+  const bad = v1.concat(v2).find(x=>isNaN(Number(x)));
+  if (!v1.length) return {ok:false,msg:'Enter some numbers for Series 1 (comma-separated) to see the chart.'};
+  if (bad!==undefined) return {ok:false,msg:`“${bad}” is not a number — values must be numbers separated by commas.`};
+  const y1 = v1.map(Number), y2 = v2.map(Number), two = (st.type==='bar2' || (st.type==='line' && y2.length>0));
+  if (st.type==='bar2' && !y2.length) return {ok:false,msg:'Two-series bar chart: also enter numbers for Series 2.'};
+  if (two && y2.length!==y1.length) return {ok:false,msg:`Series 1 has ${y1.length} values but Series 2 has ${y2.length}. They must match.`};
+  if (labs.length && st.type!=='line' && labs.length!==y1.length) return {ok:false,msg:`You typed ${labs.length} labels but ${y1.length} values. They must match.`};
+  if (labs.length && st.type==='line' && labs.length!==y1.length) return {ok:false,msg:`You typed ${labs.length} x-values/labels but ${y1.length} values. They must match.`};
+  if ((st.type==='bar'||st.type==='bar2'||st.type==='pie') && !labs.length && st.type==='pie') return {ok:false,msg:'Pie chart: enter one label per slice.'};
+  const L = (name)=> (st.leg && name) ? `, label=${pyStr(name)}` : '';
+  const li = arr => '['+arr.join(', ')+']', ls = arr => '['+arr.map(pyStr).join(', ')+']';
+  let code = 'import matplotlib.pyplot as plt\n', svg = '';
+  const common = {title:st.title, xlabel:st.xl, ylabel:st.yl, legend: st.leg};
+  const s1 = {name: st.s1n||(two?'Series 1':''), y:y1}, s2 = {name: st.s2n||'Series 2', y:y2};
+  if (st.type==='pie') {
+    code += `sizes = ${li(y1)}\nlabels = ${ls(labs)}\nplt.pie(sizes, labels=labels, autopct="%1.1f%%")\n`;
+    svg = chartPie({sizes:y1,labels:labs,autopct:'%1.1f%%',title:st.title});
+  } else if (st.type==='line') {
+    const numeric = labs.length && labs.every(x=>!isNaN(Number(x)));
+    if (!labs.length) { code += `y = ${li(y1)}\n` + (two?`y2 = ${li(y2)}\n`:'') + `plt.plot(y${L(st.s1n)})\n` + (two?`plt.plot(y2${L(st.s2n||'Series 2')})\n`:''); }
+    else if (numeric) { code += `x = ${li(labs)}\ny = ${li(y1)}\n` + (two?`y2 = ${li(y2)}\n`:'') + `plt.plot(x, y${L(st.s1n)})\n` + (two?`plt.plot(x, y2${L(st.s2n||'Series 2')})\n`:''); }
+    else { code += `labels = ${ls(labs)}\nx = range(len(labels))\ny = ${li(y1)}\n` + (two?`y2 = ${li(y2)}\n`:'') + `plt.plot(x, y${L(st.s1n)})\n` + (two?`plt.plot(x, y2${L(st.s2n||'Series 2')})\n`:'') + `plt.xticks(x, labels)\n`; }
+    const x = labs.length ? (numeric ? labs.map(Number) : labs.map((_,i)=>i)) : null;
+    const ser = [Object.assign({x},s1)]; if(two) ser.push(Object.assign({x},s2)); if(!x) ser.forEach(s=>delete s.x);
+    const xt = numeric && labs.length<=12 && labs.every(v=>Number.isInteger(Number(v))) ? labs.map(Number) : null;
+    svg = chartLine(Object.assign({series:ser, cats: (labs.length && !numeric)?labs:null, xticks:xt}, common));
+  } else {
+    const cats = labs.length ? labs : y1.map((_,i)=>String(i));
+    if (st.type==='bar') {
+      code += (labs.length?`labels = ${ls(labs)}\n`:'') + `values = ${li(y1)}\nx = range(${labs.length?'len(labels)':'len(values)'})\nplt.bar(x, values${L(st.s1n)})\n` + (labs.length?`plt.xticks(x, labels)\n`:'');
+      svg = chartBar(Object.assign({series:[s1],cats}, common));
+    } else {
+      code += (labs.length?`labels = ${ls(labs)}\n`:'') + `values1 = ${li(y1)}\nvalues2 = ${li(y2)}\nx = range(${labs.length?'len(labels)':'len(values1)'})\nw = 0.4\nplt.bar([i - w/2 for i in x], values1, width=w${L(s1.name)})\nplt.bar([i + w/2 for i in x], values2, width=w${L(s2.name)})\n` + (labs.length?`plt.xticks(x, labels)\n`:'');
+      svg = chartBar(Object.assign({series:[s1,s2],cats,grouped:true}, common));
+    }
+  }
+  if (st.type!=='pie') { if(st.xl) code += `plt.xlabel(${pyStr(st.xl)})\n`; if(st.yl) code += `plt.ylabel(${pyStr(st.yl)})\n`; }
+  if (st.title) code += `plt.title(${pyStr(st.title)})\n`;
+  if (st.leg && st.type!=='pie') code += 'plt.legend()\n';
+  code += 'plt.show()';
+  return {ok:true,code,svg};
+}
+(() => {
+  const F = {type:$('#b-type'),labels:$('#b-labels'),s1n:$('#b-s1n'),s1:$('#b-s1'),s2n:$('#b-s2n'),s2:$('#b-s2'),title:$('#b-title'),xl:$('#b-xl'),yl:$('#b-yl'),leg:$('#b-leg')};
+  const read = () => ({type:F.type.value,labels:F.labels.value,s1n:F.s1n.value,s1:F.s1.value,s2n:F.s2n.value,s2:F.s2.value,title:F.title.value,xl:F.xl.value,yl:F.yl.value,leg:F.leg.checked});
+  const write = st => { Object.keys(F).forEach(k=>{ if(k==='leg') F.leg.checked=!!st.leg; else F[k].value = st[k]; }); };
+  function sync(){
+    const st = read(), pie = st.type==='pie';
+    $('#b-s2wrap').style.display = (st.type==='line'||st.type==='bar2') ? '' : 'none';
+    $('#b-axes').style.display = pie ? 'none' : '';
+    F.leg.closest('label').style.display = pie ? 'none' : '';
+    const r = buildFrom(st);
+    $('#bmsg').textContent = r.ok ? '' : r.msg;
+    $('#bcode').innerHTML = r.ok ? r.code.split('\n').map(l=>hlLine(l)).join('\n') : '<span class="tk-cm"># Your code will appear here…</span>';
+    $('#bchart').innerHTML = r.ok ? figure(r.svg,'Live preview of your chart. Hover or focus marks to read values.') : '';
+  }
+  $$('#bform input,#bform textarea,#bform select').forEach(el=>el.addEventListener('input',sync));
+  window.loadBuilder = (st, hint) => { write(Object.assign({}, BLANK, st)); const h=$('#bhint'); if(hint){ h.hidden=false; h.textContent=hint; } else h.hidden=true; sync(); };
+  $('#presets').innerHTML = Object.keys(PRESETS).map(k=>`<button type="button" class="btn ${k[0]==='h'?'peach':'alt'} sm" data-p="${k}">${PRESETS[k].label}</button>`).join('');
+  $('#presets').addEventListener('click', e=>{ const b=e.target.closest('[data-p]'); if(b) loadBuilder(PRESETS[b.dataset.p]); });
+  $('#b-clear').addEventListener('click', ()=>loadBuilder(BLANK));
+  loadBuilder(PRESETS.ex3);
+})();
+
+/* Hands on practice */
+const HOP = [
+  {id:'h1', q:'Plot a line chart for the given data and set the title for x and y axis.<br>Average Pulse: 80, 85, 90, 95, 100 &nbsp;·&nbsp; Calorie Burnage: 240, 250, 260, 270, 280',
+   start:{type:'line'}, hint:'Practice 1 — x = Average Pulse, y = Calorie Burnage. Type the values, then set the x-axis and y-axis labels.'},
+  {id:'h2', q:'Plot a pie chart for your marks in the recent examination.',
+   start:{type:'pie'}, hint:'Practice 2 — enter 4–6 of your own subjects as labels and your marks as values.', open:true},
+  {id:'h3', q:'Plot a line chart on the academic performance of Class 12 students in Computer Science for the past 10 years.',
+   start:{type:'line'}, hint:'Practice 3 — enter 10 years as x-values and 10 sample performance values (for example average marks).', open:true},
+  {id:'h4', q:'Plot a bar chart for the number of computer science periods in a week.',
+   start:{type:'bar'}, hint:'Practice 4 — enter 5–6 days as labels and the number of periods on each day.', open:true}
+];
+(() => {
+  $('#hop').innerHTML = HOP.map((h,i)=>`<div class="hop"><h3>${i+1}. ${h.q}</h3>
+    <div class="acts"><button class="btn sm" data-try="${h.id}" type="button">✏️ Try it in the builder</button><button class="btn peach sm" data-show="${h.id}" type="button" aria-expanded="false">👁 Reveal model solution</button></div>
+    <div class="model" id="m-${h.id}" hidden></div></div>`).join('');
+  $('#hop').addEventListener('click', e=>{
+    const t = e.target.closest('[data-try]'), s = e.target.closest('[data-show]');
+    if (t) { const h = HOP.find(x=>x.id===t.dataset.try); loadBuilder(h.start, h.hint); $('#builder').scrollIntoView({behavior:'smooth'}); const f=$('#b-labels'); setTimeout(()=>f.focus({preventScroll:true}),400); }
+    if (s) { const h=HOP.find(x=>x.id===s.dataset.show), box=$('#m-'+h.id), open=box.hidden;
+      if (open && !box.innerHTML) { const r = buildFrom(PRESETS[h.id]);
+        box.innerHTML = (h.open?`<div class="note"><b>Sample data</b> · This task is open-ended, so these numbers are examples. Use your own.</div>`:'') + figure(r.svg,'Model chart') + codeBlock(r.code,{title:'Model code'}) + `<button class="btn alt sm" type="button" data-load="${h.id}">Open this model in the builder</button>`; }
+      box.hidden=!open; s.setAttribute('aria-expanded',open); s.textContent = open?'🙈 Hide model solution':'👁 Reveal model solution'; }
+    const l = e.target.closest('[data-load]'); if(l){ loadBuilder(PRESETS[l.dataset.load]); $('#builder').scrollIntoView({behavior:'smooth'}); }
+  });
+})();
+
+/* =====================================================================
+   7. Code → Chart matcher (thumbnails generated from real snippet variants)
+   ===================================================================== */
+const SUBJ = ['Tamil','English','Maths','Physics','Chem','CS','Bio'];
+function distinctInts(k,a,b){ const s=new Set(); while(s.size<k) s.add(rint(a,b)); return Array.from(s); }
+const thumb = spec => spec.t==='pie' ? chartPie(Object.assign({mini:true},spec.o)) : (spec.t==='bar' ? chartBar(Object.assign({mini:true},spec.o)) : chartLine(Object.assign({mini:true},spec.o)));
+const sig = s => JSON.stringify(s);
+const GEN = {
+  line(){
+    if (Math.random()<0.5) {
+      const y = distinctInts(4,2,9);
+      return {code:`import matplotlib.pyplot as plt\nplt.plot([${y.join(', ')}])\nplt.show()`,
+        correct:{t:'line',o:{series:[{y}]}},
+        wrong:[{t:'line',o:{series:[{x:[1,2,3,4],y}]}},{t:'line',o:{series:[{y:y.slice().reverse()}]}},{t:'bar',o:{series:[{y}]}}],
+        why:'One list → these are the y-values, and x is generated automatically as 0, 1, 2, 3. So the x-axis starts at 0, not 1 (Fig. 16.1).'};
+    }
+    const k = rint(2,4), y = [k, k*2+rint(0,1), k*3+rint(1,2), k*4+rint(2,3)];
+    return {code:`import matplotlib.pyplot as plt\nplt.plot([1,2,3,4], [${y.join(', ')}])\nplt.show()`,
+      correct:{t:'line',o:{series:[{x:[1,2,3,4],y}]}},
+      wrong:[{t:'line',o:{series:[{x:y,y:[1,2,3,4]}]}},{t:'line',o:{series:[{y}]}},{t:'line',o:{series:[{x:[1,2,3,4],y:y.slice().reverse()}]}}],
+      why:'Two lists → the first is x and the second is y: the points are (1,'+y[0]+'), (2,'+y[1]+'), (3,'+y[2]+'), (4,'+y[3]+'). Watch which list goes on which axis.'};
+  },
+  bar(){
+    const labels = shuffle(SUBJ).slice(0,4), v = distinctInts(4,40,95);
+    const O = (labs,vals)=>({t:'bar',o:{cats:labs,series:[{y:vals}]}});
+    return {code:`import matplotlib.pyplot as plt\nlabels = ${JSON.stringify(labels)}\nmarks = [${v.join(', ')}]\nx = range(len(labels))\nplt.bar(x, marks)\nplt.xticks(x, labels)\nplt.show()`,
+      correct:O(labels,v),
+      wrong:[O(labels,v.slice().reverse()),O(labels,[v[1],v[2],v[3],v[0]]),{t:'line',o:{cats:labels,series:[{y:v}]}}],
+      why:'plt.bar draws one bar per position with height = marks; xticks then puts the names under each bar in the same order as the lists.'};
+  },
+  pie(){
+    const labels = shuffle(SUBJ).slice(0,4), sz = distinctInts(4,10,60).sort((a,b)=>b-a);
+    const O = (s)=>({t:'pie',o:{labels,sizes:s,autopct:'%.1f'}});
+    return {code:`import matplotlib.pyplot as plt\nsizes = [${sz.join(', ')}]\nlabels = ${JSON.stringify(labels)}\nplt.pie(sizes, labels=labels, autopct="%.1f")\nplt.show()`,
+      correct:O(sz),
+      wrong:[O(sz.slice().reverse()),O([sz[1],sz[2],sz[3],sz[0]]),{t:'bar',o:{cats:labels,series:[{y:sz}]}}],
+      why:'Slices are drawn counter-clockwise starting from the right (3 o’clock) in list order, and each slice’s size is its share of the total.'};
+  }
+};
+(() => {
+  let mode='mixed', score=0, total=0, cur=null, answered=false;
+  const modes = [['mixed','Mixed'],['line','Line'],['bar','Bar'],['pie','Pie']];
+  $('#mtabs').innerHTML = modes.map(([k,l])=>`<button type="button" class="btn alt sm" data-mode="${k}" aria-pressed="${k===mode}">${l}</button>`).join('');
+  function next(){
+    const kind = mode==='mixed' ? ['line','bar','pie'][rint(0,2)] : mode;
+    let q, tries=0; do { q = GEN[kind](); tries++; const sigs = new Set([q.correct].concat(q.wrong).map(sig)); if(sigs.size===4) break; } while(tries<20);
+    const opts = shuffle([{s:q.correct,ok:true}].concat(q.wrong.map(s=>({s,ok:false}))));
+    cur={q,opts}; answered=false;
+    $('#mq').innerHTML = `<div class="q"><div class="qt">Which chart does this code draw?</div>${codeBlock(q.code)}
+      <div class="mopts" role="group" aria-label="Choices">${opts.map((o,i)=>`<button type="button" class="mopt" data-i="${i}" aria-label="Option ${'ABCD'[i]}"><span class="letter">${'ABCD'[i]}</span>${thumb(o.s)}</button>`).join('')}</div>
+      <div id="mfb" class="fb" hidden></div></div>`;
+  }
+  $('#mq').addEventListener('click', e=>{
+    const b = e.target.closest('.mopt'); if(!b||answered) return; answered=true; total++;
+    const ok = cur.opts[+b.dataset.i].ok; if(ok) score++;
+    $$('.mopt').forEach((x,i)=>{ x.disabled=true; if(cur.opts[i].ok) x.classList.add('ok'); else if(x===b) x.classList.add('bad'); });
+    const fb=$('#mfb'); fb.hidden=false; fb.innerHTML = (ok?'✅ <b>Correct!</b> ':'❌ <b>Not quite.</b> The right one is '+'ABCD'[cur.opts.findIndex(o=>o.ok)]+'. ') + cur.q.why;
+    $('#mscore').textContent = `Score: ${score} / ${total}`;
+  });
+  $('#mnext').addEventListener('click', next);
+  $('#mtabs').addEventListener('click', e=>{ const b=e.target.closest('[data-mode]'); if(!b) return; mode=b.dataset.mode; $$('#mtabs button').forEach(x=>x.setAttribute('aria-pressed',x===b)); next(); });
+  next();
+})();
+
+/* =====================================================================
+   8. Evaluation
+   ===================================================================== */
+/* --- Part I: MCQ --- */
+const q7 = (() => {
+  const A = chartLine({mini:true,title:'Epic Info',xlabel:'X axis',ylabel:'Y axis',legend:1,series:[{name:'a',x:[5,6,7,8,9],y:[6,10,16,8,11]},{name:'b',x:[5,6,7,8,9],y:[5,8,12,7,10],color:'#2ca02c'}]});
+  const B = chartLine({mini:true,title:'info',xlabel:'x axis',ylabel:'y axis',series:[{x:[1,2,3,4],y:[16,12,8,4]},{x:[1,2,3,4],y:[14,9,6,2],color:'#ff7f0e'}]});
+  const C = chartLine({mini:true,series:[{x:[3],y:[2]}]});
+  const D = chartLine({mini:true,series:[{y:[1,2,3,4]}]});
+  return [
+    {svg:A,t:'Two multi-line charts with peaks, titled “Epic Info”.'},
+    {svg:B,t:'Two descending lines; only axis-label placeholders (numbered 1, 2, 3 pointing to info / y axis / x axis).'},
+    {svg:C,t:'An empty-looking chart: no line, only axis ticks close to x = 3 and y = 2 (the book’s tick range is 2.85–3.15 and 1.900–2.100; the thumbnail shows fewer ticks).'},
+    {svg:D,t:'The single rising line from [1,2,3,4] — like Figure 16.1.'}];
+})();
+const MCQ = [
+ {q:'Which is a python package used for 2D charts?',o:['matplotlib.pyplot','matplotlib.pip','matplotlib.numpy','matplotlib.plt'],a:0,e:'matplotlib.pyplot is the package used to create 2D charts — you import it as plt.'},
+ {q:'Identify the package manager for installing Python packages, or modules.',o:['Matplotlib','PIP','plt.show()','python package'],a:1,e:'PIP is the package manager, e.g. pip install matplotlib.'},
+ {q:'Which of the following feature is used to represent data and information graphically?',o:['Data List','Data Tuple','Classes and Objects','Data Visualization'],a:3,e:'Data Visualization is the graphical representation of information and data.'},
+ {q:'.......... is a collection of resources assembled to create a single unified visual display.',o:['Interface','Dashboard','Objects','Graphics'],a:1,e:'A dashboard collects resources into one unified visual display.'},
+ {q:'Which of the following module should be imported to visualize data and information in Python?',o:['csv','getopt','mysql','matplotlib'],a:3,e:'matplotlib is the module to import for visualizing data.'},
+ {q:'............ is a type of chart which displays information as a series of data points connected by straight line segments.',o:['csv','Pie chart','Bar chart','All the above'],a:0,fixed:true,
+  e:'Intended answer: option (a). The description defines a Line chart.',
+  note:'The four printed options do not contain “Line chart”. Pie chart and Bar chart are different chart types, and “All the above” cannot be right, so the best/intended choice is the first slot (a), where “Line chart” would be expected — the printed “csv” looks like a misprint. Marked on that basis.'},
+ {q:'Read the code: <code class="i">import matplotlib.pyplot as plt; plt.plot(3,2); plt.show()</code> — identify the output.',fixed:true,imgs:q7,o:['(a)','(b)','(c)','(d)'],a:2,
+  e:'(c). plt.plot(3,2) is a single point, and a line needs two or more points. With no marker style set, nothing is drawn — but the axes still auto-scale around the point (x ≈ 2.85–3.15, y ≈ 1.9–2.1).',
+  note:'<b>Watch out:</b> this is <u>not</u> an error — Matplotlib accepts single numbers as a one-point series. You get a nearly blank chart because there is no line and no marker. Add a marker, e.g. <code class="i">plt.plot(3,2,\'o\')</code>, to see the dot. The thumbnails above are drawn conceptually to match the book’s four pictures.'},
+ {q:'Identify the right type of chart using the hints.<br>Hint 1: This chart is often used to visualize a trend in data over intervals of time.<br>Hint 2: The line in this type of chart is often drawn chronologically.',o:['Line chart','Bar chart','Pie chart','Scatter plot'],a:0,e:'A line chart shows a trend over time, drawn chronologically.'},
+ {q:'Statement A: To make a pie chart with Matplotlib, we can use the plt.pie() function.<br>Statement B: The autopct parameter allows us to display the percentage value using the Python string formatting.',fixed:true,o:['Statement A is correct','Statement B is correct','Both the statements are correct','Both the statements are wrong'],a:2,e:'Both are correct: plt.pie() makes the chart and autopct shows percentages via string formatting.'}
+];
+(() => {
+  let order, score, answered;
+  const box = $('#mcq');
+  function start(reshuffle){
+    order = MCQ.map((q,i)=>({q,i,perm: (reshuffle&&!q.fixed) ? shuffle(q.o.map((_,k)=>k)) : q.o.map((_,k)=>k)}));
+    if (reshuffle) order = shuffle(order);
+    score=0; answered=0; render();
+  }
+  function render(){
+    box.innerHTML = order.map((it,n)=>{ const q=it.q;
+      const opts = it.perm.map((k,j)=>`<button type="button" class="opt" data-n="${n}" data-k="${k}"><span class="letter">${'abcd'[j]}</span>${q.imgs? `<b>${q.o[k].replace(/[()]/g,'')}</b>`+q.imgs[k].svg+`<small>${q.imgs[k].t}</small>` : q.o[k]}</button>`).join('');
+      return `<div class="q" id="q${n}"><div class="qt"><span class="qn">Q${n+1}.</span> ${q.q}</div><div class="opts${q.imgs?' g2':''}" role="group" aria-label="Options for question ${n+1}">${opts}</div><div class="fb" hidden></div></div>`; }).join('');
+    upd();
+  }
+  const upd = () => { $('#qscore').textContent = `Score: ${score} / ${MCQ.length}` + (answered===MCQ.length ? (score===MCQ.length?' — perfect! 🎉':' — all answered'):''); };
+  box.addEventListener('click', e=>{
+    const b = e.target.closest('.opt'); if(!b) return;
+    const n=+b.dataset.n, it=order[n], card=$('#q'+n); if(card.dataset.done) return; card.dataset.done=1; answered++;
+    const ok = +b.dataset.k===it.q.a; if(ok) score++;
+    $$('.opt',card).forEach(x=>{ x.disabled=true; if(+x.dataset.k===it.q.a) x.classList.add('ok'); else if(x===b) x.classList.add('bad'); });
+    const fb=$('.fb',card); fb.hidden=false; fb.innerHTML=(ok?'✅ <b>Correct.</b> ':'❌ <b>Not quite.</b> ')+it.q.e+(it.q.note?`<div class="acc" style="margin-bottom:0">${it.q.note}</div>`:'');
+    upd();
+  });
+  $('#qshuffle').addEventListener('click', ()=>start(true));
+  start(false);
+})();
+
+/* --- Part II: flip cards --- */
+const P2 = [
+ ['What is Data Visualization?','Data Visualization is the <b>graphical representation of information and data</b>. It communicates information visually using statistical graphics — numerical data may be encoded using dots, lines or bars to convey a quantitative message.'],
+ ['List the general types of data visualization.','<b>Charts, Tables, Graphs, Maps, Infographics, Dashboards.</b>'],
+ ['List the types of Visualizations in Matplotlib.','<b>Line plot, Scatter plot, Histogram, Box plot, Bar chart, Pie chart.</b>'],
+ ['How will you install Matplotlib?','Using <b>pip</b>, the package manager for Python packages: <code class="i">pip install matplotlib</code>. (Detailed steps: Annexure – II.)'],
+ ['Write the difference between plt.plot([1,2,3,4]) and plt.plot([1,2,3,4], [1,4,9,16]).','<b>plt.plot([1,2,3,4])</b> — one list is taken as the y-values; x is auto-generated as [0,1,2,3] (starts at 0).<br><b>plt.plot([1,2,3,4],[1,4,9,16])</b> — explicit x and y: points (1,1), (2,4), (3,9), (4,16).']
+];
+$('#flashes').innerHTML = P2.map((c,i)=>`<button type="button" class="flip" aria-pressed="false" aria-label="Question ${i+1}. Press to flip the card."><span class="in"><span class="f"><span class="tag">Question ${i+1}</span><b>${c[0]}</b><span class="hintx">Click to reveal the answer ↻</span></span><span class="b"><span class="tag">Answer</span><span>${c[1]}</span></span></span></button>`).join('');
+$('#flashes').addEventListener('click', e=>{ const b=e.target.closest('.flip'); if(b) b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')!=='true'); });
+
+/* --- Parts III & IV: model answers --- */
+const P3CODE1 = String.raw`import matplotlib.pyplot as plt
+plt.bar([1,3,5,7,9],[5,2,7,8,2], label="Example one")
+plt.bar([2,4,6,8,10],[8,6,2,5,6], label="Example two", color='g')
+plt.legend()
+plt.xlabel('bar number')
+plt.ylabel('bar height')
+plt.title('Epic Graph\nAnother Line! Whoa')
+plt.show()`;
+const P3CODE3 = String.raw`import matplotlib.pyplot as plt
+sizes = [13, 7, 2, 2]
+labels = ['playing', 'sleeping', 'working', 'eating']
+cols = ['b', 'c', 'r', 'm']
+explode = (0, 0, 0, 0.1)      # pull the 'eating' wedge out
+plt.pie(sizes, labels=labels, colors=cols, startangle=90,
+        explode=explode, autopct='%1.1f%%')
+plt.title('Interesting Graph\nCheck it out')
+plt.show()`;
+function miniIllus(kind){
+  const st = 'stroke="currentColor" fill="none" stroke-width="2"';
+  const m = {
+    line:`<svg viewBox="0 0 120 80" role="img" aria-label="Line plot sketch"><path d="M8 68 L34 44 L60 52 L86 22 L112 30" stroke="#1f77b4" fill="none" stroke-width="3"/><path d="M8 72H112M8 72V8" ${st}/></svg>`,
+    scatter:`<svg viewBox="0 0 120 80" role="img" aria-label="Scatter plot sketch"><g fill="#d62728"><circle cx="20" cy="58" r="4"/><circle cx="38" cy="46" r="4"/><circle cx="52" cy="52" r="4"/><circle cx="70" cy="30" r="4"/><circle cx="88" cy="36" r="4"/><circle cx="104" cy="16" r="4"/></g><path d="M8 72H112M8 72V8" ${st}/></svg>`,
+    hist:`<svg viewBox="0 0 120 80" role="img" aria-label="Histogram sketch"><g fill="#9467bd" stroke="#fff"><rect x="12" y="52" width="16" height="20"/><rect x="28" y="30" width="16" height="42"/><rect x="44" y="10" width="16" height="62"/><rect x="60" y="24" width="16" height="48"/><rect x="76" y="46" width="16" height="26"/><rect x="92" y="60" width="16" height="12"/></g><path d="M8 72H112" ${st}/></svg>`,
+    box:`<svg viewBox="0 0 120 80" role="img" aria-label="Box plot sketch"><g stroke="currentColor" stroke-width="2" fill="none"><path d="M60 8V22M60 58V72M48 8H72M48 72H72"/><rect x="38" y="22" width="44" height="36" fill="#ff7f0e" fill-opacity=".45"/><path d="M38 40H82"/></g></svg>`,
+    bar:`<svg viewBox="0 0 120 80" role="img" aria-label="Bar chart sketch"><g fill="#2ca02c"><rect x="14" y="30" width="18" height="42"/><rect x="40" y="14" width="18" height="58"/><rect x="66" y="40" width="18" height="32"/><rect x="92" y="24" width="14" height="48"/></g><path d="M8 72H112" ${st}/></svg>`,
+    pie:`<svg viewBox="0 0 120 80" role="img" aria-label="Pie chart sketch"><circle cx="60" cy="40" r="32" fill="#1f77b4"/><path d="M60 40 L92 40 A32 32 0 0 0 60 8Z" fill="#ff7f0e"/><path d="M60 40 L60 8 A32 32 0 0 0 30 52Z" fill="#2ca02c"/></svg>`
+  }; return m[kind];
+}
+(() => {
+  const ans = (t, body, sm='') => `<details class="ans"><summary><span>${t}${sm?`<span class="sm">${sm}</span>`:''}</span></summary><div class="body">${body}</div></details>`;
+  const p31 = chartBar({series:[{name:'Example one',x:[1,3,5,7,9],y:[5,2,7,8,2]},{name:'Example two',x:[2,4,6,8,10],y:[8,6,2,5,6],color:MPL.g}],title:'Epic Graph\nAnother Line! Whoa',xlabel:'bar number',ylabel:'bar height',legend:1,legendPos:'ur'});
+  const p33 = chartPie({sizes:[13,7,2,2],labels:['playing','sleeping','working','eating'],colors:[MPL.b,MPL.c,MPL.r,MPL.m],explode:[0,0,0,.1],startangle:90,autopct:'%1.1f%%',title:'Interesting Graph\nCheck it out'});
+  $('#p3').innerHTML =
+   ans('1. Draw the output for the following data visualization plot.', `${codeBlock(P3CODE1)}${figure(p31,'Model output — two bar series: “Example one” (default blue) at x = 1,3,5,7,9 and “Example two” (green) at x = 2,4,6,8,10.')}
+     <ol><li>Two <code class="i">plt.bar()</code> calls draw two sets of bars on the same axes; the second uses <code class="i">color='g'</code> (green).</li>
+     <li>The x-positions interleave (odd numbers vs even numbers), so the bars sit side by side without overlapping.</li>
+     <li><code class="i">plt.legend()</code> shows “Example one” and “Example two”; the axes are labelled <i>bar number</i> and <i>bar height</i>.</li>
+     <li>The title has two lines because <code class="i">\\n</code> starts a new line: “Epic Graph” then “Another Line! Whoa”.</li></ol>`,'Two-series bar chart')
+ + ans('2. Write any three uses of data visualization.', `<ol><li>It helps users to <b>analyze and interpret</b> the data easily.</li><li>It makes <b>complex data understandable</b> and usable.</li><li>Various charts help to <b>show the relationship in the data</b> for one or more variables.</li></ol><p style="color:var(--text2)">You may choose any three of these points from section 16.1.</p>`)
+ + ans('3. Write the plot for the following pie chart output.', `<p>The “Interesting Graph / Check it out” pie: <b>playing 54.2%, sleeping 29.2%, working 8.3%, eating 8.3%</b>, with the <b>eating</b> wedge exploded.</p>${codeBlock(P3CODE3)}${figure(p33,'Model output. Sizes 13 : 7 : 2 : 2 out of 24 give 54.2 %, 29.2 %, 8.3 %, 8.3 %.')}
+     <ul><li><code class="i">explode</code> pulls one wedge away from the centre (here the 4th, by 0.1 of the radius).</li><li><code class="i">autopct='%1.1f%%'</code> prints each percentage with 1 decimal place and a % sign.</li><li><code class="i">\\n</code> inside <code class="i">plt.title()</code> makes the two-line title.</li></ul>
+     <p style="color:var(--text2);font-size:.88rem">The sizes and colours are reconstructed from the percentages given; any values with the same 13:7:2:2 ratio work.</p>`,'Pie chart with an exploded wedge');
+
+  const t = (k,h,d)=>`<div>${miniIllus(k)}<b>${h}</b><br><span style="font-size:.9rem">${d}</span></div>`;
+  $('#p4').innerHTML =
+   ans('1. Explain in detail the types of pyplots using Matplotlib.', `<div class="tp">
+      ${t('line','Line plot','Displays information as a series of data points (‘markers’) connected by straight line segments. Often used to show a trend over intervals of time, drawn chronologically. Made with plt.plot().')}
+      ${t('scatter','Scatter plot','Shows the data as a collection of points. The position of each point depends on its two-dimensional value — one value on the horizontal and one on the vertical dimension.')}
+      ${t('hist','Histogram','Displays data by way of bars to show the frequency of numerical data. It represents the frequency distribution of continuous variables; there is no gap between the bars.')}
+      ${t('box','Box plot','A standardized way of displaying the distribution of data based on the five-number summary: minimum, first quartile, median, third quartile and maximum.')}
+      ${t('bar','Bar chart','Shows the relationship between numerical data and categorical values using rectangular bars whose height equals the value. Bars may be vertical or horizontal. Made with plt.bar().')}
+      ${t('pie','Pie chart','A circular graphic divided into slices to illustrate numerical proportion — parts of a whole. Made with plt.pie(); autopct shows the percentage values.')}</div>`,'Line · Scatter · Histogram · Box · Bar · Pie')
+ + ans('2. Explain the various buttons in a matplotlib window.', `<p>The buttons appear at the bottom-left of the output window (Fig. 16.4):</p><ul>${
+      [['Home Button',TOOLBAR_T('home')],['Forward / Back buttons',TOOLBAR_T('back')],['Pan Axis',TOOLBAR_T('pan')],['Zoom',TOOLBAR_T('zoom')],['Configure Subplots',TOOLBAR_T('cfg')],['Save Figure',TOOLBAR_T('save')]].map(x=>`<li><b>${x[0]}</b> → ${x[1]}</li>`).join('')}</ul><p><a href="#buttons">Try the interactive toolbar diagram ↑</a></p>`,'Home · Forward/Back · Pan · Zoom · Configure Subplots · Save')
+ + ans('3. Explain the purpose of the following functions.', `<table class="cmp" style="min-width:0"><thead><tr><th scope="col">Function</th><th scope="col">Purpose</th></tr></thead><tbody>
+      <tr><td style="width:9rem;text-align:left"><code class="i">plt.xlabel</code></td><td>Assigns a label (name) to the <b>x-axis</b>.</td></tr>
+      <tr><td style="text-align:left"><code class="i">plt.ylabel</code></td><td>Assigns a label (name) to the <b>y-axis</b>.</td></tr>
+      <tr><td style="text-align:left"><code class="i">plt.title</code></td><td>Sets the <b>title</b> of the plot.</td></tr>
+      <tr><td style="text-align:left"><code class="i">plt.legend()</code></td><td>Invokes the default <b>legend</b>, which names each line or bar set using its <code class="i">label=</code> value.</td></tr>
+      <tr><td style="text-align:left"><code class="i">plt.show()</code></td><td><b>Displays</b> the plot window (needed when running from a Python script).</td></tr></tbody></table>`,'xlabel · ylabel · title · legend() · show()');
+  function TOOLBAR_T(k){ return esc(window.TOOLBAR.find(b=>b.k===k).txt); }
+})();
+
+/* =====================================================================
+   9. Glossary
+   ===================================================================== */
+const GLOSS = [
+ ['Data Visualization','The graphical representation of information and data, using statistical graphics (dots, lines, bars) to communicate a quantitative message.'],
+ ['Infographic','An “information graphic” — the representation of information in a graphic format.'],
+ ['Dashboard','A collection of resources assembled to create a single unified visual display; patterns become detectable at a glance.'],
+ ['Matplotlib','The most popular data-visualization library in Python; creates 2D charts in a few lines of code.'],
+ ['pip','The package manager software used to install Python packages, e.g. pip install matplotlib.'],
+ ['Line chart','Data points (‘markers’) connected by straight line segments; used for trends over time.'],
+ ['Scatter plot','Shows data as a collection of points positioned by their two-dimensional value.'],
+ ['Histogram','Bars with no gaps showing the frequency distribution of continuous numerical data.'],
+ ['Box plot','Displays data distribution using the five-number summary: min, Q1, median, Q3, max.'],
+ ['Bar chart','Rectangular bars whose height equals a value, comparing a number across categories; drawn with plt.bar().'],
+ ['Pie chart','A circle divided into slices showing parts of a whole; drawn with plt.pie().'],
+ ['autopct','A plt.pie() parameter that shows each slice’s percentage using Python string formatting, e.g. "%.2f" or "%1.1f%%".'],
+ ['xticks','plt.xticks() places tick marks along the x-axis at given positions and gives each a text label.'],
+ ['legend','plt.legend() shows a box naming each plotted line or bar set, using the label= values.']
+];
+$('#gl').innerHTML = GLOSS.map(g=>`<div><dt>${g[0]}</dt><dd>${g[1]}</dd></div>`).join('');
+
+/* =====================================================================
+   10. Navigation, scroll-spy, progress, theme, search
+   ===================================================================== */
+const SECTIONS = $$('main section.card');
+(() => {
+  /* sidebar */
+  let h='', lastG='';
+  SECTIONS.forEach(s=>{ if(s.dataset.group!==lastG){ lastG=s.dataset.group; h+=`<div class="grp">${lastG}</div>`; }
+    h+=`<a href="#${s.id}" data-id="${s.id}"><span class="ck" aria-hidden="true"></span>${esc(s.dataset.nav)}</a>`; });
+  $('#nav').innerHTML = h;
+  /* "mark as done" checkboxes */
+  SECTIONS.forEach(s=>{ s.insertAdjacentHTML('beforeend', `<div class="donebar"><label><input type="checkbox" data-done="${s.id}"> Mark this section as done</label></div>`); });
+  let done = {};
+  try { done = JSON.parse(store.get('ch16_done')||'{}') || {}; } catch(e){ done = {}; }
+  const refresh = () => {
+    let n=0; SECTIONS.forEach(s=>{ const d=!!done[s.id]; if(d) n++; $(`[data-done="${s.id}"]`).checked=d; $(`#nav a[data-id="${s.id}"] .ck`).textContent = d?'✓':''; });
+    const pct = Math.round(n/SECTIONS.length*100);
+    $('#prog-fill').style.width = pct+'%'; $('#prog').setAttribute('aria-valuenow',pct); $('#prog').setAttribute('aria-valuetext',`${n} of ${SECTIONS.length} sections done`);
+    $('#prog-label').textContent = `${n}/${SECTIONS.length} done`;
+    store.set('ch16_done', JSON.stringify(done));
+  };
+  document.addEventListener('change', e=>{ const c=e.target.closest('[data-done]'); if(c){ done[c.dataset.done]=c.checked; refresh(); } });
+  let armed=null;
+  $('#reset-btn').addEventListener('click', e=>{
+    const b=e.target;
+    if(!armed){ b.textContent='Click again to confirm'; armed=setTimeout(()=>{ armed=null; b.textContent='Reset progress'; },3000); }
+    else { clearTimeout(armed); armed=null; done={}; refresh(); b.textContent='Reset progress'; }
+  });
+  refresh();
+  if (!store.ok) $('#store-note').hidden = false;
+
+  /* mobile drawer */
+  const sb=$('#sidebar'), scrim=$('#scrim'), mb=$('#menu-btn');
+  const setMenu = o => { sb.classList.toggle('open',o); scrim.classList.toggle('open',o); mb.setAttribute('aria-expanded',o); };
+  mb.addEventListener('click', ()=>setMenu(!sb.classList.contains('open')));
+  scrim.addEventListener('click', ()=>setMenu(false));
+  $('#nav').addEventListener('click', e=>{ if(e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ setMenu(false); $('#search-res').classList.remove('open'); } });
+
+  /* scroll-spy */
+  const links = {}; $$('#nav a').forEach(a=>links[a.dataset.id]=a);
+  const setActive = id => { Object.values(links).forEach(a=>{ a.classList.toggle('active',a.dataset.id===id); if(a.dataset.id===id) a.removeAttribute('aria-current'); }); if(links[id]) links[id].setAttribute('aria-current','true'); };
+  if ('IntersectionObserver' in window) {
+    const vis = new Map();
+    const io = new IntersectionObserver(es=>{ es.forEach(e=>vis.set(e.target.id,e.isIntersecting?e.boundingClientRect.top:null));
+      const cand=[...vis].filter(([,t])=>t!==null).sort((a,b)=>a[1]-b[1]); if(cand.length){ setActive(cand[0][0]); const a=links[cand[0][0]], sbb=sb.getBoundingClientRect(), ab=a.getBoundingClientRect(); if(ab.top<sbb.top||ab.bottom>sbb.bottom) a.scrollIntoView({block:'nearest'}); } },
+      {rootMargin:'-70px 0px -55% 0px'});
+    SECTIONS.forEach(s=>io.observe(s));
+  }
+
+  /* theme */
+  $('#theme-btn').addEventListener('click', ()=>{ const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',t); store.set('ch16_theme',t); });
+
+  /* search: sections + glossary */
+  const idx = SECTIONS.map(s=>({id:s.id,title:s.dataset.nav,text:s.textContent.toLowerCase()}));
+  const res=$('#search-res'), inp=$('#search');
+  const glItems = $$('#gl>div');
+  function doSearch(){
+    const q = inp.value.trim().toLowerCase();
+    /* glossary filter with highlight */
+    let shown=0;
+    glItems.forEach((d,i)=>{ const hit=!q || (GLOSS[i][0]+' '+GLOSS[i][1]).toLowerCase().includes(q); d.style.display=hit?'':'none'; if(hit) shown++;
+      const re = q ? new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig') : null;
+      d.querySelector('dt').innerHTML = re ? esc(GLOSS[i][0]).replace(re,'<mark>$1</mark>') : esc(GLOSS[i][0]); });
+    $('#gl-empty').style.display = shown?'none':'block';
+    /* section results */
+    if(!q){ res.classList.remove('open'); res.innerHTML=''; return; }
+    const hits = idx.filter(s=>s.text.includes(q)||s.title.toLowerCase().includes(q)).slice(0,8);
+    const gl = GLOSS.filter(g=>g[0].toLowerCase().includes(q)).slice(0,3);
+    res.innerHTML = hits.map(s=>{ const p=s.text.indexOf(q); const snip = p>=0 ? '…'+s.text.slice(Math.max(0,p-25),p+45)+'…' : ''; return `<button type="button" role="option" data-go="${s.id}">${esc(s.title)}<small>${esc(snip)}</small></button>`; }).join('')
+      + gl.map(g=>`<button type="button" role="option" data-go="glossary">📖 ${esc(g[0])}<small>Glossary</small></button>`).join('')
+      || '<button type="button" disabled>No matches</button>';
+    if(!hits.length&&!gl.length) res.innerHTML='<button type="button" disabled>No matches</button>';
+    res.classList.add('open');
+  }
+  inp.addEventListener('input', doSearch);
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const f=$('[data-go]',res); if(f) f.click(); } if(e.key==='ArrowDown'){ const f=$('[data-go]',res); if(f){ e.preventDefault(); f.focus(); } } });
+  res.addEventListener('click', e=>{ const b=e.target.closest('[data-go]'); if(!b) return; const s=document.getElementById(b.dataset.go); s.scrollIntoView({behavior:'smooth'}); res.classList.remove('open'); });
+  document.addEventListener('click', e=>{ if(!e.target.closest('#search-wrap')) res.classList.remove('open'); });
+})();
+</script>
+</body>
+</html>
