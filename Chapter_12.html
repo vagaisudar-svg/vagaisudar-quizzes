@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 – SQL Query Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F4EE;--surface:#ffffff;--surface2:#f0ebe0;--border:#e0d5c5;
+  --text:#1a1208;--text2:#5a4520;--text3:#9a8060;
+  --navy:#1C2340;--navy2:#252d50;--navy3:#323d6a;
+  --teal:#2A9D8F;--teal-light:#d8f0ee;
+  --amber:#E9A228;--amber-light:#fef3cc;
+  --rose:#E05A5A;--rose-light:#fdeaea;
+  --green:#16a34a;--green-light:#dcfce7;
+  --blue:#3b82f6;--blue-light:#dbeafe;
+  --code-bg:#151210;--code-text:#e8d8c0;
+  --sidebar-w:255px;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.09);
+}
+[data-theme="dark"]{
+  --bg:#111009;--surface:#1c190f;--surface2:#252018;--border:#38301e;
+  --text:#f0e8d8;--text2:#c09860;--text3:#806840;
+  --teal-light:#0a2420;--amber-light:#281a00;--rose-light:#280e0e;
+  --green-light:#082010;--blue-light:#0a1428;--code-bg:#080604;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(--text);line-height:1.75;min-height:100vh}
+
+/* Layout */
+.layout{display:flex;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--navy);color:#fff;overflow-y:auto;z-index:100;transition:transform .3s;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:2px}
+.main{margin-left:var(--sidebar-w);flex:1;padding:2rem 2.5rem 5rem;max-width:940px}
+
+/* Sidebar header */
+.sb-header{padding:1.4rem 1.2rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-chapter{font-family:'Space Grotesk',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.45;margin-bottom:.2rem}
+.sb-title{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:700;opacity:.9}
+.sb-progress-wrap{margin-top:.85rem}
+.sb-progress-label{font-family:'Space Grotesk',sans-serif;font-size:.68rem;opacity:.4;margin-bottom:.3rem;display:flex;justify-content:space-between}
+.sb-progress-bar{height:5px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden}
+.sb-progress-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .35s}
+
+/* Nav */
+.sb-nav{padding:.6rem 0 2rem;flex:1}
+.sb-group{margin-bottom:.1rem}
+.sb-group-label{font-family:'Space Grotesk',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;padding:.7rem 1.2rem .2rem;opacity:.35}
+.nav-link{display:flex;align-items:center;gap:.55rem;padding:.42rem 1.2rem;font-family:'Space Grotesk',sans-serif;font-size:.8rem;color:rgba(255,255,255,.68);cursor:pointer;border-left:3px solid transparent;transition:all .14s;user-select:none}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06);border-left-color:rgba(255,255,255,.22)}
+.nav-link.active{color:#fff;background:rgba(255,255,255,.11);border-left-color:var(--teal)}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);flex-shrink:0;transition:all .14s}
+.nav-link.done .nav-dot{background:var(--teal)}
+.nav-link.active .nav-dot{background:var(--amber)}
+
+/* Lang toggle */
+.lang-toggle{display:flex;align-items:center;gap:.4rem;padding:.75rem 1.2rem;border-top:1px solid rgba(255,255,255,.08)}
+.lang-toggle span{font-family:'Space Grotesk',sans-serif;font-size:.75rem;opacity:.5}
+.lang-btn{padding:.25rem .65rem;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.55);font-family:'Space Grotesk',sans-serif;font-size:.72rem;cursor:pointer;transition:all .14s}
+.lang-btn.active{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;padding-bottom:.9rem;border-bottom:1px solid var(--border)}
+.breadcrumb{font-family:'Space Grotesk',sans-serif;font-size:.78rem;color:var(--text3);display:flex;align-items:center;gap:.4rem}
+.breadcrumb strong{color:var(--teal)}
+.topbar-btns{display:flex;gap:.4rem}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.88rem;transition:all .14s}
+.icon-btn:hover{border-color:var(--teal);background:var(--teal-light);color:var(--teal)}
+
+/* Typography */
+h1{font-family:'Space Grotesk',sans-serif;font-size:1.85rem;font-weight:700;color:var(--text);margin-bottom:.35rem}
+h2{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--navy);margin:2rem 0 .7rem;padding-bottom:.35rem;border-bottom:2px solid var(--surface2)}
+[data-theme="dark"] h2{color:var(--text)}
+h3{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;color:var(--text);margin:1.4rem 0 .45rem}
+h4{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;color:var(--text2);margin:.9rem 0 .3rem}
+p{margin-bottom:.85rem;color:var(--text2)}
+ul,ol{margin:.4rem 0 .85rem 1.5rem;color:var(--text2)}
+li{margin-bottom:.28rem}
+strong{color:var(--text);font-weight:600}
+code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--surface2);padding:.1em .35em;border-radius:4px;color:var(--rose)}
+
+/* Sections */
+.section{display:none}.section.active{display:block}
+.section-lead{color:var(--text3);font-family:'Space Grotesk',sans-serif;font-size:.88rem;margin-bottom:1.25rem}
+
+/* Badges */
+.badge{font-family:'Space Grotesk',sans-serif;font-size:.64rem;font-weight:700;padding:.18rem .5rem;border-radius:5px;letter-spacing:.07em;text-transform:uppercase;display:inline-block}
+.badge-textbook{background:var(--blue-light);color:var(--blue)}
+.badge-easy{background:var(--green-light);color:var(--green)}
+.badge-try{background:var(--amber-light);color:var(--amber)}
+.badge-activity{background:var(--rose-light);color:var(--rose)}
+
+/* Example card */
+.example-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin:1rem 0;overflow:hidden}
+.ex-header{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.1rem;background:var(--surface2);border-bottom:1px solid var(--border)}
+.ex-title{font-family:'Space Grotesk',sans-serif;font-size:.8rem;font-weight:700;color:var(--text)}
+.ex-body{padding:.1rem 0 0}
+
+/* Code */
+.code-wrap{position:relative;margin:.3rem 0}
+pre{background:var(--code-bg);border-radius:0;padding:1.1rem 1.4rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.65;color:var(--code-text);border:none}
+.example-card .code-wrap:last-child pre{border-radius:0 0 var(--radius) var(--radius)}
+.copy-btn{position:absolute;top:.5rem;right:.5rem;padding:.22rem .55rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:rgba(255,255,255,.45);font-family:'Space Grotesk',sans-serif;font-size:.68rem;cursor:pointer;transition:all .14s;z-index:2}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+.copy-btn.copied{background:rgba(42,157,143,.22);border-color:rgba(42,157,143,.35);color:#4adcc8}
+
+/* SQL syntax */
+.kw{color:#c792ea}.fn{color:#82aaff}.str{color:#c3e88d}.num{color:#f78c6c}
+.cm{color:#546e7a;font-style:italic}.op{color:#89ddff}
+
+/* Output */
+.result-block{background:#0d1117;border-top:1px solid rgba(255,255,255,.06);padding:.75rem 1.4rem;font-family:'JetBrains Mono',monospace;font-size:.79rem;line-height:1.6;color:#8b9ab0;white-space:pre}
+.result-label{font-family:'Space Grotesk',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3d8a7a;margin-bottom:.3rem}
+
+/* Callout */
+.callout{border-radius:var(--radius);padding:.9rem 1.1rem;margin:.85rem 0;border-left:4px solid}
+.callout-note{background:var(--blue-light);border-color:var(--blue)}
+.callout-note .ct{color:var(--blue)}
+.callout-tip{background:var(--teal-light);border-color:var(--teal)}
+.callout-tip .ct{color:var(--teal)}
+.callout-warn{background:var(--amber-light);border-color:var(--amber)}
+.callout-warn .ct{color:var(--amber)}
+.ct{font-family:'Space Grotesk',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+.callout p{margin-bottom:0;font-size:.9rem}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;margin:1rem 0;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{background:var(--navy);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:.78rem;font-weight:600;padding:.55rem .9rem;text-align:left}
+td{padding:.5rem .9rem;border-bottom:1px solid var(--border);color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:.82rem}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:var(--surface2)}
+
+/* SQL Editor */
+.editor-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:1.25rem 0;background:var(--surface)}
+.editor-bar{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;background:var(--surface2);border-bottom:1px solid var(--border)}
+.editor-label{font-family:'Space Grotesk',sans-serif;font-size:.75rem;font-weight:700;color:var(--teal)}
+.editor-actions{display:flex;gap:.4rem}
+.btn-run{padding:.28rem .8rem;background:var(--teal);color:#fff;border:none;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:background .14s}
+.btn-run:hover{background:#228a7e}
+.btn-reset{padding:.28rem .7rem;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:.75rem;cursor:pointer;transition:all .14s}
+.btn-reset:hover{border-color:var(--rose);color:var(--rose)}
+textarea.sql-input{width:100%;min-height:90px;font-family:'JetBrains Mono',monospace;font-size:.82rem;background:var(--code-bg);color:var(--code-text);border:none;padding:1rem 1.25rem;resize:vertical;outline:none;line-height:1.65}
+.editor-output{border-top:1px solid rgba(255,255,255,.06);min-height:50px;padding:.7rem 1.25rem;background:#0d1117;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#8b9ab0;white-space:pre-wrap;display:none}
+.editor-output.show{display:block}
+.out-table{width:100%;border-collapse:collapse;font-size:.8rem;margin:.3rem 0}
+.out-table th{background:rgba(42,157,143,.18);color:#4adcc8;font-family:'Space Grotesk',sans-serif;font-size:.72rem;padding:.35rem .7rem;text-align:left;border:1px solid rgba(255,255,255,.08)}
+.out-table td{padding:.3rem .7rem;border:1px solid rgba(255,255,255,.06);color:#b0c0c8;font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.out-table tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+.out-error{color:#e07070}
+.out-ok{color:#4adcc8}
+.out-rows{color:#9098b8;font-size:.72rem;margin-top:.4rem;font-family:'Space Grotesk',sans-serif}
+
+/* Practice */
+.mcq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin:.75rem 0}
+.mcq-q{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--text);margin-bottom:.85rem;font-size:.92rem}
+.mcq-opts{display:flex;flex-direction:column;gap:.4rem}
+.mcq-opt{padding:.5rem .9rem;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.88rem;color:var(--text2);transition:all .14s;display:flex;align-items:center;gap:.6rem}
+.mcq-opt:hover:not(.disabled){border-color:var(--teal);background:var(--teal-light);color:var(--teal)}
+.mcq-opt.correct{border-color:var(--green);background:var(--green-light);color:var(--green)}
+.mcq-opt.wrong{border-color:var(--rose);background:var(--rose-light);color:var(--rose)}
+.mcq-opt.disabled{cursor:default}
+.mcq-letter{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.75rem;width:20px;height:20px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mcq-fb{margin-top:.65rem;font-size:.83rem;padding:.45rem .7rem;border-radius:6px;display:none}
+.mcq-fb.correct{background:var(--green-light);color:var(--green);display:block}
+.mcq-fb.wrong{background:var(--rose-light);color:var(--rose);display:block}
+.trace-btn{padding:.25rem .65rem;background:var(--amber-light);color:var(--amber);border:1px solid var(--amber);border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:.7rem;cursor:pointer;margin-top:.5rem}
+.debug-card{background:var(--surface);border:1.5px solid var(--rose-light);border-radius:var(--radius);padding:1.1rem;margin:.75rem 0}
+.debug-label{font-family:'Space Grotesk',sans-serif;font-size:.7rem;font-weight:700;color:var(--rose);margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem}
+.score-box{background:var(--teal-light);border:1px solid var(--teal);border-radius:var(--radius);padding:1.25rem;text-align:center;margin:1.5rem 0;display:none}
+.score-box.show{display:block}
+.score-box h3{font-family:'Space Grotesk',sans-serif;color:var(--teal);font-size:1.2rem}
+.btn-retry{margin-top:.75rem;padding:.5rem 1.25rem;background:var(--teal);color:#fff;border:none;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
+
+/* PTR */
+.ptr-grid{display:grid;gap:.5rem;margin:1rem 0}
+.ptr-item{display:flex;gap:.75rem;align-items:flex-start;padding:.6rem .9rem;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.ptr-num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;min-width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.05rem}
+[data-theme="dark"] .ptr-num{background:var(--teal)}
+.ptr-text{font-size:.9rem;color:var(--text2)}
+
+/* Constraint badges */
+.con-badge{font-family:'Space Grotesk',sans-serif;font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:5px;text-transform:uppercase;letter-spacing:.05em;display:inline-block;margin:.1rem}
+.con-pk{background:#dbeafe;color:#1d4ed8}.con-fk{background:#ede9fe;color:#6d28d9}
+.con-nn{background:#fef3c7;color:#92400e}.con-uq{background:#d1fae5;color:#065f46}
+.con-ck{background:#fce7f3;color:#9d174d}.con-df{background:#e0f2fe;color:#0369a1}
+
+/* Mobile */
+.menu-toggle{display:none;position:fixed;top:.65rem;left:.65rem;z-index:200;width:36px;height:36px;border-radius:8px;background:var(--navy);color:#fff;border:none;cursor:pointer;font-size:1.05rem;align-items:center;justify-content:center}
+#back-top{position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow);z-index:200}
+#back-top.show{display:flex}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:1rem 1.1rem 3rem}
+  .menu-toggle{display:flex}
+  .topbar{margin-top:2.5rem}
+}
+</style>
+</head>
+<body>
+<button class="menu-toggle" id="menuToggle">☰</button>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-chapter">Class 12 CS · Chapter 12</div>
+    <div class="sb-title">SQL Query Lab</div>
+    <div class="sb-progress-wrap">
+      <div class="sb-progress-label"><span>Progress</span><span id="progressPct">0%</span></div>
+      <div class="sb-progress-bar"><div class="sb-progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="sb-nav" id="sbNav">
+    <div class="sb-group">
+      <div class="sb-group-label">Start Here</div>
+      <a class="nav-link active" onclick="show('intro')"><span class="nav-dot"></span>Introduction & RDBMS</a>
+      <a class="nav-link" onclick="show('ddl-overview')"><span class="nav-dot"></span>SQL Overview</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Foundations</div>
+      <a class="nav-link" onclick="show('datatypes')"><span class="nav-dot"></span>12.1 Data Types</a>
+      <a class="nav-link" onclick="show('constraints')"><span class="nav-dot"></span>12.2 Constraints</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">DDL – Define</div>
+      <a class="nav-link" onclick="show('create')"><span class="nav-dot"></span>12.3 CREATE TABLE</a>
+      <a class="nav-link" onclick="show('alter')"><span class="nav-dot"></span>12.4 ALTER TABLE</a>
+      <a class="nav-link" onclick="show('drop')"><span class="nav-dot"></span>12.5 DROP &amp; TRUNCATE</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">DML – Manipulate</div>
+      <a class="nav-link" onclick="show('insert')"><span class="nav-dot"></span>12.6 INSERT</a>
+      <a class="nav-link" onclick="show('update')"><span class="nav-dot"></span>12.7 UPDATE</a>
+      <a class="nav-link" onclick="show('delete')"><span class="nav-dot"></span>12.8 DELETE</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">DQL – Query</div>
+      <a class="nav-link" onclick="show('select')"><span class="nav-dot"></span>12.9 SELECT Basics</a>
+      <a class="nav-link" onclick="show('where')"><span class="nav-dot"></span>12.10 WHERE Clause</a>
+      <a class="nav-link" onclick="show('functions')"><span class="nav-dot"></span>12.11 Aggregate Functions</a>
+      <a class="nav-link" onclick="show('groupby')"><span class="nav-dot"></span>12.12 GROUP BY &amp; HAVING</a>
+      <a class="nav-link" onclick="show('orderby')"><span class="nav-dot"></span>12.13 ORDER BY</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">TCL</div>
+      <a class="nav-link" onclick="show('tcl')"><span class="nav-dot"></span>12.14 COMMIT / ROLLBACK</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Practice</div>
+      <a class="nav-link" onclick="show('playground')"><span class="nav-dot"></span>SQL Playground</a>
+      <a class="nav-link" onclick="show('predict')"><span class="nav-dot"></span>Predict the Output</a>
+      <a class="nav-link" onclick="show('debug')"><span class="nav-dot"></span>Debugging Lab</a>
+      <a class="nav-link" onclick="show('quicktest')"><span class="nav-dot"></span>Quick Test</a>
+    </div>
+  </div>
+  <div class="lang-toggle">
+    <span>Lang</span>
+    <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btnTA" onclick="setLang('ta')">தமிழ்</button>
+  </div>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb">Chapter 12 › <strong id="bcTitle">Introduction</strong></div>
+    <div class="topbar-btns">
+      <button class="icon-btn" onclick="toggleDark()" title="Dark mode">🌙</button>
+    </div>
+  </div>
+
+  <!-- === INTRO === -->
+  <section class="section active" id="sec-intro">
+    <h1 data-en="Introduction to SQL & RDBMS" data-ta="SQL மற்றும் RDBMS அறிமுகம்">Introduction to SQL &amp; RDBMS</h1>
+    <p class="section-lead" data-en="Understand what a database is, how RDBMS works, and what SQL is used for." data-ta="தரவுத்தளம் என்றால் என்ன, RDBMS எவ்வாறு செயல்படுகிறது என்பதை அறிந்து கொள்க.">Understand what a database is, how RDBMS works, and what SQL is used for.</p>
+    <p data-en="A <strong>Database</strong> is an organised collection of inter-related data stored so that it can be easily accessed, managed, and updated. An <strong>RDBMS (Relational Database Management System)</strong> stores data in the form of tables (relations) with rows and columns." data-ta="<strong>தரவுத்தளம்</strong> என்பது ஒழுங்கமைக்கப்பட்ட, ஒன்றுடனொன்று தொடர்புடைய தரவுகளின் தொகுப்பாகும். <strong>RDBMS</strong> தரவை அட்டவணைகளாக (relations) சேமிக்கிறது.">A <strong>Database</strong> is an organised collection of inter-related data stored so that it can be easily accessed, managed, and updated. An <strong>RDBMS</strong> stores data in the form of tables with rows and columns.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Term</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Table / Relation</td><td>Collection of rows and columns</td><td>Student</td></tr>
+          <tr><td>Row / Tuple</td><td>One record in the table</td><td>One student's data</td></tr>
+          <tr><td>Column / Attribute</td><td>A field / property</td><td>Name, Age</td></tr>
+          <tr><td>Primary Key</td><td>Uniquely identifies each row</td><td>Admno</td></tr>
+          <tr><td>Foreign Key</td><td>Links two tables</td><td>Dept_id in Employee</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip"><div class="ct">💡 Tip</div><p>Popular RDBMS: MySQL, Oracle, MS SQL Server, PostgreSQL, SQLite.</p></div>
+    <h2>SQL Sub-Languages</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Sub-Language</th><th>Full Form</th><th>Commands</th></tr></thead>
+      <tbody>
+        <tr><td><strong>DDL</strong></td><td>Data Definition Language</td><td>CREATE, ALTER, DROP, TRUNCATE</td></tr>
+        <tr><td><strong>DML</strong></td><td>Data Manipulation Language</td><td>INSERT, UPDATE, DELETE</td></tr>
+        <tr><td><strong>DQL</strong></td><td>Data Query Language</td><td>SELECT</td></tr>
+        <tr><td><strong>DCL</strong></td><td>Data Control Language</td><td>GRANT, REVOKE</td></tr>
+        <tr><td><strong>TCL</strong></td><td>Transaction Control Language</td><td>COMMIT, ROLLBACK, SAVEPOINT</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- === SQL OVERVIEW === -->
+  <section class="section" id="sec-ddl-overview">
+    <h1>SQL Overview</h1>
+    <p class="section-lead">SQL (Structured Query Language) is the standard language for interacting with relational databases.</p>
+    <p>SQL is <strong>not case-sensitive</strong> for keywords (SELECT = select), but conventionally written in uppercase. Statements end with a <strong>semicolon (;)</strong>.</p>
+    <div class="callout callout-note"><div class="ct">📌 Sample Database</div><p>The <strong>Student</strong> table used throughout this lab has columns: Admno, Name, Gender, Age, Place. It contains 8 rows (Admno 100–107). Run <code>SELECT * FROM Student;</code> in the playground to see all data.</p></div>
+    <div class="editor-wrap">
+      <div class="editor-bar">
+        <span class="editor-label">Try it — view the Student table</span>
+        <div class="editor-actions">
+          <button class="btn-run" onclick="runEditor(this)">▶ Run</button>
+        </div>
+      </div>
+      <textarea class="sql-input">SELECT * FROM Student;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === DATA TYPES === -->
+  <section class="section" id="sec-datatypes">
+    <h1>12.1 Data Types in MySQL</h1>
+    <p class="section-lead">MySQL supports several data types grouped into numeric, string, and date/time categories.</p>
+    <h2>Numeric Types</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Type</th><th>Storage</th><th>Range / Use</th></tr></thead>
+      <tbody>
+        <tr><td>INT / INTEGER</td><td>4 bytes</td><td>Whole numbers, −2,147,483,648 to 2,147,483,647</td></tr>
+        <tr><td>SMALLINT</td><td>2 bytes</td><td>−32,768 to 32,767</td></tr>
+        <tr><td>BIGINT</td><td>8 bytes</td><td>Very large integers</td></tr>
+        <tr><td>FLOAT(p)</td><td>4/8 bytes</td><td>Floating-point numbers</td></tr>
+        <tr><td>DECIMAL(M,D)</td><td>Varies</td><td>Exact numeric, M digits total, D decimal places</td></tr>
+      </tbody>
+    </table></div>
+    <h2>String (Character) Types</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Type</th><th>Max Size</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>CHAR(n)</td><td>255 chars</td><td>Fixed-length; pads with spaces</td></tr>
+        <tr><td>VARCHAR(n)</td><td>65,535 chars</td><td>Variable-length; only stores what you enter</td></tr>
+        <tr><td>TEXT</td><td>65,535 chars</td><td>Long text strings</td></tr>
+      </tbody>
+    </table></div>
+    <h2>Date &amp; Time Types</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Type</th><th>Format</th></tr></thead>
+      <tbody>
+        <tr><td>DATE</td><td>YYYY-MM-DD</td></tr>
+        <tr><td>TIME</td><td>HH:MM:SS</td></tr>
+        <tr><td>DATETIME</td><td>YYYY-MM-DD HH:MM:SS</td></tr>
+        <tr><td>YEAR</td><td>YYYY</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout callout-tip"><div class="ct">✅ Tip</div><p>Use <code>VARCHAR</code> over <code>CHAR</code> when field lengths vary. Use <code>DECIMAL</code> for money values — never <code>FLOAT</code>.</p></div>
+  </section>
+
+  <!-- === CONSTRAINTS === -->
+  <section class="section" id="sec-constraints">
+    <h1>12.2 Constraints</h1>
+    <p class="section-lead">Constraints enforce rules on the data in a table to maintain accuracy and integrity.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Constraint</th><th>Badge</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>PRIMARY KEY</td><td><span class="con-badge con-pk">PK</span></td><td>Uniquely identifies each row; NOT NULL + UNIQUE combined</td></tr>
+        <tr><td>FOREIGN KEY</td><td><span class="con-badge con-fk">FK</span></td><td>Links to PRIMARY KEY in another table; enforces referential integrity</td></tr>
+        <tr><td>NOT NULL</td><td><span class="con-badge con-nn">NN</span></td><td>Column must have a value — NULL not allowed</td></tr>
+        <tr><td>UNIQUE</td><td><span class="con-badge con-uq">UQ</span></td><td>All values in column must be different; allows one NULL</td></tr>
+        <tr><td>CHECK</td><td><span class="con-badge con-ck">CK</span></td><td>Limits values to satisfy a condition (e.g. Age &gt; 0)</td></tr>
+        <tr><td>DEFAULT</td><td><span class="con-badge con-df">DF</span></td><td>Assigns a default value when none is provided</td></tr>
+      </tbody>
+    </table></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">Constraints in CREATE TABLE</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">CREATE TABLE</span> Student (
+  Admno   <span class="kw">INT</span>          <span class="kw">PRIMARY KEY</span>,
+  Name    <span class="kw">VARCHAR</span>(<span class="num">30</span>)  <span class="kw">NOT NULL</span>,
+  Gender  <span class="kw">CHAR</span>(<span class="num">1</span>)       <span class="kw">CHECK</span> (Gender <span class="op">IN</span> (<span class="str">'M'</span>,<span class="str">'F'</span>)),
+  Age     <span class="kw">INT</span>          <span class="kw">DEFAULT</span> <span class="num">17</span>,
+  Place   <span class="kw">VARCHAR</span>(<span class="num">25</span>)
+);</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- === CREATE === -->
+  <section class="section" id="sec-create">
+    <h1>12.3 CREATE TABLE</h1>
+    <p class="section-lead">DDL statement to define a new table structure in the database.</p>
+    <h3>Syntax</h3>
+    <div class="code-wrap"><pre><span class="kw">CREATE TABLE</span> table_name (
+  column1 datatype [constraint],
+  column2 datatype [constraint],
+  ...
+);</pre></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">Create the Student table</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">CREATE TABLE</span> Student (
+  Admno  <span class="kw">INT</span>         <span class="kw">PRIMARY KEY</span>,
+  Name   <span class="kw">VARCHAR</span>(<span class="num">30</span>) <span class="kw">NOT NULL</span>,
+  Gender <span class="kw">CHAR</span>(<span class="num">1</span>),
+  Age    <span class="kw">INT</span>,
+  Place  <span class="kw">VARCHAR</span>(<span class="num">25</span>)
+);</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it — see existing tables</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SHOW TABLES;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === ALTER === -->
+  <section class="section" id="sec-alter">
+    <h1>12.4 ALTER TABLE</h1>
+    <p class="section-lead">Modify the structure of an existing table — add, modify, or drop columns.</p>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">ADD a new column</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">ALTER TABLE</span> Student <span class="kw">ADD</span> Marks <span class="kw">INT</span>;</pre>
+      </div>
+    </div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">MODIFY column data type</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">ALTER TABLE</span> Student <span class="kw">MODIFY</span> Name <span class="kw">VARCHAR</span>(<span class="num">50</span>);</pre>
+      </div>
+    </div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">DROP a column</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">ALTER TABLE</span> Student <span class="kw">DROP COLUMN</span> Marks;</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it — add a Marks column then drop it</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">ALTER TABLE Student ADD Marks INT;
+SELECT * FROM Student;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === DROP === -->
+  <section class="section" id="sec-drop">
+    <h1>12.5 DROP &amp; TRUNCATE</h1>
+    <p class="section-lead">Permanently remove a table or clear all its rows.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Command</th><th>Effect</th><th>Can Rollback?</th></tr></thead>
+      <tbody>
+        <tr><td>DROP TABLE</td><td>Removes table structure AND all data permanently</td><td>No</td></tr>
+        <tr><td>TRUNCATE TABLE</td><td>Deletes all rows; keeps the table structure intact</td><td>No (DDL)</td></tr>
+        <tr><td>DELETE (no WHERE)</td><td>Deletes all rows; keeps structure</td><td>Yes (DML)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout callout-warn"><div class="ct">⚠ Warning</div><p>DROP and TRUNCATE are irreversible. Always take a backup before using them in production.</p></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">DROP TABLE syntax</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><pre><span class="kw">DROP TABLE</span> Student;          <span class="cm">-- removes table completely</span>
+<span class="kw">TRUNCATE TABLE</span> Student;     <span class="cm">-- clears data, keeps structure</span></pre></div>
+    </div>
+  </section>
+
+  <!-- === INSERT === -->
+  <section class="section" id="sec-insert">
+    <h1>12.6 INSERT INTO</h1>
+    <p class="section-lead">DML statement to add new rows to a table.</p>
+    <h3>Syntax</h3>
+    <div class="code-wrap"><pre><span class="kw">INSERT INTO</span> table_name (col1, col2, ...) <span class="kw">VALUES</span> (val1, val2, ...);
+<span class="cm">-- OR (all columns, in order):</span>
+<span class="kw">INSERT INTO</span> table_name <span class="kw">VALUES</span> (val1, val2, ...);</pre></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">Insert rows into Student</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">INSERT INTO</span> Student <span class="kw">VALUES</span> (<span class="num">100</span>, <span class="str">'Arjun'</span>,   <span class="str">'M'</span>, <span class="num">17</span>, <span class="str">'Chennai'</span>);
+<span class="kw">INSERT INTO</span> Student <span class="kw">VALUES</span> (<span class="num">101</span>, <span class="str">'Priya'</span>,   <span class="str">'F'</span>, <span class="num">16</span>, <span class="str">'Madurai'</span>);
+<span class="kw">INSERT INTO</span> Student <span class="kw">VALUES</span> (<span class="num">102</span>, <span class="str">'Kumar'</span>,   <span class="str">'M'</span>, <span class="num">17</span>, <span class="str">'Trichy'</span>);
+<span class="kw">INSERT INTO</span> Student <span class="kw">VALUES</span> (<span class="num">103</span>, <span class="str">'Meena'</span>,   <span class="str">'F'</span>, <span class="num">18</span>, <span class="str">'Chennai'</span>);</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it — view all students</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button></div></div>
+      <textarea class="sql-input">SELECT * FROM Student;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === UPDATE === -->
+  <section class="section" id="sec-update">
+    <h1>12.7 UPDATE</h1>
+    <p class="section-lead">Modify existing records in a table. Always use WHERE to target specific rows.</p>
+    <h3>Syntax</h3>
+    <div class="code-wrap"><pre><span class="kw">UPDATE</span> table_name
+<span class="kw">SET</span> col1 = val1, col2 = val2
+<span class="kw">WHERE</span> condition;</pre></div>
+    <div class="callout callout-warn"><div class="ct">⚠ Always use WHERE</div><p>Without a WHERE clause, UPDATE modifies <strong>every row</strong> in the table.</p></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">Update a student's place</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">UPDATE</span> Student
+<span class="kw">SET</span> Place = <span class="str">'Coimbatore'</span>
+<span class="kw">WHERE</span> Admno = <span class="num">101</span>;</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it — update then verify</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">UPDATE Student SET Age = 18 WHERE Admno = 100;
+SELECT Admno, Name, Age FROM Student WHERE Admno = 100;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === DELETE === -->
+  <section class="section" id="sec-delete">
+    <h1>12.8 DELETE</h1>
+    <p class="section-lead">Remove specific rows from a table. Unlike TRUNCATE, DELETE can be rolled back.</p>
+    <h3>Syntax</h3>
+    <div class="code-wrap"><pre><span class="kw">DELETE FROM</span> table_name <span class="kw">WHERE</span> condition;</pre></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">Delete a specific student</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">DELETE FROM</span> Student <span class="kw">WHERE</span> Admno = <span class="num">107</span>;</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SELECT COUNT(*) AS Total FROM Student;
+DELETE FROM Student WHERE Age > 17;
+SELECT COUNT(*) AS Total FROM Student;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === SELECT === -->
+  <section class="section" id="sec-select">
+    <h1>12.9 SELECT Statement</h1>
+    <p class="section-lead">The most important SQL statement — retrieve data from one or more tables.</p>
+    <h3>Syntax</h3>
+    <div class="code-wrap"><pre><span class="kw">SELECT</span> [<span class="kw">DISTINCT</span>] col1, col2 | *
+<span class="kw">FROM</span> table_name
+[<span class="kw">WHERE</span> condition]
+[<span class="kw">GROUP BY</span> col]
+[<span class="kw">HAVING</span> condition]
+[<span class="kw">ORDER BY</span> col [<span class="kw">ASC</span>|<span class="kw">DESC</span>]];</pre></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">Basic SELECT examples</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> Student;                      <span class="cm">-- all rows, all columns</span>
+<span class="kw">SELECT</span> Name, Age <span class="kw">FROM</span> Student;              <span class="cm">-- specific columns</span>
+<span class="kw">SELECT DISTINCT</span> Place <span class="kw">FROM</span> Student;         <span class="cm">-- unique places only</span>
+<span class="kw">SELECT</span> Name, Age <span class="op">*</span> <span class="num">2</span> <span class="kw">AS</span> DoubleAge <span class="kw">FROM</span> Student; <span class="cm">-- computed column</span></pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SELECT DISTINCT Place FROM Student;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === WHERE === -->
+  <section class="section" id="sec-where">
+    <h1>12.10 WHERE Clause</h1>
+    <p class="section-lead">Filter rows using conditions with comparison, logical, and special operators.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>=, !=, &lt;, &gt;, &lt;=, &gt;=</td><td>Comparison</td><td>Age &gt;= 17</td></tr>
+        <tr><td>AND, OR, NOT</td><td>Logical</td><td>Age = 17 AND Gender = 'M'</td></tr>
+        <tr><td>BETWEEN … AND …</td><td>Range (inclusive)</td><td>Age BETWEEN 16 AND 18</td></tr>
+        <tr><td>IN (…)</td><td>Match any in list</td><td>Place IN ('Chennai','Madurai')</td></tr>
+        <tr><td>LIKE</td><td>Pattern match (% = any chars, _ = one char)</td><td>Name LIKE 'A%'</td></tr>
+        <tr><td>IS NULL / IS NOT NULL</td><td>Check for NULL</td><td>Place IS NOT NULL</td></tr>
+      </tbody>
+    </table></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">WHERE examples</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">WHERE</span> Age <span class="op">BETWEEN</span> <span class="num">16</span> <span class="kw">AND</span> <span class="num">17</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">WHERE</span> Place <span class="kw">IN</span> (<span class="str">'Chennai'</span>, <span class="str">'Madurai'</span>);
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">WHERE</span> Name <span class="kw">LIKE</span> <span class="str">'A%'</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">WHERE</span> Place <span class="kw">IS NULL</span>;</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it — experiment with conditions</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SELECT Name, Age, Place FROM Student
+WHERE Age BETWEEN 16 AND 17
+AND Gender = 'M';</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === FUNCTIONS === -->
+  <section class="section" id="sec-functions">
+    <h1>12.11 Aggregate Functions</h1>
+    <p class="section-lead">Functions that operate on a set of values and return a single summary value.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Function</th><th>Returns</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>COUNT(*)</td><td>Number of rows</td><td>SELECT COUNT(*) FROM Student;</td></tr>
+        <tr><td>COUNT(col)</td><td>Non-NULL values in column</td><td>SELECT COUNT(Place) FROM Student;</td></tr>
+        <tr><td>SUM(col)</td><td>Total of numeric column</td><td>SELECT SUM(Age) FROM Student;</td></tr>
+        <tr><td>AVG(col)</td><td>Average of numeric column</td><td>SELECT AVG(Age) FROM Student;</td></tr>
+        <tr><td>MAX(col)</td><td>Largest value</td><td>SELECT MAX(Age) FROM Student;</td></tr>
+        <tr><td>MIN(col)</td><td>Smallest value</td><td>SELECT MIN(Age) FROM Student;</td></tr>
+      </tbody>
+    </table></div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it — aggregate queries</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SELECT COUNT(*) AS Total,
+       MAX(Age) AS MaxAge,
+       MIN(Age) AS MinAge,
+       AVG(Age) AS AvgAge
+FROM Student;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === GROUP BY === -->
+  <section class="section" id="sec-groupby">
+    <h1>12.12 GROUP BY &amp; HAVING</h1>
+    <p class="section-lead">Group rows by a column value, then apply aggregate functions to each group.</p>
+    <div class="callout callout-note"><div class="ct">📌 Remember</div><p><strong>WHERE</strong> filters rows before grouping. <strong>HAVING</strong> filters groups after aggregation. You cannot use aggregate functions in WHERE.</p></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">GROUP BY examples</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="cm">-- Count students by gender</span>
+<span class="kw">SELECT</span> Gender, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> Count
+<span class="kw">FROM</span> Student
+<span class="kw">GROUP BY</span> Gender;
+
+<span class="cm">-- Average age per place, only where avg > 16</span>
+<span class="kw">SELECT</span> Place, <span class="fn">AVG</span>(Age) <span class="kw">AS</span> AvgAge
+<span class="kw">FROM</span> Student
+<span class="kw">GROUP BY</span> Place
+<span class="kw">HAVING</span> <span class="fn">AVG</span>(Age) <span class="op">></span> <span class="num">16</span>;</pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SELECT Place, COUNT(*) AS Students
+FROM Student
+GROUP BY Place;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === ORDER BY === -->
+  <section class="section" id="sec-orderby">
+    <h1>12.13 ORDER BY</h1>
+    <p class="section-lead">Sort query results in ascending (ASC) or descending (DESC) order.</p>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">ORDER BY examples</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">ORDER BY</span> Name;           <span class="cm">-- alphabetical ASC (default)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">ORDER BY</span> Age <span class="kw">DESC</span>;       <span class="cm">-- oldest first</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Student <span class="kw">ORDER BY</span> Place, Name;     <span class="cm">-- multi-column sort</span></pre>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Try it</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input">SELECT Name, Age FROM Student ORDER BY Age DESC;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === TCL === -->
+  <section class="section" id="sec-tcl">
+    <h1>12.14 Transaction Control (TCL)</h1>
+    <p class="section-lead">Manage transactions to ensure data consistency — commit or undo changes.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+      <tbody>
+        <tr><td>COMMIT</td><td>Permanently saves all changes made in the current transaction</td></tr>
+        <tr><td>ROLLBACK</td><td>Undoes all changes since the last COMMIT</td></tr>
+        <tr><td>SAVEPOINT name</td><td>Sets a named checkpoint within a transaction</td></tr>
+        <tr><td>ROLLBACK TO name</td><td>Reverts to a specific savepoint</td></tr>
+      </tbody>
+    </table></div>
+    <div class="example-card">
+      <div class="ex-header"><span class="ex-title">SAVEPOINT &amp; ROLLBACK example</span><span class="badge badge-textbook">Textbook</span></div>
+      <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">START TRANSACTION</span>;
+<span class="kw">INSERT INTO</span> Student <span class="kw">VALUES</span> (<span class="num">110</span>, <span class="str">'Test'</span>, <span class="str">'M'</span>, <span class="num">17</span>, <span class="str">'Chennai'</span>);
+<span class="kw">SAVEPOINT</span> sp1;
+<span class="kw">DELETE FROM</span> Student <span class="kw">WHERE</span> Admno = <span class="num">110</span>;
+<span class="kw">ROLLBACK TO</span> sp1;    <span class="cm">-- row 110 is back</span>
+<span class="kw">COMMIT</span>;             <span class="cm">-- save everything up to sp1</span></pre>
+      </div>
+    </div>
+    <div class="callout callout-note"><div class="ct">📌 Note</div><p>DDL statements (CREATE, DROP, ALTER, TRUNCATE) cause an implicit COMMIT and cannot be rolled back.</p></div>
+  </section>
+
+  <!-- === PLAYGROUND === -->
+  <section class="section" id="sec-playground">
+    <h1>SQL Playground</h1>
+    <p class="section-lead">Free-form SQL editor — the Student table is pre-loaded. Run any SQL you like.</p>
+    <div class="callout callout-tip"><div class="ct">🗂 Pre-loaded Tables</div>
+      <p><strong>Student</strong>(Admno, Name, Gender, Age, Place) — 8 rows (Admno 100–107)<br>
+      <strong>Employee</strong>(EmpNo, EmpName, Dept, Salary, City) — 5 rows</p>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-bar"><span class="editor-label">Full SQL Playground</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+      <textarea class="sql-input" style="min-height:150px">-- Try any SQL!
+SELECT * FROM Student;
+-- SELECT * FROM Employee;</textarea>
+      <div class="editor-output"></div>
+    </div>
+  </section>
+
+  <!-- === PREDICT === -->
+  <section class="section" id="sec-predict">
+    <h1>Predict the Output</h1>
+    <p class="section-lead">Read each query, predict the result, then run it to verify.</p>
+    <div class="mcq-card">
+      <div class="mcq-q">1. What does <code>SELECT DISTINCT Gender FROM Student;</code> return?</div>
+      <div class="mcq-opts">
+        <div class="mcq-opt" onclick="pickMCQ(this,0,0)"><span class="mcq-letter">A</span>All 8 rows of the Gender column</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,0,1)"><span class="mcq-letter">B</span>Two rows: M and F</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,0,2)"><span class="mcq-letter">C</span>Only M</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,0,3)"><span class="mcq-letter">D</span>Error — DISTINCT not allowed</div>
+      </div>
+      <div class="mcq-fb" id="pfb0"></div>
+      <button class="trace-btn" onclick="traceInPlayground('SELECT DISTINCT Gender FROM Student;')">Trace in Playground</button>
+    </div>
+    <div class="mcq-card">
+      <div class="mcq-q">2. What does <code>SELECT COUNT(*) FROM Student WHERE Age &gt; 17;</code> return?</div>
+      <div class="mcq-opts">
+        <div class="mcq-opt" onclick="pickMCQ(this,1,0)"><span class="mcq-letter">A</span>8</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,1,1)"><span class="mcq-letter">B</span>Depends on data</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,1,2)"><span class="mcq-letter">C</span>0</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,1,3)"><span class="mcq-letter">D</span>Error</div>
+      </div>
+      <div class="mcq-fb" id="pfb1"></div>
+      <button class="trace-btn" onclick="traceInPlayground('SELECT COUNT(*) FROM Student WHERE Age > 17;')">Trace in Playground</button>
+    </div>
+    <div class="mcq-card">
+      <div class="mcq-q">3. What is the output of <code>SELECT MAX(Age) - MIN(Age) AS Spread FROM Student;</code>?</div>
+      <div class="mcq-opts">
+        <div class="mcq-opt" onclick="pickMCQ(this,2,0)"><span class="mcq-letter">A</span>Error — can't subtract functions</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,2,1)"><span class="mcq-letter">B</span>A single number (the age spread)</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,2,2)"><span class="mcq-letter">C</span>NULL</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,2,3)"><span class="mcq-letter">D</span>Two rows: max and min</div>
+      </div>
+      <div class="mcq-fb" id="pfb2"></div>
+      <button class="trace-btn" onclick="traceInPlayground('SELECT MAX(Age) - MIN(Age) AS Spread FROM Student;')">Trace in Playground</button>
+    </div>
+    <div class="mcq-card">
+      <div class="mcq-q">4. <code>SELECT * FROM Student WHERE Place IN ('Chennai','Madurai') ORDER BY Name DESC;</code> — which row appears first?</div>
+      <div class="mcq-opts">
+        <div class="mcq-opt" onclick="pickMCQ(this,3,0)"><span class="mcq-letter">A</span>The student with the earliest alphabetical name</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,3,1)"><span class="mcq-letter">B</span>The student with the last alphabetical name (Z first)</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,3,2)"><span class="mcq-letter">C</span>The student with the highest Admno</div>
+        <div class="mcq-opt" onclick="pickMCQ(this,3,3)"><span class="mcq-letter">D</span>Random order</div>
+      </div>
+      <div class="mcq-fb" id="pfb3"></div>
+      <button class="trace-btn" onclick="traceInPlayground(&quot;SELECT * FROM Student WHERE Place IN ('Chennai','Madurai') ORDER BY Name DESC;&quot;)">Trace in Playground</button>
+    </div>
+  </section>
+
+  <!-- === DEBUG === -->
+  <section class="section" id="sec-debug">
+    <h1>Debugging Lab</h1>
+    <p class="section-lead">Find and fix the bug in each SQL snippet. Click the editor to edit, then run.</p>
+    <div class="debug-card">
+      <div class="debug-label">🐛 Bug 1</div>
+      <div class="editor-wrap" style="margin:0">
+        <div class="editor-bar"><span class="editor-label">Fix and run</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+        <textarea class="sql-input">SELECT Name Age FROM Student WHERE Gender = 'M';</textarea>
+        <div class="editor-output"></div>
+      </div>
+      <p style="margin-top:.6rem;font-size:.83rem;color:var(--text3)">Hint: Missing comma between column names</p>
+    </div>
+    <div class="debug-card">
+      <div class="debug-label">🐛 Bug 2</div>
+      <div class="editor-wrap" style="margin:0">
+        <div class="editor-bar"><span class="editor-label">Fix and run</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+        <textarea class="sql-input">SELECT Place, COUNT(*) FROM Student
+WHERE COUNT(*) > 1
+GROUP BY Place;</textarea>
+        <div class="editor-output"></div>
+      </div>
+      <p style="margin-top:.6rem;font-size:.83rem;color:var(--text3)">Hint: Can't use aggregate functions in WHERE — use HAVING after GROUP BY</p>
+    </div>
+    <div class="debug-card">
+      <div class="debug-label">🐛 Bug 3</div>
+      <div class="editor-wrap" style="margin:0">
+        <div class="editor-bar"><span class="editor-label">Fix and run</span><div class="editor-actions"><button class="btn-run" onclick="runEditor(this)">▶ Run</button><button class="btn-reset" onclick="resetEditor(this)">Reset</button></div></div>
+        <textarea class="sql-input">UPDATE Student
+SET Place = 'Salem';</textarea>
+        <div class="editor-output"></div>
+      </div>
+      <p style="margin-top:.6rem;font-size:.83rem;color:var(--text3)">Hint: Missing WHERE clause — this updates ALL rows! Add WHERE Admno = 104</p>
+    </div>
+  </section>
+
+  <!-- === QUICK TEST === -->
+  <section class="section" id="sec-quicktest">
+    <h1>Quick Test</h1>
+    <p class="section-lead">5 MCQs — test your chapter knowledge.</p>
+    <div id="qtContainer"></div>
+    <div class="score-box" id="qtScore">
+      <h3 id="qtScoreText"></h3>
+      <p id="qtScoreMsg"></p>
+      <button class="btn-retry" onclick="buildQuickTest()">Retry</button>
+    </div>
+  </section>
+
+</main>
+</div>
+<button id="back-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ============================================================
+// SQL ENGINE
+// ============================================================
+const DB = {};
+
+function initDB() {
+  DB.Student = {
+    cols: ['Admno','Name','Gender','Age','Place'],
+    rows: [
+      [100,'Arjun','M',17,'Chennai'],
+      [101,'Priya','F',16,'Madurai'],
+      [102,'Kumar','M',17,'Trichy'],
+      [103,'Meena','F',18,'Chennai'],
+      [104,'Ravi','M',16,'Salem'],
+      [105,'Divya','F',17,'Madurai'],
+      [106,'Suresh','M',18,'Trichy'],
+      [107,'Kavya','F',16,'Chennai']
+    ]
+  };
+  DB.Employee = {
+    cols: ['EmpNo','EmpName','Dept','Salary','City'],
+    rows: [
+      [1,'Anand','IT',45000,'Chennai'],
+      [2,'Bala','HR',38000,'Madurai'],
+      [3,'Chitra','IT',52000,'Chennai'],
+      [4,'Deepa','Finance',41000,'Trichy'],
+      [5,'Elan','HR',35000,'Salem']
+    ]
+  };
+}
+initDB();
+
+function execSQL(sql) {
+  const stmts = sql.split(';').map(s=>s.trim()).filter(Boolean);
+  let results = [];
+  let tempDB = JSON.parse(JSON.stringify(DB));
+  for (const stmt of stmts) {
+    try { results.push(runStmt(stmt, tempDB)); }
+    catch(e) { results.push({error: e.message}); }
+  }
+  return results;
+}
+
+function runStmt(stmt, tdb) {
+  const up = stmt.toUpperCase().trim();
+  if (up.startsWith('SHOW TABLES')) {
+    return {cols:['Tables'], rows: Object.keys(tdb).map(t=>[t])};
+  }
+  if (up.startsWith('SELECT')) return runSelect(stmt, tdb);
+  if (up.startsWith('INSERT')) return runInsert(stmt, tdb);
+  if (up.startsWith('UPDATE')) return runUpdate(stmt, tdb);
+  if (up.startsWith('DELETE')) return runDelete(stmt, tdb);
+  if (up.startsWith('ALTER TABLE')) return runAlter(stmt, tdb);
+  if (up.startsWith('DROP TABLE')) return runDrop(stmt, tdb);
+  if (up.startsWith('TRUNCATE')) return runTruncate(stmt, tdb);
+  if (up.startsWith('CREATE TABLE')) return {ok:'Table created (schema only in simulator)'};
+  if (/^(COMMIT|ROLLBACK|SAVEPOINT|START TRANSACTION|BEGIN)/.test(up)) return {ok: stmt.split(' ')[0] + ' acknowledged.'};
+  throw new Error('Unsupported statement: ' + stmt.substring(0,40));
+}
+
+function getTable(tdb, name) {
+  const key = Object.keys(tdb).find(k=>k.toLowerCase()===name.toLowerCase());
+  if (!key) throw new Error('Table not found: ' + name);
+  return {key, table: tdb[key]};
+}
+
+function runSelect(sql, tdb) {
+  // Extract FROM table
+  const fromM = sql.match(/FROM\s+(\w+)/i);
+  if (!fromM) throw new Error('FROM clause missing');
+  const {key, table} = getTable(tdb, fromM[1]);
+  let rows = table.rows.map(r=>[...r]);
+  let cols = [...table.cols];
+
+  // WHERE
+  const whereM = sql.match(/WHERE\s+(.+?)(?:GROUP BY|HAVING|ORDER BY|;|$)/is);
+  if (whereM) rows = rows.filter(r=>evalWhere(whereM[1].trim(), cols, r));
+
+  // GROUP BY
+  const gbM = sql.match(/GROUP BY\s+(.+?)(?:HAVING|ORDER BY|;|$)/is);
+  let groupedResult = null;
+  if (gbM) {
+    const gbCols = gbM[1].trim().split(',').map(c=>c.trim());
+    const groups = {};
+    for (const row of rows) {
+      const key2 = gbCols.map(c=>{const i=cols.findIndex(x=>x.toLowerCase()===c.toLowerCase());return i>=0?row[i]:null}).join('||');
+      if (!groups[key2]) groups[key2] = [];
+      groups[key2].push(row);
+    }
+    groupedResult = {groups, gbCols, allRows: rows, cols};
+    rows = Object.values(groups);
+  }
+
+  // SELECT columns
+  const selRaw = sql.match(/SELECT\s+(.*?)\s+FROM/is)?.[1]?.trim() || '*';
+  const distinct = /^DISTINCT\s+/i.test(selRaw);
+  const selPart = distinct ? selRaw.replace(/^DISTINCT\s+/i,'') : selRaw;
+
+  let outCols, outRows;
+  if (selPart === '*') {
+    outCols = cols;
+    outRows = groupedResult ? rows.map(g=>g[0]) : rows;
+  } else {
+    const selItems = splitSelect(selPart);
+    outCols = [];
+    outRows = [];
+    const sourceRows = groupedResult ? rows : [null];
+    for (const groupRows of (groupedResult ? rows : [rows])) {
+      const outRow = [];
+      const thisRows = groupedResult ? groupRows : rows;
+      for (const item of selItems) {
+        const alias = item.match(/\bAS\s+(\w+)\s*$/i)?.[1];
+        const expr = item.replace(/\s+AS\s+\w+\s*$/i,'').trim();
+        if (outRows.length === 0) outCols.push(alias || expr);
+        outRow.push(evalExpr(expr, cols, groupedResult ? groupRows[0] : null, thisRows));
+      }
+      outRows.push(outRow);
+    }
+    if (!groupedResult) {
+      outRows = rows.map(row=>{
+        return selItems.map(item=>{
+          const alias = item.match(/\bAS\s+(\w+)\s*$/i)?.[1];
+          const expr = item.replace(/\s+AS\s+\w+\s*$/i,'').trim();
+          return evalExpr(expr, cols, row, rows);
+        });
+      });
+      outCols = selItems.map(item=>{
+        const alias = item.match(/\bAS\s+(\w+)\s*$/i)?.[1];
+        const expr = item.replace(/\s+AS\s+\w+\s*$/i,'').trim();
+        return alias || expr;
+      });
+    }
+  }
+
+  // HAVING
+  const havM = sql.match(/HAVING\s+(.+?)(?:ORDER BY|;|$)/is);
+  if (havM && groupedResult) {
+    outRows = outRows.filter((_,i)=>{
+      const rowData = Object.values(groupedResult.groups)[i];
+      return evalHaving(havM[1].trim(), groupedResult.cols, rowData, outCols, outRows[i]);
+    });
+  }
+
+  // ORDER BY
+  const obM = sql.match(/ORDER BY\s+(.+?)(?:;|$)/is);
+  if (obM) {
+    const parts = obM[1].trim().split(',').map(p=>p.trim());
+    outRows.sort((a,b)=>{
+      for (const part of parts) {
+        const desc = /\bDESC\b/i.test(part);
+        const col = part.replace(/\b(ASC|DESC)\b/i,'').trim();
+        let ai = outCols.findIndex(c=>c.toLowerCase()===col.toLowerCase());
+        if (ai<0) ai = cols.findIndex(c=>c.toLowerCase()===col.toLowerCase());
+        const av = ai>=0?a[ai]:null, bv = bi>=0?b[bi]:null;
+        const bi2 = ai;
+        const av2 = a[ai], bv2 = b[ai];
+        let cmp = av2 < bv2 ? -1 : av2 > bv2 ? 1 : 0;
+        if (desc) cmp = -cmp;
+        if (cmp !== 0) return cmp;
+      }
+      return 0;
+    });
+  }
+
+  // DISTINCT
+  if (distinct) {
+    const seen = new Set();
+    outRows = outRows.filter(r=>{const k=JSON.stringify(r);if(seen.has(k))return false;seen.add(k);return true;});
+  }
+
+  return {cols: outCols, rows: outRows};
+}
+
+function splitSelect(s) {
+  const items = []; let depth = 0, cur = '';
+  for (const ch of s) {
+    if (ch==='(') depth++;
+    else if (ch===')') depth--;
+    if (ch===',' && depth===0) { items.push(cur.trim()); cur=''; }
+    else cur += ch;
+  }
+  if (cur.trim()) items.push(cur.trim());
+  return items;
+}
+
+function evalExpr(expr, cols, row, allRows) {
+  const up = expr.toUpperCase();
+  const aggM = expr.match(/^(COUNT|SUM|AVG|MAX|MIN)\s*\(\s*(.*?)\s*\)$/i);
+  if (aggM) {
+    const fn = aggM[1].toUpperCase(), arg = aggM[2];
+    if (fn==='COUNT') return arg==='*' ? allRows.length : allRows.filter(r=>{const i=cols.findIndex(c=>c.toLowerCase()===arg.toLowerCase());return i>=0&&r[i]!=null;}).length;
+    const vals = allRows.map(r=>{const i=cols.findIndex(c=>c.toLowerCase()===arg.toLowerCase());return i>=0?Number(r[i]):null;}).filter(v=>v!=null);
+    if (fn==='SUM') return vals.reduce((a,b)=>a+b,0);
+    if (fn==='AVG') return vals.length?+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):null;
+    if (fn==='MAX') return Math.max(...vals);
+    if (fn==='MIN') return Math.min(...vals);
+  }
+  // arithmetic
+  if (/[\+\-\*\/]/.test(expr) && !/['"]/.test(expr)) {
+    try {
+      const evaled = expr.replace(/\b(\w+)\b/g,(m)=>{
+        const i=cols.findIndex(c=>c.toLowerCase()===m.toLowerCase());
+        if(i>=0&&row) return Number(row[i]);
+        if(/^\d/.test(m)) return m;
+        return 0;
+      });
+      return Function('"use strict";return ('+evaled+')')();
+    } catch(e){}
+  }
+  if (!row) return null;
+  const idx = cols.findIndex(c=>c.toLowerCase()===expr.toLowerCase());
+  if (idx>=0) return row[idx];
+  return expr.replace(/^['"]|['"]$/g,'');
+}
+
+function evalHaving(cond, cols, groupRows, outCols, outRow) {
+  try {
+    const expr = cond.replace(/(COUNT|SUM|AVG|MAX|MIN)\s*\(([^)]*)\)/gi,(m,fn,arg)=>{
+      return String(evalExpr(m, cols, null, groupRows));
+    });
+    return evalCondition(expr, outCols, outRow||[]);
+  } catch(e){ return true; }
+}
+
+function evalWhere(cond, cols, row) {
+  try { return evalCondition(cond, cols, row); }
+  catch(e){ throw new Error('WHERE error: '+e.message); }
+}
+
+function evalCondition(cond, cols, row) {
+  // Strip outer parens
+  const stripped = cond.trim().replace(/^\((.*)\)$/, '$1');
+  if (stripped !== cond.trim()) return evalCondition(stripped, cols, row);
+
+  // AND / OR (simple, left-to-right)
+  const andIdx = findLogicalOp(cond, 'AND');
+  if (andIdx>=0) return evalCondition(cond.substring(0,andIdx), cols, row) && evalCondition(cond.substring(andIdx+3), cols, row);
+  const orIdx = findLogicalOp(cond, 'OR');
+  if (orIdx>=0) return evalCondition(cond.substring(0,orIdx), cols, row) || evalCondition(cond.substring(orIdx+2), cols, row);
+
+  // NOT
+  if (/^NOT\s+/i.test(cond)) return !evalCondition(cond.replace(/^NOT\s+/i,''), cols, row);
+
+  // IS NULL / IS NOT NULL
+  const isNullM = cond.match(/^(\w+)\s+IS\s+(NOT\s+)?NULL$/i);
+  if (isNullM) { const v=getVal(isNullM[1],cols,row); return isNullM[2]? v!=null : v==null; }
+
+  // BETWEEN
+  const btM = cond.match(/^(\w+)\s+BETWEEN\s+(.+?)\s+AND\s+(.+)$/i);
+  if (btM) { const v=getVal(btM[1],cols,row),lo=parseVal(btM[2]),hi=parseVal(btM[3]); return v>=lo&&v<=hi; }
+
+  // IN
+  const inM = cond.match(/^(\w+)\s+(NOT\s+)?IN\s*\((.+)\)$/i);
+  if (inM) {
+    const v=getVal(inM[1],cols,row);
+    const list=inM[3].split(',').map(s=>parseVal(s.trim()));
+    const found=list.some(l=>String(l).toLowerCase()===String(v).toLowerCase());
+    return inM[2]?!found:found;
+  }
+
+  // LIKE
+  const likeM = cond.match(/^(\w+)\s+(NOT\s+)?LIKE\s+(.+)$/i);
+  if (likeM) {
+    const v=String(getVal(likeM[1],cols,row)||'').toLowerCase();
+    const pat=likeM[3].replace(/^['"]|['"]$/g,'').toLowerCase();
+    const re=new RegExp('^'+pat.replace(/%/g,'.*').replace(/_/g,'.')+'$');
+    const m=re.test(v); return likeM[2]?!m:m;
+  }
+
+  // Comparisons
+  const cmpM = cond.match(/^(.+?)\s*(!=|<>|<=|>=|=|<|>)\s*(.+)$/);
+  if (cmpM) {
+    const lv=resolveVal(cmpM[1].trim(),cols,row), rv=resolveVal(cmpM[3].trim(),cols,row), op=cmpM[2];
+    const l=typeof lv==='string'?lv.toLowerCase():lv, r=typeof rv==='string'?rv.toLowerCase():rv;
+    if(op==='=') return l==r; if(op==='!='||op==='<>') return l!=r;
+    if(op==='<') return l<r; if(op==='>') return l>r;
+    if(op==='<=') return l<=r; if(op==='>=') return l>=r;
+  }
+  return true;
+}
+
+function findLogicalOp(s, op) {
+  let depth=0;
+  for(let i=0;i<s.length;i++){
+    if(s[i]==='(') depth++; else if(s[i]===')') depth--;
+    if(depth===0 && s.substr(i,op.length+2).toUpperCase()===` ${op} `) return i+1;
+    if(depth===0 && s.substr(i,op.length+1).toUpperCase()===` ${op}` && i+op.length+1===s.length) return i+1;
+  }
+  return -1;
+}
+
+function getVal(col, cols, row) {
+  const i=cols.findIndex(c=>c.toLowerCase()===col.toLowerCase());
+  return i>=0?row[i]:null;
+}
+function parseVal(s) {
+  const t=s.replace(/^['"]|['"]$/g,'');
+  return isNaN(t)?t:Number(t);
+}
+function resolveVal(s, cols, row) {
+  const idx=cols.findIndex(c=>c.toLowerCase()===s.toLowerCase());
+  if(idx>=0) return row[idx];
+  return parseVal(s);
+}
+
+function runInsert(sql, tdb) {
+  const m=sql.match(/INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((.+)\)/is);
+  if(!m) throw new Error('Invalid INSERT syntax');
+  const {key,table}=getTable(tdb,m[1]);
+  const vals=parseValues(m[2]);
+  if(vals.length!==table.cols.length) throw new Error(`Expected ${table.cols.length} values, got ${vals.length}`);
+  table.rows.push(vals);
+  // sync to DB
+  DB[key].rows.push(vals);
+  return {ok:`1 row inserted into ${key}.`};
+}
+
+function runUpdate(sql, tdb) {
+  const m=sql.match(/UPDATE\s+(\w+)\s+SET\s+(.+?)(?:WHERE\s+(.+))?$/is);
+  if(!m) throw new Error('Invalid UPDATE syntax');
+  const {key,table}=getTable(tdb,m[1]);
+  const setClauses=m[2].split(',').map(s=>s.trim());
+  const wh=m[3]?.trim();
+  let count=0;
+  for(const row of table.rows){
+    if(!wh||evalWhere(wh,table.cols,row)){
+      for(const cl of setClauses){
+        const [col,val]=cl.split('=').map(s=>s.trim());
+        const i=table.cols.findIndex(c=>c.toLowerCase()===col.toLowerCase());
+        if(i>=0) row[i]=parseVal(val);
+      }
+      count++;
+    }
+  }
+  DB[key].rows=table.rows;
+  return {ok:`${count} row(s) updated.`};
+}
+
+function runDelete(sql, tdb) {
+  const m=sql.match(/DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(.+))?/is);
+  if(!m) throw new Error('Invalid DELETE syntax');
+  const {key,table}=getTable(tdb,m[1]);
+  const wh=m[2]?.trim();
+  const before=table.rows.length;
+  table.rows=wh?table.rows.filter(r=>!evalWhere(wh,table.cols,r)):[];
+  DB[key].rows=table.rows;
+  return {ok:`${before-table.rows.length} row(s) deleted.`};
+}
+
+function runAlter(sql, tdb) {
+  const addM=sql.match(/ALTER TABLE\s+(\w+)\s+ADD\s+(\w+)\s+(\w+\(?[^)]*\)?)/i);
+  if(addM){
+    const {key,table}=getTable(tdb,addM[1]);
+    table.cols.push(addM[2]);
+    table.rows.forEach(r=>r.push(null));
+    DB[key].cols=table.cols; DB[key].rows=table.rows;
+    return {ok:`Column '${addM[2]}' added to ${key}.`};
+  }
+  const dropM=sql.match(/ALTER TABLE\s+(\w+)\s+DROP\s+COLUMN\s+(\w+)/i);
+  if(dropM){
+    const {key,table}=getTable(tdb,dropM[1]);
+    const i=table.cols.findIndex(c=>c.toLowerCase()===dropM[2].toLowerCase());
+    if(i<0) throw new Error('Column not found: '+dropM[2]);
+    table.cols.splice(i,1);
+    table.rows.forEach(r=>r.splice(i,1));
+    DB[key].cols=table.cols; DB[key].rows=table.rows;
+    return {ok:`Column '${dropM[2]}' dropped from ${key}.`};
+  }
+  return {ok:'ALTER executed (MODIFY not simulated fully).'};
+}
+
+function runDrop(sql, tdb) {
+  const m=sql.match(/DROP TABLE\s+(\w+)/i);
+  if(!m) throw new Error('Invalid DROP syntax');
+  const {key}=getTable(tdb,m[1]);
+  delete tdb[key]; delete DB[key];
+  return {ok:`Table '${key}' dropped.`};
+}
+
+function runTruncate(sql, tdb) {
+  const m=sql.match(/TRUNCATE(?:\s+TABLE)?\s+(\w+)/i);
+  if(!m) throw new Error('Invalid TRUNCATE syntax');
+  const {key,table}=getTable(tdb,m[1]);
+  table.rows=[]; DB[key].rows=[];
+  return {ok:`Table '${key}' truncated (0 rows).`};
+}
+
+function parseValues(s) {
+  const vals=[]; let cur='',inQ=false,qC='';
+  for(const ch of s){
+    if(!inQ&&(ch==='"'||ch==="'")){inQ=true;qC=ch;continue;}
+    if(inQ&&ch===qC){inQ=false;vals.push(cur.trim());cur='';continue;}
+    if(!inQ&&ch===','){vals.push(cur.trim());cur='';continue;}
+    cur+=ch;
+  }
+  if(cur.trim()) vals.push(cur.trim());
+  return vals.map(v=>isNaN(v)?v:Number(v));
+}
+
+// ============================================================
+// UI
+// ============================================================
+function renderResult(res) {
+  if(res.error) return `<span class="out-error">Error: ${esc(res.error)}</span>`;
+  if(res.ok) return `<span class="out-ok">✓ ${esc(res.ok)}</span>`;
+  if(!res.rows.length) return `<span class="out-ok">✓ No rows returned.</span>`;
+  let h=`<table class="out-table"><thead><tr>${res.cols.map(c=>`<th>${esc(String(c))}</th>`).join('')}</tr></thead><tbody>`;
+  for(const row of res.rows) h+=`<tr>${row.map(v=>`<td>${esc(String(v??'NULL'))}</td>`).join('')}</tr>`;
+  h+=`</tbody></table><div class="out-rows">${res.rows.length} row${res.rows.length!==1?'s':''}</div>`;
+  return h;
+}
+
+function runEditor(btn) {
+  const wrap=btn.closest('.editor-wrap');
+  const ta=wrap.querySelector('textarea.sql-input');
+  const out=wrap.querySelector('.editor-output');
+  out.classList.add('show');
+  const results=execSQL(ta.value);
+  out.innerHTML=results.map(renderResult).join('<hr style="border-color:rgba(255,255,255,.06);margin:.4rem 0">');
+}
+
+function resetEditor(btn) {
+  initDB();
+  const wrap=btn.closest('.editor-wrap');
+  wrap.querySelector('.editor-output').innerHTML='';
+  wrap.querySelector('.editor-output').classList.remove('show');
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function copyCode(btn) {
+  const pre=btn.nextElementSibling||btn.parentElement.querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);
+  });
+}
+
+// Section navigation
+const bcMap = {
+  intro:'Introduction',  'ddl-overview':'SQL Overview', datatypes:'Data Types',
+  constraints:'Constraints', create:'CREATE TABLE', alter:'ALTER TABLE', drop:'DROP & TRUNCATE',
+  insert:'INSERT', update:'UPDATE', delete:'DELETE', select:'SELECT Basics',
+  where:'WHERE Clause', functions:'Aggregate Functions', groupby:'GROUP BY & HAVING',
+  orderby:'ORDER BY', tcl:'TCL', playground:'SQL Playground',
+  predict:'Predict the Output', debug:'Debugging Lab', quicktest:'Quick Test'
+};
+let doneSections = new Set();
+try { doneSections = new Set(JSON.parse(localStorage.getItem('ch12_done')||'[]')); } catch(e){}
+const totalSections = 20;
+
+function show(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  const sec = document.getElementById('sec-'+id);
+  if(sec) sec.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>{
+    l.classList.remove('active');
+    const onclick = l.getAttribute('onclick');
+    if(onclick && onclick.includes("'"+id+"'")) l.classList.add('active');
+  });
+  document.getElementById('bcTitle').textContent = bcMap[id]||id;
+  doneSections.add(id);
+  try { localStorage.setItem('ch12_done', JSON.stringify([...doneSections])); } catch(e){}
+  updateProgress();
+  updateNavDots();
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function updateProgress() {
+  const pct = Math.round(doneSections.size / totalSections * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+function updateNavDots() {
+  document.querySelectorAll('.nav-link').forEach(l=>{
+    const onclick = l.getAttribute('onclick');
+    const m = onclick && onclick.match(/'([^']+)'/);
+    if(m && doneSections.has(m[1])) l.classList.add('done');
+  });
+}
+
+// Dark mode
+function toggleDark() {
+  const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try { localStorage.setItem('ch12_theme',t); } catch(e){}
+}
+
+// Language
+let lang = 'en';
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('[data-'+l+']').forEach(el=>{
+    el.innerHTML = el.getAttribute('data-'+l);
+  });
+  document.getElementById('btnEN').classList.toggle('active', l==='en');
+  document.getElementById('btnTA').classList.toggle('active', l==='ta');
+  try { localStorage.setItem('ch12_lang', l); } catch(e){}
+}
+
+// Predict MCQ
+const predictAns = [1,1,1,1];
+const predictExpl = [
+  '✓ Correct! DISTINCT removes duplicates — only unique values (M, F) are returned.',
+  '✓ Correct! The count depends on the data — check with the playground.',
+  '✓ Correct! SQL allows arithmetic with aggregate functions; the result is one row with the difference.',
+  '✓ Correct! DESC means descending (Z first), so the last alphabetical name appears first.'
+];
+function pickMCQ(el, qi, chosen) {
+  const card = el.closest('.mcq-card');
+  const opts = card.querySelectorAll('.mcq-opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  const correct = predictAns[qi];
+  opts[correct].classList.add('correct');
+  if(chosen!==correct) el.classList.add('wrong');
+  const fb = document.getElementById('pfb'+qi);
+  fb.className = 'mcq-fb '+(chosen===correct?'correct':'wrong');
+  fb.textContent = chosen===correct ? predictExpl[qi] : '✗ Not quite. '+predictExpl[qi];
+  fb.style.display='block';
+}
+
+function traceInPlayground(sql) {
+  show('playground');
+  setTimeout(()=>{
+    const ta = document.querySelector('#sec-playground textarea.sql-input');
+    if(ta) { ta.value=sql; ta.closest('.editor-wrap').querySelector('.editor-output').innerHTML=''; }
+  },200);
+}
+
+// Quick Test
+const qtData = [
+  {q:'Which SQL sub-language includes CREATE, ALTER, DROP?', opts:['DML','DDL','DQL','TCL'], ans:1, expl:'DDL (Data Definition Language) defines the structure of tables.'},
+  {q:'Which constraint ensures no duplicate values in a column?', opts:['NOT NULL','PRIMARY KEY','UNIQUE','CHECK'], ans:2, expl:'UNIQUE ensures all values in the column are different.'},
+  {q:'What does AVG() return when used in SELECT?', opts:['Total sum','Number of rows','Average of numeric values','Largest value'], ans:2, expl:'AVG() calculates the arithmetic mean of a numeric column.'},
+  {q:'Which clause filters GROUPS after GROUP BY?', opts:['WHERE','FILTER','HAVING','DISTINCT'], ans:2, expl:'HAVING filters groups; WHERE filters individual rows before grouping.'},
+  {q:'TRUNCATE vs DELETE: which can be rolled back?', opts:['TRUNCATE','DELETE','Both','Neither'], ans:1, expl:'DELETE is DML and can be rolled back. TRUNCATE is DDL and cannot.'}
+];
+let qtAnswered = 0, qtScore = 0;
+
+function buildQuickTest() {
+  qtAnswered=0; qtScore=0;
+  document.getElementById('qtScore').classList.remove('show');
+  const c = document.getElementById('qtContainer');
+  c.innerHTML = qtData.map((q,qi)=>`
+    <div class="mcq-card" id="qtcard${qi}">
+      <div class="mcq-q"><strong>${qi+1}.</strong> ${esc(q.q)}</div>
+      <div class="mcq-opts">${q.opts.map((o,oi)=>`<div class="mcq-opt" onclick="pickQT(this,${qi},${oi})"><span class="mcq-letter">${'ABCD'[oi]}</span>${esc(o)}</div>`).join('')}</div>
+      <div class="mcq-fb" id="qtfb${qi}"></div>
+    </div>`).join('');
+}
+
+function pickQT(el, qi, chosen) {
+  if(el.classList.contains('disabled')) return;
+  const card = document.getElementById('qtcard'+qi);
+  card.querySelectorAll('.mcq-opt').forEach(o=>o.classList.add('disabled'));
+  const correct = qtData[qi].ans;
+  card.querySelectorAll('.mcq-opt')[correct].classList.add('correct');
+  if(chosen!==correct) el.classList.add('wrong');
+  const fb = document.getElementById('qtfb'+qi);
+  fb.className = 'mcq-fb '+(chosen===correct?'correct':'wrong');
+  fb.textContent = (chosen===correct?'✓ ':'✗ ') + qtData[qi].expl;
+  fb.style.display='block';
+  if(chosen===correct) qtScore++;
+  qtAnswered++;
+  if(qtAnswered===qtData.length) setTimeout(showQTScore, 500);
+}
+
+function showQTScore() {
+  const pct = Math.round(qtScore/qtData.length*100);
+  const msgs = ['Review the chapter carefully and try again.','Good effort! A few more reviews needed.','Well done! You understand the core concepts.','Perfect score! Outstanding!'];
+  document.getElementById('qtScoreText').textContent = `Score: ${qtScore}/${qtData.length} (${pct}%)`;
+  document.getElementById('qtScoreMsg').textContent = msgs[pct<40?0:pct<60?1:pct<100?2:3];
+  document.getElementById('qtScore').classList.add('show');
+}
+
+// Scroll & mobile
+window.addEventListener('scroll',()=>{document.getElementById('back-top').classList.toggle('show',scrollY>400);});
+document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+// Init
+(function(){
+  try { const t=localStorage.getItem('ch12_theme'); if(t) document.documentElement.setAttribute('data-theme',t); } catch(e){}
+  try { const l=localStorage.getItem('ch12_lang'); if(l) setLang(l); } catch(e){}
+  updateProgress();
+  updateNavDots();
+  buildQuickTest();
+})();
+</script>
+</body>
+</html>
