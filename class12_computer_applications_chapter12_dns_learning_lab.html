@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 12 — களப்பெயர் முறைமை (DNS) | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#f3f6f8;
+    --card:#ffffff;
+    --primary:#0f766e;
+    --primary-dark:#0b544e;
+    --primary-light:#e6f5f3;
+    --accent:#7c3aed;
+    --accent-light:#f1e9ff;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#dfe6ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  [lang-ta]{font-size:1rem;}
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  /* ---- Header ---- */
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#d7efec;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#eafaf8;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  /* ---- Sidebar ---- */
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  /* ---- Main ---- */
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:900px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(20,30,40,.04);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--accent);font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  /* Diagrams */
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(15,118,110,.4);}
+  .flow-node.muted{opacity:.45;}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  /* Buttons */
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number]{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+  .byte-input{width:70px;text-align:center;}
+
+  /* MCQ option styling (shared) */
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:160px;}
+
+  .tree{list-style:none;padding-left:18px;margin:0;}
+  .tree li{position:relative;padding:4px 0 4px 16px;border-left:1px dashed var(--border);}
+  .tree > li:last-child{border-left:1px dashed transparent;}
+  .tree .node-btn{background:var(--primary-light);border:1.5px solid var(--primary);border-radius:8px;padding:4px 10px;font-size:.85rem;cursor:pointer;color:var(--primary-dark);font-weight:700;}
+  .tree .node-btn.leaf-selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .tree .node-btn:hover{background:var(--accent-light);}
+
+  .breadcrumb-build{font-family:monospace;font-size:1rem;background:#0f172a;color:#4ade80;padding:10px 14px;border-radius:8px;margin-top:10px;min-height:1.4em;letter-spacing:.3px;overflow-x:auto;}
+
+  .log-panel{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px 14px;font-family:monospace;font-size:.82rem;max-height:220px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #334155;}
+  .log-panel .ln:last-child{border-bottom:none;}
+  .log-panel .ln .step-no{color:#38bdf8;font-weight:700;}
+
+  .url-parse-out{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .url-chip{padding:6px 10px;border-radius:8px;font-size:.82rem;font-weight:700;color:#fff;}
+  .chip-protocol{background:#2563eb;}
+  .chip-domain{background:#16a34a;}
+  .chip-folder{background:#d97706;}
+  .chip-file{background:#db2777;}
+  .chip-none{background:#94a3b8;}
+
+  /* Bottom bar */
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+    .byte-input{width:58px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 12 — களப்பெயர் முறைமை (Domain Name System - DNS)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 12: DNS · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* =========================================================================
+   STORAGE (safe wrapper)
+   ========================================================================= */
+const STORE_KEY = 'ca12_dns_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable - continue with defaults */ }
+  return { completed:[], lang:'ta', quiz:{} };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* =========================================================================
+   TOPIC DATA
+   ========================================================================= */
+const TOPICS = [
+  {id:'overview',   num:'12.1-12.2', title:'அறிமுகம் & DNS கண்ணோட்டம்'},
+  {id:'ipaddr',      num:'12.3',      title:'IP முகவரி (IP Address)'},
+  {id:'url',         num:'12.4',      title:'URL'},
+  {id:'namespace',   num:'12.5.1',    title:'பெயர்வெளி & களப்பெயர்கள்'},
+  {id:'nameserver',  num:'12.5.2',    title:'பெயர் சேவையகங்கள்'},
+  {id:'zone',        num:'12.5.3',    title:'மண்டலம் (Zone)'},
+  {id:'resolver',    num:'12.5.4',    title:'தீர்வி (Resolver)'},
+  {id:'dnswork',     num:'12.5.5',    title:'DNS வேலை செய்யும் விதம்'},
+  {id:'practice',    num:'Practice',  title:'பயிற்சி & Debugging Lab'},
+  {id:'examprep',    num:'Exam',      title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* =========================================================================
+   SIDEBAR / NAV RENDERING
+   ========================================================================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+/* mobile sidebar */
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+/* language toggle (UI chrome only; lesson text follows textbook Tamil with English terms inline) */
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* =========================================================================
+   MAIN RENDER DISPATCH
+   ========================================================================= */
+const RENDERERS = {
+  overview: renderOverview,
+  ipaddr: renderIPAddr,
+  url: renderURL,
+  namespace: renderNamespace,
+  nameserver: renderNameServer,
+  zone: renderZone,
+  resolver: renderResolver,
+  dnswork: renderDNSWork,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 1 — 12.1 / 12.2 Introduction & DNS Overview
+   ========================================================================= */
+function renderOverview(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.1 &amp; 12.2</div>
+    <h2>அறிமுகம் &amp; DNS கண்ணோட்டம் <span class="eng">(Introduction &amp; DNS Overview)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      இணையத்தின் சரியான செயல்பாட்டிற்கு களப் பெயர் முறைமையின் தேவையை புரிந்து கொள்ளுதல் · IP முகவரிகளின் முக்கியத்துவத்தை அறிதல் · URL மற்றும் அதன் வகைகளை அறிதல் · DNS இன் பகுதிகளையும் அதன் பணிகளையும் அறிந்து கொள்ளுதல் · DNS எவ்வாறு வேலை செய்கிறது என்பதை அறிதல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>12.1 அறிமுகம் (Introduction)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      ஆரம்ப காலங்களில் வலைத்தளங்கள் அனைத்தும் அவற்றின் ஐபி முகவரிகள் (IP Address) மூலமே அணுகப்பட்டன. இந்த ஐபி முகவரிகளை (எண்களாக இருப்பதால்) நினைவில் கொள்வது மிகக் கடினமான ஒன்றாக இருந்தது. ஆகவே நினைவில் கொள்வதற்கு எளிதான களப் பெயர்கள் (Domain Names) உருவாக்கப்பட்டு அவை IP முகவரிகளுடன் தொடர்பு படுத்தப்பட்டன. கைப்பேசியின் போன் புக்கில் அனைத்து தொடர்பு எண்ணங்களும் (Phone Numbers) அந்தந்த பெயரில் சேமிக்கப்பட்டு, அத்தொடர்பு பெயரானாலே (contact names) அணுகப்படுகின்றன. அதைப்போல களப்பெயர் முறைமையானது (DNS) களப்பெயர்களின் (Domain names) அனைத்து கோப்பகங்களையும் (directory) பராமரித்து அவற்றுடன் தொடர்புடைய வலைத்தளங்களை அணுக உதவுகிறது.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 உதாரணம் (Example / Analogy)</span>
+      உங்கள் கைபேசியில் நண்பரின் 10 இலக்க எண்ணை (9876543210) நினைவில் வைப்பதை விட, "அம்மா" அல்லது "நண்பன் ராஜா" என்ற பெயரை நினைவில் வைப்பது எளிது. DNS செய்வதும் இதைத்தான் — கடினமான எண்களுக்கு (IP) பதிலாக எளிய பெயர்களை (Domain Name) நினைவில் வைக்க உதவுகிறது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>12.2 DNS கண்ணோட்டம் (DNS Overview)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      வலையமைப்பில் ஒரு தகவல் இலக்கினை அடைவதற்கு பல அடுக்குகளை கடந்தாக வேண்டும். பயன்பாட்டு அடுக்கு இத்தகைய அடுக்குகளில் ஒன்றாகும். பயன்பாட்டு அடுக்கில் பல பயன்பாடுகள் உள்ளன. அவற்றில் ஒன்றுதான் களப் பெயர் முறைமை (Domain Name System). இணையம் IP முகவரியின் அடிப்படையில் செயல்படுகிறது, களப்பெயரின் அடிப்படையில் அல்ல. ஆனால் நீண்ட எண்களைக் கொண்ட IP முகவரிகளை விட களப்பெயர்களைப் பயன்படுத்துவது எளிதானது. ஒரு வலையமைப்பில் களப்பெயரை அனுமதிக்க, களப்பெயர் முறைமை (DNS) பயன்படுத்தப்பட வேண்டும்.
+      <br><br>
+      DNS ஆனது, பெயர் சேவையகங்கள் (Name servers) மூலம் களப்பெயரிலிருந்து IP முகவரியைப் பொருத்துதலை (mapping) செய்கிறது.
+    </div>
+
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">🖥️ Host Computer</div>
+        <div class="flow-arrow">⇄</div>
+        <div class="flow-node">🌐 DNS Server</div>
+      </div>
+      <p style="text-align:center;margin:10px 0 0;font-size:.85rem;">
+        <span class="mono">www.tnschools.gov.in</span> → DNS மொழிபெயர்ப்பு → <span class="mono">35.173.69.207</span>
+      </p>
+      <div class="diagram-cap">படம் 12.1 — களப் பெயர் முறைமை (DNS) : களப்பெயரை IP முகவரியாக மாற்றுதல் (redrawn)</div>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      நீங்கள் உலாவியில் <span class="mono">www.tnschools.gov.in</span> என தட்டச்சு செய்யும்போது, அதை நேரடியாக கணினியால் புரிந்து கொள்ள முடியாது — கணினிகள் எண்களை (IP Address) மட்டுமே புரிந்துகொள்ளும். எனவே DNS, இந்தப் பெயரை உரிய IP முகவரியாக (35.173.69.207) மொழிபெயர்த்து, சரியான வலைத்தளத்திற்கு உங்களை இட்டுச்செல்கிறது.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 உங்களுக்குத் தெரியுமா? (Did You Know — from textbook)</span>
+      அமெரிக்க கணினி விஞ்ஞானி <b>பால் வி. மொகபட்ரிஸ் (Paul V. Mockapetris)</b> மற்றும் <b>ஜான் போஸ்டல் (Jon Postel)</b> இணைந்து இணைய களப்பெயர் முறைமையை (DNS) உருவாக்கினர். இணைய ஒதுக்கீடு எண்கள் ஆணையத்தில் (IANA) இறக்கும் வரை நிர்வாகியாக இருந்த ஜான் போஸ்டல் "இணையத்தின் கடவுள்" என்று அழைக்கப்படுகிறார்.
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு (Exam Point)</span>
+      இணையம் வேலை செய்வது <b>IP முகவரியை</b> அடிப்படையாகக் கொண்டே, களப்பெயரை அடிப்படையாகக் கொண்டு அல்ல — DNS தான் இரண்டையும் இணைக்கும் பாலமாக செயல்படுகிறது.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை (Quick Check)</span>
+    <div id="qc-overview"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 2 — 12.3 IP Address (with binary <-> dotted decimal simulator)
+   ========================================================================= */
+function renderIPAddr(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.3</div>
+    <h2>IP முகவரி <span class="eng">(IP Address)</span></h2>
+    <div class="goals"><b>முன் தேவை (Prerequisite):</b> அறிமுகம் &amp; DNS கண்ணோட்டம்</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      IP (Internet Protocol) முகவரி என்பது வலையமைப்பில் உள்ள ஒரு தருக்க (Unique) முகவரியாகும். ஒரு அடுக்குமாடி குடியிருப்பில் உள்ள ஒரு வீட்டை அதன் மற்ற வீடுகளிலிருந்து வேறுபடுத்துவதற்கு எவ்வாறு தனித்த வீட்டு எண் கொடுக்கப்படுகிறதோ, அதைப்போல ஒரு வலையமைப்பில் உள்ள ஒரு கணினியை கண்டறிய ஐபி முகவரி பயன்படுத்தப்படுகிறது. ஒரு வலையமைப்பில் P இணைப்புகள் இருந்தால், அங்கே P முகவரிகளும் இருக்க வேண்டும்.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 நிஜ வாழ்க்கை ஒப்புமை</span>
+      ஒரு பள்ளியில் ஒவ்வொரு மாணவருக்கும் தனித்துவமான "பதிவு எண் (Register Number)" இருப்பதைப் போல, இணையத்தில் ஒவ்வொரு கணினிக்கும் தனித்துவமான IP முகவரி இருக்கும்.
+    </div>
+
+    <h4>முகவரி வெளி (Address Space)</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      முகவரி வெளி (Address space) என்பது நெறிமுறையால் (IP) உருவாக்க முடிகின்ற மொத்த முகவரிகளின் எண்ணிக்கையைக் குறிக்கும். இது நெறிமுறை பயன்படுத்துகின்ற பிட்டுகளின் எண்ணிக்கையைப் பொருத்தது. ஒரு நெறிமுறையானது n பிட்டுகளைப் பயன்படுத்தினால், அந்த நெறிமுறையின் முகவரி வெளியானது 2<sup>n</sup> முகவரிகளைக் கொண்டிருக்கும்.
+    </div>
+
+    <h4>12.3.1 IPv4 முகவரி</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      IPv4 முகவரி என்பது வலையமைப்பில் உள்ள ஒரு கணினிக்கு வழங்கப்படும் 32 பிட் தனித்துவமான முகவரி ஆகும். எனவே IPv4 வகையில் 2<sup>32</sup> முகவரிகளை உருவாக்க முடியும். இந்த ஐபி முகவரிகளைக் குறிப்பதற்கு இரண்டு முகவரி குறியீடுகள் உள்ளன:
+      <ul><li>இரு நிலை குறியீடு (Binary Notation)</li><li>புள்ளி-தசம குறியீடு (Dotted Decimal Notation)</li></ul>
+      இரு நிலை குறியீட்டு முறையில், முகவரியானது 32 பிட் இரு நிலை மதிப்புகளாக குறிக்கப்படுகிறது. எ.கா. <span class="mono">00111001 10001001 00111000 00000111</span><br>
+      புள்ளி-தசம குறியீட்டில் புள்ளிகளால் (.) பிரிக்கப்பட்ட தசம வடிவத்தில் முகவரி எழுதப்படுகிறது. எ.கா. <span class="mono">128.143.137.144</span>
+    </div>
+
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">10000000<br><small>1st Byte = 128</small></div>
+        <div class="flow-node">10001111<br><small>2nd Byte = 143</small></div>
+        <div class="flow-node">10001001<br><small>3rd Byte = 137</small></div>
+        <div class="flow-node">10010000<br><small>4th Byte = 144</small></div>
+      </div>
+      <p style="text-align:center;font-weight:800;margin-top:12px;color:var(--primary-dark);">128.143.137.144</p>
+      <div class="diagram-cap">படம் 12.2 — IPv4 முகவரியின் உதாரணம் (redrawn)</div>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 கற்றல் செயல்பாடு (Learning Simulation) — IPv4 Binary ⇄ Decimal Converter</span>
+      ஒவ்வொரு byte-ஐயும் (0–255) மாற்றி, அதன் 8-பிட் binary உருவை உடனடியாகக் காணுங்கள். "பாடநூல் உதாரணத்தை ஏற்று" பொத்தானை அழுத்தி 128.143.137.144 ஐ சோதிக்கவும்.
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+        <div><label style="font-size:.78rem;display:block;">Byte 1</label><input type="number" min="0" max="255" value="128" class="byte-input" id="ipByte0"></div>
+        <div><label style="font-size:.78rem;display:block;">Byte 2</label><input type="number" min="0" max="255" value="143" class="byte-input" id="ipByte1"></div>
+        <div><label style="font-size:.78rem;display:block;">Byte 3</label><input type="number" min="0" max="255" value="137" class="byte-input" id="ipByte2"></div>
+        <div><label style="font-size:.78rem;display:block;">Byte 4</label><input type="number" min="0" max="255" value="144" class="byte-input" id="ipByte3"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="ipConvertBtn">🔄 Binary-ஆக மாற்று</button>
+        <button class="btn btn-ghost" id="ipLoadExampleBtn">📘 பாடநூல் உதாரணத்தை ஏற்று</button>
+        <button class="btn btn-ghost" id="ipRandomBtn">🎲 சீரற்ற IP</button>
+      </div>
+      <div class="breadcrumb-build" id="ipBinaryOut">—</div>
+      <div class="breadcrumb-build" id="ipDottedOut" style="color:#fbbf24;">Dotted Decimal: —</div>
+    </div>
+
+    <h4>12.3.2 IPv6 முகவரி</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      IPv6 முகவரி என்பது வலையமைப்பில் உள்ள ஒரு கணினிக்கு வழங்கப்படும் 128 பிட் தனித்த முகவரி ஆகும். இந்த முறையில் 2<sup>128</sup> முகவரிகளை உருவாக்க முடியும். இந்த 128 பிட்டுகள் எட்டு 16-பிட் தொகுதிகளாகப் பிரிக்கப்பட்டுள்ளன. ஒவ்வொரு தொகுதியும் நான்கு இலக்க பதினாறு நிலை எண்களாக மாற்றப்பட்டு முக்காற்புள்ளியால் (:) பிரிக்கப்பட்டுள்ளது.
+      <br>எ.கா. <span class="mono">2001:0000:3231:DFE1:0063:0000:0000:FEFB</span>
+    </div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">XXXX:XXXX:XXXX:XXXX<br><small>Network prefix (64 bits)</small></div>
+        <div class="flow-node">XXXX:XXXX:XXXX:XXXX<br><small>Host number (64 bits)</small></div>
+      </div>
+      <p style="text-align:center;font-size:.8rem;margin-top:8px;">X = Hexadecimal (0–9, A–F) · XXXX = 0000 முதல் FFFF வரை</p>
+      <div class="diagram-cap">படம் 12.3 — IPv6 முகவரியின் உதாரணம் (128 bits = 64 + 64, redrawn)</div>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ பொதுவான தவறு (Common Mistake)</span>
+      IPv4 = 32 பிட் (4 bytes), IPv6 = 128 பிட் (8 blocks of 16 bits) என்பதை மாற்றிக் குழப்பிக் கொள்ளக்கூடாது. IPv4-ல் 4 எண்கள் (decimal), IPv6-ல் 8 குழுக்கள் (hexadecimal) இருக்கும் என்பதை நினைவில் கொள்ளவும்.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      IPv4 → 32 bits → 2<sup>32</sup> முகவரிகள் · IPv6 → 128 bits → 2<sup>128</sup> முகவரிகள். IPv4 குறியீடுகள்: Binary Notation &amp; Dotted Decimal Notation.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ முயற்சி செய்து பாருங்கள் (Try It Yourself)</span>
+    <div id="qc-ipaddr"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 3 — 12.4 URL (with parser simulator)
+   ========================================================================= */
+function renderURL(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.4</div>
+    <h2>URL <span class="eng">(Uniform Resource Locator)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      URL (Uniform Resource Locator) என்பது இணையத்தில் உள்ள ஒரு ஆவணத்தின் முகவரியாகும். இது நான்கு பகுதிகளைக் கொண்டது. அவை: நெறிமுறைகள் (Protocols), களப்பெயர் (domain name), கோப்புறை பெயர் (Folder name) மற்றும் கோப்பு பெயர் (File name). ஒவ்வொரு பகுதியும் அதற்கென்று குறிப்பிட்ட செயல்பாடுகளைக் கொண்டுள்ளது.
+    </div>
+
+    <div class="diagram-box">
+      <div style="text-align:center;font-family:monospace;font-size:1rem;background:#0f172a;color:#fff;padding:10px;border-radius:8px;word-break:break-all;">
+        http://cms.tn.gov.in/sites/default/files/press_release/pr070119a.jpg
+      </div>
+      <div class="url-parse-out" style="justify-content:center;margin-top:12px;">
+        <span class="url-chip chip-protocol">Protocol: http</span>
+        <span class="url-chip chip-domain">Domain: cms.tn.gov.in</span>
+        <span class="url-chip chip-folder">Folders: sites/default/files/press_release</span>
+        <span class="url-chip chip-file">File: pr070119a.jpg</span>
+      </div>
+      <div class="diagram-cap">படம் 12.4 — URL இன் பகுதிகள் (redrawn)</div>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 கற்றல் செயல்பாடு (Learning Simulation) — URL Explorer</span>
+      கீழே ஒரு URL ஐத் தட்டச்சு செய்து "பகுக்க (Parse)" பொத்தானை அழுத்துங்கள். ஒவ்வொரு பகுதியும் தனித்தனி நிறத்தில் காட்டப்படும்.
+      <div style="margin-top:10px;"><input type="text" id="urlInput" value="http://cms.tn.gov.in/sites/default/files/press_release/pr070119a.jpg"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="urlParseBtn">🔍 பகுக்க (Parse)</button>
+        <button class="btn btn-ghost" id="urlRelExampleBtn">சார்பு நிலை உதாரணத்தை ஏற்று</button>
+      </div>
+      <div class="url-parse-out" id="urlParseOut"></div>
+      <div id="urlTypeOut" style="margin-top:8px;font-weight:700;"></div>
+    </div>
+
+    <h4>URL வகைகள் (Types of URL)</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      ஆவணத்தின் இருப்பிடத்தைப் பொறுத்து URL இரண்டு வகைகளாகப் பிரிக்கப்படுகிறது:
+      <ul><li>முழு நிலை URL (Absolute URL)</li><li>சார்பு நிலை URL (Relative URL)</li></ul>
+    </div>
+
+    <h4>12.4.1 முழு நிலை URL (Absolute URL)</h4>
+    <div class="tb-def">
+      முழு நிலை URL என்பது இணையத்தில் உள்ள ஒரு கோப்பின் முழுமையான முகவரி ஆகும். இது இணையத்தில் ஒரு கோப்பினைத் தேடி கண்டுபிடிக்கத் தேவையான நான்கு அடிப்படைப் பாகங்களையும் கொண்டுள்ளது.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 ஒப்புமை (Analogy)</span>
+      இது அஞ்சல் முகவரியை போன்றது. அஞ்சல் முகவரியில் ஏதேனும் ஒரு தகவல் (ஊர் / பின் கோடு) இல்லாமல் இருந்தால் அதை சரியான நபருக்கு வழங்க முடியாது. அதைப்போல URL இன் நான்கு பகுதிகளில் ஏதேனும் ஒன்று இல்லாவிட்டாலும் வலை உலாவியால் (Browser) சரியான கோப்புடன் தொடர்பை ஏற்படுத்த முடியாது.
+    </div>
+
+    <h4>12.4.2 சார்பு நிலை URL (Relative URL)</h4>
+    <div class="tb-def">
+      சார்பு நிலை URL என்பது இணையத்தில் உள்ள ஒரு கோப்பின் முழுமையற்ற முகவரி ஆகும். சார்பு நிலை URL கோப்புறைப்பெயர் அல்லது கோப்புறையுடன் கூடிய கோப்பு பெயரைக் கொண்டது. இந்த வகை URL இ நடப்பு ஆவணத்துடன் தொடர்புடைய சேவையகத்தில் (Server) இருக்கும் ஒரு கோப்பினை அணுகப் பயன்படுத்தலாம்.
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      URL = Uniform Resource Locator · 4 பகுதிகள்: Protocol + Domain Name + Folder + File · 2 வகைகள்: Absolute &amp; Relative.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-url"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 4 — 12.5.1 Name Space / Domain Names (tree explorer + rules + gTLD/cTLD)
+   ========================================================================= */
+function renderNamespace(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.5.1</div>
+    <h2>DNS பகுதிகள்: பெயர்வெளி &amp; களப்பெயர்கள் <span class="eng">(Name Space &amp; Domain Names)</span></h2>
+    <div class="goals">DNS இன் நான்கு முக்கிய பகுதிகள்: <b>பெயர்வெளி (Name Space)</b> · பெயர் சேவையகம் (Name Server) · மண்டலம் (Zone) · தீர்வி (Resolver)</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      களப்பெயர்கள் மிகவும் தனித்தன்மையானவையாகவும் பொருத்தமானவையாகவும் இருக்க வேண்டும். இப்பெயர்கள் பெயர்வெளியிலிருந்து (Name Space) தேர்ந்தெடுக்கப்பட வேண்டும். பெயர்வெளி இரண்டு வழிகளில் ஒழுங்கமைக்கப்படலாம்:
+      <ul><li>கிடைப் பெயர்வெளி (Flat Name Space)</li><li>படிநிலைப் பெயர்வெளி (Hierarchical Name Space)</li></ul>
+      கிடை பெயர்வெளியில் ஒரு IP முகவரிக்கு ஒரு பெயர் ஒதுக்கப்படுகிறது; இதில் குறிப்பிடத்தக்க கட்டமைப்பு எதுவும் இல்லை. இதன் முக்கிய குறைபாடு, அவை பெரிய அளவிலான அமைப்பில் (large system) பயன்படுத்தப்பட முடியாது. இந்தக் குறைபாட்டைத் தவிர்க்க படிநிலை பெயர்வெளி அதிக அளவில் பயன்படுத்தப்படுகிறது. படிநிலை பெயர்வெளியில் பெயர் பல பகுதிகளால் ஆனது — முதல் பகுதி நிறுவனத்தின் தன்மையைக் குறிக்கலாம், இரண்டாவது பகுதி நிறுவனத்தின் பெயரைக் குறிக்கலாம், மூன்றாம் பகுதி நிறுவனத்தின் ஒரு துறையைக் குறிக்கலாம்.
+    </div>
+
+    <h4>களப்பெயர் வெளி (Domain Name Space)</h4>
+    <div class="tb-def">
+      படிநிலை பெயர்வெளியைப் பெறுவதற்காக களப்பெயர்வெளி வடிவமைக்கப்பட்டது. இதில் பெயர்கள் தலைகீழ் மர வடிவமைப்பில் (Tree like structure) குறிக்கப்படுகிறது. இதன் வேர் உறுப்பு (Root element) மேலிருக்கும் வகையில் அமைந்திருக்கும். இந்த மர அமைப்பு 0 முதல் 127 வரை மொத்தம் 128 மட்டங்களை (level) கொண்டிருக்கும். வேர் உறுப்பு எப்போதும் வெற்றுச் சரத்தை (NULL) குறிக்கிறது.
+    </div>
+    <h4>சிட்டை (Label)</h4>
+    <div class="tb-def">
+      DNS மர அமைப்பில் ஒவ்வொரு முனையமும் (Node) ஒரு பெயரைக் கொண்டிருக்கும் — இதற்குச் <b>சிட்டை (Label)</b> என்னும் பெயர். இது அதிகபட்சம் 63 எழுத்துக்களைக் கொண்ட ஒரு சரம். ஒரு மட்டத்தில் இருக்கும் ஒவ்வொரு முனையமும் வேறுபட்ட சிட்டைகளைக் கொண்டிருக்க வேண்டும் — இது களப்பெயரின் தனித்துவத்தை உறுதிப்படுத்துகிறது.
+    </div>
+    <h4>களப்பெயர் (Domain Name)</h4>
+    <div class="tb-def">
+      இது சிட்டைகளின் வரிசையாகும். களப்பெயரில் சிட்டைகள் புள்ளி (.) மூலம் பிரிக்கப்படுகிறது. களப் பெயர் எப்போதுமே கீழ் மட்டத்திலிருந்து மேல் மட்டம் வரை (அதாவது <b>இலை முனையத்திலிருந்து வேர் முனையம் வரை</b>) படிக்கப்படுகிறது.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 கற்றல் செயல்பாடு (Learning Simulation) — Domain Name Tree Explorer</span>
+      கீழே உள்ள மரத்தில் ஒரு முனையத்தை (node) கிளிக் செய்யுங்கள். அதன் களப்பெயர் கீழிருந்து மேல் நோக்கி (leaf → root) எவ்வாறு கட்டப்படுகிறது எனக் காண்பீர்கள் — படம் 12.6 இல் உள்ள <span class="mono">challenger.atc.fhda.edu</span> உதாரணத்தின் அடிப்படையில்.
+      <div id="domainTree" style="margin-top:10px;"></div>
+      <div class="breadcrumb-build" id="domainBreadcrumb">ஒரு முனையத்தைத் தேர்ந்தெடுக்கவும் (Click a node)…</div>
+    </div>
+
+    <h4>களப்பெயருக்கான விதிமுறைகள் (Rules for Domain Names)</h4>
+    <ul>
+      <li>களப்பெயரானது a–z, A–Z வரையிலான ஆங்கில எழுத்துக்களையும் 0–9 வரையிலான எண்களையும் கொண்டிருக்க முடியும்.</li>
+      <li>இடைக்கோடு (hyphen -) அனுமதிக்கப்படலாம். ஆனால் அது களப் பெயரின் முதல் எழுத்தாக இருக்க முடியாது.</li>
+      <li>இடைவெளிகள் அனுமதிக்கப்படுவதில்லை.</li>
+      <li>சிறப்பு குறியீடுகள் (!, $, &amp;, மற்றும் பல) அனுமதிக்கப்படுவதில்லை.</li>
+      <li>ஒரு முழுமையான களப்பெயரில் அதிகபட்சமாக 253 எழுத்துக்கள் இடம் பெறலாம்.</li>
+      <li>களப்பெயர்கள் எழுத்து வடிவ உணர் திறன் அற்றவை (case-insensitive).</li>
+    </ul>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Debugging Lab — களப்பெயர் சரிபார்ப்பான் (Domain Name Validator)</span>
+      மேலே உள்ள விதிகளின்படி, ஒரு களப்பெயர் சரியானதா எனச் சரிபார்க்கவும்.
+      <div style="margin-top:10px;"><input type="text" id="domValInput" value="-my site@.com"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="domValBtn">சரிபார் (Validate)</button>
+        <button class="btn btn-ghost" data-preset="my-site.com">✅ my-site.com</button>
+        <button class="btn btn-ghost" data-preset="-wrongsite.com">❌ -wrongsite.com</button>
+        <button class="btn btn-ghost" data-preset="my site.com">❌ my site.com</button>
+        <button class="btn btn-ghost" data-preset="my@site.com">❌ my@site.com</button>
+      </div>
+      <div id="domValOut" style="margin-top:12px;"></div>
+    </div>
+
+    <h4>Generic Top-Level Domain names (gTLD)</h4>
+    <div class="tb-def">
+      களப்பெயரின் கடைசிப் பகுதியே உயர்நிலை களப்பெயர் ஆகும். பொது உயர்நிலை களப்பெயர் என்பது பொதுவான நோக்கத்திற்காகப் பயன்படுத்தப்படுகிறது. இது IANA என்ற அமைப்பினால் பராமரிக்கப்படுகின்றன.
+    </div>
+    <table class="tbl">
+      <tr><th>உயர்நிலை களப்பெயர்</th><th>பயன்பாடு</th></tr>
+      <tr><td>.com</td><td>வணிக அமைப்பு — Commercial Organisation</td></tr>
+      <tr><td>.edu</td><td>கல்வி நிறுவனங்கள் — Educational Institutions</td></tr>
+      <tr><td>.gov</td><td>(அமெரிக்க) அரசு — Government (US)</td></tr>
+      <tr><td>.mil</td><td>(அமெரிக்க) இராணுவக் குழுக்கள் — Military groups (US)</td></tr>
+      <tr><td>.org</td><td>இலாபநோக்கற்ற அமைப்பு — Non profit Organization</td></tr>
+      <tr><td>.net</td><td>வலையமைப்பு நிறுவனங்கள் — Networking organization</td></tr>
+      <tr><td>.info</td><td>தகவல் சேவை வழங்குநர்கள் — Information service providers</td></tr>
+    </table>
+    <div class="diagram-cap">அட்டவணை 12.1 — பொது உயர்நிலை களப்பெயர்கள் (gTLD)</div>
+
+    <h4>Country Top-Level Domain names (cTLD)</h4>
+    <div class="tb-def">
+      தேச உயர்நிலைக் களம் (Country domain) என்பது அந்தந்த நாட்டின் இரண்டு எழுத்து சுருக்கத்தைப் பயன்படுத்துகிறது. எ.கா., இந்தியா – google.in, அமெரிக்கா – google.us.
+    </div>
+    <table class="tbl">
+      <tr><th>களப்பெயர்</th><th>நாடு</th></tr>
+      <tr><td>.in</td><td>இந்தியா</td></tr><tr><td>.us</td><td>அமெரிக்கா</td></tr>
+      <tr><td>.fr</td><td>பிரான்ஸ்</td></tr><tr><td>.uk</td><td>இங்கிலாந்து</td></tr>
+      <tr><td>.ca</td><td>கனடா</td></tr><tr><td>.au</td><td>ஆஸ்திரேலியா</td></tr>
+      <tr><td>.lk</td><td>இலங்கை</td></tr><tr><td>.bd</td><td>வங்காளம் (Bangladesh)</td></tr>
+      <tr><td>.cn</td><td>சீனா</td></tr><tr><td>.pk</td><td>பாகிஸ்தான்</td></tr>
+      <tr><td>.jp</td><td>ஜப்பான்</td></tr><tr><td>.sg</td><td>சிங்கப்பூர்</td></tr>
+    </table>
+    <div class="diagram-cap">அட்டவணை 12.2 — தேச களப்பெயர் (cTLD)</div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 உங்களுக்குத் தெரியுமா?</span>
+      களப்பெயர்களை ஆங்கில மொழி தவிர்த்து பிற மொழிகளிலும் UNICODE வடிவத்தில் பயன்படுத்தலாம். தற்போது தமிழ் மொழி மூன்று நாடுகளில் உயர் நிலை தேச களப்பெயர்களில் பயன்படுத்தப்படுகிறது:
+      <table class="tbl" style="margin-top:8px;">
+        <tr><th>களப்பெயர்</th><th>நாடு</th></tr>
+        <tr><td>.இந்தியா</td><td>இந்தியா</td></tr>
+        <tr><td>.சிங்கப்பூர்</td><td>சிங்கப்பூர்</td></tr>
+        <tr><td>.இலங்கை</td><td>இலங்கை</td></tr>
+      </table>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      Label அதிகபட்சம் 63 எழுத்துகள் · Domain Name அதிகபட்சம் 253 எழுத்துகள் · Root element = NULL, Level 0 · மொத்த levels = 128 (0 முதல் 127 வரை).
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-namespace"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 5 — 12.5.2 Name Servers
+   ========================================================================= */
+function renderNameServer(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.5.2</div>
+    <h2>பெயர் சேவையகங்கள் <span class="eng">(Name Servers)</span></h2>
+  </div>
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      பெயர் சேவையகம் என்பது களப்பெயர் வெளியின் மிக முக்கிய அங்கமாகும். இது கணினியில் இயக்கப்படும் மென்பொருள் ஆகும். இது களப்பெயர்கள் மற்றும் அதனுடன் தொடர்புடைய IP முகவரிகள் அடங்கிய DNS தரவுத்தளத்தை உள்ளடக்கியுள்ளது. இது களப்பெயரை IP முகவரியாக மாற்றுகிறது.
+      <br><br>
+      உலகளாவிய பயன்பாட்டிற்காக அதிக எண்ணிக்கையிலான களப்பெயர்களைத் தேக்கிவைக்க வேண்டிய தேவை இருப்பதால் பல சேவையகங்கள் படிநிலை முறையில் இணைக்கப்பட்டுப் பயன்படுத்தப்படுகின்றன. பெயர் சேவையகங்கள் களப்பெயர்களைத் தேடும் முக்கியமான பணியைச் செய்கிறது. உங்களது கணிப்பொறியில் ஒரு வலைத்தளத்தைத் தேடும் போது, உள்ளூர் பெயர் சேவையகம் (ISP சேவையகம்) அதற்கான பதில் கிடைக்கும் வரை, வெவ்வேறு பெயர் சேவையகங்களை வினவுகிறது. கடைசியாக அந்தக் களப்பெயருக்கான ஐபி முகவரியைக் கண்டறிந்து உங்களது கணிப்பொறிக்குக் கொடுக்கிறது.
+    </div>
+
+    <h4>பெயர் சேவையகங்களின் வகைகள் (Types of Name Servers)</h4>
+    <p>முழு களப்பெயர் முறைமையையும் கட்டுப்படுத்துவதற்கு மூன்று வகையான பெயர் சேவையகங்கள் உள்ளன:</p>
+
+    <details class="acc" open>
+      <summary>1. மூலப் பெயர் சேவையகம் (Root Nameserver)</summary>
+      <div class="acc-body">இது முழு DNS மர அமைப்பைக் கொண்டிருக்கும் உயர்மட்ட சேவையகம் (Top-level server) ஆகும். இது ICANN என்ற அமைப்பின் மூலம் பராமரிக்கப்படுகிறது. இதில் மொத்தம் <b>13</b> சேவையகங்கள் உள்ளன.</div>
+    </details>
+    <details class="acc">
+      <summary>2. முதன்மை பெயர் சேவையகம் (Primary Nameserver)</summary>
+      <div class="acc-body">இது மண்டல வளப் பதிவுகளைக் (Zone resource records) கொண்டுள்ளன. இந்தப் பதிவுகள் களப்பெயர் உரிமையாளர்களால் புதுப்பிக்கப்படுகிறது.</div>
+    </details>
+    <details class="acc">
+      <summary>3. இரண்டாம்நிலை பெயர் சேவையகம் (Secondary Nameserver)</summary>
+      <div class="acc-body">இந்தச் சேவையகம் புதுப்பிக்கப்படுவதில்லை. ஆனால் முதன்மைச் சேவையகக் கோப்புகளை நகலெடுக்கிறது. இது வினவல்களைப் பகிர்வதன் மூலம் முதன்மைச் சேவையகத்தின் பணிச்சுமையைக் குறைக்கிறது.</div>
+    </details>
+
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">Root Nameserver<br><small>ICANN · 13 servers</small></div>
+      </div>
+      <p style="text-align:center;font-size:1.3rem;">⬇</p>
+      <div class="flow-row">
+        <div class="flow-node">Primary Nameserver<br><small>Zone records (updatable)</small></div>
+        <div class="flow-node">Secondary Nameserver<br><small>Copy (read-only)</small></div>
+      </div>
+      <div class="diagram-cap">பெயர் சேவையகங்களின் படிநிலை (Hierarchy of Name Servers) — redrawn</div>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 உங்களுக்குத் தெரியுமா?</span>
+      <b>ICANN</b> (Internet Corporation for Assigned Names and Numbers) என்பது இலாப நோக்கற்ற நிறுவனமாகும். இது களப்பெயர்கள் மற்றும் IP முகவரிகள் போன்ற அனைத்து இணைய வளங்களுக்கான பெயர்களையும் எண்களையும் வழங்குகிறது.
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      மூல பெயர்ச் சேவையகத்தை பராமரிக்கும் அமைப்பு = <b>ICANN</b> · Root servers எண்ணிக்கை = <b>13</b> · Primary = புதுப்பிக்கத்தக்கது, Secondary = நகல் மட்டும்.
+    </div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-nameserver"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 6 — 12.5.3 Zone
+   ========================================================================= */
+function renderZone(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.5.3</div>
+    <h2>மண்டலம் <span class="eng">(Zone)</span></h2>
+  </div>
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      முழு பெயர்வெளியும் பல்வேறு மண்டலங்களாகப் பிரிக்கப்பட்டுள்ளது. மண்டலம் என்பது தொடர்சியான களங்கள் மற்றும் துணைக்களங்களால் ஆனது. ஒரு மண்டலத்தில் ஒரே ஒரு களம் மட்டும் இடம்பெற்றிருந்தால், அங்கு களமும் மண்டலமும் ஒன்றையே குறிக்கும். ஒவ்வொரு மண்டலமும் ஒரு சேவையகத்தைப் பெற்றுள்ளது. இந்தச் சேவையகம் <b>மண்டல கோப்பு (Zone file)</b> எனப்படும் தரவுத்தளத்தைக் கொண்டிருக்கும். மண்டல கோப்பைப் பயன்படுத்தி, DNS சேவையகம் அதன் மண்டலத்தில் உள்ள புரவன் கணினிகள் (host) பற்றிய வினவல்களுக்குப் பதிலளிக்கிறது. மண்டல கோப்புகளில் இரண்டு நகல்கள் உள்ளன: முதன்மை கோப்பு (Master file) மற்றும் நகல் கோப்பு (Slave file).
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 கற்றல் செயல்பாடு (Learning Simulation) — Domain vs Zone</span>
+      கீழே உள்ள படத்தில் பச்சை வட்டக்கோடு (dotted) <b>Zone</b> எல்லையைக் காட்டுகிறது. "Domain" மற்றும் "Zone &amp; domain" என்ற பொத்தான்களை கிளிக் செய்து வேறுபாட்டைக் காணுங்கள்.
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="zoneBtnDomain">🔵 Domain காண்பி</button>
+        <button class="btn btn-ghost" id="zoneBtnZone">🟢 Zone காண்பி</button>
+      </div>
+      <div class="diagram-box">
+        <div class="flow-row">
+          <div class="flow-node">Root</div>
+        </div>
+        <p style="text-align:center;font-size:1.1rem;">⬇</p>
+        <div class="flow-row"><div class="flow-node">.com</div></div>
+        <p style="text-align:center;font-size:1.1rem;">⬇</p>
+        <div class="flow-row"><div class="flow-node">mhhe</div></div>
+        <div id="zoneExplain" style="text-align:center;margin-top:12px;font-weight:700;color:var(--primary-dark);min-height:1.4em;">மேலே உள்ள பொத்தான்களைத் தட்டவும்</div>
+        <div class="diagram-cap">படம் 12.9 — மண்டலம் மற்றும் களங்கள் (Domain &amp; Zone, redrawn)</div>
+      </div>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">📝 Let's Recap — நினைவில் கொள்க (from textbook)</span>
+      <ul>
+        <li>ஒரு <b>களம் (Domain)</b> என்பது களப்பெயர்வெளியின் ஒரு ஒற்றை முனையம் (Node) ஆகும்.</li>
+        <li><b>மண்டலம் (Zone)</b> என்பது தொடர்சியான களங்கள் மற்றும் துணைக்களங்களால் ஆனது. இது களப்பெயர்வெளியின் ஒரு துணைத்தொகுதி ஆகும்.</li>
+        <li><b>களப்பெயர்வெளி (Domain Namespace)</b> என்பது களங்கள், துணை களங்கள் மற்றும் மண்டலங்கள் சேர்ந்த மொத்த தொகுப்பாகும்.</li>
+        <li><b>பெயர் சேவையகம்</b> என்பது களப்பெயர்கள் மற்றும் தொடர்புடைய IP முகவரிகளின் தரவுத்தளத்தை நிர்வகிக்கிறது.</li>
+        <li>ஒரு சேவையகம் ஒன்றுக்கும் மேற்பட்ட மண்டல கோப்புகளை (மண்டலங்கள்) கொண்டிருக்கலாம். ஒரு மண்டலம் ஒன்றுக்கு மேற்பட்ட துணை களங்களைக் கொண்டிருக்கலாம்.</li>
+      </ul>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      Zone File இன் இரு நகல்கள்: <b>Master file</b> (முதன்மை) &amp; <b>Slave file</b> (நகல்).
+    </div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-zone"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 7 — 12.5.4 Resolver
+   ========================================================================= */
+function renderResolver(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.5.4</div>
+    <h2>தீர்வி <span class="eng">(Resolver)</span></h2>
+  </div>
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      தீர்வி (Resolver) என்பது ஒரு களப்பெயரை ஐபி முகவரியாக மொழிபெயர்க்கும் பணியைத் துவக்கும் நிரலாகும். தீர்வி புரவன் (Host) கணினியிலேயே சேமிக்கப்பட்டு இருப்பதால், தீர்விக்கும் பயனர் நிரலுக்கும் இடையேயான தொடர்பை உருவாக்க எந்த நெறிமுறையும் அவசியமில்லை.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 ஒப்புமை (Analogy)</span>
+      தீர்வியை ஒரு "தகவல் மையம் (Enquiry Desk)" போல நினைத்துக் கொள்ளுங்கள். நீங்கள் ஒரு முகவரியைக் கேட்கும்போது, அந்த Enquiry Desk-ஆள் உங்களுக்காக வேறு இடங்களில் விசாரித்து சரியான பதிலைக் கொண்டு வருகிறார் — நீங்கள் நேரடியாக அனைத்து இடங்களுக்கும் சென்று விசாரிக்க வேண்டியதில்லை.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      Resolver = களப்பெயரை IP முகவரியாக மாற்றும் செயல்முறையைத் தொடங்கும் நிரல் · Host கணினியிலேயே இயங்குகிறது · ISP சேவையகத்தில் இடம்பெற்றிருக்கும்.
+    </div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-resolver"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 8 — 12.5.5 How DNS works (big step simulator)
+   ========================================================================= */
+function renderDNSWork(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 12 › 12.5.5</div>
+    <h2>களப்பெயர் முறைமை வேலை செய்யும் விதம் <span class="eng">(How DNS Works)</span></h2>
+  </div>
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      பயனர் உலாவியில் URL-ஐ தட்டச்சு செய்யும் பொழுது, கணினியானது முதலில் தொடர்புடைய IP முகவரியை அக்கணிப்பொறியின் DNS இடைத்தேக்கத்தில் (Cache) தேடுகிறது. இடைத்தேக்கத்தில் ஐபி முகவரி கண்டுபிடிக்கப்பட்டால், அதைப் பற்றிய தகவல் அங்கிருந்து மீட்கப்படும். இல்லையெனில், கணினி தீர்வியிடம் DNS வினவலை (DNS query) தொடங்க வேண்டும். இந்த தீர்வி இணைய வழங்குநரின் (ISP) சேவையகத்தில் இடம் பெற்றிருக்கும். ஒவ்வொரு தீர்வியும் தனக்கென்று இடைத்தேக்கத்தைப் (cache) பெற்றிருக்கும். அதில் ஐபி முகவரி போன்ற தகவல்கள் கண்டறியப்பட்டால் அந்தத் தகவல்கள் மீட்டெடுக்கப்படும். இல்லையெனில் வினவல் அடுத்த பெயர்ச்சேவையகத்திற்கு (Domain NameServer) அதாவது TLD (உயர்நிலை களம்) க்கு அனுப்பப்படுகிறது. TLD அந்த வினவலை மதிப்பாய்வு செய்து குறிப்பிட்ட களத்துடன் தொடர்புடைய பெயர் சேவையகங்களுக்கு வினவல் அனுப்புகிறது. ஐபி முகவரி கிடைக்கும்வரை அடுத்தடுத்த பெயர் சேவையகங்களுக்கு வினவல் அனுப்பப்படுகிறது. இறுதியில் ஐபி முகவரி கண்டறியப்பட்டு அதற்கான பதிவுகள் தீர்விக்கு அனுப்பப்படுகிறது. பின்னர் தீர்வி இந்தப் பதிவுகளைக் கணினி உலாவிக்கு (Browser) வழங்குகிறது. இப்பொழுது, கண்டறியப்பட்ட ஐபி முகவரிக்கான வலைப்பக்கங்களைப் பயனரால் பார்க்க முடியும்.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 கற்றல் செயல்பாடு (Learning Simulation) — DNS Resolution Step-by-Step (படம் 12.10 அடிப்படையில்)</span>
+      <span class="mono">www.tnscert.org</span> எனத் தட்டச்சு செய்ததும் என்ன நடக்கும் எனப் படிப்படியாகக் காண "Step" பொத்தானை அழுத்தவும்.
+      <div class="diagram-box">
+        <div class="flow-row" id="dnsNodeRow">
+          <div class="flow-node" id="n-browser">🌐 Browser</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node" id="n-resolver">🧭 Resolver</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node" id="n-local">🖥️ Local DNS<br>Server</div>
+        </div>
+        <p style="text-align:center;font-size:1.3rem;">⇅</p>
+        <div class="flow-row" id="dnsNodeRow2">
+          <div class="flow-node" id="n-root">🌳 Root<br>Server</div>
+          <div class="flow-node" id="n-org">🏷️ Org / TLD<br>Server</div>
+          <div class="flow-node" id="n-auth">✅ Authoritative<br>tnscert.org Server</div>
+        </div>
+        <div class="diagram-cap">படம் 12.10 — அடிப்படை DNS வேலை செய்யும் விதம் (redrawn)</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="dnsStepBtn">▶ Step</button>
+        <button class="btn btn-accent" id="dnsPlayBtn">⏯ Auto Play</button>
+        <button class="btn btn-ghost" id="dnsResetBtn">⟲ Reset</button>
+      </div>
+      <div class="log-panel" id="dnsLog"><div class="ln">▶ "Step" பொத்தானை அழுத்தி தொடங்குங்கள்…</div></div>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      இது ஒரு "தொலைபேசி விசாரணை சங்கிலி" போல — உங்களுக்கு ஒரு எண் தெரியாவிட்டால், நீங்கள் ஒரு நபரிடம் கேட்கிறீர்கள்; அவருக்கும் தெரியாவிட்டால் இன்னொருவரிடம் அனுப்புகிறார்; இறுதியில் யாருக்காவது பதில் தெரிந்து அது திரும்பி உங்களிடம் வருகிறது. DNS-ம் இப்படித்தான் Local → Root → TLD → Authoritative என படிப்படியாக விசாரித்து IP முகவரியைக் கண்டுபிடிக்கிறது.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 உங்களுக்குத் தெரியுமா? — இணைய சேவையகம் (Web Server)</span>
+      இணைய சேவையகம் என்பது இணைய (www) பயனரின் வினவல்களைக் கையாளும் பிரத்யேக கணினியில் இயங்கும் ஒரு நிரலாகும். இது வலைத்தளங்களை நிறுவும், HTTP-ஐப் பயன்படுத்தி வலைத்தளங்களின் உள்ளடக்கங்களைப் பயனருக்குக் காட்டவும் பயன்படுத்தப்படுகிறது. உலாவியில் URL-ஐத் தட்டச்சு செய்யும் போது, உலாவி URL-ஐ DNS-க்கு அனுப்புகிறது. DNS-இலிருந்து ஒரு ஐபி முகவரியைப் பெற்ற பிறகு, இணைய சேவையகத்திற்குக் கோரிக்கையை அனுப்புகிறது.
+    </div>
+    <div class="activity-box">
+      <span class="lbl">🧪 உங்களுக்குத் தெரியுமா? — IANA &amp; WHOIS</span>
+      <b>IANA</b> (Internet Assigned Numbers Authority) என்பது ICANN இன் இணைப்பு அமைப்பு ஆகும். இது DNS மூலச் சேவையகம், IP முகவரி மற்றும் பிற இணைய நெறிமுறை வள கையாளுதல் போன்றவற்றை மேலாண்மை செய்கிறது — root zone மற்றும் .int, .arpa போன்ற களங்களை நிர்வகிக்கிறது.<br>
+      <b>WHOIS</b> என்பது ICANN இன் ஒரு சேவையாகும். இது இலவச களப்பெயர்கள் மற்றும் அவற்றின் உரிமையாளர்களின் (Registrants) விவரங்களைக் கொண்டிருக்கும்.
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      DNS தேடல் வரிசை: <b>Cache → Local DNS Server → Root Server → TLD Server → Authoritative Server → IP கிடைக்கும் → Resolver → Browser</b>.
+    </div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-dnswork"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 9 — Practice & Debugging Lab
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Debugging Lab <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — TLD ↔ பொருள் <span class="eng">(Enrichment)</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Debugging Lab — IP முகவரி / களப்பெயர் தவறுகள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு அட்டையையும் படித்து, தவறு என்ன, அது எந்த வகை (Syntax / Logical) என அடையாளம் காணவும். பிறகு ✅ சரியான வடிவத்தைப் பார்க்க கிளிக் செய்யவும்.</p>
+    <div id="debugWrap"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 10 — Exam Prep
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>களப்பெயர் முறைமை (DNS) களப்பெயர்களின் அனைத்து அடைவுகளையும் பராமரிக்கிறது. இது களப்பெயர்களைப் பயன்படுத்தி வலைத்தளங்களை அணுக உதவுகிறது. மேலும் இது களப்பெயரை IP முகவரியாக மொழிபெயர்க்கிறது.</li>
+      <li>IP முகவரி என்பது வலையமைப்பில் உள்ள ஒரு கணினியை தனித்து அடையாளம் காண உதவும் ஒரு தருக்க முகவரி ஆகும். இதில் இரண்டு வகைகள் உள்ளன: IPv4 மற்றும் IPv6.</li>
+      <li>IPv4 முகவரி = கணினிக்கு வழங்கப்படும் 32 பிட் தனித்துவமான முகவரி. இதைக் குறிக்க இரண்டு வழிகள் உள்ளன: இருநிலை குறியீடு, புள்ளி-தசம குறியீடு.</li>
+      <li>IPv6 முகவரி = ஒரு கணினிக்குக் கொடுக்கப்படும் 128 பிட் தனித்த முகவரி. இது பதினாறு நிலை எண்களால் குறிக்கப்படுகிறது.</li>
+      <li>URL (Uniform Resource Locator) = இணையத்தில் உள்ள ஒரு ஆவணத்தின் முகவரி. URL இரண்டு வகைகளாகப் பிரிக்கப்படுகிறது: முழுநிலை URL மற்றும் சார்புநிலை URL.</li>
+      <li>URL இன் நான்கு பாகங்கள்: நெறிமுறைகள், களப்பெயர், கோப்புறை பெயர் மற்றும் கோப்பு பெயர். முழுநிலை URL இல் இந்த நான்கு பகுதிகளும் அடிப்படையானவை.</li>
+      <li>சார்புநிலை URL இல் கோப்புறையுடன் கூடிய கோப்பு பெயர் அல்லது கோப்பு பெயர் மட்டும் இடம்பெற்றிருக்கும்.</li>
+      <li>களப்பெயர் முறைமையில் (DNS) 4 முக்கிய கூறுகள் உள்ளன: பெயர்வெளி, பெயர் சேவையகம், மண்டலம் மற்றும் தீர்வி.</li>
+      <li>சிட்டை (label) = ஒரு சரம், இது அதிகபட்சம் 63 எழுத்துக்களைக் கொண்டிருக்கலாம். ஒரு மட்டத்தில் (level) உள்ள ஒவ்வொரு முனையமும் (node) தனித்த சிட்டைகளைக் கொண்டிருக்க வேண்டும்.</li>
+      <li>களப் பெயர் வெளி என்பது உயர் மட்டத்தில் (top level) மூல உறுப்பைக் (root element) கொண்ட ஒரு தலைகீழ் மர அமைப்பாகும். இந்த மர அமைப்பு 0 முதல் 127 வரை மொத்தம் 128 மட்டங்களைக் கொண்டிருக்கும்.</li>
+      <li>களப்பெயர் என்பது புள்ளியால் (.) பிரிக்கப்பட்ட சிட்டைகளின் வரிசையாகும். களப்பெயர் எப்போதும் இலை முனையத்திலிருந்து வேர் முனையம் வரை படிக்கப்படுகிறது.</li>
+      <li>பெயர் சேவையகங்கள் ஒரு கணினியில் இயக்கப்படும் நிரல்கள் மற்றும் அனைத்து மண்டலத் தரவையும் சேமிக்கின்றன. அவை வினவப்படும் போது இதை நுகர்விகளுக்கு வழங்குகிறது.</li>
+      <li>மண்டலம் என்பது சேவையகம் அணுகக்கூடிய தொடர்ச்சியான பகுதியாகும். ஒரு மண்டலத்தில் ஒரே ஒரு களம் இருந்தால், அங்கு களமும் மண்டலமும் ஒன்றே.</li>
+      <li>தீர்வி, ஒரு கிளையண்ட் / சர்வர் பயன்பாடு, இது களப் பெயர்களைத் தீர்க்கும் செயல்முறையைத் தொடங்குகிறது.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>தமிழ் சொல் / English Term</th><th>விளக்கம்</th></tr>
+      <tr><td><b>களப்பெயர் முறைமை</b><br>DNS</td><td>களப்பெயரை IP முகவரியாக மாற்றும் இணையச் சேவை</td></tr>
+      <tr><td><b>ஐபி முகவரி</b><br>IP address</td><td>வலையமைப்பில் ஒரு கணினியை தனித்துவமாகக் குறிக்க பயன்படுத்தப்படுகிறது</td></tr>
+      <tr><td><b>URL</b></td><td>Uniform Resource Locator, இணையத்தில் ஒரு குறிப்பிட்ட வலைத்தள முகவரி அல்லது கோப்பின் முகவரி</td></tr>
+      <tr><td><b>களப்பெயர் வெளி</b><br>Domain Name Space</td><td>களப்பெயர்களை ஒரு படிநிலை மற்றும் தருக்க மர அமைப்பில் கொண்டுள்ள ஒரு பெயரிடும் அமைப்பு</td></tr>
+      <tr><td><b>களப்பெயர்</b><br>Domain Name</td><td>ஐபி முகவரியுடன் தொடர்புடைய குறியீட்டு பெயர்</td></tr>
+      <tr><td><b>பெயர் சேவையகம்</b><br>Name Server</td><td>களப்பெயர்கள் மற்றும் அதனுடன் தொடர்புடைய IP முகவரிகள் கொண்ட DNS தரவுத்தளத்தைக் கொண்டிருக்கிறது</td></tr>
+      <tr><td><b>ICANN</b></td><td>Internet Corporation for Assigned Names and Numbers. இலாப நோக்கற்ற அமைப்பு, இது இணையத்தை ஒழுங்குபடுத்துகிறது</td></tr>
+      <tr><td><b>IANA</b></td><td>இணைய ஒதுக்கீடு எண்கள் நிறுவனத்தின் (ICANN) இணைந்த அமைப்பாகும்</td></tr>
+      <tr><td><b>மண்டலம்</b><br>Zone</td><td>களப்பெயர் வெளியில் தொடர்ச்சியான களங்கள் மற்றும் துணை களங்களின் ஒரு குழு</td></tr>
+      <tr><td><b>தீர்வி</b><br>Resolver</td><td>களப்பெயரை ஐபி முகவரியாக மொழிபெயர்ப்பதற்குப் பொறுப்பேற்கும் ஒரு நிரல்</td></tr>
+      <tr><td><b>TLD</b></td><td>உயர் மட்ட களம், வேர் களத்திற்குக் கீழே உள்ள களங்கள்</td></tr>
+      <tr><td><b>IPv4 / IPv6</b></td><td>இணைய நெறிமுறை பதிப்பு 4/6</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி (Part-wise Answer-Writing Guide)</h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லை (keyword) கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். எண் தொடர்பான கேள்விகளுக்கு (32 bit vs 128 bit போன்றவை) குறிப்பேடு வைத்துக்கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>2 / 3-மதிப்பெண் — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் / பட்டியல் → (3) தேவைப்பட்டால் ஒரு வரி முக்கியத்துவம்.<br>
+        <b>எ.கா.</b> "URL என்றால் என்ன?" → "URL (Uniform Resource Locator) என்பது இணையத்தில் உள்ள ஒரு ஆவணத்தின் முகவரி. இது நான்கு பகுதிகளைக் கொண்டது: நெறிமுறை, களப்பெயர், கோப்புறை, கோப்பு பெயர்."
+      </div>
+    </details>
+    <details class="acc"><summary>5-மதிப்பெண் — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) வகைகள் / பகுதிகள் (தலைப்பு வாரியாக) → (3) ஒவ்வொன்றையும் 1-2 வரிகளில் விளக்குதல் → (4) படம்/உதாரணம் → (5) முடிவுரை ஒரு வரி.<br>
+        <b>எ.கா.</b> "DNS எவ்வாறு வேலை செய்கிறது?" → Cache சோதனை → Resolver → Local Server → Root → TLD → Authoritative Server → IP திரும்புதல் → Browser இணைப்பு, ஒவ்வொரு படிநிலையையும் விளக்கி படம் 12.10 ஐ வரையவும்.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ (Part II, III, IV — reference)</h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும் (2 மதிப்பெண்கள்)</summary>
+      <div class="acc-body">
+        <ol>
+          <li>ஏதாவது நான்கு களப் பெயர்களை பட்டியலிடுக. <i>(எ.கா. google.com, tnschools.gov.in, wikipedia.org, bbc.co.uk)</i></li>
+          <li>IP முகவரி என்றால் என்ன?</li>
+          <li>URL என்றால் என்ன?</li>
+          <li>உனக்குத் தெரிந்த நான்கு URL களை பட்டியலிடு.</li>
+          <li>மண்டலம் என்பது யாது?</li>
+          <li>தீர்வி என்றால் என்ன?</li>
+          <li>ஏதாவது நான்கு பொதுவான உயர் மட்ட களங்களை எழுதுக. <i>(.com, .edu, .org, .net)</i></li>
+          <li>DNS ன் பகுதிகளை குறிப்பிடுக. <i>(பெயர்வெளி, பெயர் சேவையகம், மண்டலம், தீர்வி)</i></li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும் (3 மதிப்பெண்கள்)</summary>
+      <div class="acc-body">
+        <ol>
+          <li>URL மற்றும் அதன் வகைகள் பற்றி குறிப்பு வரைக.</li>
+          <li>IPv4 மற்றும் IPv6 வேறுபடுத்துக.</li>
+          <li>முழுநிலை URL மற்றும் சார்புநிலை URL இவற்றிற்கு இடையில் உள்ள வேறுபாடுகள் யாவை?</li>
+          <li>களப்பெயர் பற்றி குறிப்பு வரைக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும் (5 மதிப்பெண்கள்)</summary>
+      <div class="acc-body">
+        <ol>
+          <li>IP முகவரியை அதன் வகைகளுடன் விளக்கவும்.</li>
+          <li>பெயர் சேவையகத்தை அதன் வகைகளுடன் விளக்குக.</li>
+          <li>DNS எவ்வாறு வேலை செய்கிறது என்பதை விளக்குக.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (10 கேள்விகள்)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   QUICK-CHECK MCQ HELPER (generic renderer + event wiring)
+   ========================================================================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* =========================================================================
+   QUICK-CHECK QUESTION BANKS (one per topic, small, 1-2 Qs each)
+   ========================================================================= */
+const QC_BANKS = {
+  overview: {
+    'qc1': {q:'DNS இன் முழு வடிவம் என்ன?', o:['Domain Name System','Digital Network Server','Data Name Security','Domain Network Security'], c:0, exp:'DNS = Domain Name System, இது களப்பெயரை IP முகவரியாக மாற்றுகிறது.'}
+  },
+  ipaddr: {
+    'qc2': {q:'IPv4 முகவரியில் எத்தனை பிட்கள் பயன்படுத்தப்படுகின்றன?', o:['16 பிட்','32 பிட்','64 பிட்','128 பிட்'], c:1, exp:'IPv4 = 32 பிட் (4 bytes); IPv6 = 128 பிட்.'}
+  },
+  url: {
+    'qc3': {q:'URL இன் நான்கு பகுதிகளில் இல்லாதது எது?', o:['Protocol','Domain Name','File Name','Password'], c:3, exp:'URL பகுதிகள்: Protocol, Domain Name, Folder Name, File Name — Password இல்லை.'}
+  },
+  namespace: {
+    'qc4': {q:'ஒரு Label-இல் அதிகபட்சம் எத்தனை எழுத்துக்கள் இருக்கலாம்?', o:['32','63','128','253'], c:1, exp:'ஒரு Label அதிகபட்சம் 63 எழுத்துக்களைக் கொண்டிருக்கலாம்; முழு Domain Name அதிகபட்சம் 253.'}
+  },
+  nameserver: {
+    'qc5': {q:'Root Nameserver-ஐ பராமரிக்கும் அமைப்பு எது?', o:['IANA','ICANN','WHOIS','TNSCERT'], c:1, exp:'Root Nameserver ICANN அமைப்பால் பராமரிக்கப்படுகிறது; மொத்தம் 13 root servers உள்ளன.'}
+  },
+  zone: {
+    'qc6': {q:'மண்டல கோப்பின் (Zone file) இரு நகல்கள் எவை?', o:['Master & Slave','Primary & Backup','Root & Leaf','Local & Global'], c:0, exp:'Zone file-இன் இரு நகல்கள்: Master file (முதன்மை), Slave file (நகல்).'}
+  },
+  resolver: {
+    'qc7': {q:'தீர்வி (Resolver) எங்கு சேமிக்கப்பட்டிருக்கும்?', o:['Root Server-இல்','Host கணினியில்','ICANN-இல்','.com TLD-இல்'], c:1, exp:'தீர்வி புரவன் (Host) கணினியிலேயே சேமிக்கப்பட்டிருக்கும்.'}
+  },
+  dnswork: {
+    'qc8': {q:'DNS தேடலில் முதலில் சோதிக்கப்படுவது எது?', o:['Root Server','DNS Cache','TLD Server','Authoritative Server'], c:1, exp:'கணினி முதலில் அதன் சொந்த DNS இடைத்தேக்கத்தை (Cache) சோதிக்கும்; அங்கு கிடைக்கவில்லையெனில் தான் Resolver query தொடங்கும்.'}
+  },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   PRACTICE PAGE DATA — Book MCQ (Part I, exact from textbook)
+   ========================================================================= */
+const MCQ_BOOK = {
+  'b1': {q:'1. களப்பெயர்களின் அனைத்து கோப்பகங்களையும் பராமரிக்க கீழ்கண்டவற்றில் எது பயன்படுத்தப்படுகிறது?', o:['களப்பெயர் முறைமை','களப்பெயர் வெளி','பெயர் வெளி','IP முகவரி'], c:0},
+  'b2': {q:'2. IPv4 முகவரிகளை குறிக்க பின்வரும் எந்த குறிமுறை பயன்படுத்தப்படுகிறது?', o:['இருமம் (Binary)','புள்ளி-தசம (Dotted Decimal)','பதினாறு (Hexadecimal)','அ மற்றும் ஆ'], c:3},
+  'b3': {q:'3. IPv6 முகவரிகளில் எத்தனை பிட்கள் பயன்படுத்தப்படுகின்றன?', o:['32','64','128','16'], c:2},
+  'b4': {q:'4. URL இன் விரிவாக்கம் எது?', o:['Uniform Resource Location','Universal Resource Location','Uniform Resource Locator','Universal Resource Locator'], c:2},
+  'b5': {q:'5. URL இல் எத்தனை வகைகள் உள்ளன?', o:['2','3','4','5'], c:0},
+  'b6': {q:'6. ஒரு முனையத்தின் (node) சிட்டையில் (label) பயன்படுத்தப்படும் அதிகபட்ச எழுத்துக்கள் எத்தனை?', o:['255','128','63','32'], c:2},
+  'b7': {q:'7. களப்பெயரில், சிட்டைகளைப் பிரிப்பது எது?', o:['அரைப்புள்ளி (;)','புள்ளி (.)','முக்காற்புள்ளி (:)','Null'], c:1},
+  'b8': {q:'8. பின்வருபவற்றில் எது களப்பெயரை IP முகவரியாக மாற்றுவதைத் துவக்குகிறது?', o:['மண்டலம்','களம்','தீர்வி','பெயர் சேவையகங்கள்'], c:2},
+  'b9': {q:'9. சேவையகம் அணுகக்கூடிய தொடர்ச்சியான பகுதி எது?', o:['மண்டலம்','களம்','தீர்வி','பெயர் சேவையகங்கள்'], c:0},
+  'b10': {q:'10. மூல பெயர்ச் சேவையகம் எந்த அமைப்பினால் பராமரிக்கப்படுகிறது?', o:['IANA','ICANN','WHO','DNS'], c:1},
+};
+
+/* enrichment MCQ with difficulty tiers */
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'IP என்ற சுருக்கத்தின் முழு வடிவம் என்ன?', o:['Internet Protocol','Internal Processing','Internet Provider','Information Packet'], c:0, exp:'IP = Internet Protocol.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'192.168.1.1 என்ற முகவரியில் எத்தனை bytes (எண் தொகுதிகள்) உள்ளன?', o:['2','3','4','8'], c:2, exp:'புள்ளி-தசம (Dotted Decimal) குறியீட்டில் IPv4 முகவரி 4 bytes கொண்டது.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'binary byte 11000000 இன் தசம மதிப்பு என்ன?', o:['128','192','200','255'], c:1, exp:'11000000 = 128+64 = 192.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'ஒரு களப்பெயரின் கடைசி பகுதியை என்ன என்று அழைப்பர்?', o:['Root','TLD (உயர்நிலை களம்)','Sub-domain','Label only'], c:1, exp:'களப்பெயரின் கடைசி பகுதி உயர்நிலை களப்பெயர் (Top-Level Domain) எனப்படும்.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'binary 11000000.10101000.00000001.00000001 ஐ dotted-decimal ஆக மாற்றினால் கிடைப்பது?', o:['192.168.1.1','192.168.0.1','168.192.1.1','192.169.1.1'], c:0, exp:'11000000=192, 10101000=168, 00000001=1, 00000001=1 → 192.168.1.1'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'"challenger.atc.fhda.edu" என்ற களப்பெயரில், எது Root-க்கு மிக அருகில் உள்ள சிட்டை?', o:['challenger','atc','fhda','edu'], c:3, exp:'களப்பெயர் இலை முனையத்திலிருந்து (challenger) வேர் முனையம் வரை (edu) படிக்கப்படுகிறது; edu தான் Root-க்கு மிக அருகில்.'},
+};
+
+const TF_QS = [
+  {q:'IPv6 முகவரி 32 பிட்களைக் கொண்டது.', a:false, exp:'தவறு — IPv6 = 128 பிட்; IPv4 தான் 32 பிட்.'},
+  {q:'களப்பெயர் முதல் எழுத்தாக hyphen (-) இருக்கலாம்.', a:false, exp:'தவறு — hyphen களப்பெயரின் முதல் எழுத்தாக இருக்க முடியாது.'},
+  {q:'Root element எப்போதும் NULL ஐக் குறிக்கும்.', a:true, exp:'சரி — Domain Name Space-இல் Root element எப்போதும் வெற்றுச் சரத்தை (NULL) குறிக்கும்.'},
+  {q:'ஒரு Label-இல் அதிகபட்சம் 63 எழுத்துக்கள் இருக்கலாம்.', a:true, exp:'சரி — Label அதிகபட்சம் 63 எழுத்துக்களைக் கொண்ட ஒரு சரம்.'},
+  {q:'தீர்வி (Resolver) எப்போதும் Root Server-இல் சேமிக்கப்பட்டிருக்கும்.', a:false, exp:'தவறு — Resolver, Host கணினியிலேயே சேமிக்கப்பட்டிருக்கும்.'},
+];
+
+const FIB_QS = [
+  {text:'DNS இன் முழு வடிவம் ______________ .', ans:'domain name system'},
+  {text:'IPv4 முகவரியில் ______________ பிட்கள் பயன்படுத்தப்படுகின்றன.', ans:'32'},
+  {text:'களப்பெயரில் சிட்டைகளைப் பிரிக்க ______________ பயன்படுத்தப்படுகிறது.', ans:'.'},
+  {text:'Root Server-ஐ பராமரிக்கும் அமைப்பு ______________ .', ans:'icann'},
+];
+
+const MATCH_LEFT = ['.com','.edu','.gov','.org'];
+const MATCH_RIGHT = ['இலாபநோக்கற்ற அமைப்பு','வணிக அமைப்பு','கல்வி நிறுவனங்கள்','(அமெரிக்க) அரசு'];
+const MATCH_ANSWER = {'.com':'வணிக அமைப்பு', '.edu':'கல்வி நிறுவனங்கள்', '.gov':'(அமெரிக்க) அரசு', '.org':'இலாபநோக்கற்ற அமைப்பு'};
+
+const DEBUG_CASES = [
+  {wrong:'my site.com', errorType:'Syntax Error', why:'களப்பெயர்களில் இடைவெளி (space) அனுமதிக்கப்படுவதில்லை.', fix:'my-site.com'},
+  {wrong:'-mysite.com', errorType:'Syntax Error', why:'இடைக்கோடு (hyphen) களப்பெயரின் முதல் எழுத்தாக இருக்க முடியாது.', fix:'mysite.com அல்லது my-site.com'},
+  {wrong:'my@site.com', errorType:'Syntax Error', why:'சிறப்பு குறியீடுகள் (!, $, &, @ போன்றவை) களப்பெயரில் அனுமதிக்கப்படுவதில்லை.', fix:'mysite.com'},
+  {wrong:'300.168.1.1', errorType:'Logical Error', why:'ஒவ்வொரு byte-ம் 0–255 க்குள் மட்டுமே இருக்க வேண்டும் (8 பிட் = அதிகபட்சம் 255). 300 என்பது செல்லாது.', fix:'192.168.1.1 (அல்லது 0–255 க்குள் உள்ள மதிப்பு)'},
+];
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு வலையமைப்பில் 5 கணினிகள் இணைக்கப்பட்டுள்ளன எனில், குறைந்தபட்சம் எத்தனை தனித்துவமான IP முகவரிகள் தேவை?', o:['1','4','5','10'], c:2, exp:'வலையமைப்பில் P இணைப்புகள் இருந்தால், P முகவரிகளும் இருக்க வேண்டும் (ஒவ்வொரு கணினிக்கும் ஒரு தனித்துவ IP).'},
+  'c2': {q:'🔴 ஒரு நெறிமுறை 8 பிட்களைப் பயன்படுத்தினால், அது உருவாக்கக்கூடிய மொத்த முகவரிகளின் எண்ணிக்கை என்ன?', o:['8','16','128','256'], c:3, exp:'முகவரி வெளி = 2ⁿ. n=8 எனில் 2⁸ = 256.'},
+};
+
+/* =========================================================================
+   WIRE-UP: called after each renderMain() to attach interactive JS per page
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  // Generic quick-check (every topic page)
+  const qcMap = { overview:'qc-overview', ipaddr:'qc-ipaddr', url:'qc-url', namespace:'qc-namespace',
+                  nameserver:'qc-nameserver', zone:'qc-zone', resolver:'qc-resolver', dnswork:'qc-dnswork' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+
+  if(topicId === 'ipaddr') wireIPAddr();
+  if(topicId === 'url') wireURL();
+  if(topicId === 'namespace') wireNamespace();
+  if(topicId === 'zone') wireZone();
+  if(topicId === 'dnswork') wireDNSWork();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* ---- IP Address simulator wiring ---- */
+function toBin8(n){ return (n>>>0).toString(2).padStart(8,'0'); }
+function wireIPAddr(){
+  function update(){
+    const vals = [0,1,2,3].map(i => {
+      let v = parseInt(document.getElementById('ipByte'+i).value,10);
+      if(isNaN(v)) v = 0;
+      v = Math.max(0, Math.min(255, v));
+      document.getElementById('ipByte'+i).value = v;
+      return v;
+    });
+    document.getElementById('ipBinaryOut').textContent = 'Binary: ' + vals.map(toBin8).join(' . ');
+    document.getElementById('ipDottedOut').textContent = 'Dotted Decimal: ' + vals.join('.');
+  }
+  [0,1,2,3].forEach(i => document.getElementById('ipByte'+i).addEventListener('input', update));
+  document.getElementById('ipConvertBtn').addEventListener('click', update);
+  document.getElementById('ipLoadExampleBtn').addEventListener('click', () => {
+    [128,143,137,144].forEach((v,i) => document.getElementById('ipByte'+i).value = v);
+    update();
+  });
+  document.getElementById('ipRandomBtn').addEventListener('click', () => {
+    [0,1,2,3].forEach(i => document.getElementById('ipByte'+i).value = Math.floor(Math.random()*256));
+    update();
+  });
+  update();
+}
+
+/* ---- URL parser wiring ---- */
+function wireURL(){
+  function parse(){
+    const raw = document.getElementById('urlInput').value.trim();
+    const out = document.getElementById('urlParseOut');
+    const typeOut = document.getElementById('urlTypeOut');
+    out.innerHTML = '';
+    const protoMatch = raw.match(/^([a-zA-Z]+):\/\//);
+    if(protoMatch){
+      const protocol = protoMatch[1];
+      const rest = raw.slice(protoMatch[0].length);
+      const firstSlash = rest.indexOf('/');
+      const domain = firstSlash === -1 ? rest : rest.slice(0, firstSlash);
+      const pathPart = firstSlash === -1 ? '' : rest.slice(firstSlash+1);
+      const lastSlash = pathPart.lastIndexOf('/');
+      const folders = lastSlash === -1 ? '' : pathPart.slice(0, lastSlash);
+      const file = lastSlash === -1 ? pathPart : pathPart.slice(lastSlash+1);
+      out.innerHTML =
+        '<span class="url-chip chip-protocol">Protocol: '+protocol+'</span>' +
+        '<span class="url-chip chip-domain">Domain: '+domain+'</span>' +
+        (folders ? '<span class="url-chip chip-folder">Folders: '+folders+'</span>' : '<span class="url-chip chip-none">Folders: (இல்லை)</span>') +
+        (file ? '<span class="url-chip chip-file">File: '+file+'</span>' : '<span class="url-chip chip-none">File: (இல்லை)</span>');
+      typeOut.innerHTML = '🟦 இது <b>முழு நிலை URL (Absolute URL)</b> — நான்கு பகுதிகளும் (அல்லது protocol+domain) தெளிவாக உள்ளன.';
+    } else {
+      out.innerHTML = '<span class="url-chip chip-folder">Folder/File path: '+raw+'</span>';
+      typeOut.innerHTML = '🟧 இது <b>சார்பு நிலை URL (Relative URL)</b> — Protocol/Domain இல்லாமல் கோப்பு/கோப்புறைப் பெயர் மட்டும் உள்ளது.';
+    }
+  }
+  document.getElementById('urlParseBtn').addEventListener('click', parse);
+  document.getElementById('urlRelExampleBtn').addEventListener('click', () => {
+    document.getElementById('urlInput').value = 'sites/default/files/press_release/pr070119a.jpg';
+    parse();
+  });
+  parse();
+}
+
+/* ---- Domain Name Tree + Validator wiring ---- */
+function wireNamespace(){
+  // Tree model matching Fig 12.6: root -> edu -> fhda -> atc -> challenger
+  const treeHTML = `
+    <ul class="tree">
+      <li><button class="node-btn" data-path="">Root</button>
+        <ul class="tree">
+          <li><button class="node-btn" data-path="edu">edu</button>
+            <ul class="tree">
+              <li><button class="node-btn" data-path="fhda.edu">fhda</button>
+                <ul class="tree">
+                  <li><button class="node-btn" data-path="atc.fhda.edu">atc</button>
+                    <ul class="tree">
+                      <li><button class="node-btn" data-path="challenger.atc.fhda.edu">challenger</button></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><button class="node-btn" data-path="com">com</button></li>
+          <li><button class="node-btn" data-path="org">org</button></li>
+          <li><button class="node-btn" data-path="net">net</button></li>
+        </ul>
+      </li>
+    </ul>`;
+  document.getElementById('domainTree').innerHTML = treeHTML;
+  document.querySelectorAll('#domainTree .node-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#domainTree .node-btn').forEach(b => b.classList.remove('leaf-selected'));
+      this.classList.add('leaf-selected');
+      const path = this.dataset.path;
+      const bc = document.getElementById('domainBreadcrumb');
+      if(!path){ bc.textContent = 'Root — NULL (வெற்றுச் சரம்)'; return; }
+      const labels = path.split('.');
+      let html = labels.map((l,i) => i===0 ? l : '<span style="color:#fff;">.</span>'+l).join('');
+      bc.innerHTML = html + '.&nbsp;&nbsp;&nbsp;← (leaf → root படித்தல்: ' + labels.join(' → ') + ' → Root)';
+    });
+  });
+
+  // Domain validator
+  function validate(name){
+    const rules = [];
+    const noSpace = !/\s/.test(name);
+    rules.push({label:'இடைவெளிகள் இல்லை', pass:noSpace});
+    const onlyAllowed = /^[a-zA-Z0-9.\-]+$/.test(name);
+    rules.push({label:'அனுமதிக்கப்பட்ட எழுத்துக்கள் மட்டும் (a-z, A-Z, 0-9, hyphen, dot)', pass:onlyAllowed});
+    const labels = name.split('.');
+    const noLeadHyphen = labels.every(l => !l.startsWith('-'));
+    rules.push({label:'எந்த சிட்டையும் hyphen-இல் தொடங்கவில்லை', pass:noLeadHyphen});
+    const lenOk = name.length > 0 && name.length <= 253;
+    rules.push({label:'மொத்த நீளம் ≤ 253 எழுத்துக்கள்', pass:lenOk});
+    const labelLenOk = labels.every(l => l.length <= 63);
+    rules.push({label:'ஒவ்வொரு சிட்டையும் ≤ 63 எழுத்துக்கள்', pass:labelLenOk});
+    const allPass = rules.every(r => r.pass);
+    return {rules, allPass};
+  }
+  function renderValidation(name){
+    const res = validate(name);
+    let html = '<div style="font-weight:800;margin-bottom:8px;">'+(res.allPass ? '✅ செல்லுபடியாகும் களப்பெயர்!' : '❌ இந்தக் களப்பெயர் விதிமீறலைக் கொண்டுள்ளது')+'</div>';
+    html += '<ul>' + res.rules.map(r => '<li style="color:'+(r.pass?'#15803d':'#c0392b')+';">'+(r.pass?'✅':'❌')+' '+r.label+'</li>').join('') + '</ul>';
+    document.getElementById('domValOut').innerHTML = html;
+  }
+  document.getElementById('domValBtn').addEventListener('click', () => renderValidation(document.getElementById('domValInput').value.trim()));
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => { document.getElementById('domValInput').value = btn.dataset.preset; renderValidation(btn.dataset.preset); });
+  });
+  renderValidation(document.getElementById('domValInput').value.trim());
+}
+
+/* ---- Zone diagram wiring ---- */
+function wireZone(){
+  document.getElementById('zoneBtnDomain').addEventListener('click', () => {
+    document.getElementById('zoneExplain').textContent = '🔵 "mhhe.com" என்பது ஒரு Domain (களம்) — இது Domain Name Space-இல் ஒரு முனையம் மட்டுமே.';
+  });
+  document.getElementById('zoneBtnZone').addEventListener('click', () => {
+    document.getElementById('zoneExplain').textContent = '🟢 "mhhe.com" மற்றும் அதன் கீழ் உள்ள அனைத்து துணைக் களங்களும் சேர்ந்தது ஒரு Zone — இது தொடர்ச்சியான களங்கள் மற்றும் துணைக்களங்களின் தொகுப்பு.';
+  });
+}
+
+/* ---- DNS resolution step simulator wiring ---- */
+const DNS_STEPS = [
+  {active:['n-browser'], log:'பயனர் உலாவியில் <b>www.tnscert.org</b> எனத் தட்டச்சு செய்கிறார்.'},
+  {active:['n-browser','n-resolver'], log:'உலாவி, தீர்வியிடம் (Resolver) கேட்கிறது: "www.tnscert.org எங்கே உள்ளது?"'},
+  {active:['n-resolver'], log:'தீர்வி முதலில் DNS இடைத்தேக்கத்தை (Cache) சரிபார்க்கிறது — முகவரி இல்லை (Cache Miss).'},
+  {active:['n-resolver','n-local'], log:'தீர்வி உள்ளூர் பெயர்ச் சேவையகத்திற்கு (Local DNS Server) வினவல் அனுப்புகிறது.'},
+  {active:['n-local','n-root'], log:'உள்ளூர் சேவையகத்திற்கும் தெரியவில்லை — அது மூலப் பெயர்ச் சேவையகத்திடம் (Root Server) கேட்கிறது.'},
+  {active:['n-root'], log:'Root Server: "எனக்குத் தெரியாது, ஆனால் .org சேவையகத்திடம் கேளுங்கள்" என பதிலளிக்கிறது.'},
+  {active:['n-local','n-org'], log:'உள்ளூர் சேவையகம் .org (TLD / Org Server) சேவையகத்திடம் வினவுகிறது.'},
+  {active:['n-org'], log:'.org சேவையகம்: "எனக்குத் தெரியாது, tnscert.org சேவையகத்திடம் கேளுங்கள்" எனக் கூறுகிறது.'},
+  {active:['n-local','n-auth'], log:'உள்ளூர் சேவையகம் Authoritative DNS Server (tnscert.org) இடம் வினவுகிறது.'},
+  {active:['n-auth'], log:'tnscert.org சேவையகம்: "www.tnscert.org is at 198.71.57.84" என பதிலளிக்கிறது. ✅'},
+  {active:['n-local','n-resolver'], log:'உள்ளூர் சேவையகம் இந்த IP முகவரியை தீர்வியிடம் அனுப்புகிறது; தீர்வி அதை இடைத்தேக்கத்தில் (cache) சேமிக்கிறது.'},
+  {active:['n-resolver','n-browser'], log:'தீர்வி IP முகவரியை உலாவிக்கு அனுப்புகிறது. உலாவி 198.71.57.84 உடன் இணைந்து வலைப்பக்கத்தைக் காட்டுகிறது. 🎉'},
+];
+let dnsStep = -1, dnsTimer = null;
+function wireDNSWork(){
+  dnsStep = -1;
+  clearInterval(dnsTimer); dnsTimer = null;
+  document.getElementById('dnsStepBtn').addEventListener('click', () => dnsAdvance());
+  document.getElementById('dnsResetBtn').addEventListener('click', dnsReset);
+  document.getElementById('dnsPlayBtn').addEventListener('click', () => {
+    clearInterval(dnsTimer);
+    dnsTimer = setInterval(() => {
+      if(dnsStep >= DNS_STEPS.length - 1){ clearInterval(dnsTimer); return; }
+      dnsAdvance();
+    }, 1400);
+  });
+}
+function dnsAllNodes(){ return ['n-browser','n-resolver','n-local','n-root','n-org','n-auth']; }
+function dnsAdvance(){
+  if(dnsStep >= DNS_STEPS.length - 1) return;
+  dnsStep++;
+  dnsAllNodes().forEach(id => document.getElementById(id) && document.getElementById(id).classList.remove('active'));
+  const s = DNS_STEPS[dnsStep];
+  s.active.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('active'); });
+  const log = document.getElementById('dnsLog');
+  const line = document.createElement('div');
+  line.className = 'ln';
+  line.innerHTML = '<span class="step-no">படி '+(dnsStep+1)+'/'+DNS_STEPS.length+':</span> ' + s.log;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+  if(dnsStep === DNS_STEPS.length - 1){
+    const done = document.createElement('div');
+    done.className = 'ln';
+    done.innerHTML = '<b style="color:#4ade80;">✔ DNS தீர்வு நிறைவடைந்தது (Resolution Complete)!</b>';
+    log.appendChild(done);
+  }
+}
+function dnsReset(){
+  clearInterval(dnsTimer); dnsTimer = null;
+  dnsStep = -1;
+  dnsAllNodes().forEach(id => document.getElementById(id) && document.getElementById(id).classList.remove('active'));
+  document.getElementById('dnsLog').innerHTML = '<div class="ln">▶ "Step" பொத்தானை அழுத்தி தொடங்குங்கள்…</div>';
+}
+
+/* ---- Practice page wiring ---- */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  // True / False
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  // Fill in the blanks
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans || val.replace(/\s/g,'') === f.ans.replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  // Match the following
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>TLD</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>பொருள்</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='140px';
+      b.textContent = l + (matched[l] ? ' ✅ → ' + matched[l] : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); b.style.outline='3px solid var(--accent)'; });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='220px';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும் (மேலே உள்ள பட்டியலுடன் ஒப்பிடவும்).';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  // Debugging Lab
+  const debugWrap = document.getElementById('debugWrap');
+  debugWrap.innerHTML = DEBUG_CASES.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span class="mono">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-dbg="${i}">என்ன தவறு? (What's wrong?)</button>
+      <div class="explain-box" id="dbg-${i}">
+        <b>வகை:</b> ${c.errorType}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான வடிவம்:</span> <span class="mono">${c.fix}</span>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-dbg]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('dbg-'+this.dataset.dbg).classList.toggle('show'); });
+  });
+}
+
+/* ---- Exam prep page wiring ---- */
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
