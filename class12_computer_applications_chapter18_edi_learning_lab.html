@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 18 — மின்னணு தரவு பரிமாற்றம் (EDI) | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#fdf8f1;
+    --card:#ffffff;
+    --primary:#b45309;
+    --primary-dark:#7c2d12;
+    --primary-light:#fef3e0;
+    --accent:#1d4ed8;
+    --accent-light:#dbeafe;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#241a12;
+    --muted:#6b5c4c;
+    --border:#ecdcc4;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#fde9cf;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#fff6ea;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#f3ece0;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:900px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(180,83,9,.06);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:#f3e8ff;border-left:5px solid #9333ea;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:#7e22ce;font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .caution-box{background:#f1f5f9;border-left:5px solid #64748b;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .caution-box .lbl{font-weight:800;color:#475569;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fcf9f4;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#f3ece0;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;transition:all .25s;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(180,83,9,.4);}
+  .flow-node.muted{opacity:.35;}
+  .flow-node.done{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  .tab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0;}
+  .ex-chip{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:.85rem;font-weight:700;cursor:pointer;}
+  .ex-chip:hover{border-color:var(--primary);background:var(--primary-light);}
+  .ex-chip .cat{display:none;font-size:.74rem;font-weight:600;color:var(--muted);margin-top:6px;text-align:left;}
+  .ex-chip.revealed .cat{display:block;}
+  .ex-chip.revealed{border-color:var(--accent);}
+
+  .fcaps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0;}
+  .fcaps-card{border:2px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;background:#fff;font-weight:800;font-size:.88rem;}
+  .fcaps-card.active{border-color:var(--accent);background:var(--accent-light);}
+
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+  .cmp-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;}
+  .cmp-card h4{margin-top:0;}
+  @media (max-width:600px){.cmp-grid{grid-template-columns:1fr;}}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#f3ece0;color:var(--text);}
+  .btn-ghost:hover{background:#e9ddc8;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fffdf9;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  /* ---- Chapter 18 specific widgets ---- */
+  .party-box{border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center;min-width:110px;background:#fff;}
+  .party-box.lit{border-color:var(--accent);background:var(--accent-light);}
+  .party-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;align-items:flex-start;margin:10px 0;}
+
+  .stack-wrap{display:flex;flex-direction:column;gap:6px;margin:12px 0;}
+  .stack-layer{border:2px solid var(--border);border-radius:10px;padding:12px 16px;background:#fff;cursor:pointer;transition:all .2s;}
+  .stack-layer:hover{border-color:var(--primary);}
+  .stack-layer.active{border-color:var(--accent);background:var(--accent-light);box-shadow:0 4px 14px rgba(29,78,216,.18);}
+  .stack-layer .sl-title{font-weight:800;color:var(--primary-dark);}
+  .stack-layer .sl-sub{font-size:.8rem;color:var(--muted);}
+  .stack-detail{display:none;margin-top:10px;}
+  .stack-detail.show{display:block;}
+
+  .order-pool{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;min-height:44px;}
+  .order-chip{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer;}
+  .order-chip:hover{border-color:var(--primary);background:var(--primary-light);}
+  .order-chip:disabled{opacity:.35;cursor:not-allowed;}
+  .order-seq{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;border:2px dashed var(--border);border-radius:10px;padding:10px;margin:10px 0;}
+  .order-seq .seq-item{background:var(--primary);color:#fff;border-radius:999px;padding:8px 14px;font-size:.82rem;font-weight:700;}
+
+  .scn-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;margin-bottom:12px;}
+  .scn-card .scn-text{font-weight:600;margin-bottom:10px;}
+
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9a8a76;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media print{
+    header.top, nav.sidebar, .bottom-bar, footer.note, .sidebar-backdrop{display:none !important;}
+    main.content{padding:0;}
+    .card{box-shadow:none;break-inside:avoid;}
+  }
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .cmp-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 18 — மின்னணு தரவு பரிமாற்றம் (Electronic Data Interchange — EDI)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 18: Electronic Data Interchange (EDI) · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* ============================= STORAGE ============================= */
+const STORE_KEY = 'ca12_edi_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable */ }
+  return { completed:[], lang:'ta' };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* ============================= TOPICS ============================= */
+const TOPICS = [
+  {id:'intro',     num:'18.1', title:'அறிமுகம் — EDI'},
+  {id:'history',   num:'18.2', title:'EDI வரலாறு'},
+  {id:'types',     num:'18.3', title:'EDI வகைகள்'},
+  {id:'benefits',  num:'18.4', title:'EDI நன்மைகள்'},
+  {id:'layers',    num:'18.5', title:'EDI அடுக்குகள்'},
+  {id:'standards', num:'18.6', title:'EDI தரநிலைகள் & UN/EDIFACT'},
+  {id:'practice',  num:'Practice', title:'பயிற்சி & Mistake Museum'},
+  {id:'examprep',  num:'Exam', title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* ============================= SIDEBAR / NAV ============================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* ============================= MAIN RENDER DISPATCH ============================= */
+const RENDERERS = {
+  intro: renderIntro,
+  history: renderHistory,
+  types: renderTypes,
+  benefits: renderBenefits,
+  layers: renderLayers,
+  standards: renderStandards,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 18.1 — அறிமுகம்
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 18 › 18.1</div>
+    <h2>அறிமுகம் <span class="eng">(Introduction — Electronic Data Interchange)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      மின்னணு தரவு பரிமாற்றம் (EDI) இல் அடிப்படை அறிவு பெறுதல் · EDI வரலாற்றை மேலோட்டமாக அறிந்துக்கொள்ளுதல் · EDI வகைகளைப் புரிந்துகொள்ளுதல் · EDI நன்மைகள் தெரிந்துகொள்ளுதல் · EDI அடுக்குகளைப் பற்றி அறிந்துகொள்ளுதல் · UN/EDIFACT பற்றி சுருக்கமாக அறிதல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>18.1 EDI என்றால் என்ன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்னணு தரவு பரிமாற்றம் (Electronic Data Interchange – EDI) என்பது வர்த்தக நிறுவனங்களுக்கு இடையே மின்னணு வணிக ஆவணங்களை பரிமாற்றம் செய்வதை குறிக்கும். இது ஒரு தனிப்பயன் தடம் (Dedicated Channel) மூலமாகவோ அல்லது இணையம் மூலமாகவோ முன் வரையறுக்கப்பட்ட வடிவத்தில், அதிக மனித தலையீடு இல்லாமல் நடைபெறுகிறது.
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை — தேசிய தர நிர்ணய நிறுவகம் (NIST)</span>
+      தேசிய தர நிர்ணய மற்றும் தொழில்நுட்ப நிறுவகத்தின் படி, EDI என்பது "பணக்கருவிகள் அல்லாத பிற தொழில் துறை ஆவணங்களை நேரடியாக இரு கணினிகளுக்கு இடையே, முற்றிலும் வடிவமைக்கப்பட்ட வடிவில் நடைபெறும் தகவல் பரிமாற்றம்" ஆகும்.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு ரேஷன் கடை கணக்குப் பதிவேட்டை நினைத்துப் பாருங்கள் — கடைக்காரர் ஒவ்வொரு முறையும் கையால் பட்டியலை எழுதி, பிறகு அதை மீண்டும் கணக்கு அலுவலகத்தில் தட்டச்சு செய்ய வேண்டும் என்றால் நேரம் வீணாகும், தவறுகளும் ஏற்படும். அதற்குப் பதிலாக, கடையின் கணினியிலிருந்து நேரடியாக கணக்கு அலுவலக கணினிக்கு, ஒரே செந்தர வடிவத்தில் தரவு தானாகச் சென்றுவிட்டால்? அதுவே EDI-யின் அடிப்படைக் கருத்து — இரு நிறுவனங்களின் கணினிகள், மனிதர் தலையிடாமல், ஒரே "மொழியில்" (செந்தர வடிவமைப்பில்) நேரடியாகப் பேசிக்கொள்வது.
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>EDI விரிவாக்கம் = <b>Electronic Data Interchange</b>. இரண்டு வரையறைகளையும் (பாடம் தொடக்கத்தில் உள்ளது & "நினைவில் கொள்க" பெட்டியில் உள்ள NIST வரையறை) பாடநூல் வாசகப்படியே எழுத பழகவும்.</div>
+  </div>
+
+  <div class="card">
+    <h3>🤔 ஏன் EDI தேவைப்பட்டது?</h3>
+    <div class="analogy">
+      <span class="lbl">🏪 நிகழ்வு ஒப்பீடு (Real-life Analogy — Rekey Problem)</span>
+      பேருந்து நிலையத்தில் ஒரு முகவர் கையால் டிக்கெட் பதிவேட்டை எழுதி, அதை மாலையில் மீண்டும் கணக்கு அலுவலகத்தில் கணினியில் தட்டச்சு செய்கிறார் என வைத்துக்கொள்வோம் — இதில் 2 முறை தரவு உள்ளிடப்படுகிறது (Rekey), நேரம் விரயமாகிறது, தட்டச்சுப் பிழை வாய்ப்பும் அதிகரிக்கிறது. நிறுவனங்கள் தங்களுக்குள் வெவ்வேறு வடிவங்களில் தரவை வைத்திருந்ததால், ஒருவருக்கொருவர் தொடர்பு கொள்ளும்போது இதே "மீண்டும் உள்ளிடும்" (Rekey) பிரச்சனை ஏற்பட்டது. இந்த நேர விரயமே EDI தோன்றக் காரணம்.
+    </div>
+    <p>கணிப்பொறிகளின் வளர்ச்சி தொடங்கியதும், பல நிறுவனங்கள் தரவுகளை சேமித்து, செயல்படுத்த கணினிகளைப் பயன்படுத்த தொடங்கின. இருப்பினும் வெவ்வேறு நிறுவனங்கள் வெவ்வேறான பயன்பாட்டு முறைமைகளை பயன்படுத்தியதால், உருவாக்கப்படும் தரவுகளின் வடிவமைப்பு ஒரே மாதிரியாக இல்லை. நிறுவனங்கள் தங்கள் வணிகத் தேவைகளுக்கு தொடர்பு கொள்ள வேண்டிய அவசியம் ஏற்பட்டால், அவை மீண்டும் தரவுகளை மாற்றி உள்ளிட (Rekey) வேண்டியிருந்தது. இதன் காரணமாக உண்டான நேர விரயம் வியாபார நடவடிக்கைகளில் பெரும் தடையாக இருந்தது. இப்பிரச்சனைக்கு தீர்வு காண, சில நிறுவனங்கள், குறிப்பிட்ட செந்தர வடிவமைப்பை பயன்படுத்தத் தொடங்கின. இதனை EDI-ன் தோற்றமாக கருத முடியும்.</p>
+    <div class="example-box">
+      <span class="lbl">📦 EDI மூலம் பரிமாறப்படும் ஆவணங்கள்</span>
+      EDI விநியோக குறிப்புகள், விலைப்பட்டியல்கள் (Invoices), கொள்முதல் ஆணைகள் (Purchase Orders), செயல்பாட்டு ஒப்புகைகள் போன்ற ஆவணங்களை பரிமாற்றம் செய்ய பயன்படுத்தப்படுகிறது. வழங்கல் நிறுவனத்தின் கணினியில் இருந்து இந்த ஆவணங்கள் நேரடியாக அனுப்பப்படும். இதனால் பாரம்பரிய "காகித" தொடர்பில் நேரும் பல பிழைகளை தவிர்த்து, பெரும் நேரம் மற்றும் பொருட் செலவு குறைக்கப்படும்.
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் — "காகிதமற்ற வணிகம்"</span>
+      ஆவணங்கள் ரேடியோ, தொலை-அச்சு, டெலக்ஸ்-செய்திகள் அல்லது தொலைபேசி மூலமாக மின்னணு முறையில் பரிமாற்றம் செய்யப்பட்டன. <b>EDI</b> மூலம் "<b>காகிதமற்ற வணிகம்</b>" மற்றும் <b>EFT</b> மூலம் "<b>காகிதமற்ற நிதி பரிமாற்றம்</b>" சாத்தியமாகிறது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Rekey Vs EDI — What If? Lab <span class="eng">(Learning Simulation)</span></h3>
+    <p>கீழே உள்ள பொத்தானை அழுத்தி, EDI இல்லாத பழைய முறையிலும், EDI உள்ள புதிய முறையிலும் ஒரு கொள்முதல் ஆணை (Purchase Order) எவ்வாறு பயணிக்கிறது எனப் பாருங்கள்.</p>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="rekeyToggleBtn">🔁 முறையை மாற்று (Toggle: Without EDI / With EDI)</button>
+    </div>
+    <div class="diagram-box" id="rekeyDiagram"></div>
+    <div id="rekeyNote" class="caution-box" style="display:none;"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-intro"></div></div>
+  `;
+}
+
+function wireIntro(){
+  let withEdi = false;
+  function renderRekey(){
+    const d = document.getElementById('rekeyDiagram');
+    if(!withEdi){
+      d.innerHTML = `
+      <div class="flow-row">
+        <div class="flow-node">வாங்குநர் எழுதுகிறார்</div><div class="flow-arrow">➡</div>
+        <div class="flow-node" style="background:var(--incorrect-bg);border-color:var(--incorrect);color:#7f1d1d;">காகிதத்தில் ஆணை</div><div class="flow-arrow">➡</div>
+        <div class="flow-node" style="background:var(--incorrect-bg);border-color:var(--incorrect);color:#7f1d1d;">Fax / அஞ்சல்</div><div class="flow-arrow">➡</div>
+        <div class="flow-node" style="background:var(--incorrect-bg);border-color:var(--incorrect);color:#7f1d1d;">Rekey (மீண்டும் தட்டச்சு)</div><div class="flow-arrow">➡</div>
+        <div class="flow-node">விற்பனையாளர் கணினி</div>
+      </div>
+      <div class="diagram-cap">⏱️ மெதுவானது · ❌ தட்டச்சுப் பிழை வாய்ப்பு அதிகம் · 📄 காகிதச் செலவு அதிகம்</div>`;
+      document.getElementById('rekeyNote').style.display = 'block';
+      document.getElementById('rekeyNote').innerHTML = '<span class="lbl">🧐 என்ன நடந்தது?</span>தரவு 2 முறை கையால் உள்ளிடப்படுகிறது (வாங்குநரிடமும், விற்பனையாளரிடமும்) — ஒவ்வொரு முறையும் தவறு நுழையும் வாய்ப்பு உள்ளது, நேரமும் அதிகமாகும்.';
+    } else {
+      d.innerHTML = `
+      <div class="flow-row">
+        <div class="flow-node">வாங்குநர் கணினி</div><div class="flow-arrow active">➡</div>
+        <div class="flow-node active">EDI செந்தர வடிவம்</div><div class="flow-arrow active">➡</div>
+        <div class="flow-node done">நேரடி மின்னணு அனுப்பல்</div><div class="flow-arrow active">➡</div>
+        <div class="flow-node">விற்பனையாளர் கணினி</div>
+      </div>
+      <div class="diagram-cap">⚡ வேகமானது · ✅ Rekey தேவையில்லை · 💰 செலவு குறைவு</div>`;
+      document.getElementById('rekeyNote').style.display = 'block';
+      document.getElementById('rekeyNote').innerHTML = '<span class="lbl">✅ ஏன் இது சிறந்தது?</span>இரு கணினிகளும் ஒரே செந்தர வடிவமைப்பைப் (EDI Standard) புரிந்துகொள்வதால், தரவு நேரடியாக ஒரு கணினியிலிருந்து மற்றொன்றுக்குச் செல்கிறது — மனித தலையீடு, Rekey தேவையில்லை.';
+    }
+  }
+  renderRekey();
+  document.getElementById('rekeyToggleBtn').addEventListener('click', () => { withEdi = !withEdi; renderRekey(); });
+}
+
+/* =========================================================================
+   TOPIC 18.2 — EDI வரலாறு
+   ========================================================================= */
+const HISTORY_STEPS = [
+  {y:'1948', t:'தொடக்கப் புள்ளி — பெர்லின் விமான சரக்குப் போக்குவரத்து', d:'எட் கில்பர்ட் (Ed Guilbert) தனது குழுவுடன் இணைந்து, 1948 பெர்லின் விமான சரக்கு-போக்குவரத்து பணியின்போது வணிக ஆவண பரிமாற்றத்திற்கான முதல் தரப்படுத்தப்பட்ட (856, மற்றும் ANS போன்ற) வடிவமைப்பை உருவாக்கினார். எட் கில்பர்ட் "EDI-யின் தந்தை" என்று அழைக்கப்படுகிறார்.'},
+  {y:'1965', t:'முதல் EDI செய்தி', d:'முதல் EDI செய்தி, 1965 இல், ஹாலந்து-அமெரிக்க நீராவி கப்பல் நிறுவனத்திலிருந்து ட்ரான்ஸ்-அட்லாண்டிக் கப்பல் நிறுவனத்திற்கு டெலெக்ஸ் செய்திகளைப் பயன்படுத்தி அனுப்பப்பட்டது. கணினி ஒரு முழு பக்கத்தை கிட்டத்தட்ட 2 நிமிடங்களில் அனுப்பியிருந்தது.'},
+  {y:'1968', t:'TDCC குழு அமைப்பு', d:'அமெரிக்காவின் கப்பல், இரயில், விமான போக்குவரத்து நிறுவனங்கள் மற்றும் சரக்குந்து (Truck) நிறுவனங்கள் தங்களுக்குள் ஒன்றாக இணைந்து Transportation Data Coordinating Committee (TDCC) என்ற குழுவை அமைத்து EDI தரநிலைகளை உருவாக்க துவங்கின.'},
+  {y:'1975', t:'முதல் தொழில்துறை EDI தரநிலை', d:'இக்குழுவால் வெளியிடப்பட்ட TDCC தரநிலை முதல் குறிப்பிட்ட தொழில்துறை EDI ஆகும்.'},
+  {y:'1977', t:'பல்பொருள் அங்காடி EDI', d:'பல்பொருள் அங்காடி நிறுவனங்கள் மற்றும் அவற்றின் வணிக கூட்டாளிகளின் ஒரு குழு, EDI தரப்பாடுகளை வரையறுத்து பயன்படுத்த தொடங்கின.'},
+  {y:'1978', t:'EDIA & ANSI X12', d:'TDCC நிறுவனம் Electronic Data Interchange Association (EDIA) என பெயர் மாற்றம் செய்யப்பட்டது. அதன் பின்னர் அமெரிக்க தேசிய தர நிர்ணய நிறுவனம் (American National Standards Institute – Accredited Standards Committee, ANSI-ASC) EDIA-க்கு பொறுப்பேற்றது. இக்குழு ANSI X12 என்னும் தரநிலையை உருவாக்கி வெளியிட்டது.'},
+  {y:'1987', t:'UN/EDIFACT உருவாக்கம்', d:'ஐக்கிய நாடுகள் சபை, மின்-வணிக தொழில்நுட்பம் உலகளவில் தொழில் துறைக்கு உதவ UN/EDIFACT-ஐ உருவாக்கியது. (பாடநூலின் "நினைவில் கொள்க" பெட்டியில் இந்த ஆண்டு 1985 என்றும் குறிப்பிடப்பட்டுள்ளது — கீழே உள்ள குறிப்பைப் பார்க்கவும்.)'},
+];
+function renderHistory(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 18 › 18.2</div>
+    <h2>EDI வரலாறு <span class="eng">(History of EDI)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> EDI எவ்வாறு படிப்படியாக உருவாகி வளர்ந்தது என்பதை காலவரிசையில் அறிந்துகொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>18.2 EDI வரலாறு</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      1960 களின் பிற்பகுதியில், அமெரிக்காவின் கப்பல், இரயில், விமான போக்குவரத்து நிறுவனங்கள் மற்றும் சரக்குந்து (Truck) நிறுவனங்கள் தங்கள் வணிகங்களுக்காக மின்னணு செய்திகளை பரிமாறிக் கொண்டிருந்தன. இந்த செய்திகள் வெவ்வேறு வடிவங்களில் இருந்தன, அதனால் பொருட்கள் பரிமாற்றம் செய்வதில் சிக்கல்கள் ஏற்பட்டது.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      EDI வரலாற்றை ஒரு பேருந்து பயணமாக நினைத்துக் கொள்ளுங்கள்: முதலில் ஒரு தனி நபர் (எட் கில்பர்ட்) ஒரு வழியை உருவாக்குகிறார் (1948) → சில நிறுவனங்கள் அதைப் பயன்படுத்தத் தொடங்குகின்றன (1965) → போக்குவரத்துத் துறையினர் சேர்ந்து ஒரு குழு அமைக்கிறார்கள் (1968) → அந்தக் குழு ஒரு தரநிலையை வெளியிடுகிறது (1975) → பிற தொழில்களும் சேர்ந்துகொள்கின்றன (1977-78) → இறுதியாக ஐக்கிய நாடுகள் சபை உலகளாவிய தரநிலையை உருவாக்குகிறது (1987).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🕰️ காலவரிசைப் படி (Timeline Scrubber) — படி-படியாகப் பார்க்கவும்</h3>
+    <div class="diagram-box">
+      <div class="flow-row" id="histDots"></div>
+      <div id="histPanel" style="margin-top:14px;min-height:90px;"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="histPrevBtn">⬅ முந்தைய படி</button>
+        <button class="btn btn-primary" id="histNextBtn">அடுத்த படி ➡</button>
+        <button class="btn btn-ghost" id="histResetBtn">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>⚠️ பாடநூல் முரண்பாடு — தேதி சரிபார்க்க வேண்டியது <span class="eng">(needs verification)</span></h3>
+    <div class="caution-box">
+      <span class="lbl">🔍 கவனிக்கவும்</span>
+      பாடநூலின் 18.2 பகுதியில் "1987 ல், ஐக்கிய நாடுகள் சபை ... UN/EDIFACT-ஐ உருவாக்கியது" என உள்ளது. ஆனால் பக்கம் 279-ல் உள்ள "நினைவில் கொள்க" பெட்டியில் "1985 இல், ஐக்கிய நாடுகள் சபை ... EDIFACT-ஐ உருவாக்கியது" என வேறு ஆண்டு குறிப்பிடப்பட்டுள்ளது. இரண்டு இடங்களிலும் பாடநூல் வாசகம் அப்படியே இங்கு தரப்பட்டுள்ளது — தேர்வுக்கு பாடநூலில் உள்ளபடியே (18.2-ல் 1987, "நினைவில் கொள்க"-ல் 1985) நினைவில் வைத்துக் கொள்ளவும்.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-history"></div></div>
+  `;
+}
+function wireHistory(){
+  let hStep = -1;
+  function renderHist(){
+    const dotsWrap = document.getElementById('histDots');
+    let dotsHtml = '';
+    HISTORY_STEPS.forEach((s,i) => {
+      dotsHtml += '<div class="flow-node '+(i===hStep?'active':(i<hStep?'done':'muted'))+'" style="min-width:64px;padding:8px 10px;">'+s.y+'</div>';
+      if(i < HISTORY_STEPS.length - 1) dotsHtml += '<div class="flow-arrow '+(i<hStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = dotsHtml;
+    const panel = document.getElementById('histPanel');
+    if(hStep === -1){
+      panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி EDI வரலாற்றைப் படி-படியாகப் பயணிக்கவும்…</p>';
+    } else {
+      const s = HISTORY_STEPS[hStep];
+      panel.innerHTML = '<h4>'+s.y+' — '+s.t+'</h4><p>'+s.d+'</p>';
+    }
+    document.getElementById('histPrevBtn').disabled = hStep <= 0;
+    document.getElementById('histNextBtn').disabled = hStep >= HISTORY_STEPS.length - 1;
+  }
+  renderHist();
+  document.getElementById('histNextBtn').addEventListener('click', () => { if(hStep < HISTORY_STEPS.length-1){ hStep++; renderHist(); } });
+  document.getElementById('histPrevBtn').addEventListener('click', () => { if(hStep > 0){ hStep--; renderHist(); } });
+  document.getElementById('histResetBtn').addEventListener('click', () => { hStep = -1; renderHist(); });
+}
+
+/* =========================================================================
+   TOPIC 18.3 — EDI வகைகள்
+   ========================================================================= */
+const EDI_TYPES = [
+  {k:'direct', icon:'🔗', ta:'நேரடி EDI', en:'Direct / Point-to-Point EDI',
+   def:'இது முனையம்-முனையம் EDI (Point-to-Point) என்றும் அழைக்கப்படுகிறது. இது பல்வேறு வணிக கூட்டாளிகளுக்கும் இடையே நேரடி தொடர்பை ஏற்படுத்துகிறது. இந்த வகை EDI, தொடர் வணிக பரிவர்த்தனைகளுக்கும் பெரிய நிறுவனங்களுக்கு பொருந்தும்.'},
+  {k:'van', icon:'🏢', ta:'VAN வழியாக EDI', en:'EDI via VAN (Value Added Network)',
+   def:'இது மதிப்புக் கூட்டப்பட்ட வலையமைப்பு வழியாக நடைபெறும் EDI ஆகும். இங்கு EDI ஆவணங்கள் மூன்றாம் தரப்பு (Third Party) வலை சேவை வழங்குநர்களின் ஆதரவுடன் பரிமாற்றம் செய்யப்படுகின்றன. பல நிறுவனங்கள் வலையமைப்பு தொழில்நுட்பங்களின் புதுப்பித்தல் போன்ற சிக்கல்களை தவிர்க்க இந்த வகையை விரும்புகின்றன.'},
+  {k:'ftp', icon:'🔒', ta:'FTP/VPN, SFTP, FTPS வழியாக EDI', en:'EDI via FTP/VPN, SFTP, FTPS',
+   def:'FTP/VPN, SFTP மற்றும் FTPS போன்ற நெறிமுறைகளை பயன்படுத்தி இணையம் அல்லது அகஇணையம் அடிப்படையில் EDI ஆவணங்களை பரிமாற்றம் செய்வது பொதுவாக இவ்வாறு அழைக்கப்படுகிறது.'},
+  {k:'internet', icon:'🌐', ta:'இணையம் வழி EDI', en:'Internet-based EDI',
+   def:'இணைய அடிப்படையிலான EDI, இணையம் வழியாக ஒரு உலாவியை பயன்படுத்தி நடைபெறுகிறது. இங்கு நிறுவனங்கள் ஒரு உலாவியைப் பயன்படுத்தி தரவை தங்கள் வர்த்தகக் கூட்டாளிகளுக்கு பரிமாற்றம் செய்கின்றன. சிறிய மற்றும் நடுத்தர நிறுவனங்களுக்கு ஏற்ற எளிமையையும் வசதியையும் கொண்டது இணைய EDI ஆகும்.'},
+  {k:'mobile', icon:'📱', ta:'கைப்பேசி வழி EDI', en:'Mobile EDI',
+   def:'திறன்பேசி அல்லது பிற கையடக்க சாதனங்களை EDI ஆவணங்களை பரிமாற்றம் செய்ய பயன்படுத்தப்படும்போது அது கைப்பேசி வழி EDI எனப்படுகிறது. கைப்பேசி வழி EDI பயன்பாடுகள், EDI பரிமாற்றங்களின் வேகத்தை கணிசமாக அதிகரிக்கிறது.'},
+];
+const VAN_STEPS = [
+  {k:'prep', ta:'1️⃣ ஆவணம் தயாரித்தல்', en:'Prepare the documents', who:'sender',
+   d:'அனுப்பும் நிறுவனம் (Sending Company) தனது உள் வடிவமைப்பில் (Internal Format) அனுப்ப வேண்டிய ஆவணங்களைத் தயார் செய்கிறது.'},
+  {k:'translate', ta:'2️⃣ EDI வடிவமாக மாற்றுதல்', en:'Translate into EDI format', who:'sender',
+   d:'EDI Translator மென்பொருள், உள் வடிவமைப்பு ஆவணத்தை செந்தர EDI தரவு (EDI Data) வடிவமாக மாற்றுகிறது.'},
+  {k:'send', ta:'3️⃣ VAN வழியாக இணைத்து அனுப்புதல்', en:'Connect and transmit via VAN', who:'van',
+   d:'Communications Software, EDI தரவை EDI Network Service Provider (VAN) வழியாக இணைத்து, வணிக கூட்டாளியின் கணினிக்கு அனுப்புகிறது.'},
+  {k:'receive', ta:'4️⃣ பெறுநர் EDI தரவைப் பெறுதல்', en:'Receiving company gets EDI data', who:'receiver',
+   d:'பெறும் நிறுவனத்தின் (Receiving Company) Communications Software, VAN வழியாக வந்த EDI தரவைப் பெறுகிறது.'},
+  {k:'back', ta:'5️⃣ மீண்டும் உள் வடிவமாக மாற்றுதல்', en:'Translate back to internal format', who:'receiver',
+   d:'பெறுநரின் EDI Translator, EDI தரவை மீண்டும் அவர்களின் சொந்த உள் வடிவமைப்புக்கு (Internal Format) மாற்றுகிறது — இப்போது அவர்களின் கணினி அதைப் புரிந்துகொள்கிறது.'},
+];
+function renderTypes(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 18 › 18.3</div>
+    <h2>EDI வகைகள் <span class="eng">(Types of EDI)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> தகவல் தொடர்பு இணைப்புகள் மற்றும் பரிமாற்ற ஊடகத்தின் அடிப்படையில் EDI-யின் 5 வகைகளை அறிந்துகொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>18.3 EDI வகைகள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      தகவல் தொடர்பு இணைப்புகள் மற்றும் பரிமாற்ற ஊடகத்தின் அடிப்படையில் EDI கீழ்கண்டவாறு வகைப்படுத்தலாம்: நேரடி EDI · VAN வழியாக EDI · FTP/VPN, SFTP, FTPS வழியாக EDI · இணையம் வழி EDI · கைப்பேசி வழி EDI.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🗂️ 5 EDI வகைகள் — கிளிக் செய்து அறியவும் <span class="eng">(Click to reveal)</span></h3>
+    <div class="ex-grid" id="ediTypeGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>🏢 VAN வழியாக EDI — படி-படி சிமுலேஷன் <span class="eng">(Learning Simulation — Figure 18.2)</span></h3>
+    <p>பாடநூல் படம் 18.2-ல் உள்ள "VAN வழியாக EDI" கட்டமைப்பை படி-படியாகப் பின்தொடரவும்.</p>
+    <div class="diagram-box">
+      <div class="party-row">
+        <div class="party-box" id="vanSender"><b>🏭 Sending Company</b><br><span class="eng" style="font-size:.76rem;">Internal Format</span></div>
+        <div class="party-box" id="vanNet"><b>☁️ EDI Network<br>Service Provider (VAN)</b></div>
+        <div class="party-box" id="vanReceiver"><b>🏬 Receiving Company</b><br><span class="eng" style="font-size:.76rem;">Internal Format</span></div>
+      </div>
+      <div id="vanPanel" style="margin-top:14px;min-height:80px;"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="vanPrevBtn">⬅ முந்தைய படி</button>
+        <button class="btn btn-primary" id="vanNextBtn">அடுத்த படி ➡</button>
+        <button class="btn btn-ghost" id="vanResetBtn">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="caution-box"><span class="lbl">💡 மதிப்புக் கூட்டப்பட்ட வலையமைப்பு (VAN) என்றால்?</span>ஒரு நிறுவனம் அதன் சொந்த வலையமைப்பை அடிப்படையாக கொண்டு மற்ற நிறுவனங்களுக்கு EDI சேவைகளை வழங்குவதை குறிக்கிறது. இது வணிகர்களுக்கிடையே ஒரு இடைத்தரகர் போல் செயல்படுகிறது. VAN-களின் கோட்பாடுகள் அணுகல் உரிமைகளை பயனர்களுக்கு ஒதுக்கீடு மற்றும் உயர் தரவுப் பாதுகாப்பு வழங்குதல் ஆகும்.</div>
+  </div>
+
+  <div class="card">
+    <h3>🎯 சரியான EDI வகையை தேர்வு செய் <span class="eng">(Learning Activity — Scenario Mission)</span></h3>
+    <p>கீழே உள்ள ஒவ்வொரு நிலைமைக்கும் (Scenario) மிகவும் பொருத்தமான EDI வகையைத் தேர்ந்தெடுக்கவும்.</p>
+    <div id="scenarioWrap"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-types"></div></div>
+  `;
+}
+const SCENARIOS = [
+  {text:'ஒரு பெரிய வாகனத் தயாரிப்பு நிறுவனம், ஒரே ஒரு நிலையான பாகங்கள் சப்ளையருடன் தொடர்ந்து, அதிக அளவு ஆர்டர்களை நேரடியாகப் பரிமாறிக் கொள்ள விரும்புகிறது.', ans:'direct', exp:'தொடர் வணிக பரிவர்த்தனைகளுக்கும், பெரிய நிறுவனங்களுக்கும் நேரடி EDI (Point-to-Point) பொருந்தும்.'},
+  {text:'ஒரு நிறுவனம், வலையமைப்பு தொழில்நுட்பப் புதுப்பித்தல் பற்றிக் கவலைப்படாமல், மூன்றாம் தரப்பு சேவை வழங்குநர் மூலம் பல வணிக கூட்டாளிகளுடன் பாதுகாப்பாக EDI பரிமாறிக்கொள்ள விரும்புகிறது.', ans:'van', exp:'மூன்றாம் தரப்பு சேவை வழங்குநரின் ஆதரவுடன் நடைபெறுவது VAN வழியாக EDI.'},
+  {text:'ஒரு சிறிய/நடுத்தர வணிக நிறுவனம், குறைந்த செலவில், வெறும் ஒரு வலை உலாவியைப் பயன்படுத்தி EDI ஆவணங்களை அனுப்ப விரும்புகிறது.', ans:'internet', exp:'எளிமை மற்றும் வசதி வேண்டும் என்றால் இணையம் வழி (Internet-based) EDI பொருத்தமானது.'},
+  {text:'ஒரு விற்பனை பிரதிநிதி, களத்தில் (Field) இருந்தபடியே, தனது திறன்பேசியில் இருந்தே ஒரு EDI ஆவணத்தை உடனடியாக அனுப்ப விரும்புகிறார்.', ans:'mobile', exp:'கையடக்க சாதனங்கள் / திறன்பேசி மூலம் EDI அனுப்புவது கைப்பேசி வழி EDI (Mobile EDI).'},
+  {text:'ஒரு நிறுவனம், இணையம் அல்லது அக இணையம் அடிப்படையில், SFTP போன்ற பாதுகாப்பான கோப்பு பரிமாற்ற நெறிமுறையைப் பயன்படுத்தி ஆவணங்களை அனுப்ப விரும்புகிறது.', ans:'ftp', exp:'SFTP/FTPS/FTP-VPN நெறிமுறைகளைப் பயன்படுத்துவது FTP/VPN, SFTP, FTPS வழியாக EDI.'},
+];
+function wireTypes(){
+  document.getElementById('ediTypeGrid').innerHTML = EDI_TYPES.map((t,i) =>
+    `<div class="ex-chip" data-i="${i}">${t.icon} ${t.ta}<div class="cat"><b>${t.en}</b><br>${t.def}</div></div>`).join('');
+  document.querySelectorAll('#ediTypeGrid .ex-chip').forEach(c => c.addEventListener('click', function(){ this.classList.toggle('revealed'); }));
+
+  let vStep = -1;
+  function renderVan(){
+    document.getElementById('vanSender').classList.toggle('lit', vStep===0 || vStep===1);
+    document.getElementById('vanNet').classList.toggle('lit', vStep===2);
+    document.getElementById('vanReceiver').classList.toggle('lit', vStep===3 || vStep===4);
+    const panel = document.getElementById('vanPanel');
+    if(vStep === -1){
+      panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி VAN வழியாக ஒரு ஆவணம் எவ்வாறு பயணிக்கிறது எனப் பாருங்கள்…</p>';
+    } else {
+      const s = VAN_STEPS[vStep];
+      panel.innerHTML = '<h4>'+s.ta+' <span class="eng">('+s.en+')</span></h4><p>'+s.d+'</p>';
+    }
+    document.getElementById('vanPrevBtn').disabled = vStep <= 0;
+    document.getElementById('vanNextBtn').disabled = vStep >= VAN_STEPS.length - 1;
+  }
+  renderVan();
+  document.getElementById('vanNextBtn').addEventListener('click', () => { if(vStep < VAN_STEPS.length-1){ vStep++; renderVan(); } });
+  document.getElementById('vanPrevBtn').addEventListener('click', () => { if(vStep > 0){ vStep--; renderVan(); } });
+  document.getElementById('vanResetBtn').addEventListener('click', () => { vStep = -1; renderVan(); });
+
+  const wrap = document.getElementById('scenarioWrap');
+  wrap.innerHTML = SCENARIOS.map((s,i) => `
+    <div class="scn-card" id="scn-${i}">
+      <div class="scn-text">📍 ${s.text}</div>
+      <div class="btn-row">
+        ${EDI_TYPES.map(t => `<button class="btn btn-ghost scn-opt" data-i="${i}" data-k="${t.k}">${t.icon} ${t.ta}</button>`).join('')}
+      </div>
+      <div class="feedback-line" id="scnfb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.scn-opt').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const card = document.getElementById('scn-'+i);
+      if(card.dataset.answered) return;
+      card.dataset.answered = '1';
+      const correct = this.dataset.k === SCENARIOS[i].ans;
+      const fb = document.getElementById('scnfb-'+i);
+      fb.className = 'feedback-line ' + (correct ? 'ok' : 'bad');
+      fb.textContent = (correct ? '✅ சரி! ' : '❌ இன்னும் பொருத்தமான வகை உள்ளது. ') + SCENARIOS[i].exp;
+    });
+  });
+}
+
+/* =========================================================================
+   TOPIC 18.4 — EDI நன்மைகள்
+   ========================================================================= */
+const BENEFITS = [
+  {icon:'📈', ta:'உற்பத்தித் திறன் அதிகரிப்பு', en:'Increased Productivity'},
+  {icon:'⚙️', ta:'செயல்பாட்டுத் திறன் ஊக்குவிப்பு', en:'Operational Efficiency'},
+  {icon:'🎯', ta:'விநியோக தொடர் மீது கட்டுப்பாடு', en:'Control over Supply Chain'},
+  {icon:'🤝', ta:'திறம்பட வர்த்தகம் செய்தல்', en:'Effective Trading'},
+];
+const EDIFACT_BENEFITS = [
+  'இறுதிப் பயனர்களுக்கு சேவையை மேம்படுத்துதல்',
+  'உற்பத்தியை அதிகரித்தல்',
+  'பிழைகள் குறைப்பு',
+  'பதிலளிப்பு நேரங்களை குறைத்தல்',
+  'தானியக்க செயல்பாடுகள்',
+  'செலவுகள் குறைப்பு',
+  'அனைத்து தொழில் மற்றும் வர்த்தக கூட்டாளிகளை ஒருங்கிணைத்தல்',
+  'செயல்பாட்டு நிலை பற்றிய தகவல் அளித்தல்',
+  'நிதி விகிதங்கள் மேம்படுத்துதல்',
+];
+function renderBenefits(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 18 › 18.4</div>
+    <h2>EDI நன்மைகள் <span class="eng">(Benefits of EDI)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> EDI ஒரு நிறுவனத்திற்கு அளிக்கும் முக்கிய நன்மைகளை அறிந்துகொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>18.4 EDI நன்மைகள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      காகித அடிப்படையிலான பரிமாற்ற செயலாக்கம் மற்றும் பிற மின்னணு தரவு பரிமாற்றத்தின் உள்ளார்ந்த பிரச்சினைகளை தீர்க்க EDI உருவாக்கப்பட்டது. EDI அமைப்பை செயல்படுத்துதல் மூலம் ஒரு நிறுவனம் அதன் விநியோக தொடர் (Supply Chain) மீது அதிக கட்டுப்பாட்டைக் கொண்டிருக்கவும், மேலும் திறம்பட வர்த்தகம் செய்யவும் முடியும். இது உற்பத்தித் திறனை அதிகரித்து செயல்பாட்டுத் திறனை ஊக்குவிக்கிறது.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      ஒரு தேநீர் கடையில் ஆர்டர் எடுத்து, உடனே சமையலறைக்கு chit அனுப்பி, பில் தானாகவே தயாராகிவிடும் முறையை நினைத்துப் பாருங்கள் — மனிதர் இடைவெளியில் தவறு செய்ய வாய்ப்பு குறையும், வேலை வேகமாக நடக்கும். அதேபோல, EDI நிறுவனங்களுக்கிடையே தரவு ஓட்டத்தை வேகப்படுத்தி, தவறுகளைக் குறைத்து, வணிகத்தை திறம்படச் செய்கிறது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌟 4 முக்கிய நன்மைகள் — கிளிக் செய்யவும்</h3>
+    <div class="fcaps-grid" id="benefitGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>📋 UN/EDIFACT-ன் கூடுதல் நன்மைகள் <span class="eng">(9 Benefits — Section 18.6.1)</span></h3>
+    <p>இவை பாடம் 18.6.1-ல் UN/EDIFACT தரநிலையின் நன்மைகளாக பட்டியலிடப்பட்டுள்ளன; EDI-யின் பொதுவான நன்மைகளாகவும் பொருந்தும்.</p>
+    <div class="ex-grid" id="edifactBenefitGrid"></div>
+  </div>
+
+  <div class="tryit-box">
+    <span class="lbl">🖐️ முயற்சி செய்! (Try It Yourself)</span>
+    உங்கள் பள்ளி நூலகத்தில் புத்தகம் கடனாகக் கொடுக்கும் முறையை நினைத்துப் பாருங்கள். தற்போது கையால் பதிவேடு எழுதி வைக்கப்படுகிறதா? இதை ஒரு EDI போன்ற மின்னணு முறையில் மாற்றினால், மேலே உள்ள நன்மைகளில் எவை அந்த நூலகத்திற்குப் பொருந்தும் எனப் பட்டியலிடுங்கள்.
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-benefits"></div></div>
+  `;
+}
+function wireBenefits(){
+  document.getElementById('benefitGrid').innerHTML = BENEFITS.map((b,i) =>
+    `<div class="fcaps-card" data-i="${i}">${b.icon}<br>${b.ta}<br><span class="eng" style="font-size:.72rem;">${b.en}</span></div>`).join('');
+  document.getElementById('edifactBenefitGrid').innerHTML = EDIFACT_BENEFITS.map((b,i) =>
+    `<div class="ex-chip" style="cursor:default;">✅ ${b}</div>`).join('');
+}
+
+/* =========================================================================
+   TOPIC 18.5 — EDI அடுக்குகள்
+   ========================================================================= */
+const LAYERS = [
+  {k:'semantic', ta:'பயன்பாட்டு அடுக்கு', en:'Semantic Layer (Application Level)',
+   d:'இது மிக உயர்ந்த அடுக்கு — Application level services. நிறுவனத்தின் பயன்பாட்டு மென்பொருள், அனுப்ப வேண்டிய ஆவணத்தின் (கொள்முதல் ஆணை, விலைப்பட்டியல் போன்றவை) அர்த்தத்தையும் நோக்கத்தையும் வரையறுக்கிறது.'},
+  {k:'standard', ta:'தரப்பாடுகள் அடுக்கு', en:'Standard Layer',
+   d:'இந்த அடுக்கு, தரவை ஒரு பொதுவான "மொழியில்" — EDIFACT business form standards அல்லது ANSI X12 business form standards — குறியீடாக்குகிறது. இதுவே இரு வெவ்வேறு நிறுவனங்களின் கணினிகளும் ஒருவரையொருவர் புரிந்துகொள்ள உதவுகிறது.'},
+  {k:'transport', ta:'இடமாற்று அடுக்கு', en:'Transport Layer',
+   d:'இந்த அடுக்கு, EDI தரவு வடிவமைக்கப்பட்ட பின், அதை எவ்வழியில் அனுப்புவது எனத் தீர்மானிக்கிறது — மின்னஞ்சல் (X.435, MIME), Point-to-point (FTP, TELNET), அல்லது World Wide Web (HTTP) வழியாக.'},
+  {k:'physical', ta:'பரும அடுக்கு', en:'Physical Layer',
+   d:'இது மிகக் கீழ் மட்ட அடுக்கு — உண்மையான இணைப்பு ஊடகம்: Dial-up line, internet, I-way போன்றவை. இதன் மூலமே உண்மையில் மின்-சமிக்ஞைகள் ஒரு கணினியிலிருந்து மற்றொன்றுக்குச் செல்கின்றன.'},
+];
+function renderLayers(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 18 › 18.5</div>
+    <h2>EDI அடுக்குகள் <span class="eng">(EDI Layers)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> EDI கட்டமைப்பில் உள்ள 4 அடுக்குகளையும், தரவு ஒரு கணினியிலிருந்து மற்றொன்றுக்கு எவ்வாறு பாய்கிறது என்பதையும் அறிந்துகொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>18.5 EDI அடுக்குகள் (Layers)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்னணு தரவு பரிமாற்றக் கட்டமைப்பு நான்கு வெவ்வேறு அடுக்குகளைக் குறிப்பிடுகிறது: பயன்பாட்டு அடுக்கு (Semantic layer) · தரப்பாடுகள் அடுக்கு (Standard layer) · இடமாற்று அடுக்கு (Transport layer) · பரும அடுக்கு (Physical layer). இந்த EDI அடுக்குகள் ஒரு கணினியில் இருந்து மற்றொரு கணினிக்கு தரவு எவ்வாறு பாய்கிறது என்பதை விவரிக்கிறது.
+    </div>
+    <div class="analogy">
+      <span class="lbl">📮 நிகழ்வு ஒப்பீடு (Post Office Analogy)</span>
+      ஒரு கடிதத்தை அஞ்சல் மூலம் அனுப்புவதை நினைத்துப் பாருங்கள்: (1) முதலில் நீங்கள் என்ன சொல்ல வேண்டும் என முடிவு செய்கிறீர்கள் (Semantic) → (2) அதை ஒரு குறிப்பிட்ட கடித வடிவத்தில் எழுதுகிறீர்கள் — முகவரி மேலே, கையொப்பம் கீழே (Standard) → (3) அதை தபால் எப்படி கொண்டு செல்லும் என முடிவு செய்யப்படுகிறது — விமானம்/ரயில்/சாலை (Transport) → (4) இறுதியாக உண்மையான சாலை/தண்டவாளம் வழியாக கடிதம் பயணிக்கிறது (Physical).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧱 அடுக்குகளை மேலிருந்து கீழாகக் கிளிக் செய்யவும் <span class="eng">(Click each layer — top to bottom)</span></h3>
+    <p>பாடநூல் படம் 18.3-ல் உள்ளபடி, ஒவ்வொரு அடுக்கையும் கிளிக் செய்து அதன் விவரத்தைப் பாருங்கள்.</p>
+    <div class="stack-wrap" id="stackWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 "ஒரு ஆவணத்தைப் பின்தொடர்" சிமுலேஷன் <span class="eng">(What If? — Trace the Document)</span></h3>
+    <p>ஒரு கொள்முதல் ஆணை அனுப்பும் நிறுவனத்தின் அடுக்குகளில் இருந்து கீழிறங்கி, பெறும் நிறுவனத்தின் அடுக்குகளில் ஏறிச் செல்வதை படி-படியாகப் பாருங்கள்.</p>
+    <div class="diagram-box">
+      <div class="flow-row" id="layerTraceDots"></div>
+      <div id="layerTracePanel" style="margin-top:14px;min-height:70px;"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="ltPrevBtn">⬅ முந்தைய படி</button>
+        <button class="btn btn-primary" id="ltNextBtn">அடுத்த படி ➡</button>
+        <button class="btn btn-ghost" id="ltResetBtn">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-layers"></div></div>
+  `;
+}
+const LAYER_TRACE = [
+  {t:'அனுப்புநர் — பயன்பாட்டு அடுக்கு', d:'அனுப்பும் நிறுவனத்தின் பயன்பாட்டு மென்பொருளில் கொள்முதல் ஆணை உருவாக்கப்படுகிறது. (Semantic layer)'},
+  {t:'அனுப்புநர் — தரப்பாடுகள் அடுக்கு', d:'ஆவணம் EDIFACT / ANSI X12 வடிவமைப்புக்கு மாற்றப்படுகிறது. (Standard layer)'},
+  {t:'அனுப்புநர் — இடமாற்று அடுக்கு', d:'FTP / HTTP / மின்னஞ்சல் மூலம் அனுப்ப தயாராகிறது. (Transport layer)'},
+  {t:'பரும அடுக்கு — பயணம்', d:'Dial-up / Internet / I-way வழியாக உண்மையான சமிக்ஞை இரு கணினிகளுக்கும் இடையே பயணிக்கிறது. (Physical layer)'},
+  {t:'பெறுநர் — இடமாற்று அடுக்கு', d:'பெறும் நிறுவனத்தின் கணினி FTP/HTTP மூலம் தரவைப் பெறுகிறது.'},
+  {t:'பெறுநர் — தரப்பாடுகள் அடுக்கு', d:'EDI Translator, EDIFACT/ANSI X12 வடிவத்தைப் படிக்கிறது.'},
+  {t:'பெறுநர் — பயன்பாட்டு அடுக்கு', d:'பெறுநரின் பயன்பாட்டு மென்பொருளில் கொள்முதல் ஆணை தோன்றுகிறது — பயணம் முடிந்தது!'},
+];
+function wireLayers(){
+  let activeLayer = null;
+  document.getElementById('stackWrap').innerHTML = LAYERS.map((l,i) => `
+    <div class="stack-layer" data-i="${i}">
+      <div class="sl-title">${l.ta} <span class="eng" style="font-weight:600;">(${l.en})</span></div>
+      <div class="sl-sub">கிளிக் செய்து விரிவாகப் பார்க்கவும் ▾</div>
+      <div class="stack-detail" id="stackDetail-${i}">${l.d}</div>
+    </div>`).join('');
+  document.querySelectorAll('.stack-layer').forEach(el => {
+    el.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      document.querySelectorAll('.stack-layer').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.stack-detail').forEach(x => x.classList.remove('show'));
+      this.classList.add('active');
+      document.getElementById('stackDetail-'+i).classList.add('show');
+    });
+  });
+
+  let ltStep = -1;
+  function renderLt(){
+    const dotsWrap = document.getElementById('layerTraceDots');
+    let dotsHtml = '';
+    LAYER_TRACE.forEach((s,i) => {
+      dotsHtml += '<div class="flow-node '+(i===ltStep?'active':(i<ltStep?'done':'muted'))+'" style="min-width:34px;padding:7px 9px;">'+(i+1)+'</div>';
+      if(i < LAYER_TRACE.length - 1) dotsHtml += '<div class="flow-arrow '+(i<ltStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = dotsHtml;
+    const panel = document.getElementById('layerTracePanel');
+    if(ltStep === -1){
+      panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தவும்…</p>';
+    } else {
+      const s = LAYER_TRACE[ltStep];
+      panel.innerHTML = '<h4>'+s.t+'</h4><p>'+s.d+'</p>';
+    }
+    document.getElementById('ltPrevBtn').disabled = ltStep <= 0;
+    document.getElementById('ltNextBtn').disabled = ltStep >= LAYER_TRACE.length - 1;
+  }
+  renderLt();
+  document.getElementById('ltNextBtn').addEventListener('click', () => { if(ltStep < LAYER_TRACE.length-1){ ltStep++; renderLt(); } });
+  document.getElementById('ltPrevBtn').addEventListener('click', () => { if(ltStep > 0){ ltStep--; renderLt(); } });
+  document.getElementById('ltResetBtn').addEventListener('click', () => { ltStep = -1; renderLt(); });
+}
+
+/* =========================================================================
+   TOPIC 18.6 — EDI தரநிலைகள் & UN/EDIFACT
+   ========================================================================= */
+const STD_CATEGORIES = ['அடிப்படை தரநிலைகள்','குறியீடு தரநிலைகள்','செய்தி தரநிலைகள்','ஆவண தரநிலைகள்','மேலாண்மை தரநிலைகள்','பயன்பாட்டு தரநிலைகள்','தகவல் தொடர்பு தரங்கள்','பாதுகாப்பு தரநிலைகள்'];
+const EDIFACT_HIERARCHY = [
+  {k:'interchange', lvl:'மிக உயர்ந்த மட்டம் (Highest Level)', ta:'Interchange', en:'Interchange', d:'EDI படிநிலைசார் கட்டமைப்பின் மேல்மட்ட செய்தி. UNB மற்றும் UNZ எனும் பிரிவுகளுக்கு இடையே உள்ள தரவுத் துண்டு.'},
+  {k:'func', lvl:'', ta:'Functional Groups', en:'Functional Groups', d:'UNG மற்றும் UNE எனும் பிரிவுகளுக்கு இடையே உள்ள தரவுத் துண்டு — தொடர்புடைய செய்திகளை ஒன்றாக தொகுக்கிறது.'},
+  {k:'msg', lvl:'', ta:'Messages', en:'Messages', d:'UNH மற்றும் UNT எனும் பிரிவுகளுக்கு இடையே உள்ள தரவுத் துண்டு — ஒரு முழுமையான வணிக ஆவணத்தை (எ.கா. ஒரு விலைப்பட்டியல்) குறிக்கும்.'},
+  {k:'seggrp', lvl:'', ta:'Segment Groups', en:'Segment Groups', d:'தொடர்புடைய தரவுகளின் தொகுப்பு (Block of related data).'},
+  {k:'seg', lvl:'', ta:'Segments', en:'Segments', d:'எளிய மற்றும் கலவை உறுப்புகளின் கலவை (Mixture of simple and composite elements).'},
+  {k:'comp', lvl:'', ta:'Composite Elements', en:'Composite Elements', d:'தொடர்புடைய எளிய உறுப்புகளின் குழு (Group of related simple elements).'},
+  {k:'simple', lvl:'மிகக் கீழ் மட்டம் (Lowest Level)', ta:'Simple Data Elements', en:'Simple Data Elements', d:'ஒரு தனி தரவுத் துண்டு (Piece of single data) — படிநிலையின் மிகச் சிறிய அலகு.'},
+];
+function renderStandards(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 18 › 18.6</div>
+    <h2>EDI தரநிலைகள் &amp; UN/EDIFACT <span class="eng">(EDI Standards &amp; UN/EDIFACT)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> EDI தரநிலையின் முக்கியத்துவத்தை, அதன் வகைகளை, மற்றும் UN/EDIFACT-ன் கட்டமைப்பை அறிந்துகொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>18.6 EDI தரநிலைகள் (Standards)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      தரநிலை என்பது ஒட்டுமொத்த EDI-ல் மிக முக்கியமான பகுதியாகும். EDI தரவு பரிமாற்றம் என்பது ஒரு ஒப்புக்கொண்ட செய்தி வடிவமைப்பின் வடிவத்தில் இருப்பதால், ஒரு ஒருங்கிணைந்த EDI தரத்தை உருவாக்குவது முக்கியமானதாக கருதப்படுகிறது. முதல் தொழில் சார்ந்த EDI தரநிலை 1975 ஆம் ஆண்டில் போக்குவரத்து தரவு ஒருங்கிணைப்புக் குழுவால் (TDCC) வெளியிடப்பட்டது. பின்னர் பிற தொழில்கள் அவற்றின் தனிப்பட்ட தேவைகளின் அடிப்படையில் தனித்துவமான தரங்களை உருவாக்கத் தொடங்கின. எ.கா. கிடங்கு தொழிலில் WINS. மிகவும் பரவலாக பயன்படும் EDI தரநிலைகள், ஐக்கிய நாடுகள் சபையின் UN/EDIFACT மற்றும் ANSI X12.
+    </div>
+    <div class="example-box">
+      <span class="lbl">📂 EDI தரநிலையின் 8 அம்சங்கள்</span>
+      EDI தரநிலை முக்கியமாக பின்வரும் அம்சங்களாக பிரிக்கப்பட்டுள்ளது:
+      <div class="ex-grid" style="margin-top:8px;">${STD_CATEGORIES.map(c => `<div class="ex-chip" style="cursor:default;">${c}</div>`).join('')}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>18.6.1 UN/EDIFACT</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      United Nations / Electronic Data Interchange for Administration, Commerce and Transport (UN/EDIFACT) ஐக்கிய நாடுகள் சபையின் மேற்பார்வையின் கீழ் உருவாக்கப்பட்ட ஒரு சர்வதேச EDI தரநிலை ஆகும். 1987 ல், UN/EDIFACT சர்வதேச தரப்படுத்தலுக்கான அமைப்பால் (ISO) அங்கீகரிக்கப்பட்டது. இதில் சர்வதேச அளவில் ஒப்புக்கொண்ட தரநிலைகள், அட்டவணைகள் மற்றும் தற்சார்பு கணினி அமைப்புகளுக்கிடையே உள்ள கட்டமைக்கப்பட்ட தரவுகளின் மின்னணு பரிமாற்றத்திற்கான வழிகாட்டுதல்கள் ஆகியவை அடங்கும்.
+    </div>
+    <p>இது வணிக பரிவர்த்தனைகளுக்கு சர்வதேச தரத்திலான பல்-தொழில்துறை, மின்னணு தரவு பரிமாற்ற தரநிலைகள் ஆகும். மேலும் இந்த தரநிலைகளின் பராமரிப்பும் மேம்பாடும், ஐக்கிய நாடுகள் சபையின் ஐரோப்பாவிற்கான பொருளாதார ஆணையத்துடன் (UNECE) இணைந்த ஐக்கிய நாடுகள் சபையின் வர்த்தக வசதி மற்றும் மின்னணு வர்த்தகத்திற்கான பொருளாதார ஆணையம் (UN/CEFACT) மேற்கொண்டுள்ளது.</p>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>UN/EDIFACT-ன் விரிவாக்கம்: <b>United Nations / Electronic Data Interchange for Administration, Commerce and Transport</b>. இது ஒரு சர்வதேச, பல்-தொழில்துறை EDI தரநிலை.</div>
+  </div>
+
+  <div class="card">
+    <h3>🔭 EDIFACT கட்டமைப்பு — Zoom-in படிநிலை <span class="eng">(Figure 18.6 — Click to zoom in)</span></h3>
+    <p>மிக உயர்ந்த மட்டத்தில் இருந்து (Interchange) மிகக் கீழ் மட்டம் (Simple Data Elements) வரை ஒவ்வொன்றாகக் கிளிக் செய்து பாருங்கள்.</p>
+    <div class="fcaps-grid" id="hierGrid"></div>
+    <div id="hierDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔀 படிநிலையை வரிசைப்படுத்து! <span class="eng">(Game — Build the Hierarchy)</span></h3>
+    <p>கீழே கலைந்துள்ள படிகளை, <b>மிக உயர்ந்த மட்டத்தில் இருந்து மிகக் கீழ் மட்டம்</b> வரை சரியான வரிசையில் கிளிக் செய்யவும்.</p>
+    <div class="order-pool" id="orderPool"></div>
+    <div class="order-seq" id="orderSeq"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="orderResetBtn">🔄 மீண்டும் தொடங்கு</button>
+    </div>
+    <div class="feedback-line" id="orderFb"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-standards"></div></div>
+  `;
+}
+function wireStandards(){
+  document.getElementById('hierGrid').innerHTML = EDIFACT_HIERARCHY.map((h,i) =>
+    `<div class="fcaps-card" data-i="${i}">${h.ta}</div>`).join('');
+  document.querySelectorAll('#hierGrid .fcaps-card').forEach(c => {
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#hierGrid .fcaps-card').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const h = EDIFACT_HIERARCHY[parseInt(this.dataset.i,10)];
+      const panel = document.getElementById('hierDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = `<span class="lbl">💡 ${h.ta}${h.lvl ? ' — '+h.lvl : ''}</span>${h.d}`;
+    });
+  });
+
+  let shuffled = EDIFACT_HIERARCHY.slice().sort(() => Math.random() - 0.5);
+  let seq = [];
+  function renderOrder(){
+    document.getElementById('orderPool').innerHTML = shuffled.map(h =>
+      `<button class="order-chip" data-k="${h.k}" ${seq.includes(h.k) ? 'disabled' : ''}>${h.ta}</button>`).join('');
+    document.getElementById('orderSeq').innerHTML = seq.map((k,i) => {
+      const h = EDIFACT_HIERARCHY.find(x => x.k === k);
+      return `<span class="seq-item">${i+1}. ${h.ta}</span>`;
+    }).join('') || '<span style="color:var(--muted);font-size:.85rem;">⬅ மேலே உள்ள படிகளைக் கிளிக் செய்து இங்கே வரிசைப்படுத்தவும்</span>';
+    document.querySelectorAll('#orderPool .order-chip').forEach(btn => {
+      btn.addEventListener('click', function(){
+        if(this.disabled) return;
+        seq.push(this.dataset.k);
+        renderOrder();
+        if(seq.length === EDIFACT_HIERARCHY.length){
+          const correctOrder = EDIFACT_HIERARCHY.map(h => h.k);
+          const allCorrect = seq.every((k,i) => k === correctOrder[i]);
+          const fb = document.getElementById('orderFb');
+          fb.className = 'feedback-line ' + (allCorrect ? 'ok' : 'bad');
+          fb.textContent = allCorrect ? '🎉 சரியான வரிசை! Interchange → Functional Groups → Messages → Segment Groups → Segments → Composite Elements → Simple Data Elements.' : '❌ வரிசை தவறு. "மீண்டும் தொடங்கு" பொத்தானை அழுத்தி மீண்டும் முயற்சிக்கவும்.';
+        }
+      });
+    });
+  }
+  renderOrder();
+  document.getElementById('orderResetBtn').addEventListener('click', () => {
+    shuffled = EDIFACT_HIERARCHY.slice().sort(() => Math.random() - 0.5);
+    seq = [];
+    document.getElementById('orderFb').textContent = '';
+    document.getElementById('orderFb').className = 'feedback-line';
+    renderOrder();
+  });
+}
+
+/* =========================================================================
+   PRACTICE ZONE
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Mistake Museum <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — <span class="eng">Enrichment</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Mistake Museum — பொதுவான தவறான கருத்துக்கள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு தவறான கருத்தையும் படித்து, அது ஏன் தவறு எனக் யூகிக்கவும். பிறகு "ஏன் தவறு?" பொத்தானை கிளிக் செய்து, சரியான புரிதலைப் பாருங்கள்.</p>
+    <div id="misWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. EDI விரிவாக்கம்', o:['Electronic Details Information','Electronic Data Information','Electronic Data Interchange','Electronic Details Interchange'], c:2, exp:'EDI = Electronic Data Interchange (மின்னணு தரவு பரிமாற்றம்).'},
+  'b2': {q:'2. பின்வருவனவற்றில் மின்னணு தரவு பரிமாற்றத்திற்கு (EDI) என சர்வதேச அளவில் அங்கீகரிக்கப்பட்ட நிலையான வடிவமைப்பு எது?', o:['TSLFACT','SETFACT','FTPFACT','EDIFACT'], c:3, exp:'EDIFACT (UN/EDIFACT) சர்வதேச அளவில் அங்கீகரிக்கப்பட்ட EDI தரநிலை.'},
+  'b3': {q:'3. முதல் தொழில்துறைக்கான EDI தரநிலை எது?', o:['TDCC','VISA','Master','ANSI'], c:0, exp:'1975-ல் TDCC (Transportation Data Coordinating Committee) வெளியிட்ட தரநிலையே முதல் தொழில்துறை EDI.'},
+  'b4': {q:'4. பின்வருவனவற்றுள் எது EDI தரவு பரிமாற்ற வகை ஆகும்?', o:['நேரடி EDI','மறைமுக EDI','கூட்டு EDI','தனித்துவ EDI'], c:0, exp:'நேரடி EDI (Direct / Point-to-Point EDI) என்பது பாடநூலில் உள்ள 5 EDI வகைகளில் ஒன்று.'},
+  'b5': {q:'5. EDI ன் தந்தை என்று அழைக்கப்படுபவர் யார்?', o:['சார்லஸ் பாபேஜ்','எட் கில்பர்ட்','பாஸ்கல்','மேற்கூறிய எவரும் இல்லை'], c:1, exp:'எட் கில்பர்ட் (Ed Guilbert) EDI-ன் தந்தை என்று அழைக்கப்படுகிறார்.'},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'EDI மூலம் "காகிதமற்ற வணிகம்" சாத்தியமாகிறது; EFT மூலம் சாத்தியமாவது எது?', o:['காகிதமற்ற கல்வி','காகிதமற்ற நிதி பரிமாற்றம்','காகிதமற்ற போக்குவரத்து','காகிதமற்ற மருத்துவம்'], c:1, exp:'EFT (Electronic Funds Transfer) மூலம் "காகிதமற்ற நிதி பரிமாற்றம்" சாத்தியமாகிறது.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'நேரடி EDI வேறு எந்தப் பெயரில் அழைக்கப்படுகிறது?', o:['Point-to-Point EDI','VAN EDI','Mobile EDI','Internet EDI'], c:0, exp:'நேரடி EDI, முனையம்-முனையம் EDI (Point-to-Point EDI) என்றும் அழைக்கப்படுகிறது.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'சிறிய மற்றும் நடுத்தர நிறுவனங்களுக்கு எளிமையையும் வசதியையும் தரும் EDI வகை எது?', o:['நேரடி EDI','VAN வழியாக EDI','இணையம் வழி EDI','கைப்பேசி வழி EDI'], c:2, exp:'இணைய அடிப்படையிலான EDI, ஒரு உலாவியை மட்டும் பயன்படுத்துவதால் சிறிய/நடுத்தர நிறுவனங்களுக்கு ஏற்றது.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'EDI அடுக்குகளில், EDIFACT மற்றும் ANSI X12 வணிக வடிவ தரநிலைகள் எந்த அடுக்கில் அமைந்துள்ளன?', o:['பயன்பாட்டு அடுக்கு (Semantic)','தரப்பாடுகள் அடுக்கு (Standard)','இடமாற்று அடுக்கு (Transport)','பரும அடுக்கு (Physical)'], c:1, exp:'EDIFACT business form standards மற்றும் ANSI X12 business form standards தரப்பாடுகள் அடுக்கில் (Standard layer) அமைந்துள்ளன.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'EDIFACT படிநிலைக் கட்டமைப்பில், "Segment Groups" எந்த இரண்டு மட்டங்களுக்கு இடையே அமைந்துள்ளது?', o:['Interchange மற்றும் Functional Groups','Functional Groups மற்றும் Messages','Messages மற்றும் Segments','Segments மற்றும் Composite Elements'], c:2, exp:'படிநிலையில் Messages-க்குக் கீழே, Segments-க்கு மேலே Segment Groups அமைந்துள்ளது — இது தொடர்புடைய தரவுகளின் தொகுப்பு.'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'TDCC நிறுவனம் 1978-ல் எந்தப் பெயராக மாற்றப்பட்டது, அதன் பிறகு எந்த அமைப்பு அதற்குப் பொறுப்பேற்றது?', o:['EDIA → ANSI-ASC','WINS → ISO','VAN → UNECE','ANSI X12 → UN/CEFACT'], c:0, exp:'TDCC, Electronic Data Interchange Association (EDIA) என பெயர் மாற்றப்பட்டது; பின்னர் ANSI-ASC (American National Standards Institute – Accredited Standards Committee) அதற்குப் பொறுப்பேற்று ANSI X12 தரநிலையை உருவாக்கியது.'},
+};
+
+const TF_QS = [
+  {q:'EDI என்பது இரு கணினிகளுக்கு இடையே, முன் வரையறுக்கப்பட்ட வடிவத்தில், அதிக மனித தலையீடு இல்லாமல் நடைபெறும் தகவல் பரிமாற்றம்.', a:true, exp:'சரி — இதுவே EDI-யின் பாடநூல் வரையறையின் மையக் கருத்து.'},
+  {q:'VAN வழியாக EDI என்பது ஒரு நிறுவனம் நேரடியாக இணையத்தைப் பயன்படுத்தி தரவை அனுப்புவதாகும்.', a:false, exp:'தவறு — VAN வழியாக EDI என்பது மூன்றாம் தரப்பு வலை சேவை வழங்குநர் (Value Added Network) வழியாக நடைபெறும் EDI.'},
+  {q:'ஒவ்வொரு EDI செய்தியும் ஆறு ஆங்கில எழுத்துகளைக் கொண்டதாக இருக்கும் என பாடநூல் குறிப்பிடுகிறது.', a:true, exp:'சரி — இது பாடநூலின் "நினைவில் கொள்க" பகுதியில் உள்ள ஒரு குறிப்பு (எ.கா. INVOIC போன்ற 6-எழுத்து செய்தி வகைக் குறியீடுகள்).'},
+  {q:'UN/EDIFACT, ANSI X12-ஐ விட முன்பே, 1975-ல் உருவாக்கப்பட்டது.', a:false, exp:'தவறு — 1975 TDCC தரநிலை (முதல் தொழில்துறை EDI); UN/EDIFACT அதற்குப் பின் (1987 எனப் பாடம் 18.2-ல் / 1985 எனப் "நினைவில் கொள்க"-ல்) உருவாக்கப்பட்டது.'},
+];
+
+const FIB_QS = [
+  {text:'______________, EDI-யின் தந்தை என்று அழைக்கப்படுகிறார்.', ans:'எட் கில்பர்ட்'},
+  {text:'முதல் EDI செய்தி ______________ ஆண்டில் டெலெக்ஸ் மூலம் அனுப்பப்பட்டது.', ans:'1965'},
+  {text:'______________ என்பது மதிப்புக் கூட்டப்பட்ட வலையமைப்பு வழியாக நடைபெறும் EDI.', ans:'VAN'},
+  {text:'EDIFACT படிநிலையில் மிகக் கீழ் மட்டம் ______________ ஆகும்.', ans:'Simple Data Elements'},
+];
+
+const MATCH_LEFT = ['TDCC','VAN','Telex','Interchange','FTP'];
+const MATCH_RIGHT = ['போக்குவரத்து தரவு தொடர்பாடல் குழு — முதல் தொழில்துறை EDI தரநிலை','மதிப்புக் கூட்டப்பட்ட பிணையம், ஒரு மூன்றாம் தரப்பு பிணைய சேவை வழங்குநர்','ஒரு வகை தொலை அச்சியந்திரம்','EDI படிநிலைசார் கட்டமைப்பின் மேல்மட்ட செய்தி','கணிப்பொறி பிணையத்தில் கோப்பு பரிமாற்றுவதற்கான நிலையான பிணைய நெறிமுறை'];
+const MATCH_ANSWER = {'TDCC':'போக்குவரத்து தரவு தொடர்பாடல் குழு — முதல் தொழில்துறை EDI தரநிலை','VAN':'மதிப்புக் கூட்டப்பட்ட பிணையம், ஒரு மூன்றாம் தரப்பு பிணைய சேவை வழங்குநர்','Telex':'ஒரு வகை தொலை அச்சியந்திரம்','Interchange':'EDI படிநிலைசார் கட்டமைப்பின் மேல்மட்ட செய்தி','FTP':'கணிப்பொறி பிணையத்தில் கோப்பு பரிமாற்றுவதற்கான நிலையான பிணைய நெறிமுறை'};
+
+const MISCONCEPTIONS = [
+  {wrong:'"EDI என்பது ஒரு விலைப்பட்டியலை Scan செய்து மின்னஞ்சலில் Attach செய்து அனுப்புவது" என்று நினைப்பது.', type:'கருத்தியல் குழப்பம் (Conceptual Misconception)', why:'மின்னஞ்சலில் Attach செய்யப்படும் ஆவணத்தை இன்னொரு கணினி "புரிந்துகொள்ள" முடியாது — அதை ஒரு மனிதர் படித்து மீண்டும் கைமுறையாக (Rekey) தரவுத்தளத்தில் உள்ளிட வேண்டும். ஆனால் EDI-யில் ஆவணம் ஒரு செந்தர வடிவத்தில் (EDIFACT/ANSI X12) இருப்பதால், பெறுநரின் கணினி அதை நேரடியாகப் படித்து செயலாக்க முடியும் — மனித தலையீடு இல்லாமல்.', fix:'EDI = "கணினி-கணினி நேரடி உரையாடல்" ஒரு செந்தர மொழியில். மின்னஞ்சல் இணைப்பு (Attachment) = "மனிதர் படிக்க வேண்டிய ஆவணம்" — இரண்டும் வெவ்வேறு.'},
+  {wrong:'"VAN என்பது Internet-ன் இன்னொரு பெயர்" என்று நினைப்பது.', type:'வரையறைக் குழப்பம் (Definition Confusion)', why:'VAN (Value Added Network) என்பது ஒரு குறிப்பிட்ட மூன்றாம் தரப்பு நிறுவனம் வழங்கும் தனியார் சேவை — இது அணுகல் உரிமைகள் ஒதுக்கீடு, உயர் தரவுப் பாதுகாப்பு போன்ற கூடுதல் மதிப்புகளைச் (Value Added) சேர்க்கிறது. பொது இணையம் (Internet) என்பது அனைவருக்கும் திறந்த, உலகளாவிய வலையமைப்பு.', fix:'VAN = "கட்டணம் செலுத்தி பயன்படுத்தும், கூடுதல் பாதுகாப்புடன் கூடிய தனியார் தபால் சேவை". Internet = "அனைவருக்கும் திறந்த பொது சாலை".'},
+  {wrong:'"EDI-யும் EFT-யும் ஒன்றுதான்" என்று நினைப்பது.', type:'வரையறைக் குழப்பம் (Definition Confusion)', why:'பாடநூலின்படி EDI என்பது "காகிதமற்ற வணிகம்" — அதாவது கொள்முதல் ஆணை, விலைப்பட்டியல் போன்ற வணிக ஆவணங்களின் பரிமாற்றம். EFT (Electronic Funds Transfer) என்பது "காகிதமற்ற நிதி பரிமாற்றம்" — அதாவது பணப் பரிமாற்றம் மட்டும்.', fix:'EDI = ஆவணங்கள் பரிமாறுதல். EFT = பணம் பரிமாறுதல். இரண்டும் தொடர்புடையவை, ஆனால் ஒன்றல்ல.'},
+  {wrong:'"நேரடி (Direct/Point-to-Point) EDI-தான் எல்லா நிறுவனங்களுக்கும் மிகச் சிறந்தது" என்று நினைப்பது.', type:'செயல்பாட்டுக் குழப்பம் (Functional Misconception)', why:'பாடநூலின்படி, நேரடி EDI தொடர் வணிக பரிவர்த்தனைகளுக்கும் பெரிய நிறுவனங்களுக்கும் பொருந்தும். சிறிய/நடுத்தர நிறுவனங்களுக்கு இணைய EDI-தான் எளிமையும் வசதியும் தரும்; VAN வழியாக EDI வலையமைப்பு சிக்கல்களை தவிர்க்க விரும்புவோருக்கு உகந்தது.', fix:'EDI வகையைத் தேர்வது நிறுவனத்தின் அளவு, தேவை மற்றும் வசதியைப் பொறுத்தது — "ஒரே அளவு அனைவருக்கும் பொருந்தாது" (No one-size-fits-all).'},
+];
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு சிறிய நிறுவனம், வலையமைப்பு உள்கட்டமைப்பில் முதலீடு செய்யாமல், விரைவாக EDI-யைத் தொடங்க விரும்புகிறது. எந்த வகை EDI மிகவும் பொருத்தமானது, ஏன்?', o:['நேரடி EDI — ஏனெனில் இது வேகமானது','இணையம் வழி EDI — ஏனெனில் இதற்கு ஒரு உலாவி மட்டுமே போதும்','VAN வழியாக EDI — ஏனெனில் இது இலவசம்','கைப்பேசி வழி EDI — ஏனெனில் இது மிகவும் பழமையானது'], c:1, exp:'இணைய அடிப்படையிலான EDI, ஒரு உலாவியை மட்டுமே பயன்படுத்துவதால், கூடுதல் வலையமைப்பு உள்கட்டமைப்பு இல்லாமல் சிறிய/நடுத்தர நிறுவனங்களுக்கு எளிமையும் வசதியும் தருகிறது.'},
+  'c2': {q:'🔴 EDI அடுக்குகளில், ஒரு நிறுவனம் தனது Transport Layer-ஐ மாற்றி, FTP-க்குப் பதிலாக HTTP (World Wide Web) பயன்படுத்தினால், அதனால் பாதிக்கப்படும் அடுக்கு எது?', o:['Semantic Layer மட்டும்','Standard Layer மட்டும்','வேறு எந்த அடுக்கும் பாதிக்கப்படாது — Transport Layer மட்டும் மாறுகிறது','Physical Layer மட்டும்'], c:2, exp:'ஒவ்வொரு அடுக்கும் சுயாதீனமானது (independent) — Transport Layer-ஐ மட்டும் மாற்றினால், ஆவணத்தின் அர்த்தம் (Semantic) அல்லது தரநிலை வடிவமைப்பு (Standard) மாறாது; எவ்வழியில் அனுப்பப்படுகிறது என்பது மட்டுமே மாறுகிறது.'},
+};
+
+/* ============================= MCQ HELPER ============================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* ============================= QUICK-CHECK BANKS ============================= */
+const QC_BANKS = {
+  intro: { 'qc1': {q:'EDI-யின் முழு விரிவாக்கம் என்ன?', o:['Electronic Document Information','Electronic Data Interchange','Electronic Details Internet','Enterprise Data Interchange'], c:1, exp:'EDI = Electronic Data Interchange.'} },
+  history: { 'qc2': {q:'TDCC குழு எந்த ஆண்டில் அமைக்கப்பட்டது?', o:['1948','1965','1968','1975'], c:2, exp:'1968-ல் அமெரிக்க போக்குவரத்து நிறுவனங்கள் இணைந்து TDCC-ஐ அமைத்தன.'} },
+  types: { 'qc3': {q:'பல வணிக கூட்டாளிகளுக்கும் இடையே நேரடித் தொடர்பை ஏற்படுத்தும் EDI வகை எது?', o:['VAN வழியாக EDI','நேரடி EDI','இணையம் வழி EDI','கைப்பேசி வழி EDI'], c:1, exp:'நேரடி EDI (Point-to-Point) பல்வேறு வணிக கூட்டாளிகளுக்கும் இடையே நேரடித் தொடர்பை ஏற்படுத்துகிறது.'} },
+  benefits: { 'qc4': {q:'EDI அமைப்பை செயல்படுத்துதல் மூலம் ஒரு நிறுவனம் எதன் மீது அதிக கட்டுப்பாட்டைக் கொண்டிருக்க முடியும்?', o:['ஊழியர் எண்ணிக்கை','விநியோக தொடர் (Supply Chain)','கட்டிட வடிவமைப்பு','விளம்பரச் செலவு'], c:1, exp:'EDI, ஒரு நிறுவனத்தின் விநியோக தொடர் (Supply Chain) மீது அதிக கட்டுப்பாட்டைக் கொடுக்கிறது.'} },
+  layers: { 'qc5': {q:'EDIFACT மற்றும் ANSI X12 வணிக வடிவ தரநிலைகள் எந்த அடுக்கில் உள்ளன?', o:['Semantic Layer','Standard Layer','Transport Layer','Physical Layer'], c:1, exp:'இவை தரப்பாடுகள் அடுக்கில் (Standard Layer) உள்ளன.'} },
+  standards: { 'qc6': {q:'UN/EDIFACT எந்த ஆண்டில் சர்வதேச தரப்படுத்தலுக்கான அமைப்பால் (ISO) அங்கீகரிக்கப்பட்டது?', o:['1975','1978','1987','1996'], c:2, exp:'1987-ல் UN/EDIFACT, ISO-வால் அங்கீகரிக்கப்பட்டது.'} },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP DISPATCH
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { intro:'qc-intro', history:'qc-history', types:'qc-types', benefits:'qc-benefits', layers:'qc-layers', standards:'qc-standards' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+  if(topicId === 'intro') wireIntro();
+  if(topicId === 'history') wireHistory();
+  if(topicId === 'types') wireTypes();
+  if(topicId === 'benefits') wireBenefits();
+  if(topicId === 'layers') wireLayers();
+  if(topicId === 'standards') wireStandards();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* =========================================================================
+   PRACTICE PAGE WIRING
+   ========================================================================= */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans.toLowerCase() || val.replace(/\s/g,'') === f.ans.toLowerCase().replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>சொல்</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>விளக்கம்</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='160px';
+      b.textContent = l + (matched[l] ? ' ✅' : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='300px'; b.style.textAlign='left';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும்.';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  const misWrap = document.getElementById('misWrap');
+  misWrap.innerHTML = MISCONCEPTIONS.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span style="font-weight:700;">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-mis="${i}">ஏன் தவறு? (Why is this wrong?)</button>
+      <div class="explain-box" id="mis-${i}">
+        <b>வகை:</b> ${c.type}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான புரிதல்:</span> ${c.fix}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-mis]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('mis-'+this.dataset.mis).classList.toggle('show'); });
+  });
+}
+
+/* =========================================================================
+   EXAM PREPARATION PAGE
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+    <div class="btn-row"><button class="btn btn-ghost" id="printBtn">🖨️ அச்சிடக்கூடிய பார்வை (Print Cheat Sheet)</button></div>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>EDI = Electronic Data Interchange — இரு கணினிகளுக்கு இடையே, முன் வரையறுக்கப்பட்ட வடிவத்தில், அதிக மனித தலையீடு இல்லாமல் நடைபெறும் வணிக ஆவணப் பரிமாற்றம்.</li>
+      <li>EDI = "காகிதமற்ற வணிகம்"; EFT = "காகிதமற்ற நிதி பரிமாற்றம்".</li>
+      <li>எட் கில்பர்ட் (Ed Guilbert) = EDI-யின் தந்தை; 1948 பெர்லின் விமான சரக்கு-போக்குவரத்தின்போது முதல் தரப்படுத்தப்பட்ட வடிவமைப்பை உருவாக்கினார்.</li>
+      <li>முதல் EDI செய்தி — 1965, டெலெக்ஸ் மூலம் (ஹாலந்து-அமெரிக்க கப்பல் நிறுவனம் → ட்ரான்ஸ்-அட்லாண்டிக் கப்பல் நிறுவனம்).</li>
+      <li>1968 — TDCC (Transportation Data Coordinating Committee) அமைக்கப்பட்டது; 1975 — TDCC முதல் தொழில்துறை EDI தரநிலையை வெளியிட்டது.</li>
+      <li>1978 — TDCC, EDIA ஆக பெயர் மாற்றப்பட்டது; ANSI-ASC பொறுப்பேற்று ANSI X12 தரநிலையை உருவாக்கியது.</li>
+      <li>UN/EDIFACT — ஐக்கிய நாடுகள் சபை உருவாக்கியது (பாடம் 18.2-ல் 1987, "நினைவில் கொள்க" பகுதியில் 1985 எனக் குறிப்பிடப்பட்டுள்ளது); 1987-ல் ISO-வால் அங்கீகரிக்கப்பட்டது; UN/CEFACT பராமரிக்கிறது.</li>
+      <li>5 EDI வகைகள்: நேரடி EDI (Point-to-Point) · VAN வழியாக EDI · FTP/VPN, SFTP, FTPS வழியாக EDI · இணையம் வழி EDI · கைப்பேசி வழி EDI.</li>
+      <li>EDI நன்மைகள்: விநியோக தொடர் மீது கட்டுப்பாடு, திறம்பட வர்த்தகம், உற்பத்தித் திறன் அதிகரிப்பு, செயல்பாட்டுத் திறன் ஊக்குவிப்பு.</li>
+      <li>4 EDI அடுக்குகள் (மேலிருந்து கீழாக): பயன்பாட்டு அடுக்கு (Semantic) → தரப்பாடுகள் அடுக்கு (Standard) → இடமாற்று அடுக்கு (Transport) → பரும அடுக்கு (Physical).</li>
+      <li>EDI தரநிலையின் 8 அம்சங்கள்: அடிப்படை, குறியீடு, செய்தி, ஆவண, மேலாண்மை, பயன்பாட்டு, தகவல் தொடர்பு, பாதுகாப்பு தரநிலைகள்.</li>
+      <li>EDIFACT படிநிலை (உயர்ந்தது → கீழ்): Interchange → Functional Groups → Messages → Segment Groups → Segments → Composite Elements → Simple Data Elements.</li>
+      <li>ஒவ்வொரு EDI செய்தியும் ஆறு ஆங்கில எழுத்துகளைக் கொண்டதாக இருக்கும் (பாடநூல் குறிப்பு).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>சொல்</th><th>விளக்கம்</th></tr>
+      <tr><td><b>FTP (File Transfer Protocol)</b></td><td>ஒரு கணிப்பொறி பிணையத்தில் உள்ள முனையம் மற்றும் சேவையகத்திற்கு இடையே கோப்பு பரிமாற்றுவதற்கு ஒரு நிலையான பிணைய நெறிமுறை.</td></tr>
+      <tr><td><b>Interchange</b></td><td>EDI படிநிலைசார் கட்டமைப்பின் மேல்மட்ட செய்தி.</td></tr>
+      <tr><td><b>பிரிவு (Division / Group)</b></td><td>பிரிவுகள் ஒன்று அல்லது பல தொடர்புடைய பயனர் தரவு உறுப்புகள் கொண்டிருக்கும்.</td></tr>
+      <tr><td><b>பிரிப்பான்கள் (Delimiters)</b></td><td>தரவு அல்லது தரவு கூறுகளை பிரிக்க பயன்படுத்தப்படும் நிறுத்தக்குறிகளைக் குறிக்கிறது.</td></tr>
+      <tr><td><b>TDCC</b></td><td>போக்குவரத்து தரவு தொடர்பாடல் குழு — முதல் தொழில்துறை EDI தரநிலை.</td></tr>
+      <tr><td><b>Telex</b></td><td>ஒரு வகை தொலை அச்சியந்திரம்.</td></tr>
+      <tr><td><b>VAN</b></td><td>மதிப்புக் கூட்டப்பட்ட பிணையம், ஒரு மூன்றாம் தரப்பு பிணைய சேவை வழங்குநர்.</td></tr>
+      <tr><td><b>ANSI-ASC</b></td><td>American National Standards Institute – Accredited Standards Committee</td></tr>
+      <tr><td><b>UN / EDIFACT</b></td><td>United Nations / Electronic Data Interchange for Administration, Commerce and Transport</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி <span class="eng">(Part-wise Answer-Writing Guide)</span></h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லைக் கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். ஆண்டு தொடர்பான கேள்விகளுக்கு (1968=TDCC, 1975=TDCC தரநிலை, 1987/1985=UN/EDIFACT) குறிப்பேடு வைத்துக்கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>3-வரிகளில் (பகுதி ஆ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் → (3) முக்கியத்துவம் ஒரு வரியில்.<br>
+        <b>எ.கா.</b> "EDI வரையறு" → "EDI என்பது வர்த்தக நிறுவனங்களுக்கு இடையே மின்னணு வணிக ஆவணங்களை பரிமாற்றம் செய்வது. இது தனிப்பயன் தடம் அல்லது இணையம் மூலம் நடைபெறும். மனித தலையீடு இல்லாமல் நேரடியாக இரு கணினிகளுக்கு இடையே தகவல் பாய்கிறது."
+      </div>
+    </details>
+    <details class="acc"><summary>ஒரு பத்தியளவில் (பகுதி இ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரி → (2) 2-3 முக்கியப் புள்ளிகள் → (3) ஒரு உதாரணம்/முடிவுரை.<br>
+        <b>எ.கா.</b> "VAN வழியாக EDI சிறுகுறிப்பு வரைக" → வரையறை → மூன்றாம் தரப்பு சேவை வழங்குநர் பங்கு → அணுகல் உரிமைகள் &amp; தரவுப் பாதுகாப்பு நன்மை → முடிவுரை.
+      </div>
+    </details>
+    <details class="acc"><summary>ஒரு பக்க அளவில் (பகுதி ஈ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) வகைகள்/புள்ளிகள் (தலைப்பு வாரியாக) → (3) ஒவ்வொன்றையும் 1-2 வரிகளில் விளக்குதல் → (4) அட்டவணை/படம் (இருந்தால்) → (5) முடிவுரை ஒரு வரி.<br>
+        <b>எ.கா.</b> "பல்வேறு வகையான EDI வகைகளை விளக்குக" → அறிமுகம் (1 வரி) → 5 வகைகளையும் பெயர் + ஒரு வரி விளக்கத்துடன் பட்டியலிடுக → முடிவுரை.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ &amp; மாணவர் நடவடிக்கை <span class="eng">(reference)</span></h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>EDI வரையறு.</li>
+          <li>EDI மூலம் பரிமாற்றம் செய்யப்படும் சில வகை வணிக ஆவணங்களைப் பட்டியலிடுக.</li>
+          <li>EDI யின் பல்வேறு அடுக்குகளைப் பட்டியலிடுக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>VAN வழியாக EDI சிறுகுறிப்பு வரைக.</li>
+          <li>EDI தரப்பாடுகள் பற்றி எழுதுக.</li>
+          <li>UN/EDIFACT பற்றி குறிப்பு வரைக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>பல்வேறு வகையான EDI வகைகளை விளக்குக.</li>
+          <li>EDI நன்மைகள் யாவை?</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>மாணவர் நடவடிக்கை <span class="eng">(Student Activity — reference)</span></summary>
+      <div class="acc-body">
+        <ol>
+          <li>பல வகையான EDI தரநிலைகளை விளக்கும் விளக்கப்படத்தை தயாரிக்கவும். (எ.கா. வலை EDI)</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (பாடநூல் MCQ)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* ============================= INIT ============================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
