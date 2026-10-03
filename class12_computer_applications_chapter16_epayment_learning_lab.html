@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 16 — மின்னணு செலுத்தல் முறைகள் | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#f8f5fc;
+    --card:#ffffff;
+    --primary:#7c3aed;
+    --primary-dark:#5b21b6;
+    --primary-light:#f3e8ff;
+    --accent:#c026d3;
+    --accent-light:#fae8ff;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#241a33;
+    --muted:#6b5e7a;
+    --border:#e7dcf5;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  [lang-ta]{font-size:1rem;}
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#ecdcfb;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#f3e8ff;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#f3eefa;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:920px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(80,20,120,.05);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#9a3412;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:var(--accent-light);border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--accent);font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fdfbfe;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#f3ecf8;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;transition:all .25s;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(124,58,237,.4);}
+  .flow-node.muted{opacity:.35;}
+  .flow-node.done{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  .tab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .card-visual{position:relative;width:260px;height:160px;border-radius:14px;margin:14px auto;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:14px;font-size:.7rem;box-shadow:0 8px 20px rgba(100,20,150,.25);}
+  .card-visual .cv-dot{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;color:var(--primary-dark);font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--accent);}
+  .card-visual .cv-dot.active{background:var(--accent);color:#fff;}
+
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:12px 0;}
+  .ex-chip{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:.82rem;font-weight:700;cursor:pointer;}
+  .ex-chip:hover{border-color:var(--primary);background:var(--primary-light);}
+  .ex-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  .stakeholder-grid{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .stake-chip{border:2px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;font-weight:700;font-size:.8rem;cursor:pointer;min-width:90px;text-align:center;}
+  .stake-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  .wallet-box{border:2px solid var(--primary);border-radius:14px;padding:18px;text-align:center;background:var(--primary-light);max-width:300px;margin:0 auto;}
+  .wallet-balance{font-size:1.8rem;font-weight:900;color:var(--primary-dark);}
+
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+  .cmp-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;}
+  .cmp-card h4{margin-top:0;}
+  @media (max-width:600px){.cmp-grid{grid-template-columns:1fr;}}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#f3eefa;color:var(--text);}
+  .btn-ghost:hover{background:#e9dff5;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfafc;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#ece3f5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fdfbfe;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  .log-panel{background:#1e1033;color:#e9d5ff;font-family:Consolas,Menlo,monospace;font-size:.78rem;border-radius:10px;padding:12px;max-height:220px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:4px;}
+  .log-panel .ln.ok{color:#86efac;}
+  .log-panel .ln.err{color:#fca5a5;}
+
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#ab9bbd;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .cmp-grid{grid-template-columns:1fr;}
+    .card-visual{width:220px;height:135px;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 16 — மின்னணு செலுத்தல் முறைகள் (Electronic Payment Systems)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 16: Electronic Payment Systems · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* ============================= STORAGE ============================= */
+const STORE_KEY = 'ca12_epayment_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable */ }
+  return { completed:[], lang:'ta' };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* ============================= TOPICS ============================= */
+const TOPICS = [
+  {id:'intro',          num:'16.1', title:'அறிமுகம்'},
+  {id:'classification',  num:'16.2', title:'வகைப்பாடு — நுண் Vs பேரின'},
+  {id:'cards',          num:'16.3', title:'அட்டை அடிப்படையிலான செலுத்தல்'},
+  {id:'transfer',       num:'16.4', title:'மின்னணு கணக்குப் பரிமாற்றம்'},
+  {id:'ecash',          num:'16.5', title:'மின்-பணம் & மின்னணு பணப்பை'},
+  {id:'banking',        num:'16.6', title:'கைப்பேசி & இணைய வங்கி'},
+  {id:'upicod',         num:'16.7-8', title:'UPI & COD'},
+  {id:'practice',       num:'Practice', title:'பயிற்சி & Misconception Buster'},
+  {id:'examprep',       num:'Exam', title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* ============================= SIDEBAR / NAV ============================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* ============================= MAIN RENDER DISPATCH ============================= */
+const RENDERERS = {
+  intro: renderIntro,
+  classification: renderClassification,
+  cards: renderCards,
+  transfer: renderTransfer,
+  ecash: renderEcash,
+  banking: renderBanking,
+  upicod: renderUpiCod,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 16.1 — அறிமுகம்
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.1</div>
+    <h2>அறிமுகம் <span class="eng">(Introduction)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      மின்னணு செலுத்தல் முறைகள் என்றால் என்ன என்பதைப் புரிந்துகொள்ளுதல் · மின்செலுத்தல் முறைகளின் வகைகளை அறிந்து கொள்ளுதல் · அட்டை அடிப்படையிலான பணம் செலுத்தல் (Credit, Debit, Stored Value Card) · மின்னணு கணக்கு பரிமாற்றம் (ECS, NEFT, RTGS) · மின்னணு பணம் செலுத்தல் முறைகள் (Cryptocurrency, E-Wallets) · கைப்பேசி மற்றும் இணைய செலுத்தல் முறைகளை சுருக்கமாக அறிந்து கொள்ளுதல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>16.1 அறிமுகம்</h3>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      மக்கள் நாள்தோறும் பொருட்கள் மற்றும் சேவைகளை வாங்கவோ விற்கவோ செய்கிறார்கள். இந்த பரிமாற்றங்களுக்கு பணம் முக்கிய ஊடகமாக இருக்கிறது. வணிகம் மற்றும் பொருளாதார வளர்ச்சிக்கு உதவும் பொருட்டு வேறு சில செலுத்தல் முறைகளும் உருவாக்கப்பட்டு வருகின்றன. கட்டணம் செலுத்த எளிமையான கருவிகள் (ரொக்கம் போன்றவை) முதல் சிக்கலான அமைப்புகள் (மறைபீட்டு நாணயம் வரை) பண மதிப்பின் மாற்றத்தை பயன்படுத்தப்படும் ஊடகங்கள் மிகவும் வேறுபட்டவை.
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்னணு செலுத்தல் என்பது வங்கி ஊழியர்களின் நேரடி தலையீடு இல்லாமல் மின்னணு முறைகளை பயன்படுத்தி ஒரு வங்கிக் கணக்கிலிருந்து மற்றொரு வங்கிக் கணக்கிற்கு பணம் செலுத்தும் வழிமுறை ஆகும்.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 உதாரணம் (Analogy)</span>
+      பேருந்து நிலையத்தில் நேரடியாகப் பணம் கொடுத்து டிக்கெட் வாங்குவது "இயல்நிலை (Physical) செலுத்தல்". அதே டிக்கெட்டை ஒரு App-இல் UPI மூலம் பணம் செலுத்தி பதிவு செய்வது "மின்னணு செலுத்தல்" — வங்கி ஊழியர் நேரடியாக இடையில் இல்லாமல், கணினி அமைப்புகளே பணத்தை மாற்றுகின்றன.
+    </div>
+    <p>பெரிய பரிவர்த்தனைகளின் மதிப்பு விரிவடையும் போது பரிமாற்றத்திற்குத் தேவையான பணத்தின் அளவும் அதிகரிக்கிறது. பெரிய பரிவர்த்தனைகள் ஒவ்வொன்றிற்கும் ரொக்கத்தைப் பயன்படுத்துவது சாத்தியமல்ல. மேலும் பெரிய அளவிலான பணப் பரிமாற்றங்கள் நடைபெறும் சந்தர்ப்பங்களில் பாதுகாப்பு மற்றும் போக்குவரத்துச் சிக்கல்கள் எழுகின்றன. இதுபோன்ற சந்தர்ப்பங்களில் ரொக்கமில்லாத பிற பணம் செலுத்தும் முறைகளை வழங்குவதன் மூலம், வங்கிகள் உதவுகின்றன.</p>
+    <div class="mistake-box">
+      <span class="lbl">⚠️ பொதுவான தவறு</span>
+      "ரொக்கமில்லா சமூகம் (Cashless Society)" என்பது "ரொக்கம் உடனடியாக முற்றிலும் நீக்கப்படும்" என்று பொருள் அல்ல — பாடநூல் குறிப்பிடுவது போல், பழைய பழக்கங்கள் எளிதில் மாறுவதில்லை; பணம் மற்றும் காசோலைகளின் நீக்கம் உடனடியாக நிகழாது, ஆனால் மக்கள் படிப்படியாக மாற்றங்களை ஏற்றுக்கொள்கிறார்கள்.
+    </div>
+
+    <h4>💳 மின்-தொழில் செலுத்தல் வலையமைப்பு <span class="eng">(Visual Explanation — Pic 16.1)</span></h4>
+    <p>பணம் செலுத்தும் முறையானது பல பங்கேற்பாளர்களை இணைக்கிறது. கீழே உள்ள சிப்பங்களைக் கிளிக் செய்யவும்.</p>
+    <div class="diagram-box">
+      <div class="ex-grid" id="paymentWebGrid"></div>
+      <div class="flow-row" style="margin:14px 0;">
+        <div class="flow-node active" style="background:var(--accent);color:#fff;border-color:var(--accent);">☁️ Payment Method</div>
+      </div>
+      <div id="paymentWebDetail" class="easy" style="display:none;"></div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>நவீன கட்டண முறைகள் இயல்நிலை (Physical) அல்லது மின்னணு வடிவில் இருக்கலாம். ஒவ்வொன்றுக்கும் அதன் சொந்த நடைமுறைகள் மற்றும் நெறிமுறைகள் உள்ளன. தரப்படுத்துதல் இவற்றை உலகளாவிய அளவில் வளர உதவுகிறது.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-intro"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 16.2 — வகைப்பாடு (நுண் Vs பேரின)
+   ========================================================================= */
+function renderClassification(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.2</div>
+    <h2>மின்னணு செலுத்தல் முறைகளின் வகைப்பாடு <span class="eng">(Classification)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> பண மதிப்பு, பாதுகாப்பு தேவை அடிப்படையில் மின்-செலுத்தல் முறைகள் எவ்வாறு இரு வகைகளாகப் பிரிக்கப்படுகின்றன என அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>16.2 வகைப்பாடு</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      இணையத் தொழில்நுட்பங்களின் முன்னேற்றங்களுடன் பல மின்னணு பணம் செலுத்தும் தொழில்நுட்பங்கள் உருவாக்கப்பட்டுள்ளன. பண மதிப்பின் அளவை அடிப்படையாகக் கொண்டும், பரிவர்த்தனைகளின் செயலாக்க நேரம், செயலாக்கத் தேவைகள், பாதுகாப்புச் சிக்கல்கள் மற்றும் பயன்பாட்டினை அடிப்படையாகக் கொண்டும், மின்னணு செலுத்தல் முறைகள் பொதுவாக இரண்டு வகைகளாகப் பிரிக்கலாம்: நுண் மின்செலுத்தல் முறைகள் (Micro electronic-Payment System), பேரின மின்செலுத்தல் முறைகள் (Macro electronic-Payment System).
+    </div>
+
+    <h4>⚖️ நுண் Vs பேரின — ஒப்பீட்டு கருவி <span class="eng">(Interactive)</span></h4>
+    <div class="tab-row" id="microMacroTabs"></div>
+    <div id="microMacroDetail"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔄 நுண் மின்செலுத்தல் பரிவர்த்தனையின் 3 படிகள் <span class="eng">(Visual Explanation)</span></h3>
+    <div class="diagram-box">
+      <div id="microSteps" class="flow-row" style="margin-bottom:14px;"></div>
+      <div id="microStepPanel"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="microPrevBtn">⬅ முந்தைய படி</button>
+      <button class="btn btn-primary" id="microNextBtn">அடுத்த படி ➡</button>
+      <button class="btn btn-ghost" id="microResetBtn">🔄 Reset</button>
+    </div>
+  </div>
+
+  <div class="tryit-box">
+    <span class="lbl">🧪 முயற்சி செய்</span>
+    ஒரு ஆன்லைன் கேம் விளையாடும் போது "100 நாணயங்களை வாங்க ₹10 செலுத்துங்கள்" என்று வரும் பணம் செலுத்துதல் — இது நுண் (Micro) அல்லது பேரின (Macro) செலுத்தலா? காரணம் கூறுக.
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-classification"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 16.3 — அட்டை அடிப்படையிலான பணம் செலுத்தல் முறைகள்
+   ========================================================================= */
+function renderCards(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.3</div>
+    <h2>அட்டை அடிப்படையிலான பணம் செலுத்தல் முறைகள் <span class="eng">(Card-based Payment)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> Credit, Debit, Stored Value மற்றும் Smart Card வகைகளையும், கடன் அட்டை பரிவர்த்தனையின் பங்கேற்பாளர்களையும் அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>16.3 அட்டை அடிப்படையிலான பணம் செலுத்தல்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      பணம் செலுத்தல் அட்டைகள் என்பது பணமில்லா பரிவர்த்தனைகளைச் செயல்படுத்தும் நெகிழி (Plastic) அட்டைகள் ஆகும். இவை அட்டை வழங்கும் நிறுவனம் சார்பாக அட்டை வைத்திருப்பவரை அங்கீகரிப்பவரும் மற்றும் பல்வேறு நிதி சேவைகளை பயன்படுத்த அனுமதிக்கிறது. 90% க்கும் மேற்பட்ட நிகழ்நிலை செலுத்துதல்கள், அட்டை அடிப்படையிலான செலுத்துதல்கள் ஆகும். பரிமாற்ற தீர்வு முறையின் அடிப்படையில், மூன்று வகையான அட்டை அடிப்படையிலான பணம் செலுத்தல் முறைகள் உள்ளன.
+    </div>
+
+    <h4>💳 3 அட்டை வகைகளை ஆராயுங்கள் <span class="eng">(Interactive Tabs)</span></h4>
+    <div class="tab-row" id="cardTypeTabs"></div>
+    <div id="cardTypeDetail"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔁 கடன் அட்டை பரிவர்த்தனை — Learning Simulation <span class="eng">(Pic 16.2)</span></h3>
+    <p>ஒரு கடன் அட்டை பரிவர்த்தனையில் 5 பங்கேற்பாளர்கள் உள்ளனர். "அடுத்த படி" பொத்தானை அழுத்தி பணம் எவ்வாறு ஒவ்வொரு பங்கேற்பாளர் வழியாகவும் பாய்கிறது எனக் காணவும்.</p>
+    <div class="diagram-box">
+      <div class="stakeholder-grid" id="txnStakeholders"></div>
+      <div id="txnStepPanel" style="margin-top:12px;"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="txnPrevBtn">⬅ முந்தைய படி</button>
+      <button class="btn btn-primary" id="txnNextBtn">அடுத்த படி ➡</button>
+      <button class="btn btn-ghost" id="txnResetBtn">🔄 Reset</button>
+    </div>
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா? — Diners Club (முதல் கடன் அட்டை)</span>
+      பிப்ரவரி 1950, பிராங்க் மெக்னமரா மற்றும் ரால்ப் ஷனீடர் ஆகியோர் காகித அட்டை மூலம் தயாரிக்கப்பட்ட The Diners Club கடன் அட்டையை உருவாக்கினர். ஆரம்பத்தில் இந்த அட்டை 27 உணவகங்களில் மட்டுமே ஏற்றுக்கொள்ளப்பட்டது, இரண்டு நிறுவனர்களின் நண்பர்கள் மற்றும் பரிச்சயமானவர்களால் மட்டும் பயன்படுத்தப்பட்டது (சுமார் 200 நபர்கள்). பின்னர் அது மேம்படுத்தப்பட்டு உலகெங்கும் ஏற்றுக்கொள்ளப்பட்டது. 1955 முதல், கடன் அட்டை நெகிழியால் செய்யப்பட்டு வருகிறது. Diners Club International என்ற பெயரில் இந்த அட்டைகள் இன்றும் பயன்பாட்டில் உள்ளது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔍 நவீன கடன் அட்டையின் உடற்கூறு <span class="eng">(Card Anatomy Explorer — Pic 16.3)</span></h3>
+    <p>முன்புறம்/பின்புறம் தேர்ந்தெடுத்து, எண்களைக் கிளிக் செய்து ஒவ்வொரு பகுதியையும் அறியவும்.</p>
+    <div class="tab-row" id="cardFaceTabs"></div>
+    <div class="diagram-box">
+      <div class="card-visual" id="cardVisual"></div>
+      <div id="cardPartDetail" class="easy" style="display:none;margin-top:10px;"></div>
+    </div>
+    <div class="example-box">
+      <span class="lbl">🔢 கடன் அட்டை எண் கட்டமைப்பு</span>
+      <ul>
+        <li>முதல் இலக்கம் = Major Industry Identifier (MII) — வழங்குநர் வகையை அடையாளம் காட்டும் (எ.கா. 4,5 = வங்கிகள், 1 = விமான நிறுவனங்கள்).</li>
+        <li>அடுத்த 5 இலக்கங்கள் = வங்கி நிறுவனத்தை தனித்துவமாக அடையாளம் காட்டும்.</li>
+        <li>முதல் 6 இலக்கங்கள் சேர்ந்தே = Issuer Identifier Number (IIN) அல்லது Bank Identification Number (BIN).</li>
+        <li>அடுத்த 9 இலக்கங்கள் = வாடிக்கையாளர் கணக்கு எண்.</li>
+        <li>கடைசி இலக்கம் = சோதனை இலக்கம் (லூஹான் நெறிமுறை அடிப்படையில்).</li>
+      </ul>
+      அனைத்து கட்டண அட்டைகளும் 85.60 மிமீ அகலம் × 53.98 மிமீ உயரம் கொண்ட, ISO/IEC 7810#ID-1 தரத்தின்படி அளவிடப்பட்ட நெகிழி அட்டைகள்.
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>கடன் அட்டை Vs பற்று அட்டை தோற்றத்தில் ஒன்றுபோல் இருக்கும் — "Credit" அல்லது "Debit" என அச்சடிக்கப்பட்டால் மட்டுமே வேறுபடுத்தி அறியமுடியும்.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-cards"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 16.4 — மின்னணு கணக்குப் பரிமாற்றம் (ECS, EFT, RTGS)
+   ========================================================================= */
+function renderTransfer(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.4</div>
+    <h2>மின்னணு கணக்குப் பரிமாற்றம் <span class="eng">(Electronic Fund Transfer)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> ECS, EFT (NEFT) மற்றும் RTGS ஆகிய மூன்று முறைகளையும் ஒப்பிட்டு அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>16.4 மின்னணு கணக்குப் பரிமாற்றம்</h3>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      கணிப்பொறிகள், இணைய தொழில்நுட்பங்கள் மற்றும் மின்னணு தகவல் தொடர்பு வளர்ச்சியால், அட்டை அடிப்படையிலான செலுத்தல் தவிர, பல வங்கி-க்கு-வங்கி பணப் பரிமாற்ற முறைகள் உருவாகியுள்ளன: ECS, EFT (NEFT), RTGS. இவை உள்நாட்டு மற்றும் வெளிநாட்டு பரிவர்த்தனைகளுக்கு பயன்படுத்தப்படுகின்றன.
+    </div>
+
+    <h4>🔀 மூன்று முறைகளை ஒப்பிடுங்கள் <span class="eng">(Interactive)</span></h4>
+    <div class="tab-row" id="transferTabs"></div>
+    <div id="transferDetail"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-transfer"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 16.5 — மின்-பணம், மறைகுறியீட்டு நாணயம் & மின்னணு பணப்பை
+   ========================================================================= */
+function renderEcash(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.5</div>
+    <h2>மின்னணு பணம் செலுத்தல் முறைகள் <span class="eng">(e-Cash, Cryptocurrency &amp; e-Wallets)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> மின்-பணம், மறைகுறியீட்டு நாணயம் மற்றும் மின்னணு பணப்பை பற்றி அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>16.5 மின்-பணம் (e-Cash)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-பணம் (e-Cash) என்பது மின்னணு தரவு வடிவில் உள்ள பணம் ஆகும். இது ரொக்க மதிப்பை தொடர்ச்சியாக குறையும் எண்களின் வரிசைகளாக மாற்றுகிறது. மேலும் இந்த தொடர் எண்கள் பல நாணயங்களின் சந்தை மதிப்பை பிரதிபலிக்கப் பயன்படுத்தப்படுகிறது.
+    </div>
+
+    <h4>16.5.1 மறைகுறியீட்டு நாணயம் (Cryptocurrency)</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மறைகுறியீட்டு நாணயம் என்பது மறைகுறியீட்டியல் (Cryptography) மூலம் பாதுகாக்கப்பட்ட ஒரு மெய்நிகர்/டிஜிட்டல் நாணயமாகும், இது பணப் பரிமாற்றத்தை போலியாக்கவோ அல்லது இரட்டை-செலவு செய்யவோ முடியாதபடி செயல்படுகிறது. பல மறைகுறியீட்டு நாணயங்கள் Blockchain தொழில்நுட்பத்தை அடிப்படையாகக் கொண்ட பரவலாக்கப்பட்ட வலையமைப்புகள் ஆகும் — பல கணினிகளின் பரவலான வலையமைப்பால் செயல்படுத்தப்படும் ஒரு பகிர்ந்த பதிவேடு. மறைகுறியீட்டு நாணயங்களின் ஒரு முக்கிய பண்பு என்னவென்றால், அவை பொதுவாக எந்த மைய அதிகாரத்தாலும் வெளியிடப்படுவதில்லை, இதனால் அரசாங்கத் தலையீடு அல்லது கையாளுதலிலிருந்து தத்துவார்த்த ரீதியாக அவை பாதுகாக்கப்படுகின்றன.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      மறைகுறியீட்டு நாணய பணப்பையின் உரிமை "portfolios" என்ற தனித்துவ சொத்து தொகுதிகளுடன் தொடர்புடையது — குறிப்பிட்ட கடவுச்சொல் வைத்திருப்பவர் மட்டுமே அந்த portfolio மீது கட்டுப்பாட்டைக் கொண்டிருப்பார். மறையீட்டு நாணயத்தின் செயல்பாடு அகழ்தல் (Mining), தொடரேடு (Blockchain) மற்றும் பகிர்வு பதிவேடு (Ledger) போன்ற பல தொழில்நுட்பங்களை அடிப்படையாகக் கொண்டது.
+    </div>
+
+    <h4>16.5.2 மின்னணு பணப்பை (e-Wallets)</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்னணு பணப்பை (e-Wallets) பயனர்கள் மின்னணு பரிவர்த்தனைகளைத் திறன் பேசிகள் அல்லது கணினிகள் மூலம் இணையத்தில் விரைவாகவும் பாதுகாப்பாகவும் செய்ய அனுமதிக்கிறது. ஒரு உண்மையான பணப்பை போலவே மின்னணு பணப்பையானது நம்முடைய பணத்தை (மின்னணு வடிவில்) தேக்கி வைத்திருக்கும். பல மின்னணு பணப்பை சேவைகள் தற்போது பரவலாகப் பயன்படுத்தப்பட்டு வருகின்றன. எடுத்துக்காட்டு: PayPal, SBI Buddy, Paytm, PhonePe.
+    </div>
+
+    <h4>🧪 மின்னணு பணப்பை Learning Simulation</h4>
+    <p>கீழே உள்ள மின்னணு பணப்பையில் பணம் சேர்த்து, ஒரு கடைக்கு செலுத்தி, இருப்பு எவ்வாறு மாறுகிறது எனப் பாருங்கள்.</p>
+    <div class="diagram-box">
+      <div class="wallet-box">
+        <div>💳 என் மின்னணு பணப்பை</div>
+        <div class="wallet-balance" id="walletBalance">₹0</div>
+      </div>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="walletAddBtn">➕ ₹500 சேர்</button>
+        <button class="btn btn-accent" id="walletPayBtn">🛒 ₹150 கடைக்குச் செலுத்து</button>
+        <button class="btn btn-ghost" id="walletResetBtn">🔄 Reset</button>
+      </div>
+      <div class="log-panel" id="walletLog"></div>
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-ecash"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 16.6 — கைப்பேசி மற்றும் இணைய செலுத்தல் முறைகள்
+   ========================================================================= */
+function renderBanking(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.6</div>
+    <h2>கைப்பேசி மற்றும் இணைய செலுத்தல் முறைகள் <span class="eng">(Mobile &amp; Internet Banking)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> Mobile Banking மற்றும் Internet Banking வேறுபாடுகளையும் நிதி பரிமாற்ற படிகளையும் அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>16.6.1 கைப்பேசி வங்கிச் சேவை (Mobile Banking)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      கைப்பேசி வங்கிச் சேவை (Mobile Banking / m-Banking) என்பது மின் வங்கிச் சேவையின் மற்றொரு வடிவமாகும். கைப்பேசி வங்கிச் சேவை என்ற சொல், வாடிக்கையாளர்களுக்கு வங்கி-பரிவர்த்தனைகளை கைப்பேசிகளின் உதவியுடன் நடத்த, வங்கிகள் வழங்கும் சேவைகளைக் குறிக்கிறது. இந்த பரிவர்த்தனைகளில் பணம் இருப்பு சரிபார்த்தல், பிற கணக்குகளுக்கு பணத்தை மாற்றுதல், பணம் செலுத்தல்கள், கொள்முதல் போன்றவை அடங்கும். இதன் மூலம் எந்த நேரத்திலும், எந்த இடத்திலும் பரிவர்த்தனைகளை மேற்கொள்ளலாம்.
+    </div>
+    <div class="example-box">
+      <span class="lbl">📱 கைப்பேசி வங்கி செயல்படும் வழிகள்</span>
+      அழைப்புவழி மையத்தைத் தொடர்பு கொள்ளுதல் · தானியங்கி IVR தொலைப்பேசி சேவை · எஸ்எம்எஸ் வழியாக கைப்பேசியைப் பயன்படுத்துதல் · WAP தொழில்நுட்பம் · திறன்பேசி பயன்பாடுகளைப் பயன்படுத்துதல்.
+    </div>
+    <h4>🏦 கைப்பேசி App மெனு ஆராய்ச்சி <span class="eng">(Walkthrough — Pic 16.11, Learning Simulation)</span></h4>
+    <p>பாடநூலில் உள்ள கைப்பேசி வங்கி App-இன் மெனு பொத்தான்களைக் கிளிக் செய்து, ஒவ்வொன்றும் என்ன செய்கிறது எனக் காணவும். (இது உண்மையான வங்கி App அல்ல — கருத்துரு காட்சிப்படுத்தல் மட்டும்.)</p>
+    <div class="ex-grid" id="mbankingGrid"></div>
+    <div id="mbankingDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>16.6.2 இணைய வங்கிச் சேவை (Internet Banking)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      இணைய வங்கிச் சேவை என்பது நிகழ்நிலை வங்கி (Online Banking), நிகழ்நிலை வங்கி (Netbanking), மெய்நிகர் வங்கி (கிளைகள் இல்லாமல், இணையத்தில் மட்டுமே இயங்குவது), நேரடி வங்கி, வலையமைப்பு வங்கி மற்றும் தொலை வங்கிகளுக்கான ஒரு தொகுப்பு பெயர் ஆகும்.
+    </div>
+    <details class="acc" open><summary>✅ நன்மைகள்</summary>
+      <div class="acc-body">
+        <ul>
+          <li>வாடிக்கையாளர் தனது பயனர் பெயர் மற்றும் கடவுச்சொல் மூலம் பாதுகாப்பாக தனது வசதிக்கேற்ப பணம் செலுத்துதல்.</li>
+          <li>உலகின் எந்த இடத்தில் இருந்தும் எந்த நேரத்திலும் பயன்படுத்த முடியும்.</li>
+          <li>ஏதேனும் ஒரு உலாவி (உதாரணம் Google Chrome) போதுமானது — எந்தவொரு கூடுதல் மென்பொருளையும் நிறுவத் தேவையில்லை.</li>
+          <li>வழக்கமான பரிவர்த்தனைகள் தவிர, வங்கிக் கணக்கு நிலுவைகள், பரிவர்த்தனை அறிக்கைகள், சமீபத்திய பரிவர்த்தனைகள், பிற கட்டணங்கள் செலுத்துதல், திருடு அல்லது இழப்பு ஏற்பட்டால் அட்டையை முடக்குதல், மற்ற வங்கி சேவைகளான கடன் அட்டைகள், வைப்பீடுகள், கடன்கள் முதலிய அனைத்து வங்கி செயல்பாடுகளின் முழுமையான கட்டுப்பாட்டையும் வழங்குகிறது.</li>
+        </ul>
+      </div>
+    </details>
+
+    <h4>🔢 நிதி பரிமாற்றத்திற்கான 6 படிகள் <span class="eng">(Pic 16.12)</span></h4>
+    <div class="diagram-box">
+      <div id="ibankSteps" class="flow-row" style="margin-bottom:14px;"></div>
+      <div id="ibankStepPanel"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="ibankPrevBtn">⬅</button>
+      <button class="btn btn-primary" id="ibankNextBtn">அடுத்த படி ➡</button>
+      <button class="btn btn-ghost" id="ibankResetBtn">🔄 Reset</button>
+    </div>
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா? — IFSC &amp; SWIFT</span>
+      Indian Financial System Code (IFSC) என்பது இந்தியாவில் ஒவ்வொரு வங்கியின் கிளையையும் தனித்தனியாக அடையாளம் காட்ட இந்திய ரிசர்வ் வங்கியால் வெளியிடப்பட்ட 11 இலக்க எழுத்து குறியீடு. இது உள்நாட்டு மின் செலுத்தல்களுக்காகப் பயன்படுத்தப்படுகிறது. SWIFT குறியீடு சர்வதேச வங்கிப் பரிவர்த்தனைகளுக்குப் பயன்படுத்தப்படுகிறது.
+    </div>
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா?</span>
+      770 கோடி உலக மக்கள்தொகையில் தோராயமாக 434 கோடி மக்கள் இணைய அணுகல் பெற்றுள்ளனர். இதன் மூலம் 50% க்கும் அதிகமான மக்கள் இணைய வங்கிச் சேவை பெற முடியும்.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-banking"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 16.7-8 — UPI & COD
+   ========================================================================= */
+function renderUpiCod(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 16 › 16.7 - 16.8</div>
+    <h2>ஒருங்கிணைந்த செலுத்தல் இடைமுகம் &amp; ஒப்படையப்பின் பணம் <span class="eng">(UPI &amp; COD)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> UPI-இன் VPA கருத்தையும், COD முறையையும் அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>16.7 ஒருங்கிணைந்த செலுத்தல் இடைமுகம் (UPI)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      ஒருங்கிணைந்த செலுத்தல் இடைமுகம் (Unified Payments Interface – UPI) வங்கிகளுக்கு இடையேயான பரிவர்த்தனைகளை எளிதாக்க, இந்திய தேசிய செலுத்தல் நிறுவனம் (NPCI) மூலம் உருவாக்கப்பட்ட ஒரு நிகழ் நேர கட்டண செலுத்தல் அமைப்பாகும். இந்த இடைமுகம் இந்திய ரிசர்வ் வங்கியால் ஒழுங்குபடுத்தப்பட்டு, இரண்டு வங்கிக் கணக்குகளுக்கு இடையே உடனடியாகப் பணத்தை கைப்பேசி (Mobile Platform) சாதனங்கள் மூலம் பரிமாற்றம் செய்யப் பயன்படுகிறது. UPI உடனடி-கட்டண-சேவை (IMPS) அடிப்படையில் உருவாக்கப்பட்டது.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 மெய்நிகர் செலுத்தல் முகவரி (VPA)</span>
+      மெய்நிகர் செலுத்தல் முகவரி (Virtual Payment Address – VPA) UPI-ID என்றும் அழைக்கப்படுகிறது — மின்னஞ்சல் முகவரியை ஒத்த ஒரு தனிப்பட்ட முகவரி (எடுத்துக்காட்டு: பெயர்@வங்கிபெயர்). இவை பல வங்கி கணக்கிலிருந்து பணம் பெற மற்றும் அனுப்ப உதவுகின்றன. VPA பயன்படுத்துவதன் மூலம் வங்கி கணக்கு பற்றிய முக்கிய தகவல்கள் முழுமையாக மறைக்கப்படுகிறது. UPI ஒற்றை மொபைல் பயன்பாட்டில் பல வங்கிக் கணக்குகளை இயக்க அனுமதிக்கிறது.
+    </div>
+
+    <h4>🧪 UPI பரிமாற்ற Learning Simulation</h4>
+    <p>VPA (எ.கா. priya@okbank) கொடுத்து பணம் அனுப்பும் ஓட்டத்தைக் காணவும்.</p>
+    <div class="diagram-box">
+      <div class="flow-row" style="margin-bottom:10px;">
+        <div class="flow-node" id="upiSender">நீங்கள்<br><span class="eng" style="font-size:.7rem;">(அனுப்புநர்)</span></div>
+        <div class="flow-arrow" id="upiArrow1">➡</div>
+        <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#86198f;">UPI<br><span class="eng" style="font-size:.7rem;">(NPCI Server)</span></div>
+        <div class="flow-arrow" id="upiArrow2">➡</div>
+        <div class="flow-node" id="upiReceiver">பெறுநர்<br><span class="eng" style="font-size:.7rem;">(VPA)</span></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <input type="text" id="upiVpaInput" placeholder="VPA எடுத்துக்காட்டு: priya@okbank" style="max-width:260px;">
+        <input type="text" id="upiAmtInput" placeholder="தொகை (₹)" style="max-width:120px;">
+      </div>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="upiSendBtn">▶ அனுப்பு</button>
+        <button class="btn btn-ghost" id="upiResetBtn">🔄 Reset</button>
+      </div>
+      <div class="log-panel" id="upiLog"></div>
+      <div class="diagram-cap">⚠️ Learning Simulation — இது உண்மையான UPI ஆப் அல்ல.</div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>UPI இரண்டு வகை முகவரிகளைப் பயன்படுத்துகிறது: உலகளாவிய முகவரி (வங்கி கணக்கு எண் + IFSC) மற்றும் உள்ளமை முகவரி (VPA).</div>
+  </div>
+
+  <div class="card">
+    <h3>16.8 ஒப்படையப்பின் போது பணம் செலுத்தல் (COD)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      ஒப்படையப்பின் போது பணம் செலுத்தல் (Cash On Delivery – COD) என்பது Collection On Delivery என்றும் அழைக்கப்படுகிறது. இது பணத்தை முன்கூட்டியே செலுத்துவதற்கு மாறாக, பொருட்களைப் பெற்றுக்கொண்ட பின் பணம் செலுத்தும் முறையை விவரிக்கிறது. 'பணம்' என்ற சொல், காசோலைகள், கடன் அல்லது பற்று அட்டைகள் கொண்டு செய்யப்படும் பரிவர்த்தனைகளையும் குறிக்கும் "சேகரிக்கும்" என்ற சொல்லாக சில நேரங்களில் மாற்றப்பட்டுள்ளது.
+    </div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">📦 பொருள் ஒப்படைப்பு</div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#86198f;">💵 பணம் செலுத்தல்</div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-node done">✅ பரிவர்த்தனை முடிவு</div>
+      </div>
+      <div class="diagram-cap">படம் — COD ஓட்டம் (redrawn). பணம் செலுத்தாவிட்டால், பொருள் விற்பனையாளருக்குத் திருப்பி அனுப்பப்படும்.</div>
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-upicod"></div></div>
+  `;
+}
+
+/* =========================================================================
+   PRACTICE PAGE
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Misconception Buster <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — <span class="eng">Enrichment</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Misconception Buster — மின்னணு செலுத்தல் பற்றிய தவறான கருத்துக்கள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு தவறான கருத்தையும் படித்து, அது ஏன் தவறு எனக் யூகிக்கவும். பிறகு ✅ "ஏன் தவறு?" பொத்தானை கிளிக் செய்து, சரியான புரிதலைப் பார்க்கவும்.</p>
+    <div id="misWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. பண மதிப்பின் அடிப்படையில் மின்னணு கட்டணம் செலுத்தும் முறையை ___ மற்றும் ___ என வகைப்படுத்தலாம்.', o:['நுண் செலுத்தல் மற்றும் பேரின செலுத்தல்','நுண் மற்றும் நானோ செலுத்தல்','அதிகபட்ச மற்றும் குறைந்தபட்ச செலுத்தல்','அதிகபட்ச மற்றும் பேரின செலுத்தல்'], c:0, exp:'பண மதிப்பு, செயலாக்க நேரம், பாதுகாப்பு தேவை அடிப்படையில் மின்னணு செலுத்தல் முறைகள் நுண் (Micro) மற்றும் பேரின (Macro) என இரு வகைகளாகப் பிரிக்கப்படும்.'},
+  'b2': {q:'2. ___ என்பது மின்னணு முறைகளை பயன்படுத்தி ஒரு வங்கி கணக்கிலிருந்து மற்றொரு வங்கி கணக்கிற்கு பணம் செலுத்தும் வழிமுறை ஆகும்.', o:['மின்னணு செலுத்தல்','நேரடி செலுத்தல்','மறைமுக செலுத்தல்','இவற்றில் ஏதுமில்லை'], c:0, exp:'மின்னணு செலுத்தல் (Electronic Payment) என்பது வங்கி ஊழியர்களின் நேரடி தலையீடு இல்லாமல் மின்னணு முறைகளை பயன்படுத்தி பணம் செலுத்தும் வழிமுறை.'},
+  'b3': {q:'3. கூற்று: பேரின மின்னணு செலுத்தல் முறை உயர் மதிப்பு செலுத்துதலை ஆதரிக்கின்றன. காரணம்: விலையுயர்ந்த மறைகுறியீட்டியல் செயல்பாடுகள் பேரின மின்னணு செலுத்துதல் முறையில் சேர்க்கப்பட்டுள்ளது.', o:['கூற்றும் காரணமும் சரி; காரணம் கூற்றை சரியாக விளக்குகிறது.','கூற்றும் காரணமும் சரி; ஆனால் கூற்றை காரணம் சரியாக விளக்கவில்லை.','கூற்று சரி; காரணம் தவறு.','கூற்று தவறு; காரணமும் சரி.'], c:0, exp:'பேரின செலுத்தல்களில் அதிகப் பணப் பரிவர்த்தனை இருப்பதால், விலையுயர்ந்த மறைகுறியீட்டியல் முறைகள் பாதுகாப்பிற்காகப் பயன்படுத்தப்படுகின்றன — இதுவே உயர் மதிப்பு செலுத்துதலை ஆதரிக்க உதவுகிறது.'},
+  'b4': {q:'4. பின்வருவனவற்றில் எது சரியாக பொருந்தியுள்ளது?', o:['கடன் அட்டை – முன்பே செலுத்து','பற்று அட்டை – இப்போழுது செலுத்து','சேமித்துவைக்கப்படும் மதிப்பு அட்டை – பிறகு செலுத்து','திறன் அட்டை – எப்போது வேண்டுமானாலும் செலுத்து'], c:1, exp:'பற்று அட்டை (Debit Card) = இப்போதே செலுத்து (Pay Now); கடன் அட்டை = பிறகு செலுத்து; சேமிக்கப்பட்ட மதிப்பு அட்டை = முன்பே செலுத்து.'},
+  'b5': {q:'5. ECS ன் விரிவாக்கம்', o:['Electronic Clearing Services','Electronic Cloning Services','Electronic Clearing Station','Electronic Cloning Station'], c:0, exp:'ECS = Electronic Clearing Services (மின்னணு தீர்வை சேவை).'},
+  'b6': {q:'6. பின்வருவனவற்றுள் குறைந்த கட்டணங்களுக்கான நிகழ்நிலை கட்டணமுறை எது?', o:['அட்டை மூலம் பணம் செலுத்துதல்','நுண் மின் செலுத்தல் கட்டணமுறை','பேரின மின் செலுத்தல் கட்டணமுறை','கடன் அட்டை கட்டணமுறை'], c:1, exp:'நுண் மின்செலுத்தல் முறை (Micro e-Payment) சிறிய, அடிக்கடி நடக்கும் பணம் செலுத்தல்களுக்கு ஏற்றது.'},
+  'b7': {q:'7. பின்வருவனவற்றுள் எது மெய்நிகர் செலுத்தல் முகவரி (VPA) பற்றிய சரியான கூற்று ஆகும்?', o:['வாடிக்கையாளர்கள் தங்கள் மின்னஞ்சல் முகவரியை VPA வாக பயன்படுத்த முடியும்.','VPA ல் எண்கள் அடங்கவில்லை.','VPA ஒரு தனித்த (Unique) முகவரி.','பல வங்கிக் கணக்குகள் ஒற்றை VPA கொண்டிருக்க முடியாது.'], c:2, exp:'VPA (UPI-ID) ஒரு தனிப்பட்ட (Unique) முகவரி — பெயர்@வங்கிபெயர் வடிவில் இருக்கும்.'},
+  'b8': {q:'8. கடன் அட்டையுடன் பொருந்தாத ஒன்றை தேர்தெடுக்கவும்.', o:['வாடிக்கையாளர்','வியாபாரி','சந்தைப்பத்து மேலாளர்','பெறுநர் (Acquirer)'], c:2, exp:'கடன் அட்டை பரிவர்த்தனையின் 5 பங்கேற்பாளர்கள்: வாடிக்கையாளர், வியாபாரி, பெறுநர் (Acquirer), கடன் அட்டை அமைப்பு (Network), வழங்குபவர் (Issuer). "சந்தைப்பத்து மேலாளர்" இதில் இல்லை.'},
+  'b9': {q:'9. கீழ்கண்டவற்றில் பற்று அட்டை பற்றி சரியான கூற்று எவை? (i. ஏடிஎம்-களில் பயன்படுத்த முடியாது ii. நிகழ்நிலை பரிமாற்றங்களில் பயன்படுத்த முடியாது iii. பெற வங்கி கணக்கு தேவையில்லை iv. பற்று அட்டை மற்றும் கடன் அட்டை இரண்டும் தோற்றத்தில் ஒன்று போலவே இருக்கும்)', o:['i, ii, iii','ii, iii, iv','iii மட்டும்','iv மட்டும்'], c:3, exp:'iv மட்டுமே சரி — பற்று அட்டையும் கடன் அட்டையும் தோற்றத்தில் ஒரே மாதிரியாக இருக்கும். (i,ii,iii தவறு — பற்று அட்டையை ATM-லும் ஆன்லைனிலும் பயன்படுத்தலாம்; வங்கி கணக்கு கட்டாயம் தேவை.)'},
+  'b10': {q:'10. பொருத்துக — கடன் அட்டை எண்ணில்: (1) முதல் இலக்கம் (2) 9-15 இலக்கங்கள் (3) முதல் 6 இலக்கங்கள் (4) கடைசி இலக்கம் — இவற்றை (கணக்கு எண், MII குறியீடு, BIN குறியீடு, சோதனை இலக்கம்) வரிசையில் பொருத்தவும்.', o:['4, 3, 2, 1','2, 1, 3, 4','2, 3, 4, 1','2, 4, 3, 1'], c:1, exp:'கணக்கு எண் = (2) 9-15 இலக்கங்கள்; MII குறியீடு = (1) முதல் இலக்கம்; BIN குறியீடு = (3) முதல் 6 இலக்கங்கள்; சோதனை இலக்கம் = (4) கடைசி இலக்கம் → வரிசை 2,1,3,4.'},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'ஒரு கடையில் பொருள் வாங்கும்போது உடனே வங்கிக் கணக்கிலிருந்து பணம் பிடிக்கப்படும் அட்டை எது?', o:['கடன் அட்டை','பற்று அட்டை','சேமிக்கப்பட்ட மதிப்பு அட்டை','பரிசு அட்டை'], c:1, exp:'பற்று அட்டை (Debit Card) வாடிக்கையாளரின் பெயரில் அவரது வங்கிக் கணக்கிலிருந்து நேரடியாக பரிவர்த்தனை தொகையை பிடித்தம் செய்யும்.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'NEFT இந்தியாவில் எந்த நிறுவனத்தால் நிறுவப்பட்டு பராமரிக்கப்படுகிறது?', o:['SEBI','IDRBT (RBI மூலம்)','NPCI','TRAI'], c:1, exp:'NEFT, இந்திய ரிசர்வ் வங்கி (RBI) மூலம் நவம்பர் 2005ல் தொடங்கப்பட்டு, Institute for Development and Research in Banking Technology (IDRBT) மூலம் வளர்ச்சி/பராமரிப்பு செய்யப்படுகிறது.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'RTGS பரிவர்த்தனைகள் எவ்வாறு செயலாக்கப்படுகின்றன?', o:['தினமும் ஒரு முறை batch ஆக','நிகழ் நேரத்தில் (Real time)','வாரம் ஒருமுறை','மாதம் ஒருமுறை'], c:1, exp:'RTGS (Real Time Gross Settlement) பெயர் குறிப்பிடுவது போலவே, பரிவர்த்தனைகள் நிகழ் நேரத்தில் செயலாக்கப்படுகின்றன; பெரிய மதிப்புள்ள பரிவர்த்தனைகளுக்கு ஏற்றது.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'Chennai Metro Rail பயண அட்டை எந்த வகை சேமிக்கப்பட்ட மதிப்பு அட்டைக்கு எடுத்துக்காட்டு?', o:['திறந்த வளையம் (Open loop)','மூடிய வளையம் (Closed loop)','EMV அட்டை','RFID அட்டை மட்டும்'], c:1, exp:'Chennai Metro Rail அட்டை ஒரு குறிப்பிட்ட சேவைக்கு மட்டுமே பயன்படும் மூடிய வளையம் (Closed loop) அட்டைக்கு எடுத்துக்காட்டு.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'மறைகுறியீட்டு நாணயம் (Cryptocurrency) ஏன் அரசாங்க தலையீட்டிலிருந்து பாதுகாக்கப்பட்டதாகக் கருதப்படுகிறது?', o:['அது ஒரு வங்கியால் வழங்கப்படுவதால்','அது பொதுவாக எந்த மைய அதிகாரத்தாலும் வெளியிடப்படாததால்','அது அரசு அச்சிடுவதால்','அது நாணயமாக அங்கீகரிக்கப்படாததால்'], c:1, exp:'மறைகுறியீட்டு நாணயம் பொதுவாக எந்த மைய அதிகாரத்தாலும் (central authority) வெளியிடப்படாததால், தத்துவார்த்த ரீதியாக அரசாங்க தலையீடு/கையாளுதலிலிருந்து பாதுகாக்கப்பட்டதாகக் கருதப்படுகிறது.'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'UPI பரிவர்த்தனையைத் தொடங்க இரண்டு வழிகள் உள்ளன. அவை யாவை?', o:['கடன் அட்டை மற்றும் பற்று அட்டை','உலகளாவிய முகவரி மற்றும் உள்ளமை முகவரி (VPA)','ECS மற்றும் RTGS','IFSC மற்றும் SWIFT'], c:1, exp:'UPI பயன்பாடு பரிவர்த்தனையைத் தொடங்க உலகளாவிய முகவரி (வங்கி கணக்கு எண் + IFSC) மற்றும் உள்ளமை முகவரி (VPA) ஆகிய இரு வழிகளைப் பயன்படுத்துகிறது.'},
+};
+
+const TF_QS = [
+  {q:'சேமிக்கப்பட்ட மதிப்பு அட்டை (Stored Value Card) பெற வங்கி கணக்கு கட்டாயம் தேவை.', a:false, exp:'தவறு — சேமிக்கப்பட்ட மதிப்பு அட்டையின் முக்கிய நன்மை, அதைப் பெற வாடிக்கையாளர்கள் வங்கிக் கணக்கு வைத்திருக்க வேண்டிய அவசியமில்லை.'},
+  {q:'RTGS முறை பொதுவாகப் பெரிய மதிப்புள்ள பரிவர்த்தனைகளுக்குப் பயன்படுகிறது.', a:true, exp:'சரி — RTGS பரிமாற்றங்கள் பொதுவாகப் பெரிய மதிப்பு செலுத்துதல்களாகும்.'},
+  {q:'மறைகுறியீட்டு நாணயம் பொதுவாக ஒரு மைய வங்கியால் வெளியிடப்படுகிறது.', a:false, exp:'தவறு — மறைகுறியீட்டு நாணயங்கள் பொதுவாக எந்த மைய அதிகாரத்தாலும் வெளியிடப்படுவதில்லை; பரவலாக்கப்பட்ட (decentralized) வலையமைப்புகள்.'},
+  {q:'UPI, IMPS (உடனடி-கட்டண-சேவை) அடிப்படையில் உருவாக்கப்பட்டது.', a:true, exp:'சரி — UPI உடனடி-கட்டண-சேவை (IMPS) அடிப்படையில் உருவாக்கப்பட்டது.'},
+  {q:'கடன் அட்டை மற்றும் பற்று அட்டை தோற்றத்தால் எளிதாக வேறுபடுத்தி அறியலாம்.', a:false, exp:'தவறு — இரண்டும் தோற்றத்தில் ஒரே மாதிரியாக இருக்கும்; "Credit" அல்லது "Debit" என அச்சடிக்கப்பட்டால் மட்டுமே வேறுபடுத்தி அறியமுடியும்.'},
+];
+
+const FIB_QS = [
+  {text:'ECS என்பது ______________ என்பதன் சுருக்கமாகும்.', ans:'electronic clearing services'},
+  {text:'இந்தியாவில் EFT ______________ என்று அழைக்கப்படுகிறது.', ans:'neft'},
+  {text:'மெய்நிகர் செலுத்தல் முகவரி (VPA) ______________ என்றும் அழைக்கப்படுகிறது.', ans:'upi-id'},
+  {text:'முதல் கடன் அட்டையான Diners Club ஐ உருவாக்கியவர்கள் பிராங்க் மெக்னமரா மற்றும் ______________.', ans:'ralph schneider'},
+];
+
+const MATCH_LEFT = ['கடன் அட்டை','பற்று அட்டை','RTGS','e-Wallet','VPA'];
+const MATCH_RIGHT = ['பிறகு செலுத்தும் அட்டை (Pay Later)','இப்போதே செலுத்தும் அட்டை (Pay Now)','பெரிய மதிப்புள்ள, நிகழ் நேர பணப் பரிமாற்றம்','மின்னணு பரிவர்த்தனைகளை விரைவாகவும் பாதுகாப்பாகவும் செய்ய அனுமதிக்கும் டிஜிட்டல் பணப்பை','மின்னஞ்சலை ஒத்த தனிப்பட்ட UPI முகவரி'];
+const MATCH_ANSWER = {'கடன் அட்டை':'பிறகு செலுத்தும் அட்டை (Pay Later)','பற்று அட்டை':'இப்போதே செலுத்தும் அட்டை (Pay Now)','RTGS':'பெரிய மதிப்புள்ள, நிகழ் நேர பணப் பரிமாற்றம்','e-Wallet':'மின்னணு பரிவர்த்தனைகளை விரைவாகவும் பாதுகாப்பாகவும் செய்ய அனுமதிக்கும் டிஜிட்டல் பணப்பை','VPA':'மின்னஞ்சலை ஒத்த தனிப்பட்ட UPI முகவரி'};
+
+const MISCONCEPTIONS = [
+  {wrong:'"கடன் அட்டையும் பற்று அட்டையும் ஒன்றுதான், ஏனெனில் இரண்டும் ஒரே மாதிரித் தோற்றமுடையவை" என நினைப்பது.', type:'தோற்றக் குழப்பம் (Appearance Confusion)', why:'தோற்றத்தில் ஒரே மாதிரியாக இருந்தாலும், கடன் அட்டை வங்கியிலிருந்து கடன் வாங்கி பிறகு திருப்பிச் செலுத்துவதையும், பற்று அட்டை சொந்த கணக்கிலிருந்து இப்போதே பணம் எடுப்பதையும் குறிக்கிறது.', fix:'கடன் அட்டை = பிறகு செலுத்து (Pay Later). பற்று அட்டை = இப்போதே செலுத்து (Pay Now). "Credit"/"Debit" என அச்சிடப்பட்ட வார்த்தையால் மட்டுமே வேறுபடுத்தலாம்.'},
+  {wrong:'"நுண் மின்செலுத்தல் முறைகள் பேரின முறைகளை விட அதிக பாதுகாப்பானவை" என நினைப்பது.', type:'பாதுகாப்புக் குழப்பம் (Security Misconception)', why:'நுண் மின்செலுத்தல் முறைகளின் பாதுகாப்பு ஒப்பீட்டளவில் குறைவாகவே உள்ளது; ஆனால் மோசடி மூலம் பெறப்படும் சாத்தியமான மதிப்பை விட மோசடிக்கான செலவு அதிகமாக இருப்பதால் அவை நடைமுறையில் பாதுகாப்பானதாகக் கருதப்படுகின்றன.', fix:'பேரின முறைகள் விலையுயர்ந்த மறைகுறியீட்டியல் மூலம் அதிக பாதுகாப்புடன் இருக்கும்; நுண் முறைகள் எளிய தொடர்ச்சிநிலை மறைகுறியீட்டியல் முறைகளை மட்டுமே பயன்படுத்தும்.'},
+  {wrong:'"UPI-இல் VPA பயன்படுத்தினால் வங்கி கணக்கு எண்ணையும் தெரிவிக்க வேண்டும்" என நினைப்பது.', type:'செயல்பாட்டுக் குழப்பம் (Functional Misconception)', why:'VPA பயன்படுத்துவதன் முக்கிய நோக்கமே, வங்கி கணக்கு எண் போன்ற முக்கிய தகவல்களை முழுமையாக மறைப்பதாகும்.', fix:'VPA (பெயர்@வங்கிபெயர்) ஒன்றே போதும் — பணம் அனுப்ப/பெற வங்கி கணக்கு எண் தேவையில்லை.'},
+  {wrong:'"மின்னணு பணப்பையில் (e-Wallet) பணம் சேர்த்தால் அது வங்கி கணக்கில் சேர்ந்துவிடும்" என நினைப்பது.', type:'கருத்தியல் குழப்பம் (Conceptual Misconception)', why:'e-Wallet தனியாக பணத்தை மின்னணு வடிவில் சேமித்து வைக்கும் ஒரு தனித்த அமைப்பு; இது வங்கிக் கணக்கு அல்ல.', fix:'e-Wallet = ஒரு "டிஜிட்டல் பணப்பை" போன்றது, பணத்தை தேக்கி வைக்கும்; வங்கிக் கணக்கு வேறு, e-Wallet வேறு.'},
+];
+
+/* =========================================================================
+   EXAM PREPARATION PAGE
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>மின்னணு செலுத்தல் = வங்கி ஊழியர் நேரடி தலையீடு இல்லாமல் மின்னணு முறையில் ஒரு கணக்கிலிருந்து மற்றொரு கணக்கிற்கு பணம் செலுத்தும் வழிமுறை.</li>
+      <li>வகைப்பாடு: நுண் மின்செலுத்தல் (சிறு, அடிக்கடி, குறைந்த பாதுகாப்பு) Vs பேரின மின்செலுத்தல் (உயர் மதிப்பு, அதிக மறைகுறியீட்டியல் பாதுகாப்பு).</li>
+      <li>3 அட்டை வகைகள்: கடன் அட்டை (பிறகு செலுத்து), பற்று அட்டை (இப்போதே செலுத்து), சேமிக்கப்பட்ட மதிப்பு அட்டை (முன்பே செலுத்து).</li>
+      <li>கடன் அட்டை பரிவர்த்தனையில் 5 பங்கேற்பாளர்கள்: வாடிக்கையாளர், வியாபாரி, பெறுநர் (Acquirer), கடன் அட்டை அமைப்பு (Network), வழங்குபவர் (Issuer).</li>
+      <li>கடன் அட்டை எண் கட்டமைப்பு: 1 இலக்கம் MII, முதல் 6 இலக்கங்கள் BIN/IIN, அடுத்த 9 இலக்கங்கள் கணக்கு எண், கடைசி இலக்கம் சோதனை இலக்கம்.</li>
+      <li>ECS = ஒரு கணக்கிலிருந்து பல கணக்குகளுக்கோ, பல கணக்குகளிலிருந்து ஒன்றிற்கோ பணப் பரிமாற்றம். EFT/NEFT = ஒரு நாளில் பணம் வரவு. RTGS = நிகழ் நேர, உயர் மதிப்பு பரிமாற்றம்.</li>
+      <li>மின்-பணம் (e-Cash), மறைகுறியீட்டு நாணயம் (Cryptocurrency — Blockchain அடிப்படையிலானது, மைய அதிகாரம் இல்லை), மின்னணு பணப்பை (e-Wallet — PayPal, Paytm, PhonePe).</li>
+      <li>கைப்பேசி வங்கி (Mobile Banking) Vs இணைய வங்கி (Internet Banking) — இரண்டும் மின் வங்கிச் சேவையின் வடிவங்கள்.</li>
+      <li>UPI = NPCI உருவாக்கியது, RBI ஒழுங்குபடுத்துகிறது, IMPS அடிப்படையிலானது. VPA (UPI-ID) = பெயர்@வங்கிபெயர்.</li>
+      <li>COD (Cash On Delivery) = பொருள் பெற்ற பின் பணம் செலுத்தும் முறை; பணம் செலுத்தாவிட்டால் பொருள் திருப்பி அனுப்பப்படும்.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>சொல்</th><th>விளக்கம்</th></tr>
+      <tr><td><b>கடன் அட்டை நிறுவனம் / செயலாக்குபவர்</b> (Credit card issuer/processor)</td><td>பெறுநர் மற்றும் வழங்குநர் இடையே பரிவர்த்தனையை தெரியப்படுத்துவதில் பொறுப்பாகும். எடுத்துக்காட்டு: மாஸ்டர்கார்டு, விசா, Rupay</td></tr>
+      <tr><td><b>மின்னணு பணப்பை</b> (e-Wallet)</td><td>பயனர்கள் மின்னணு பரிவர்த்தனைகளை விரைவாகவும், பாதுகாப்பாகவும் செய்ய அனுமதிக்கிறது</td></tr>
+      <tr><td><b>பரிசு அட்டைகள்</b> (Gift Cards)</td><td>ஒரு மின்-வணிகம் பரிசாக வழங்கும் பணத்தின் மதிப்பு மெய்நிகர் வடிவில் கொண்டிருக்கும் ஒரு காந்தப்பட்டை அல்லது சில்லு அட்டை</td></tr>
+      <tr><td><b>இணைய வங்கி</b> (Internet Banking)</td><td>இணையத்தின் வழியாக வங்கி சேவையை பெறுவது</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி <span class="eng">(Part-wise Answer-Writing Guide)</span></h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லை (keyword) கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். அட்டை வகைகளை "பிறகு/இப்போது/முன்பே" என மூன்று சொற்களில் நினைவில் கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>2 / 3-மதிப்பெண் (பகுதி ஆ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் → (3) தேவைப்பட்டால் ஒரு வரி முக்கியத்துவம்.<br>
+        <b>எ.கா.</b> "திறன் அட்டை (smart card) என்றால் என்ன?" → "திறன் அட்டை என்பது அட்டை அடிப்படையிலான பணம் செலுத்தும் முறையின் நவீன வடிவம். இது EMV சில்லு கொண்டு, வாடிக்கையாளரின் அடையாளம், அங்கீகாரம், தரவு சேமிப்பு மற்றும் பயன்பாடு ஆகியவற்றைச் செயல்படுத்துகிறது."
+      </div>
+    </details>
+    <details class="acc"><summary>3-மதிப்பெண் (பகுதி இ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரி → (2) 2-3 முக்கிய புள்ளிகள் → (3) ஒரு உதாரணம்.<br>
+        <b>எ.கா.</b> "கடன் அட்டை மற்றும் பற்று அட்டையை ஒப்பிட்டு, வேறுபடுத்தவும்" → வரையறைகள் → "பிறகு Vs இப்போது செலுத்துதல்" அம்சம் → தோற்றத்தில் ஒரேமாதிரி என்ற ஒரு வரி.
+      </div>
+    </details>
+    <details class="acc"><summary>5-மதிப்பெண் (பகுதி ஈ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) பங்கேற்பாளர்கள்/வகைகளைத் தலைப்பு வாரியாகப் பட்டியலிடுதல் → (3) 1-2 வரிகளில் விளக்குதல் → (4) படம் (இருந்தால்) → (5) முடிவுரை.<br>
+        <b>எ.கா.</b> "கடன் அட்டை மூலம் பணம் செலுத்தும் முறையின் முக்கிய பங்களிப்பாளர்களை விளக்குக" → வாடிக்கையாளர் → வியாபாரி → பெறுநர் → கடன் அட்டை அமைப்பு → வழங்குபவர், ஒவ்வொன்றையும் 1-2 வரிகளில் விளக்கி Pic16.2 ஓட்டப்படத்துடன் முடிக்கவும்.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ &amp; மாணவர் நடவடிக்கை <span class="eng">(reference)</span></h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின்னணு செலுத்தல் முறை வரையறு.</li>
+          <li>நுண் மின்னணு செலுத்துதல் மற்றும் பேரின மின்னணு செலுத்துதல் வேறுபடுத்துக.</li>
+          <li>மின்-பணப்பை கருத்தை விளக்குக.</li>
+          <li>கடன் அட்டை பற்றி சிறுகுறிப்பு வரைக.</li>
+          <li>திறன் அட்டை (smart card) என்றால் என்ன?</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>நுண் மின்னணு பணம் செலுத்துதல் மற்றும் மின்-வணிகத்தில் அதன் பங்கை விவரி.</li>
+          <li>கடன் அட்டை மற்றும் பற்று அட்டை ஒப்பிட்டு, வேறுபடுத்தவும்.</li>
+          <li>கடன் அட்டையின் பகுதிகளை விளக்கி எழுது.</li>
+          <li>சேமிக்கப்பட்ட மதிப்பு அட்டையையும் அதன் வகைகளையும் சுருக்கமாக விளக்கவும்.</li>
+          <li>மின்னணு பணப் பரிமாற்றம் என்றால் என்ன?</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>கடன் அட்டை மூலம் பணம் செலுத்தும் முறையின் முக்கிய பங்களிப்பாளர்களை விளக்குக.</li>
+          <li>குறிப்பு வரைக — அ. இணைய வங்கிச் சேவை ஆ. கைப்பேசி வங்கிச் சேவை</li>
+          <li>விரிவாக விளக்குக: ஒருங்கிணைந்த செலுத்தல் இடைமுகம்.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>மாணவர் நடவடிக்கை <span class="eng">(Student Activity — reference)</span></summary>
+      <div class="acc-body">
+        <ol>
+          <li>ஏதேனும் விளக்கக்காட்சி கருவியைத் தேர்வு செய்யவும் (உதாரணம் Open Office Impress).</li>
+          <li>ஒரு பணம் செலுத்தும் முறையை விவரித்து சில்லுவை உருவாக்கவும்.</li>
+          <li>குறிப்பிட்ட பணம் செலுத்தும் முறையின் சிறப்பியல்புகளை அதில் விளக்கவும்.</li>
+          <li>அதன் நன்மைகள் மற்றும் குறைபாடுகளை பட்டியலிடவும்.</li>
+          <li>மற்ற பணம் செலுத்தும் முறைகளுக்கு மேற்காணும் வழிமுறைகளை மீண்டும் செய்யவும்.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (பாடநூல் MCQ)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு வாடிக்கையாளர் ₹50 பேரூந்து மின்-டிக்கெட்டை ஸ்கேன் செய்து ஆப் மூலம் செலுத்துகிறார். இது எந்த வகை, ஏன்?', o:['பேரின மின்செலுத்தல் — அதிக மதிப்பு என்பதால்','நுண் மின்செலுத்தல் — சிறிய, அடிக்கடி நடக்கும் செலுத்தல் என்பதால்','ECS — வங்கி-க்கு-வங்கி பரிமாற்றம் என்பதால்','RTGS — நிகழ் நேர பரிமாற்றம் என்பதால்'], c:1, exp:'₹50 போன்ற சிறிய, அடிக்கடி செய்யப்படும் தொகை நுண் மின்செலுத்தல் (Micro e-Payment) வகையைச் சேரும்.'},
+  'c2': {q:'🔴 ஒரு நிறுவனம் 500 ஊழியர்களுக்கு ஒரே நேரத்தில் சம்பளம் செலுத்த விரும்புகிறது (ஒரு கணக்கிலிருந்து பல கணக்குகளுக்கு). எந்த முறை மிகவும் பொருத்தமானது?', o:['RTGS (ஒரு பரிவர்த்தனைக்கு ஒன்று)','ECS (Bulk Payment வசதி)','COD','Stored Value Card'], c:1, exp:'ECS திரள் பணம் செலுத்துதல் (Bulk Payments) வசதியை வழங்குகிறது — ஒரு கணக்கிலிருந்து பல கணக்குகளுக்கு (சம்பளம் போன்றவை) ஒரே நேரத்தில் பணம் செலுத்த ஏற்றது.'},
+};
+
+/* ============================= MCQ HELPER ============================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* ============================= QUICK-CHECK BANKS ============================= */
+const QC_BANKS = {
+  intro: {
+    'qc1': {q:'மின்னணு செலுத்தலின் முக்கிய அம்சம் என்ன?', o:['வங்கி ஊழியர் நேரடி தலையீடு தேவை','வங்கி ஊழியர் நேரடி தலையீடு இல்லாமல் நடைபெறும்','ரொக்கம் மட்டுமே பயன்படும்','எப்போதும் அஞ்சல் மூலம் நடைபெறும்'], c:1, exp:'மின்னணு செலுத்தல் வங்கி ஊழியர்களின் நேரடி தலையீடு இல்லாமல் மின்னணு முறையில் நடைபெறுகிறது.'}
+  },
+  classification: {
+    'qc2': {q:'எந்த மின்செலுத்தல் முறையில் விலையுயர்ந்த மறைகுறியீட்டியல் பயன்படுத்தப்படுகிறது?', o:['நுண் மின்செலுத்தல்','பேரின மின்செலுத்தல்','இரண்டிலும் இல்லை','இரண்டிலும் சமமாக'], c:1, exp:'பேரின மின்செலுத்தல் முறையில் அதிக பாதுகாப்புக்காக விலையுயர்ந்த மறைகுறியீட்டியல் பயன்படுத்தப்படுகிறது.'}
+  },
+  cards: {
+    'qc3': {q:'கடன் அட்டை பரிவர்த்தனையில் "பெறுநர்" (Acquirer) யார்?', o:['பொருள் வாங்குபவர்','வியாபாரிக்கு பணம் பெற உதவும் வங்கி','அட்டை வழங்கும் வங்கி','கடன் அட்டை நெட்வொர்க்'], c:1, exp:'பெறுநர் (Acquirer) என்பது வியாபாரியின் சார்பாக பணம் பெற்றுக் கொள்ளவதற்கு உதவும் வங்கி.'}
+  },
+  transfer: {
+    'qc4': {q:'எந்த முறை பெரிய மதிப்புள்ள, நிகழ் நேர பரிவர்த்தனைகளுக்கு ஏற்றது?', o:['ECS','NEFT','RTGS','COD'], c:2, exp:'RTGS (Real Time Gross Settlement) பெரிய மதிப்புள்ள, நிகழ் நேர பரிவர்த்தனைகளுக்கு ஏற்றது.'}
+  },
+  ecash: {
+    'qc5': {q:'மறைகுறியீட்டு நாணயம் எந்த தொழில்நுட்பத்தை அடிப்படையாகக் கொண்டது?', o:['Blockchain','HTML','SQL','UPI'], c:0, exp:'பல மறைகுறியீட்டு நாணயங்கள் Blockchain தொழில்நுட்பத்தை அடிப்படையாகக் கொண்ட பரவலாக்கப்பட்ட வலையமைப்புகள்.'}
+  },
+  banking: {
+    'qc6': {q:'இணைய வங்கிச் சேவை பயன்படுத்த என்ன தேவை?', o:['சிறப்பு மென்பொருள் நிறுவுதல்','ஏதேனும் ஒரு உலாவி மட்டும்','வங்கிக் கிளைக்குச் செல்ல வேண்டும்','கடன் அட்டை மட்டும்'], c:1, exp:'இணைய வங்கிச் சேவைக்கு ஏதேனும் ஒரு உலாவி (எ.கா. Google Chrome) போதுமானது; கூடுதல் மென்பொருள் தேவையில்லை.'}
+  },
+  upicod: {
+    'qc7': {q:'UPI ஐ உருவாக்கிய நிறுவனம் எது?', o:['RBI','NPCI','SEBI','IDRBT'], c:1, exp:'UPI, இந்திய தேசிய செலுத்தல் நிறுவனம் (NPCI) மூலம் உருவாக்கப்பட்டது; RBI அதை ஒழுங்குபடுத்துகிறது.'}
+  },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP DISPATCH
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { intro:'qc-intro', classification:'qc-classification', cards:'qc-cards', transfer:'qc-transfer', ecash:'qc-ecash', banking:'qc-banking', upicod:'qc-upicod' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+  if(topicId === 'intro') wireIntro();
+  if(topicId === 'classification') wireClassification();
+  if(topicId === 'cards') wireCards();
+  if(topicId === 'transfer') wireTransfer();
+  if(topicId === 'ecash') wireEcash();
+  if(topicId === 'banking') wireBanking();
+  if(topicId === 'upicod') wireUpiCod();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* =========================================================================
+   16.1 WIRING — Payment web diagram
+   ========================================================================= */
+const PAYMENT_WEB = [
+  {n:'நுகர்வோர்', en:'Consumers', d:'பொருட்கள்/சேவைகளுக்காக பணம் செலுத்தும் இறுதி பயனர்.'},
+  {n:'கைப்பேசி', en:'Mobile Phone', d:'கைப்பேசி App-கள் மூலம் பணம் செலுத்தும் வழி.'},
+  {n:'சில்லறை POS முனையம்', en:'Retail POS Terminal', d:'கடைகளில் அட்டை ஸ்வைப் செய்யும் கருவி — கொள்முதல், Cash-in/out, Rewards.'},
+  {n:'மின்-வணிகம்', en:'eCommerce', d:'இணையதளம் வழியாக நடக்கும் வணிகம்.'},
+  {n:'வலை அடிப்படையிலான போர்ட்டல்', en:'WEB-based Portal', d:'SMS, Smart App போன்றவற்றின் வழியாக பணம் செலுத்துதல்.'},
+  {n:'வங்கி & வணிக அமைப்பு நிர்வாகி', en:'Bank &amp; Merchant System Administrator', d:'அறிக்கைகள், நிர்வாகக் கருவிகள், தீர்வு (Settlement), சமரசம் (Reconciliation) ஆகியவற்றை நிர்வகிக்கும்.'},
+  {n:'வலை மேலாண்மை பணியகம்', en:'WEB-based Management Console', d:'நிர்வாகிகள் பணம் செலுத்தல் அமைப்பை நிர்வகிக்கும் இடைமுகம்.'},
+  {n:'நிதி ஆதாரம்', en:'Funding Source', d:'வங்கி நேரடி இணைப்பு (ACH), சம்பளம் (Payroll), கடன் அட்டை ஆகியவற்றிலிருந்து பணம் பெறப்படுகிறது.'},
+];
+function wireIntro(){
+  document.getElementById('paymentWebGrid').innerHTML = PAYMENT_WEB.map((p,i) =>
+    `<div class="ex-chip" data-i="${i}">${p.n}</div>`).join('');
+  document.querySelectorAll('#paymentWebGrid .ex-chip').forEach(c => {
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#paymentWebGrid .ex-chip').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const p = PAYMENT_WEB[this.dataset.i];
+      const panel = document.getElementById('paymentWebDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">💡 '+p.n+' <span class="eng">('+p.en+')</span></span>'+p.d;
+    });
+  });
+}
+
+/* =========================================================================
+   16.2 WIRING — Micro vs Macro + 3-step micro flow
+   ========================================================================= */
+const MICRO_MACRO = {
+  micro: {label:'நுண் மின்செலுத்தல் (Micro)', points:[
+    'சிறிய, அடிக்கடி நடக்கும் பணம் செலுத்தலை அனுமதிக்கும் அமைப்பு.',
+    'தகவல் தொடர்பு & கணக்கீட்டு செலவுகளை மிகவும் குறைவாக வைத்திருக்கும்.',
+    'விலையுயர்ந்த மறைகுறியீட்டியல் (Cryptography) பயன்படுத்தாது — எளிய தொடர்நிலை சரிபார்ப்புகள் & அகல்நிலை (Offline) கட்டண சரிபார்ப்புகள் மூலம் தரிக்கப்படுகிறது.',
+    'பாதுகாப்பு ஒப்பீட்டளவில் குறைவு — ஆனால் மோசடி செலவு, மோசடி மூலம் பெறக்கூடிய மதிப்பை விட அதிகம்.',
+    'எடுத்துக்காட்டு: நிகழ்நிலை விளையாட்டு நாணயங்கள், மின்-இதழ் வாசிப்பு, ஒரு பாடலைக் கேட்பது.',
+  ]},
+  macro: {label:'பேரின மின்செலுத்தல் (Macro)', points:[
+    'உயர் மதிப்பு கட்டணங்களை செலுத்த உதவும்.',
+    'அதிகப் பணப் பரிவர்த்தனைகள் காரணமாக பாதுகாப்பு தேவைகள் இதில் கூடுதலானதாக இருக்கும்.',
+    'விலையுயர்ந்த மறைகுறியீட்டியல் செயல்பாடுகள் பயன்படுத்தப்படுவதால், ஒவ்வொரு பரிவர்த்தனைக்கும் வங்கிகள் குறைந்தபட்ச பரிவர்த்தனை கட்டணங்களை விதிக்கும்.',
+    'சிறிய அளவிலான செலுத்தல்களுக்கு இந்த வகையைப் பயன்படுத்துவதைக் குறைக்கிறது.',
+    'எடுத்துக்காட்டு: அட்டை மூலம் பணம் செலுத்துதல், EFT, RTGS, கைப்பேசி/இணைய பணம் செலுத்தல் முறைகள்.',
+  ]},
+};
+function wireClassification(){
+  let active = 'micro';
+  function render(){
+    document.getElementById('microMacroTabs').innerHTML = Object.keys(MICRO_MACRO).map(k =>
+      `<button class="tab-btn ${k===active?'active':''}" data-k="${k}">${MICRO_MACRO[k].label}</button>`).join('');
+    document.querySelectorAll('#microMacroTabs .tab-btn').forEach(b => b.addEventListener('click', () => { active=b.dataset.k; render(); }));
+    document.getElementById('microMacroDetail').innerHTML = '<ul>'+MICRO_MACRO[active].points.map(p=>'<li>'+p+'</li>').join('')+'</ul>';
+  }
+  render();
+
+  const MICRO_STEPS = [
+    {t:'படி 1 — மின்-பணப்பை வழங்கல்', d:'செயலாக்குபவர் (Operator), வாடிக்கையாளரின் அடையாளத்தை உறுதிசெய்த பின், பணத்துக்கு மாற்றாக நுண் பணம் (e-wallets) வழங்குகிறார்.'},
+    {t:'படி 2 — சேவை/பொருள் பெறுதல்', d:'வாடிக்கையாளர், நிகழ்நிலைச் சேவை வழங்குநரிடம் நுண் கட்டணங்களை செலுத்தி விரும்பிய பொருட்கள் அல்லது சேவைகளை அவர்களிடமிருந்து பெறுகிறார்.'},
+    {t:'படி 3 — தீர்வு (Settlement)', d:'சேவை வழங்குநர், வாடிக்கையாளரிடமிருந்து பெறப்பட்ட நுண் கட்டணங்களை செயலாக்குபவரிடம் கொடுத்து பணத்தைப் பெறுகிறார்.'},
+  ];
+  let microStep = -1;
+  function renderMicroStep(){
+    const dotsWrap = document.getElementById('microSteps');
+    let html = '';
+    MICRO_STEPS.forEach((s,i) => {
+      html += '<div class="flow-node '+(i===microStep?'active':(i<microStep?'done':'muted'))+'" style="min-width:40px;padding:8px 10px;">'+(i+1)+'</div>';
+      if(i < MICRO_STEPS.length-1) html += '<div class="flow-arrow '+(i<microStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = html;
+    const panel = document.getElementById('microStepPanel');
+    panel.innerHTML = microStep === -1 ? '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி தொடங்குங்கள்…</p>' : `<h4>${MICRO_STEPS[microStep].t}</h4><p>${MICRO_STEPS[microStep].d}</p>`;
+    document.getElementById('microPrevBtn').disabled = microStep<=0;
+    document.getElementById('microNextBtn').disabled = microStep>=MICRO_STEPS.length-1;
+  }
+  microStep = -1;
+  renderMicroStep();
+  document.getElementById('microNextBtn').addEventListener('click', () => { if(microStep<MICRO_STEPS.length-1){ microStep++; renderMicroStep(); } });
+  document.getElementById('microPrevBtn').addEventListener('click', () => { if(microStep>0){ microStep--; renderMicroStep(); } });
+  document.getElementById('microResetBtn').addEventListener('click', () => { microStep=-1; renderMicroStep(); });
+}
+
+/* =========================================================================
+   16.3 WIRING — Card types, transaction flow, anatomy
+   ========================================================================= */
+const CARD_TYPES = {
+  credit: {label:'கடன் அட்டை (Credit Card)', def:'கடன் அட்டை (Credit Card) என்பது பொதுவாக சில்லறை பரிவர்த்தனைகளுக்குப் பயன்படுத்தப்படும் மின்னணு செலுத்தல் அமைப்பாகும். கடன் அட்டை வழங்குபவர் வாடிக்கையாளரின் வங்கிக் கணக்கிலிருந்து உடனடியாக பணம் எடுப்பதற்குப் பதிலாக, வாடிக்கையாளரை பணத்தைச் செலவு செய்ய அனுமதிக்கிறது. ஒப்புக்கொண்ட வட்டியுடன் பணத்தைத் திரும்பக் கொடுக்க வேண்டும் என்ற அட்டைதாரரின் உறுதிமொழி அடிப்படையில் வழங்குநர் பயனரை விற்பனையாளரிடமிருந்து பொருட்கள் அல்லது சேவைகளை வாங்க அனுமதிக்கிறார்.', benefits:['பெரும்பாலான கடன் அட்டைகள் உலகெங்கும் ஏற்றுக்கொள்ளப்படுகின்றன.','வாங்கும் நேரத்திலேயே பணம் செலுத்த வேண்டிய அவசியமில்லை — செலுத்த கூடுதல் காலம் கிடைக்கும்.','அட்டையைப் பொறுத்து, ஆண்டு பராமரிப்பு கட்டணத்தை செலுத்த வேண்டிய அவசியமில்லை.','இணையம் மூலம் கொள்முதல் செய்வதை தவணைகளில் திரும்பச் செலுத்த அனுமதிக்கிறது.']},
+  debit: {label:'பற்று அட்டை (Debit Card)', def:'பற்று அட்டை (Debit Card) என்பது, வாடிக்கையாளரின் அங்கீகாரத்தின் பெயரில் அவரது வங்கிக் கணக்கிலிருந்து நேரடியாகப் பரிவர்த்தனை தொகையைப் பிடித்தம் செய்யும் ஒரு மின்செலுத்தல் அட்டை ஆகும். பொதுவாக பற்று அட்டைகள் ஏடிஎம் அட்டைகளாகச் செயல்படுவதோடு, ரொக்கத்திற்கு மாற்றாகச் செயல்படும்.', benefits:['வாங்கும் நேரத்திலேயே பணம் பிடிக்கப்படுவதால் கடன் சுமை இல்லை.','எளிதாக ATM-களில் பணம் எடுக்கலாம்.','பொதுவாக கடன் அட்டையை விட குறைவான கட்டணங்கள்/வரம்புகள்.']},
+  stored: {label:'சேமிக்கப்பட்ட மதிப்பு அட்டை (Stored Value Card)', def:'சேமிக்கப்பட்ட மதிப்பு அட்டை (Stored Value Card / Prepaid Card) என்பது ஒரு குறிப்பிட்ட தொகை (மதிப்பு) முன்னதாகவே செலுத்தப்பட்ட பற்று அட்டையின் ஒரு வகை ஆகும். அட்டையின் மதிப்பை முழுவதும் பயன்படுத்திய பிறகு அதை மீண்டும் பயன்படுத்த மறு ஊட்டம் செய்யலாம். இதன் முக்கிய நன்மை, இவ்வகை அட்டையைப் பெற வாடிக்கையாளர்கள் வங்கிக் கணக்கு பெற்றிருக்க வேண்டிய அவசியமில்லை.', benefits:['வங்கிக் கணக்கு தேவையில்லை.','2 வகைகள்: மூடிய வளையம் (Closed loop, எ.கா. Chennai Metro Rail அட்டை), திறந்த வளையம் (Open loop, எ.கா. VISA Gift Cards).','பரிசு அட்டைகளுக்கும் இதுவே அடிப்படை.']},
+};
+function wireCards(){
+  let active = 'credit';
+  function render(){
+    document.getElementById('cardTypeTabs').innerHTML = Object.keys(CARD_TYPES).map(k =>
+      `<button class="tab-btn ${k===active?'active':''}" data-k="${k}">${CARD_TYPES[k].label}</button>`).join('');
+    document.querySelectorAll('#cardTypeTabs .tab-btn').forEach(b => b.addEventListener('click', () => { active=b.dataset.k; render(); }));
+    const c = CARD_TYPES[active];
+    document.getElementById('cardTypeDetail').innerHTML = `
+      <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>${c.def}</div>
+      <div class="easy"><span class="lbl">💡 முக்கிய அம்சங்கள்</span><ul>${c.benefits.map(b=>'<li>'+b+'</li>').join('')}</ul></div>`;
+  }
+  render();
+
+  const STAKEHOLDERS = [
+    {k:'customer', t:'வாடிக்கையாளர்', d:'கடன் அட்டை கணக்கை வைத்திருப்பவர்; முழுவதுமாக (transactor) அல்லது வட்டியுடன் பகுதியாக (revolver) செலுத்த வேண்டியவர்.'},
+    {k:'merchant', t:'வியாபாரி', d:'கடை உரிமையாளர்/விற்பனையாளர்/சேவை வழங்குநர், கடன் அட்டை மூலம் வாடிக்கையாளரிடமிருந்து பணம் பெறுகிறார்.'},
+    {k:'acquirer', t:'பெறுநர் (Acquirer)', d:'வியாபாரிக்கு பணம் பெற உதவும் வங்கி; கடன் அட்டையை ஏற்க வியாபாரிக்கு அங்கீகாரம் வழங்குகிறது.'},
+    {k:'network', t:'கடன் அட்டை அமைப்பு (Network)', d:'பெறுநர் மற்றும் வழங்குநர் வங்கிகளுக்கு இடையேயான தகவல் பரிமாற்றத்திற்கு பொறுப்பான இடைநிலை அமைப்பு. எ.கா. Visa, MasterCard, RuPay.'},
+    {k:'issuer', t:'வழங்குபவர் (Issuer)', d:'கடன் அட்டையை வழங்கும் வங்கி; கொள்முதல் வரம்பை நிர்ணயித்து, அங்கீகாரங்களை முடிவு செய்கிறது.'},
+  ];
+  const TXN_STEPS = [
+    {active:['customer','merchant'], t:'படி 1', d:'அட்டைதாரர் (Cardholder) ஒரு பொருளை வாங்குவதற்காக வியாபாரிக்கு கடன் அட்டை மூலம் பணம் செலுத்துகிறார்.'},
+    {active:['merchant','acquirer'], t:'படி 2', d:'வியாபாரி, கடன் அட்டை விவரங்களை பெறுநர் (Acquirer) வங்கிக்கு அனுப்புகிறார்.'},
+    {active:['acquirer','network'], t:'படி 3', d:'பெறுநர், கடன் அட்டை விவரங்களை கடன் அட்டை அமைப்பிற்கு (Network) அனுப்புகிறார்.'},
+    {active:['network','issuer'], t:'படி 4', d:'கடன் அட்டை அமைப்பு, வழங்குபவர் வங்கியிடமிருந்து (Issuing Bank) பணம் செலுத்தல் அங்கீகாரத்தைக் கோருகிறது.'},
+  ];
+  let txnStep = -1;
+  function renderTxnStakeholders(){
+    document.getElementById('txnStakeholders').innerHTML = STAKEHOLDERS.map(s =>
+      `<div class="stake-chip ${txnStep>=0 && TXN_STEPS[txnStep].active.includes(s.k)?'active':''}" data-k="${s.k}">${s.t}</div>`).join('');
+    document.querySelectorAll('.stake-chip').forEach(c => {
+      c.addEventListener('click', function(){
+        const s = STAKEHOLDERS.find(x=>x.k===this.dataset.k);
+        document.getElementById('txnStepPanel').innerHTML = '<div class="easy"><span class="lbl">💡 '+s.t+'</span>'+s.d+'</div>';
+      });
+    });
+  }
+  function renderTxnStep(){
+    renderTxnStakeholders();
+    const panel = document.getElementById('txnStepPanel');
+    if(txnStep === -1){ panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தவும், அல்லது மேலே பங்கேற்பாளரைக் கிளிக் செய்து அவர் பங்கை அறியவும்.</p>'; }
+    else { const s = TXN_STEPS[txnStep]; panel.innerHTML = `<h4>${s.t}</h4><p>${s.d}</p>`; }
+    document.getElementById('txnPrevBtn').disabled = txnStep<=0;
+    document.getElementById('txnNextBtn').disabled = txnStep>=TXN_STEPS.length-1;
+  }
+  txnStep = -1;
+  renderTxnStep();
+  document.getElementById('txnNextBtn').addEventListener('click', () => { if(txnStep<TXN_STEPS.length-1){ txnStep++; renderTxnStep(); } });
+  document.getElementById('txnPrevBtn').addEventListener('click', () => { if(txnStep>0){ txnStep--; renderTxnStep(); } });
+  document.getElementById('txnResetBtn').addEventListener('click', () => { txnStep=-1; renderTxnStep(); });
+
+  const CARD_PARTS = {
+    front: [
+      {x:'14%', y:'16%', t:'வழங்குபவர் (Issuer)', d:'வழங்கும் வங்கியின் சின்னம்/லோகோ.'},
+      {x:'50%', y:'55%', t:'கடன் அட்டை எண்', d:'நவீன கடன் அட்டை எண் 16 இலக்க தனித்துவ அடையாள எண்.'},
+      {x:'30%', y:'80%', t:'வாடிக்கையாளர் பெயர்', d:'இது அட்டையின் முன்பக்கத்தில் பொறிக்கப்பட்டிருக்கும்.'},
+      {x:'15%', y:'46%', t:'EMV சில்லு', d:'காந்தப் பட்டைக்கு கூடுதலாக அட்டையில் தகவல்களைச் சேமிக்க உள்ள ஒரு உட்பொதிக்கப்பட்ட ஒருங்கிணைந்த சில்லு.'},
+      {x:'80%', y:'40%', t:'RFID சின்னம்', d:'இது ஒரு தொடர்பு இல்லாத திறன் அட்டை (Contactless Smart Card) என்பதைக் குறிக்கிறது.'},
+      {x:'55%', y:'80%', t:'காலாவதி மாதம் & ஆண்டு', d:'அட்டையின் முன்பக்கத்தில் இருக்கும்; அச்சிடப்பட்ட மாதத்தின் கடைசி நாள் வரை அட்டை செல்லுபடியாகும்.'},
+      {x:'85%', y:'80%', t:'அட்டை நிறுவன அடையாள சின்னம்', d:'இது கடன் அட்டை அமைப்பின் பெயர். எடுத்துக்காட்டு: விசா, மாஸ்டர்கார்டு மற்றும் RUPAY.'},
+    ],
+    back: [
+      {x:'25%', y:'18%', t:'காந்த பட்டை', d:'வாடிக்கையாளர் பற்றிய மறைகுறியீடப்பட்ட தரவு மற்றும் கணக்கு எண் அடங்கிய காந்தப் பட்டை இது.'},
+      {x:'80%', y:'18%', t:'முப்பரிமாணப் ஒளிப்படிமம் (Hologram)', d:'நகலெடுத்தலைத் தடுக்கும் ஒரு பாதுகாப்பு அம்சம்.'},
+      {x:'20%', y:'55%', t:'கையொப்பம் பலகை', d:'அட்டையின் பின்புறத்தில் வாடிக்கையாளரின் கையொப்பம் அடையாளம் காணும் முயற்சியாகப் பயன்படுத்தப்படுகிறது.'},
+      {x:'75%', y:'55%', t:'CVC/CVV', d:'அட்டை சரிபார்ப்பு குறியீடு/மதிப்பு — வழக்கமாக கையொப்பப் பலகத்தின் இடதுபுறம் அச்சிடப்படும் 3 இலக்கங்கள்.'},
+    ],
+  };
+  let face = 'front';
+  let activePartIdx = -1;
+  function renderCardFace(){
+    document.getElementById('cardFaceTabs').innerHTML = ['front','back'].map(f =>
+      `<button class="tab-btn ${f===face?'active':''}" data-f="${f}">${f==='front'?'முன்புறம்':'பின்புறம்'}</button>`).join('');
+    document.querySelectorAll('#cardFaceTabs .tab-btn').forEach(b => b.addEventListener('click', () => { face=b.dataset.f; activePartIdx=-1; renderCardFace(); }));
+    const parts = CARD_PARTS[face];
+    const visual = document.getElementById('cardVisual');
+    visual.innerHTML = (face==='front' ? '<div style="position:absolute;top:10px;right:14px;font-size:.9rem;font-weight:800;">CREDIT CARD</div>' : '<div style="position:absolute;top:8px;left:0;right:0;height:28px;background:#000;"></div>') +
+      parts.map((p,i) => `<div class="cv-dot ${i===activePartIdx?'active':''}" style="left:${p.x};top:${p.y};" data-i="${i}">${i+1}</div>`).join('');
+    document.querySelectorAll('.cv-dot').forEach(d => {
+      d.addEventListener('click', function(){
+        activePartIdx = parseInt(this.dataset.i,10);
+        renderCardFace();
+        const p = parts[activePartIdx];
+        const panel = document.getElementById('cardPartDetail');
+        panel.style.display = 'block';
+        panel.innerHTML = '<span class="lbl">💡 '+(activePartIdx+1)+'. '+p.t+'</span>'+p.d;
+      });
+    });
+  }
+  renderCardFace();
+}
+
+/* =========================================================================
+   16.4 WIRING — ECS / EFT / RTGS
+   ========================================================================= */
+const TRANSFER_INFO = {
+  ecs: {label:'ECS', d:'மின்னணு தீர்வை சேவை (Electronic Clearing Service — ECS) என்பது ஒரு வங்கிக் கணக்கிலிருந்து பல வங்கிக் கணக்குகளுக்கோ அல்லது பல வங்கிக் கணக்குகளிலிருந்து ஒன்றிற்கோ, கணினி மற்றும் இணைய தொழில்நுட்பத்தைப் பயன்படுத்தி பணப் பரிமாற்றம் செய்வது ஆகும். பணம் செலுத்துபவர் ஒரு தொகையை தனது வங்கிக் கணக்கிலிருந்து பற்று செய்து ஒருவர் அல்லது பலரின் வங்கி கணக்குகளுக்கு வரவு வைக்க வேண்டும் என்று வங்கியை அறிவுறுத்துகிறார். பயன்கள்: திரள் பணம் செலுத்துதல் (Bulk Payments), உத்தரவாதமான பணம் செலுத்துதல்; பணம் செலுத்தும் தேதிகளை நினைவில் கொள்ள வேண்டிய அவசியமில்லை.'},
+  neft: {label:'EFT / NEFT', d:'மின்னணு நிதிப் பரிமாற்றம் (Electronic Funds Transfer — EFT) என்பது நிகழ்நிலையில் "மின்னணு" மூலம் பண மதிப்பை பரிமாற்றம் செய்வதாகும். அனுப்புநரின் வங்கிக் கிளையிலிருந்து அனுப்பப்பட்ட தொகுதி, அதே நாளில் பெறுநரின் வங்கிக் கிளைக்கு வரவு வைக்கப்படுகிறது. இந்தியாவில் இது NEFT (National Electronic Fund Transfer) என அழைக்கப்படுகிறது; இது இந்திய ரிசர்வ் வங்கி (RBI) மூலம் நவம்பர் 2005ல் தொடங்கப்பட்டு, IDRBT மூலம் வளர்ச்சி பெற்று பராமரிக்கப்படுகிறது. EFT முறை B2B வணிக மாதிரிகளில் ஒரு கணக்கிலிருந்து மற்றொரு கணக்கிற்கு நிதிகளை மாற்றுவதற்கு பரவலாகப் பயன்படுத்தப்படும் முறையாகும்.'},
+  rtgs: {label:'RTGS', d:'நிகழ் நேர மொத்த வணிகத் தீர்வு (Real Time Gross Settlement — RTGS) நிதி நிறுவனங்களுக்கு, குறிப்பாக வங்கிகளுக்கு இடையிலான பரிவர்த்தனைகளின் தீர்வுக்காக பயன்படுத்தப்படும் ஒரு செலுத்தல் முறையாகும். பெயர் குறிப்பிடுவதைப் போல, RTGS பரிவர்த்தனைகள் நிகழ் நேரத்தில் செயலாக்கப்படுகின்றன. RTGS பணம் செலுத்தல்கள் தள்ளு பணம் செலுத்தல் (Push Payment) என்றும் அழைக்கப்படுகிறது — இவை பணம் செலுத்துபவரால் தொடங்கப்படும் ("தூண்டப்படும்") பணப் பரிமாற்றம். RTGS பரிமாற்றங்கள் பொதுவாகப் பெரிய மதிப்பு செலுத்துதல்களாகும், அதாவது அதிக மதிப்பு பரிவர்த்தனைகளாகும்.'},
+};
+function wireTransfer(){
+  let active = 'ecs';
+  function render(){
+    document.getElementById('transferTabs').innerHTML = Object.keys(TRANSFER_INFO).map(k =>
+      `<button class="tab-btn ${k===active?'active':''}" data-k="${k}">${TRANSFER_INFO[k].label}</button>`).join('');
+    document.querySelectorAll('#transferTabs .tab-btn').forEach(b => b.addEventListener('click', () => { active=b.dataset.k; render(); }));
+    document.getElementById('transferDetail').innerHTML = '<div class="tb-def"><span class="lbl">📘 '+TRANSFER_INFO[active].label+'</span>'+TRANSFER_INFO[active].d+'</div>';
+  }
+  render();
+}
+
+/* =========================================================================
+   16.5 WIRING — e-Wallet simulation
+   ========================================================================= */
+let walletBalance = 0;
+function wireEcash(){
+  walletBalance = 0;
+  const log = document.getElementById('walletLog');
+  log.innerHTML = '';
+  function addLog(line, cls){ const d = document.createElement('div'); d.className='ln '+(cls||''); d.textContent=line; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  function renderBal(){ document.getElementById('walletBalance').textContent = '₹' + walletBalance; }
+  renderBal();
+  document.getElementById('walletAddBtn').addEventListener('click', () => {
+    walletBalance += 500;
+    renderBal();
+    addLog('✅ ₹500 சேர்க்கப்பட்டது. புதிய இருப்பு: ₹'+walletBalance, 'ok');
+  });
+  document.getElementById('walletPayBtn').addEventListener('click', () => {
+    if(walletBalance < 150){ addLog('❌ போதிய இருப்பு இல்லை!', 'err'); return; }
+    walletBalance -= 150;
+    renderBal();
+    addLog('🛒 ₹150 கடைக்கு செலுத்தப்பட்டது. புதிய இருப்பு: ₹'+walletBalance, 'ok');
+  });
+  document.getElementById('walletResetBtn').addEventListener('click', () => { walletBalance = 0; renderBal(); log.innerHTML=''; });
+}
+
+/* =========================================================================
+   16.6 WIRING — Mobile banking menu + internet banking steps
+   ========================================================================= */
+const MBANKING_MENU = [
+  {n:'Funds Transfer', d:'ஒரு கணக்கிலிருந்து மற்றொரு கணக்கிற்கு பணத்தை மாற்ற உதவும்.'},
+  {n:'Enquiry', d:'கணக்கு இருப்பு, பரிவர்த்தனை வரலாறு போன்றவற்றை சரிபார்க்க உதவும்.'},
+  {n:'Demat', d:'பங்குகள்/முதலீடுகள் தொடர்பான கணக்கை நிர்வகிக்க உதவும்.'},
+  {n:'Requests', d:'காசோலை புத்தகம், அறிக்கை போன்ற சேவைகளைக் கோர உதவும்.'},
+  {n:'Bill Pay', d:'மின்சாரம், தொலைபேசி போன்ற பில்களை செலுத்த உதவும்.'},
+  {n:'Mobile Topup', d:'முன்பணம் கைப்பேசி இணைப்புக்கு ரீசார்ஜ் செய்ய உதவும்.'},
+  {n:'M-Commerce', d:'கைப்பேசி மூலம் நிகழ்நிலை கொள்முதல் செய்ய உதவும்.'},
+  {n:'Settings', d:'App அமைப்புகளை மாற்ற உதவும்.'},
+  {n:'Feedback', d:'வங்கிக்கு கருத்துக்களை அனுப்ப உதவும்.'},
+];
+function wireBanking(){
+  document.getElementById('mbankingGrid').innerHTML = MBANKING_MENU.map((m,i) =>
+    `<div class="ex-chip" data-i="${i}">${m.n}</div>`).join('');
+  document.querySelectorAll('#mbankingGrid .ex-chip').forEach(c => {
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#mbankingGrid .ex-chip').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const m = MBANKING_MENU[this.dataset.i];
+      const panel = document.getElementById('mbankingDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">💡 '+m.n+' <span class="eng">(Learning Simulation — Enrichment)</span></span>'+m.d;
+    });
+  });
+
+  const IBANK_STEPS = [
+    'முன்னதாக வங்கி வழங்கிய பிரத்யேக பயனர்பெயர் மற்றும் கடவுச்சொல்லை பயன்படுத்தி நிகழ்நிலை வங்கிக் கணக்கில் உள்நுழையவும்.',
+    'நிதி பரிமாற்றத்தை செயல்படுத்த பயனாளியை "பணம் பெறுபவரில் சேர்க்கவும்". பயனாளியின் வங்கிக் கணக்கு எண், பெயர், IFSC போன்றவற்றை நிரப்பவும்.',
+    'பயனாளி சேர்க்கப்பட்டவுடன், நிதி பரிமாற்ற முறையை (RTGS/NEFT/IMPS) தேர்வு செய்யவும்.',
+    'பணத்தைச் செலுத்த வேண்டிய கணக்கைத் தேர்ந்தெடுக்கவும், பணம் பெறுபவரைத் தேர்ந்தெடுக்கவும், தொகையை உள்ளிடவும்.',
+    'சமர்ப்பி சொடுக்கவும்.',
+    'வங்கி கணக்குடன் தொடர்புடைய கைப்பேசி எண்ணுக்குப் பெறப்பட்ட OTP-ஐ உள்ளிட்டு பரிவர்த்தனையை நிறைவுசெய்யவும்.',
+  ];
+  let ibankStep = -1;
+  function renderIbankStep(){
+    const dotsWrap = document.getElementById('ibankSteps');
+    let html = '';
+    IBANK_STEPS.forEach((s,i) => {
+      html += '<div class="flow-node '+(i===ibankStep?'active':(i<ibankStep?'done':'muted'))+'" style="min-width:36px;padding:8px 10px;">'+(i+1)+'</div>';
+      if(i < IBANK_STEPS.length-1) html += '<div class="flow-arrow '+(i<ibankStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = html;
+    document.getElementById('ibankStepPanel').innerHTML = ibankStep===-1 ? '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தவும்…</p>' : '<p><b>படி '+(ibankStep+1)+':</b> '+IBANK_STEPS[ibankStep]+'</p>';
+    document.getElementById('ibankPrevBtn').disabled = ibankStep<=0;
+    document.getElementById('ibankNextBtn').disabled = ibankStep>=IBANK_STEPS.length-1;
+  }
+  ibankStep = -1;
+  renderIbankStep();
+  document.getElementById('ibankNextBtn').addEventListener('click', () => { if(ibankStep<IBANK_STEPS.length-1){ ibankStep++; renderIbankStep(); } });
+  document.getElementById('ibankPrevBtn').addEventListener('click', () => { if(ibankStep>0){ ibankStep--; renderIbankStep(); } });
+  document.getElementById('ibankResetBtn').addEventListener('click', () => { ibankStep=-1; renderIbankStep(); });
+}
+
+/* =========================================================================
+   16.7-8 WIRING — UPI simulator
+   ========================================================================= */
+function wireUpiCod(){
+  const log = document.getElementById('upiLog');
+  log.innerHTML = '';
+  function addLog(line, cls){ const d = document.createElement('div'); d.className='ln '+(cls||''); d.textContent=line; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  document.getElementById('upiSendBtn').addEventListener('click', () => {
+    const vpa = (document.getElementById('upiVpaInput').value || '').trim();
+    const amt = (document.getElementById('upiAmtInput').value || '').trim();
+    if(!vpa.includes('@')){ addLog('❌ தவறான VPA — "பெயர்@வங்கிபெயர்" வடிவில் இருக்க வேண்டும்.', 'err'); return; }
+    if(!amt || isNaN(amt) || Number(amt)<=0){ addLog('❌ சரியான தொகையை உள்ளிடவும்.', 'err'); return; }
+    const arrow1 = document.getElementById('upiArrow1'), arrow2 = document.getElementById('upiArrow2');
+    addLog('🔐 MPIN சரிபார்க்கப்படுகிறது…', 'ok');
+    arrow1.classList.add('active');
+    setTimeout(() => {
+      addLog('➡ ₹'+amt+' UPI (NPCI) சேவையகத்திற்கு அனுப்பப்பட்டது…', 'ok');
+      arrow2.classList.add('active');
+      setTimeout(() => {
+        addLog('✅ ₹'+amt+' '+vpa+' க்கு வெற்றிகரமாக செலுத்தப்பட்டது!', 'ok');
+        arrow1.classList.remove('active'); arrow2.classList.remove('active');
+      }, 500);
+    }, 500);
+  });
+  document.getElementById('upiResetBtn').addEventListener('click', () => {
+    log.innerHTML = '';
+    document.getElementById('upiVpaInput').value = '';
+    document.getElementById('upiAmtInput').value = '';
+    document.getElementById('upiArrow1').classList.remove('active');
+    document.getElementById('upiArrow2').classList.remove('active');
+  });
+}
+
+/* =========================================================================
+   PRACTICE PAGE WIRING
+   ========================================================================= */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans || val.replace(/\s/g,'') === f.ans.replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>சொல்</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>விளக்கம்</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='160px';
+      b.textContent = l + (matched[l] ? ' ✅' : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='320px'; b.style.textAlign='left';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும்.';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  const misWrap = document.getElementById('misWrap');
+  misWrap.innerHTML = MISCONCEPTIONS.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span style="font-weight:700;">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-mis="${i}">ஏன் தவறு? (Why is this wrong?)</button>
+      <div class="explain-box" id="mis-${i}">
+        <b>வகை:</b> ${c.type}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான புரிதல்:</span> ${c.fix}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-mis]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('mis-'+this.dataset.mis).classList.toggle('show'); });
+  });
+}
+
+/* =========================================================================
+   EXAM PREP WIRING
+   ========================================================================= */
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* ============================= INIT ============================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
