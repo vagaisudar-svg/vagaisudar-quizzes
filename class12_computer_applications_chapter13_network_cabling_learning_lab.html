@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 13 — வலையமைப்பு வடமிடல் | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#f3f6f8;
+    --card:#ffffff;
+    --primary:#0f766e;
+    --primary-dark:#0b544e;
+    --primary-light:#e6f5f3;
+    --accent:#7c3aed;
+    --accent-light:#f1e9ff;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#dfe6ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  [lang-ta]{font-size:1rem;}
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  /* ---- Header ---- */
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#d7efec;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#eafaf8;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  /* ---- Sidebar ---- */
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  /* ---- Main ---- */
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:900px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(20,30,40,.04);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--accent);font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  /* Diagrams */
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(15,118,110,.4);}
+  .flow-node.muted{opacity:.45;}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  /* Tabs (cable explorer / standards) */
+  .tab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  /* RJ45 pin strip */
+  .pin-strip{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .pin-unit{text-align:center;width:58px;}
+  .pin-swatch{height:64px;border-radius:6px;border:1.5px solid #cbd5e1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);}
+  .pin-num{font-size:.72rem;font-weight:800;color:var(--muted);margin-top:4px;}
+  .pin-fn{font-size:.64rem;color:var(--muted);}
+  .conn-wrap{display:flex;justify-content:space-between;gap:12px;}
+  .conn-label{text-align:center;font-weight:800;font-size:.95rem;color:var(--primary-dark);margin-bottom:6px;}
+
+  /* Buttons */
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number]{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+
+  /* MCQ option styling (shared) */
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  /* Bottom bar */
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+    .pin-unit{width:40px;}
+    .pin-swatch{height:48px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 13 — வலையமைப்பு வடமிடல் (Network Cabling)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 13: Network Cabling · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* =========================================================================
+   STORAGE (safe wrapper)
+   ========================================================================= */
+const STORE_KEY = 'ca12_netcabling_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable - continue with defaults */ }
+  return { completed:[], lang:'ta', quiz:{} };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* =========================================================================
+   TOPIC DATA
+   ========================================================================= */
+const TOPICS = [
+  {id:'overview',     num:'13.1',        title:'அறிமுகம்'},
+  {id:'cabletypes',   num:'13.2',        title:'வடங்களின் வகைகள்'},
+  {id:'ethparts',     num:'13.3 / 13.3.1', title:'ஈத்தர்நெட் வடமிடல் பகுதிகள் & இணைப்பு வடம்'},
+  {id:'rj45',         num:'13.3.2',      title:'RJ45 இணைப்பி & வயரிங்'},
+  {id:'ethport',      num:'13.3.3',      title:'ஈத்தர்நெட் தொடர்பி & NIC'},
+  {id:'crimping',     num:'13.3.4',      title:'கிரிம்பிங் கருவி'},
+  {id:'otherjacks',   num:'13.4',        title:'மற்ற ஜாக் வகைகள்'},
+  {id:'colorcoding',  num:'13.5',        title:'வண்ணக் குறிமுறை நுட்பங்கள்'},
+  {id:'practice',     num:'Practice',    title:'பயிற்சி & Debugging Lab'},
+  {id:'examprep',     num:'Exam',        title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* =========================================================================
+   SIDEBAR / NAV RENDERING
+   ========================================================================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+/* mobile sidebar */
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+/* language toggle (UI chrome only; lesson text follows textbook Tamil with English terms inline) */
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* =========================================================================
+   MAIN RENDER DISPATCH
+   ========================================================================= */
+const RENDERERS = {
+  overview: renderOverview,
+  cabletypes: renderCableTypes,
+  ethparts: renderEthParts,
+  rj45: renderRJ45,
+  ethport: renderEthPort,
+  crimping: renderCrimping,
+  otherjacks: renderOtherJacks,
+  colorcoding: renderColorCoding,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 1 — 13.1 Introduction
+   ========================================================================= */
+function renderOverview(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.1</div>
+    <h2>அறிமுகம் <span class="eng">(Introduction)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      வலையமைப்பு வடமிடலின் அவசியத்தை அறிந்து கொள்ளுதல் · வலையமைப்பில் பயன்படுத்தப்படும் பல்வேறு வகையான வடங்கள் (Cables) பற்றி தெரிந்து கொள்ளுதல் · ஈத்தர்நெட் கேபிள் தயாரிப்பில் தொடர்புடைய பகுதிகளை தெரிந்து கொள்ளுதல் · பல்வேறு வகையான பதிவு செய்யப்பட்ட ஜாக் (Registered Jack) மற்றும் அதன் செயல்பாடுகளை தெரிந்து கொள்ளுதல் · ஈத்தர்நெட் வடமிடலின் பயன்படுத்தப்படும் வயரிங் மற்றும் வண்ண குறியீட்டு நுட்பங்களை தெரிந்து கொள்ளுதல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>13.1 அறிமுகம் (Introduction)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      கணினி வலையமைப்பு என்பது தரவுகள் மற்றும் வளங்களைப் பகிர்ந்து கொள்வதற்காக ஒன்றோடொன்று இணைக்கப்பட்ட கணினிகள் அல்லது பிற சாதனங்களின் தொகுப்பாகும். கம்பி ஊடகம் அல்லது கம்பியில்லா ஊடகம் மூலம் கணினிகளை வலையமைப்பில் இணைக்க முடியும். காப்பிடாத முறுக்கு இணைக் கம்பிகள் (UTP), காப்பிடப்பட்ட முறுக்கு கம்பிகள் (STP) மற்றும் ஒளியிழை வடங்கள் போன்றவை கம்பி ஊடகங்களுக்கு உதாரணங்களாகும். அகச்சிவப்பு கதிர்கள், ப்ளூடூத் (Bluetooth) மற்றும் வை·பை (WI-FI) போன்றவை கம்பியில்லா ஊடகங்களுக்கு உதாரணங்களாகும்.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      பள்ளியின் Computer Lab-இல் உள்ள அனைத்து கணினிகளும் ஒரே பிரிண்டரைப் பயன்படுத்த முடிவதும், ஒரு கணினியிலிருந்து இன்னொரு கணினிக்கு கோப்புகளை அனுப்ப முடிவதும் — இதுவே Network (வலையமைப்பு) செய்யும் வேலை. இந்த இணைப்பை ஏற்படுத்த கம்பிகள் (wired) அல்லது கம்பியில்லா சமிக்ஞைகள் (wireless) பயன்படுகின்றன.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 நிஜ வாழ்க்கை உதாரணம் (Analogy)</span>
+      பள்ளி பேருந்து சேவையை நினைத்துப் பாருங்கள் — ஒவ்வொரு மாணவனும் (கணினி) பேருந்து பாதையில் (Cable) இணைக்கப்பட்டு பள்ளிக்கு (மற்ற கணினிகள்/சேவையகம்) வந்து சேர்கிறான். பாதை நல்லதாக இருந்தால் (நல்ல தரமான கேபிள்) பயணம் வேகமாகவும் பாதுகாப்பாகவும் இருக்கும்.
+    </div>
+    <table class="tbl">
+      <tr><th>ஊடக வகை (Media Type)</th><th>உதாரணங்கள்</th></tr>
+      <tr><td>கம்பி ஊடகம் (Wired)</td><td>UTP, STP, ஒளியிழை வடம் (Fiber Optic)</td></tr>
+      <tr><td>கம்பியில்லா ஊடகம் (Wireless)</td><td>அகச்சிவப்பு (Infrared), ப்ளூடூத் (Bluetooth), Wi-Fi</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>இணையம் மற்றும் WWW</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      இணையம் என்பது உலகெங்கிலும் உள்ள பில்லியன் கணக்கான கணினிகளை ஒன்றோடொன்று இணைக்கும் உலகளாவிய வலையமைப்பு ஆகும். World Wide Web (WWW) என்பது இணையத்தின் ஒரு சேவையாகும். இது கோடிக்கணக்கான இணையப் பக்கங்கள் அடங்கிய ஒரு தொகுப்பாகும். இது டிம் பெர்னர்ஸ் லீ என்பவரால் உருவாக்கப்பட்டது. வலையமைப்பின் மூலம் மக்கள் இணையத்தை எங்கிருந்தும் அணுக முடியும். ஆனால் வலையமைப்பைக் கட்டமைப்பது கடினமான ஒன்றாக இருக்கிறது.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு (Exam Point)</span>
+      உலகம் முழுவதும் இன்றளவும் மக்களுக்கு வேகமான இணைய தளத்தை வழங்க வலையமைப்பு வடங்கள் பயன்படுத்தப்படுகின்றன. சரியான வடம் (cable) தேர்வு செய்வது வலையமைப்பு வேகம் மற்றும் பாதுகாப்பில் முக்கியப் பங்கு வகிக்கிறது.
+    </div>
+    <div class="activity-box">
+      <span class="lbl">🧪 கூடுதல் தகவல் (Did You Know)</span>
+      அதிக எண்ணிக்கையிலான சாதனங்கள் (கைப்பேசி உட்பட) தொலைவிலுள்ள வளங்களைப் பகிர்வதை கம்பியில்லா வலையமைப்புகள் சாத்தியமாக்குகின்றன. கம்பிவலை அமைப்புகள், கம்பியில்லா வலையமைப்புகளுடன் ஒப்பிடும் பொழுது அதிக இணைய வேகம் மற்றும் பாதுகாப்பைக் கொடுக்கின்றன. ஆனால் பெரிய பரப்பளவில் கம்பி வலையமைப்பை நிறுவுதல் மிகுந்த செலவை ஏற்படுத்தும் — அதனால் அதிக வேகம் மற்றும் பாதுகாப்பான இணைப்புகள் தேவைப்படும் இடங்களில் கம்பிவலை அமைப்புகள் இன்றும் பரவலாகப் பயன்படுத்தப்படுகின்றன.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை (Quick Check)</span>
+    <div id="qc-overview"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 2 — 13.2 Types of Network Cables (interactive explorer)
+   ========================================================================= */
+const CABLE_DATA = {
+  coax: {
+    title:'இணையச்சு வடம் (Coaxial Cable)',
+    def:'இவ்வகை வடம் தொலைக்காட்சியை அலைவாங்கியுடன் (antenna) இணைக்கப் பயன்படுகிறது. இது உட்பகுதியில் தாமிரக் கம்பியை கொண்டு சுற்றிலும் காப்பிடப்பட்டு பாதுகாக்கப்பட்டிருக்கும். இவை அளவில் பெரியவை என்பதால் எடுத்துச் செல்வதும் மாற்றுவதும் கடினமானது. இதனால் இதனை நிறுவுவதும் பராமரிப்பதும் எளிதல்ல. இது 10 mbps வேகத்தில் தகவல் பகிர்கிறது.',
+    types:'Thinnet (மெல்லிய வலை) மற்றும் Thicknet (தடிமன் வலை) என இரண்டு வகைப்படும்.',
+    facts:['வேகம்: 10 mbps','பயன்பாடு: Cable TV / Antenna இணைப்பு','கட்டமைப்பு: தாமிரக் கம்பி மைய கடத்தி + காப்பு + பின்னல் கவசம் + வெளிப்புற உறை'],
+    analogy:'வீட்டில் Cable TV இணைப்புக்குப் பயன்படுத்தும் கனமான கருப்பு வடத்தை நினைவு கூறுங்கள் — அதுவே Coaxial Cable.',
+    exam:'Coaxial Cable நிறுவுவதும் பராமரிப்பதும் கடினம் — ஏனெனில் இது அளவில் பெரியது.'
+  },
+  twisted: {
+    title:'முறுக்கு இணை வடம் (Twisted Pair Cable)',
+    def:'இரண்டு அல்லது அதற்கு மேற்பட்ட, காப்பிடப்பட்டு முறுக்கப்பட்ட கம்பிகளின் தொகுப்பாகும். இதில் மின்காந்தக் குறுக்கீட்டை தவிர்ப்பதற்காக 8 கம்பிகள் முறுக்கப்பட்ட வடிவில் அமைக்கப்பட்டிருக்கும்.',
+    types:'காப்பிடப்பட்ட முறுக்கு இணை கம்பி (Shielded Twisted Pair – STP) மற்றும் காப்பில்லாத முறுக்கு இணை கம்பி (Unshielded Twisted Pair – UTP) என இரண்டு வகைப்படும். STP என்பது UTP போன்றதே. ஆனால் வெளி மின்காந்த குறுக்கீடுகளிலிருந்து கம்பிகளை பாதுகாக்க இது கூடுதல் உறைகளால் பாதுகாக்கப்பட்டிருக்கும்.',
+    facts:['இன்று இணையத்தில் நவீன வடங்களாக UTP கேபிள்கள் பயன்படுத்தப்படுகின்றன','UTP விலை மலிவானது; நிறுவுவதும் பராமரிப்பதும் எளிது','STP-இல் கூடுதல் கவசம் (shield) உண்டு → செலவு அதிகம்'],
+    analogy:'இரண்டு நூல்களை ஒன்றாக முறுக்கினால் அவை பலமாக இருப்பது போல, இரண்டு கம்பிகளை முறுக்குவதால் வெளியிலிருந்து வரும் மின்காந்த இரைச்சல் (noise) குறைகிறது.',
+    exam:'ஈத்தர்நெட் வடம் (Ethernet Cable) இந்த Twisted Pair வகையைச் சார்ந்ததே.'
+  },
+  fiber: {
+    title:'ஒளியிழை வடம் (Fiber Optic Cable)',
+    def:'இந்த வடம் கண்ணாடி இழைகளால் உருவாக்கப்படுகிறது. இது தகவல்களை ஒளி துடிப்புகளை (Pulse of Light) பயன்படுத்தி அனுப்புகிறது. இது முக்கியமாக பரந்த வலையமைப்பில் (WAN) பயன்படுத்தப்படுகிறது. கேபிள்களுக்கு சேதம் ஏற்படாமல் தவிர்க்க அவை தரையின் ஆழத்தில் புதைக்கப்படுகின்றன.',
+    types:'ஒற்றை முறை ஒளியியல் வடம் (Single mode Cable) மற்றும் பன்முறை ஒளியியல் வடம் (Multimode Cable) என இரு வகைகள் உள்ளன. ஒற்றை முறை வடங்கள் தொலைதூர பரிமாற்றத்திற்கு உதவுகின்றன, ஆனால் விலை அதிகமானவை. குறைந்த தூரத்திற்குப் பயன்படும் பன்முறை ஒளியியல் வடம் விலை மலிவானவை.',
+    facts:['ஊடகம்: கண்ணாடி இழை (Glass)','சமிக்ஞை: ஒளி துடிப்புகள் (Pulse of Light)','பயன்பாடு: WAN','நிறுவுவதும் பராமரிப்பதும் மிக எளிது'],
+    analogy:'தண்ணீர் குழாயில் தண்ணீர் பாய்வது போல, ஒளியிழையில் ஒளி சமிக்ஞைகள் பாய்கின்றன — மின்சாரம் அல்ல, வெளிச்சம் தான் தகவலைக் கொண்டு செல்கிறது!',
+    exam:'ஒற்றை முறை (Single mode) = தொலைதூரம் + விலை அதிகம். பன்முறை (Multimode) = குறுகிய தூரம் + விலை மலிவு.'
+  },
+  usb: {
+    title:'USB கேபிள் (Universal Serial Bus)',
+    def:'இந்த வடம் விசைப்பலகை, சுட்டி மற்றும் பிற புற சாதனங்களை கணினியுடன் இணைக்கப் பயன்படுத்தப்படுகிறது. மைக்ரோ USB என்பது மொபைல் சாதனங்களை இணைப்பதற்குப் பயன்படும் USB இன் சிறிய பதிப்பாகும். மேலும் இது ஸ்மார்ட் போன்கள், GPS சாதனங்கள் மற்றும் டிஜிட்டல் கேமராக்கள் போன்ற சாதனங்களை இணைக்கிறது. USB இன் சமீபத்திய பதிப்பானது USB 3.0 ஆகும். இதன் தரவு பரிமாற்ற வேகம் 4.85 Gbps ஆகும்.',
+    types:'USB Type A, USB Type B, Mini USB, Micro USB எனப் பல வடிவங்கள் உள்ளன.',
+    facts:['சமீபத்திய பதிப்பு: USB 3.0','வேகம்: 4.85 Gbps','பயன்பாடு: Keyboard, Mouse, Smartphone, Camera, GPS'],
+    analogy:'USB போர்ட் என்பது உங்கள் கணினியின் "பல்பொருள் கடை வாசல்" போன்றது — எந்தச் சாதனமானாலும் எளிதில் உள்ளே வந்து இணைந்துவிடும்.',
+    exam:'Dongle: SIM Slot கொண்ட ஒரு சிறிய USB புற சாதனம், மொபைல் Broadband மூலம் கணினியை இணையத்துடன் இணைக்க மோடம் போல செயல்படுகிறது.'
+  },
+  serial: {
+    title:'தொடர் மற்றும் இணை வடங்கள் (Serial and Parallel Cable)',
+    def:'ஈத்தர்நெட் வடங்கள் கண்டுபிடிக்கப்படுவதற்கு முன் வரை, கணினியை இணையத்துடன் இணைக்க தொடர் மற்றும் இணை வடங்கள் மட்டுமே பயன்படுத்தப்பட்டன. இந்த வடங்கள் இரண்டு கணினிகளை நேரடியாக இணைக்கவும் பயன்படுத்தப்படுகின்றன. எ.கா. RS-232 வடம். இணை வடம் ஒரு நேரத்தில் 8 பிட்டுகள் அனுப்பும்; அதே நேரத்தில் தொடர் வடம் ஒரு நேரத்தில் 1 பிட் மட்டுமே அனுப்பும்.',
+    types:'தொடர் வடம் (Serial) — 1 பிட்/நேரம், இணை வடம் (Parallel) — 8 பிட்/நேரம்.',
+    facts:['உதாரணம்: RS-232','இணை வடம் = 8 பிட்டுகள்/நேரம்','தொடர் வடம் = 1 பிட்/நேரம்'],
+    analogy:'இணை வடம் 8-வழிச் சாலை போன்றது (ஒரே நேரத்தில் 8 வாகனங்கள் செல்லும்); தொடர் வடம் ஒற்றை வழிச் சாலை போன்றது (ஒரு நேரத்தில் ஒரு வாகனம் மட்டும்).',
+    exam:'RS-232 ஒரு பூஜ்ய மோடம் வடம் (Null Modem Cable) — மோடமின்றி இரு கணினிகளை நேரடியாக இணைக்கிறது.'
+  },
+  ethernet: {
+    title:'ஈத்தர்நெட் வடம் (Ethernet Cable)',
+    def:'இது முறுக்கு இணை வடத்தின் (Twisted pair) ஒரு வகையாகும். இது வீடு அல்லது அலுவலகங்களில் கணினிகளை இணைக்கப் பயன்படும் பொதுவான வடம் ஆகும். இந்த வடம் வளப் பகிர்வு மற்றும் இணைய அணுகலுக்காக குறும்பரப்பு வலையில் (LAN) உள்ள கம்பித் தொடர்பு சாதனங்களை இணைக்கிறது.',
+    types:'CAT 3, CAT 5, CAT 6, CAT 6e, CAT 7 எனப் பல்வேறு தொழில்நுட்பத் தரங்களில் உற்பத்தி செய்யப்படுகிறது. CAT என்பது Category என்ற வார்த்தையிலிருந்து உருவானது; அதைத் தொடர்ந்து வரும் எண் வடத்தின் பதிப்பை குறிக்கிறது.',
+    facts:['வகை: Twisted Pair','பயன்பாடு: LAN, வீடு/அலுவலக இணைப்பு','CAT எண் அதிகரிக்க, வேகம் அதிகரிக்கும் (MHz அளவில்)'],
+    analogy:'வீட்டு Wi-Fi ரவுட்டரில் இருந்து கணினிக்கு நேரடியாக செல்லும் வடமே பொதுவாகக் காணப்படும் Ethernet Cable.',
+    exam:'வடத்தின் நீளம் அதிகரிக்கும் பொழுது அதன் தகவல் பரிமாறும் வேகம் குறையும். இதன் வேகம் MHz இல் அளவிடப்படுகிறது.'
+  }
+};
+const CABLE_TABS = [['coax','இணையச்சு'],['twisted','முறுக்கு இணை'],['fiber','ஒளியிழை'],['usb','USB'],['serial','தொடர்/இணை'],['ethernet','ஈத்தர்நெட்']];
+
+function renderCableTypes(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.2</div>
+    <h2>வலையமைப்பு வடங்களின் வகைகள் <span class="eng">(Types of Network Cables)</span></h2>
+    <div class="goals"><b>இந்தப் பகுதியில்:</b> வலையமைப்பில் பயன்படுத்தப்படும் 6 முக்கிய வடவகைகளை கீழே உள்ள தாவல்களில் (tabs) கிளிக் செய்து ஆராயுங்கள்.</div>
+  </div>
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      வலையமைப்பில் பல்வேறு வகையான வடங்கள் (Cables) பயன்பாட்டில் உள்ளன. அவற்றில் சில வகைகள் இங்கே கொடுக்கப்பட்டுள்ளன.
+    </div>
+    <div class="tab-row" id="cableTabs"></div>
+    <div class="diagram-box" id="cableVisual"></div>
+    <div id="cableDetail"></div>
+  </div>
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை (Quick Check)</span>
+    <div id="qc-cabletypes"></div>
+  </div>
+  `;
+}
+
+function cableVisualHTML(key){
+  if(key === 'coax'){
+    return `
+    <div style="position:relative;width:140px;height:140px;margin:0 auto;">
+      <div style="position:absolute;inset:0;border-radius:50%;background:#1f2937;"></div>
+      <div style="position:absolute;inset:16px;border-radius:50%;background:#9ca3af;"></div>
+      <div style="position:absolute;inset:36px;border-radius:50%;background:#f1f5f9;"></div>
+      <div style="position:absolute;inset:58px;border-radius:50%;background:#d97706;"></div>
+    </div>
+    <div style="font-size:.76rem;color:var(--muted);text-align:center;margin-top:10px;">① வெளிப்புற உறை (Jacket) ② பின்னல் கவசம் (Braided Shield) ③ காப்பு (Insulation) ④ தாமிரக் கம்பி மைய கடத்தி (Copper Core)</div>`;
+  }
+  if(key === 'twisted'){
+    return `
+    <div style="display:flex;gap:30px;justify-content:center;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <svg width="120" height="90" viewBox="0 0 120 90">
+          <path d="M0,25 Q30,5 60,25 T120,25" stroke="#2563eb" stroke-width="4" fill="none"/>
+          <path d="M0,65 Q30,45 60,65 T120,65" stroke="#f97316" stroke-width="4" fill="none"/>
+        </svg>
+        <div style="font-weight:700;">UTP</div><div style="font-size:.74rem;color:var(--muted);">வெளிக் கவசம் இல்லை</div>
+      </div>
+      <div style="text-align:center;">
+        <svg width="130" height="100" viewBox="0 0 130 100">
+          <rect x="3" y="5" width="124" height="90" rx="12" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="4 3"/>
+          <path d="M12,32 Q42,12 72,32 T128,32" stroke="#2563eb" stroke-width="4" fill="none"/>
+          <path d="M12,70 Q42,50 72,70 T128,70" stroke="#f97316" stroke-width="4" fill="none"/>
+        </svg>
+        <div style="font-weight:700;">STP</div><div style="font-size:.74rem;color:var(--muted);">வெளிக் கவசம் உண்டு (dashed border)</div>
+      </div>
+    </div>`;
+  }
+  if(key === 'fiber'){
+    return `
+    <div style="position:relative;width:200px;height:60px;margin:0 auto;background:#e2e8f0;border-radius:30px;display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:14px;right:14px;height:6px;background:linear-gradient(90deg,#fde047,#f59e0b);border-radius:3px;"></div>
+      <span style="position:relative;font-size:1.1rem;">➡️ ஒளி (Light) துடிப்புகள்</span>
+    </div>
+    <div style="font-size:.76rem;color:var(--muted);text-align:center;margin-top:10px;">கண்ணாடி இழை மையம் வழியாக ஒளி சமிக்ஞைகள் பயணிக்கின்றன</div>`;
+  }
+  if(key === 'usb'){
+    return `
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      ${['USB Type A','USB Type B','Mini USB','Micro USB'].map(n=>`<div style="text-align:center;"><div style="width:56px;height:38px;background:#334155;border-radius:6px;margin:0 auto;"></div><div style="font-size:.72rem;margin-top:6px;">${n}</div></div>`).join('')}
+    </div>`;
+  }
+  if(key === 'serial'){
+    return `
+    <div style="display:flex;gap:30px;justify-content:center;flex-wrap:wrap;align-items:flex-end;">
+      <div style="text-align:center;"><div style="width:60px;height:40px;background:#1e293b;border-radius:8px;margin:0 auto;"></div><div style="font-size:.76rem;margin-top:6px;">தொடர் (Serial)<br>1 பிட்/நேரம்</div></div>
+      <div style="text-align:center;"><div style="width:110px;height:40px;background:#1e293b;border-radius:8px;margin:0 auto;"></div><div style="font-size:.76rem;margin-top:6px;">இணை (Parallel)<br>8 பிட்/நேரம்</div></div>
+    </div>`;
+  }
+  return `
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+    <div style="width:80px;height:8px;background:#2563eb;border-radius:4px;"></div>
+    <div style="width:36px;height:30px;background:#f1f5f9;border:2px solid #475569;border-radius:4px;position:relative;">
+       <div style="position:absolute;top:3px;left:3px;right:3px;display:flex;gap:1px;justify-content:space-between;">
+         ${Array(8).fill('<div style="width:2px;height:10px;background:#d4af37;"></div>').join('')}
+       </div>
+    </div>
+  </div>
+  <div style="font-size:.76rem;color:var(--muted);text-align:center;margin-top:10px;">8 ஊசிகள் (Pins) கொண்ட RJ45 பிளக் (8P8C)</div>`;
+}
+
+/* =========================================================================
+   TOPIC 3 — 13.3 Parts of Ethernet Cabling + 13.3.1 Patch Cable
+   ========================================================================= */
+function renderEthParts(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.3 &amp; 13.3.1</div>
+    <h2>ஈத்தர்நெட் வடமிடலின் பகுதிகள் &amp; இணைப்பு வடம் <span class="eng">(Parts of Ethernet Cabling &amp; Patch Cable)</span></h2>
+  </div>
+  <div class="card">
+    <h3>13.3 ஈத்தர்நெட் வடமிடலின் பகுதிகள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      ஈத்தர்நெட் வடமிடல் (Ethernet Cabling) என்பது ஈத்தர்நெட் வடங்களைப் பயன்படுத்தி கணினிகளை மற்ற சாதனங்களுடன் இணைக்கும் செயலாகும். ஈத்தர்நெட் வடமிடலில் நான்கு முக்கிய பகுதிகள் உள்ளன.
+    </div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">1️⃣ இணைப்பு வடம்<br><span class="eng" style="font-weight:400;">Patch Cable</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">2️⃣ RJ45 இணைப்பி<br><span class="eng" style="font-weight:400;">RJ45 Connector</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">3️⃣ ஈத்தர்நெட் தொடர்பி<br><span class="eng" style="font-weight:400;">Ethernet Port</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">4️⃣ கிரிம்பிங் கருவி<br><span class="eng" style="font-weight:400;">Crimping Tool</span></div>
+      </div>
+      <div class="diagram-cap">படம் — ஈத்தர்நெட் வடமிடலின் 4 பகுதிகள் (redrawn)</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>13.3.1 இணைப்பு வடம் (Patch Cable)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      இந்த வடங்கள் பொதுவாக ஒவ்வொன்றும் வெவ்வேறு வண்ணங்களில் தயாரிக்கப்படுகின்றன. அவைகளில் நான்கு திட (Solid) நிறங்கள், மற்றவை கோடிப்பட்டவை (Striped).
+    </div>
+    <div class="easy"><span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>இது உண்மையில் முறுக்கப்பட்ட இணை கம்பிகளால் (Twisted Pair wires) ஆன வடம் — ஒரு முனையில் RJ45 இணைப்பியும் இன்னொரு முனையில் RJ45 இணைப்பியும் பொருத்தப்பட்டால் அது "Patch Cable" எனப்படும்.</div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு (Exam Point)</span>Patch Cable-இல் 4 ஜோடி (மொத்தம் 8) கம்பிகள் இருந்தாலும், நிறங்கள் Solid மற்றும் Striped என இருவகைப்படும்.</div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை (Quick Check)</span><div id="qc-ethparts"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 4 — 13.3.2 RJ45 Connector & Wiring (interactive pinout simulator)
+   ========================================================================= */
+const RJ45_STANDARDS = {
+  a: {label:'T-568A', pins:[
+    {num:1, fn:'TX+', stripe:true,  color:'#16a34a'},
+    {num:2, fn:'TX−', stripe:false, color:'#16a34a'},
+    {num:3, fn:'RX+', stripe:true,  color:'#f97316'},
+    {num:4, fn:'—',   stripe:false, color:'#2563eb'},
+    {num:5, fn:'—',   stripe:true,  color:'#2563eb'},
+    {num:6, fn:'RX−', stripe:false, color:'#f97316'},
+    {num:7, fn:'—',   stripe:true,  color:'#92400e'},
+    {num:8, fn:'—',   stripe:false, color:'#92400e'},
+  ]},
+  b: {label:'T-568B', pins:[
+    {num:1, fn:'TX+', stripe:true,  color:'#f97316'},
+    {num:2, fn:'TX−', stripe:false, color:'#f97316'},
+    {num:3, fn:'RX+', stripe:true,  color:'#16a34a'},
+    {num:4, fn:'—',   stripe:false, color:'#2563eb'},
+    {num:5, fn:'—',   stripe:true,  color:'#2563eb'},
+    {num:6, fn:'RX−', stripe:false, color:'#16a34a'},
+    {num:7, fn:'—',   stripe:true,  color:'#92400e'},
+    {num:8, fn:'—',   stripe:false, color:'#92400e'},
+  ]}
+};
+function pinSwatchStyle(p){
+  if(p.stripe) return 'background:repeating-linear-gradient(45deg,#fff,#fff 4px,'+p.color+' 4px,'+p.color+' 8px);';
+  return 'background:'+p.color+';';
+}
+
+function renderRJ45(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.3.2</div>
+    <h2>RJ45 இணைப்பி &amp; வயரிங் <span class="eng">(RJ45 Connector &amp; Wiring)</span></h2>
+  </div>
+  <div class="card">
+    <h3>13.3.2 RJ45 இணைப்பி (RJ45 Connector)</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>RJ45 இணைப்பி ஒரு தொலைபேசி ஜாக் (Jack) போலவே தோற்றமளிக்கிறது. ஆனால் இது அளவில் சற்று பெரியது. RJ45 இல் "RJ" என்பது Registered Jack மற்றும் "45" என்பது வடத்தின் இடைமுகத் தரத்தை குறிக்கிறது. RJ45 ஈத்தர்நெட் இணைப்பி ஒரு சிறிய பிளாஸ்டிக் cube ஆகும். இதில் எட்டு ஊசிகள் (pins) உள்ளன. RJ45 இணைப்பிகள் ஈத்தர்நெட் வடத்தின் இருமுனைகளிலும் இணைக்கப்பட்டுள்ளன. இது 8P8C இணைப்பி என்றும் அறியப்படுகிறது.</div>
+    <div class="easy"><span class="lbl">💡 எளிய விளக்கம்</span>RJ45 என்பது ஈத்தர்நெட் வடத்தின் இரு முனைகளிலும் பொருத்தப்பட்டுள்ள "பிளக்" — இது ஈத்தர்நெட் தொடர்பியில் (Port) செருகப்படும்.</div>
+  </div>
+
+  <div class="card">
+    <h3>இணைப்பியின் வடமிடல் திட்டங்கள் &amp; வண்ண குறியீடுகள் <span class="eng">(Wiring Schemes &amp; Colour Codes)</span></h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>வயரிங் திட்டங்கள் கம்பிகளை (Wires) RJ45 இணைப்பியுடன் (Connector) எவ்வாறு இணைக்க வேண்டும் என்பதை குறிக்கின்றன. இரண்டு வகையான வயரிங் திட்டங்கள் உள்ளன — T-568A மற்றும் T-568B.</div>
+
+    <div class="tab-row" id="rj45Tabs"></div>
+    <div class="diagram-box">
+      <div class="conn-label" id="rj45StdLabel"></div>
+      <div class="pin-strip" id="rj45PinStrip"></div>
+      <div class="diagram-cap">படம் 13.10 — ஈத்தர்நெட் வயரிங் திட்டங்கள் (redrawn; மேலே உள்ள தரநிலையை கிளிக் செய்யவும்)</div>
+    </div>
+
+    <table class="tbl">
+      <tr><th>Pin</th><th>T-568A</th><th>Pin</th><th>T-568B</th></tr>
+      <tr><td>1</td><td>white/green stripe (Tx+)</td><td>1</td><td>white/orange stripe (Tx+)</td></tr>
+      <tr><td>2</td><td>green (Tx−)</td><td>2</td><td>orange (Tx−)</td></tr>
+      <tr><td>3</td><td>white/orange stripe (Rx+)</td><td>3</td><td>white/green stripe (Rx+)</td></tr>
+      <tr><td>4</td><td>blue</td><td>4</td><td>blue</td></tr>
+      <tr><td>5</td><td>white/blue stripe</td><td>5</td><td>white/blue stripe</td></tr>
+      <tr><td>6</td><td>orange (Rx−)</td><td>6</td><td>green (Rx−)</td></tr>
+      <tr><td>7</td><td>white/brown stripe</td><td>7</td><td>white/brown stripe</td></tr>
+      <tr><td>8</td><td>brown</td><td>8</td><td>brown</td></tr>
+    </table>
+    <div class="diagram-cap">அட்டவணை 13.1 — வண்ணக் குறியீடுகள் கொண்ட வயரிங் திட்டங்கள்</div>
+
+    <div class="easy"><span class="lbl">💡 எளிய விளக்கம்</span>வடத்தில் நான்கு ஜோடி கம்பிகள் இருந்தாலும், ஈத்தர்நெட் இரண்டு ஜோடிகளை மட்டுமே பயன்படுத்துகிறது: ஆரஞ்சு மற்றும் பச்சை. மற்ற இரண்டு வண்ணங்களை (நீலம் மற்றும் பழுப்பு) ISDN அல்லது தொலைபேசி இணைப்புகளில் பயன்படுத்த முடியும்.</div>
+  </div>
+
+  <div class="card">
+    <h3>ஊசி (Pin) செயல்பாடுகள்</h3>
+    <table class="tbl">
+      <tr><th>Pin</th><th>செயல்பாடு</th></tr>
+      <tr><td>1</td><td>தரவை அனுப்பும் நேர்மின் முனை (TX+)</td></tr>
+      <tr><td>2</td><td>தரவை அனுப்பும் எதிர்மின் முனை (TX−)</td></tr>
+      <tr><td>3</td><td>தரவைப் பெறும் நேர்மின் முனை (RX+)</td></tr>
+      <tr><td>4, 5</td><td>பிற்கால பயன்பாட்டிற்காக ஒதுக்கப்பட்டவை (Reserved)</td></tr>
+      <tr><td>6</td><td>தரவைப் பெறும் எதிர்மின் முனை (RX−)</td></tr>
+      <tr><td>7, 8</td><td>பிற்கால பயன்பாட்டிற்காக ஒதுக்கப்பட்டவை (Reserved)</td></tr>
+    </table>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>இவை அனைத்தும் இரு வழி செயல்பாடு (Bidirectional) ஊசிகள் ஆகும்.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-rj45"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 5 — 13.3.3 Ethernet Port & NIC
+   ========================================================================= */
+function renderEthPort(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.3.3</div>
+    <h2>ஈத்தர்நெட் தொடர்பி &amp; NIC <span class="eng">(Ethernet Port &amp; Network Interface Card)</span></h2>
+  </div>
+  <div class="card">
+    <h3>13.3.3 ஈத்தர்நெட் தொடர்பி (Ethernet Port)</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>ஈத்தர்நெட் தொடர்பி என்பது ஈத்தர்நெட் அட்டையின் ஒரு திறப்பு (opening) பகுதியாகும். இது ஈத்தர்நெட் வடத்தின் RJ45 இணைப்பியை ஏற்கும். தனியாள் கணினிகள், மடிக்கணினிகள், திசைவிகள், சுவிட்சுகள், மையங்கள் (hub) மற்றும் மோடம்கள் போன்றவற்றில் இது காணப்படுகிறது.</div>
+    <div class="easy"><span class="lbl">💡 எளிய விளக்கம்</span>நீங்கள் கணினியின் தொடர்பியில் பிளக் ஒன்றை பொருத்தினால், இரண்டு LED விளக்குகள் ஒளிரும். ஒன்று பச்சை, மற்றொன்று ஆரஞ்சு. இணைய இணைப்பு கிடைத்தவுடன் ஆரஞ்சு ஒளி விட்டுவிட்டு (Blink) ஒளிரத் தொடங்கும்.</div>
+    <table class="tbl">
+      <tr><th>சாதனங்கள்/தொழில்நுட்பம்</th><th>மாற்றுப் பெயர்கள்</th></tr>
+      <tr><td>ஈத்தர்நெட் தொழில்நுட்பம்</td><td>RJ45, 802.3 (IEEE படி)</td></tr>
+      <tr><td>RJ45 இணைப்பி (ஆண்)</td><td>RJ45 பிளக், ஈத்தர்நெட் இணைப்பி, 8P8C இணைப்பி</td></tr>
+      <tr><td>RJ45 சாக்கெட் (பெண்)</td><td>RJ45 ஜாக், ஈத்தர்நெட் தொடர்பி</td></tr>
+      <tr><td>RJ45 வடம்</td><td>ஈத்தர்நெட் வடம்</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>வலையமைப்பு இடைமுக அட்டை <span class="eng">(Network Interface Card – NIC)</span></h3>
+    <div class="activity-box"><span class="lbl">🧪 உங்களுக்குத் தெரியுமா?</span>ஈத்தர்நெட் அட்டை என்பது வலையமைப்பில் உள்ள சாதனங்களை இணைக்கவும், அவற்றுக்கிடையே தரவுகளை பரிமாறவும் அனுமதிக்கும் வலையமைப்பு இடைமுக அட்டை (NIC) ஆகும். இது ஒரு விரிவாக்க அட்டை (expansion card) அல்லது உள்ளிணைந்த அட்டையாக இருக்கலாம். விரிவாக்க வகை அட்டை PCI ஈத்தர்நெட் அட்டை எனவும் அழைக்கப்படுகிறது — இது கணினியின் மதர்போர்டில் உள்ள PCI ஸ்லாட்டுக்குள் செருகப்படுகிறது. தற்போது பெரும்பாலான கணினிகளில் மதர்போர்டில் உள்ளமைக்கப்பட்ட ஈத்தர்நெட் அட்டைகள் உள்ளன. மேலும் தற்போது ரேடியோ அலைகள் மூலம் தரவுகளை பரிமாறும் கம்பியில்லா ஈத்தர்நெட் அட்டைகளும் பயன்பாட்டில் உள்ளன.</div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">📶 PCI Ethernet Card<br><span class="eng" style="font-weight:400;">(Expansion type)</span></div>
+        <div class="flow-arrow">/</div>
+        <div class="flow-node">🖥️ Built-in Ethernet Card<br><span class="eng" style="font-weight:400;">(on Motherboard)</span></div>
+      </div>
+      <div class="diagram-cap">NIC-இன் இரு வகைகள் (redrawn)</div>
+    </div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-ethport"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 6 — 13.3.4 Crimping Tool (7-step procedure simulator)
+   ========================================================================= */
+const CRIMP_STEPS = [
+  {title:'படி 1 — நீளம் வெட்டுதல்', text:'வடத்தை தேவையான நீளம் வெட்டிக்கொள்ளவும்.', why:'தேவையான நீளத்தை விட குறைவாகவோ அதிகமாகவோ இருந்தால் பின்னர் நிறுவுவதில் சிக்கல் ஏற்படும்.'},
+  {title:'படி 2 — உறை நீக்குதல்', text:'வடத்தின் இருபுறமும் இருந்து 1 அங்குல அளவிற்கு பாதுகாப்பு உறையை நீக்கவும். இதனால் முறுக்கப்பட்ட இணை கம்பிகள் வெளியே தெரியும்.', why:'உள்ளே உள்ள 8 கம்பிகளை அணுக வேண்டுமெனில் முதலில் வெளி உறையை அகற்ற வேண்டும்.'},
+  {title:'படி 3 — கம்பிகளை நேராக்குதல்', text:'கம்பி அகற்றப்பட்ட பிறகு, சிறிய கம்பிகளை அவிழ்த்து, சரியான வயரிங் அமைப்பில் வைக்கவும் (T568B பொதுவாக விரும்பப்படுகிறது).', why:'முறுக்கப்பட்ட கம்பிகள் சரியான வரிசையில் இல்லாவிடில் Tx/Rx இணைப்பில் பிழை ஏற்படும்.'},
+  {title:'படி 4 — சம அளவு வெட்டுதல்', text:'கம்பிகளை ஒன்றாக வைத்து, அவற்றை ஒரே அளவுள்ளதாக (½ அங்குலம்) வெட்டவும்.', why:'கம்பிகள் சமமாக இல்லாவிடில் இணைப்பியில் சில ஊசிகளைத் தொடாமல் போகலாம்.'},
+  {title:'படி 5 — இணைப்பியில் செருகுதல்', text:'இணைப்பியில் உள்ள எட்டு பள்ளங்களில் இந்த 8 நிற கம்பிகளை செருகவும். பிளாஸ்டிக் உறை இணைப்பின் உள்ளே செல்லும் வகையில் செருகப்பட வேண்டும்.', why:'பிளாஸ்டிக் உறை உள்ளே சென்றால் தான் Crimping செய்யும் போது வடம் இணைப்பியில் இறுக்கமாக பிடிபடும்.'},
+  {title:'படி 6 — Crimping செய்தல்', text:'crimping கருவியைப் பயன்படுத்தி RJ45 இணைப்பியை வடத்தில் பொருத்தவும். கையால் இழுத்தால் வெளிவராத அளவிற்கு நன்கு பொருந்தியிருக்க வேண்டும். இப்போது வடம் தரவு பரிமாற்றத்திற்கு தயாராக உள்ளது.', why:'Crimping கருவி இணைப்பியின் உலோக ஊசிகளை கம்பிகளுக்குள் அழுத்தி மின் தொடர்பை உருவாக்குகிறது.'},
+  {title:'படி 7 — சோதித்தல்', text:'தேவைப்பட்டால், வடத்தின் இணைப்பை சரிபார்க்க ஒரு வட சோதிப்பானை (Cable Tester) பயன்படுத்தவும்.', why:'Cable Tester ஒவ்வொரு pin-ம் சரியாக இணைக்கப்பட்டுள்ளதா எனச் சோதித்து உறுதி செய்கிறது.'},
+];
+
+function renderCrimping(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.3.4</div>
+    <h2>கிரிம்பிங் கருவி <span class="eng">(Crimping Tool)</span></h2>
+  </div>
+  <div class="card">
+    <h3>13.3.4 கிரிம்பிங் கருவி (Crimping Tool)</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>Crimping என்பது இரண்டு அல்லது அதற்கு மேற்பட்ட கம்பிகள் ஒன்றை ஒன்று பற்றிக் கொள்ளும் வகையில் இணைக்கும் செயலாகும். ஈத்தர்நெட் வடமிடலின் முக்கிய செயல் RJ45 இணைப்பியை முறுக்கு இணைக் கம்பியின் இருபுறமும் இணைப்பதாகும். இதனால் ஈத்தர்நெட் வடம் சரியாக வேலை செய்ய முடிகிறது. crimping கருவி என்பது வடத்துடன் ஈத்தர்நெட் இணைப்பியை இணைக்கப் பயன்படும் ஒரு கருவி ஆகும். Crimping கருவி இரண்டு ஈத்தர்நெட் தொடர்பியின் அச்சுடன் கூடிய கைப்பிடி கொண்ட ஒரு சிறிய வெட்டும் கருவியை போன்றது.</div>
+  </div>
+  <div class="card">
+    <h3>Crimping கருவியைப் பயன்படுத்தி ஈத்தர்நெட் வடத்தை உருவாக்குவதற்கான செயல்முறை</h3>
+    <div class="diagram-box">
+      <div class="flow-row" id="crimpDots"></div>
+      <div id="crimpPanel" style="margin-top:14px;"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="crimpPrevBtn">⬅ முந்தைய படி</button>
+        <button class="btn btn-primary" id="crimpNextBtn">அடுத்த படி ➡</button>
+        <button class="btn btn-ghost" id="crimpResetBtn">↺ Reset</button>
+      </div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>தேவைப்பட்டால், வடத்தின் இணைப்பை சரிபார்க்க ஒரு வட சோதிப்பானை (Cable Tester) பயன்படுத்தலாம்.</div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-crimping"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 7 — 13.4 Other Jack Types
+   ========================================================================= */
+function renderOtherJacks(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.4</div>
+    <h2>மற்ற ஜாக் வகைகள் <span class="eng">(Other Jack Types)</span></h2>
+  </div>
+  <div class="card">
+    <h3>13.4 பதிவு செய்யப்பட்ட ஜாக் (Registered Jack)</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>பதிவு செய்யப்பட்ட ஜாக், பொதுவாக RJ என்று அழைக்கப்படும் Registered Jack, வலையமைப்பு வடமிடல், வயரிங் மற்றும் வலையமைப்பு இடைமுகத்திற்கான கட்டுமானத்திற்காகப் பயன்படுத்தப்படும் ஜாக் ஆகும். இதன் முதன்மையான செயல்பாடு பல்வேறு தரவு சாதனங்களையும் தொலைத்தொடர்பு சாதனங்களையும் இணைப்பது ஆகும். RJ-11, RJ-45, RJ-21, மற்றும் RJ-28 ஆகியவை பயன்பாட்டில் உள்ள சில புகழ்பெற்ற Registered Jacks ஆகும். Registered Jack என்பது இணைப்பி (male connector/Plug), தொடர்பி (female connector/Jack) மற்றும் அதன் வயரிங் ஆகியவற்றை ஒன்றாகச் சேர்த்துக் குறிக்கிறது.</div>
+  </div>
+  <div class="card">
+    <h3>1. RJ-11</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>இது பதிவுசெய்யப்பட்ட ஜாக்கின் மிகவும் பிரபலமான வடிவமாகும். இது வீடு மற்றும் அலுவலகங்களில் தொலைபேசி இணைப்பிற்குப் பயன்படுத்தப்படுகிறது. RJ-11 இல் ஆறு ஊசிகள் (6 PINS) உள்ளன. அவற்றில் 2 ஊசிகள் தகவல் அனுப்புவதற்கும், 2 ஊசிகள் தகவலைப் பெறுவதற்கும், மீதம் 2 ஊசிகள் பயன்படுத்தப்படாமலும் விடப்பட்டிருக்கும்.</div>
+  </div>
+  <div class="card">
+    <h3>2. RJ-14 மற்றும் RJ-61</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>RJ-14 என்பது RJ-11 போன்று தொலைபேசி இணைப்பில் பயன்படுத்தப்படுகிறது. இதிலும் 6 ஊசிகள் உள்ளன, ஆனால் 4 ஊசிகள் மட்டுமே பயன்படுத்தப்படுகின்றன. RJ-61 எட்டு ஊசிகள் கொண்டிருக்கும். வலையமைப்பு கருவிகளை இணைப்பதற்கு, RJ-61 முறுக்கு இணை கம்பிகளை (Twisted pair) பயன்படுத்துகிறது.</div>
+  </div>
+  <div class="card">
+    <h3>3. RJ-21</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>இந்த இணைப்பான் ஒரு முனையில் 25 ஊசிகளும் அடுத்த முனையில் 25 ஊசிகளும் மொத்தம் 50 ஊசிகளைக் கொண்டுள்ளது. இது சாம்ப் (Champ) அல்லது ஆம்பனோல் (Amphenol) இணைப்பி எனவும் அழைக்கப்படுகிறது. Amphenol என்பது இணைப்பியை உற்பத்தி செய்யும் நிறுவனம் ஆகும். RJ-21 இடைமுகமானது தரவுத் தொடர்பைப் பிரித்தனுப்பும் பயன்பாடுகளில் (Trunking Applications) பொதுவாக பயன்படுத்தப்படுகிறது.</div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>RJ-21 = 50 ஊசிகள் = Champ/Amphenol இணைப்பி — மற்றவை 6 அல்லது 8 ஊசிகளே கொண்டவை.</div>
+  </div>
+  <div class="card">
+    <h3>ஒப்பீட்டு அட்டவணை (Comparison Table)</h3>
+    <table class="tbl">
+      <tr><th>ஜாக் வகை</th><th>ஊசிகள் (Pins)</th><th>முக்கிய பயன்பாடு</th></tr>
+      <tr><td>RJ-11</td><td>6 (2 பயன்பாட்டில்)</td><td>தொலைபேசி</td></tr>
+      <tr><td>RJ-14</td><td>6 (4 பயன்பாட்டில்)</td><td>தொலைபேசி (பல வரி)</td></tr>
+      <tr><td>RJ-45</td><td>8</td><td>Ethernet / Network</td></tr>
+      <tr><td>RJ-61</td><td>8</td><td>Network (Twisted Pair)</td></tr>
+      <tr><td>RJ-21</td><td>50 (25+25)</td><td>Trunking Applications (Champ/Amphenol)</td></tr>
+    </table>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-otherjacks"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 8 — 13.5 Ethernet Colour Coding Technique (wiring pattern simulator)
+   ========================================================================= */
+const WIRING_PATTERNS = {
+  straight: {label:'நேர் நேர் (Straight-Through)', map:[1,2,3,4,5,6,7,8], desc:'வடத்தின் இரு முனையங்களிலும் ஒரே வண்ண வரிசை இருக்கும் (Pin 1→1, 2→2 ... 8→8 — T568A &amp; T568B இரண்டு முனையிலும் ஒரே தரநிலை). PC/NIC-ஐ Hub/Switch உடன் இணைக்கப் பயன்படுகிறது. கணினிகள், சுவிட்சுகள் மற்றும் பிற வலையமைப்பு சாதனங்களை இணைக்கப் பயன்படுகிறது.'},
+  cross: {label:'குறுக்கீடு (Cross-over)', map:[3,6,1,4,5,2,7,8], desc:'இரண்டு கணினிகள் அல்லது ஈத்தர்நெட் சாதனங்களை மையத்தின் (Hub) உதவியின்றி நேரடியாக இணைக்கப் பயன்படுகிறது. முதல் முனையத்தின் Pin 1,2 அடுத்த முனையத்தின் Pin 3,6 உடன் இணைக்கப்படும்; அதேபோல் முதல் முனையத்தின் Pin 3,6 அடுத்த முனையத்தின் Pin 1,2 உடன் இணைக்கப்படும். எளிய வழி: ஒரு முனையில் T568A, மறு முனையில் T568B இணைப்பியைப் பயன்படுத்துவது.'},
+  roll: {label:'நேர் எதிர் (Roll-over)', map:[8,7,6,5,4,3,2,1], desc:'ஊசிகள் முற்றிலும் தலைகீழ் வரிசையில் இணைக்கப்படும் (ஒரு முனையில் உள்ள ஊசிகள் மறு முனையில் தலைகீழ் வரிசையில் இணைக்கப்படும்). சாதனத்தின் கன்சோல் தொடர்பி போர்ட்டுடன் (Device Console Port) இணைத்து அதன் கன்சோல் குறிமுறையை மாற்றப் பயன்படுகிறது. இது பூஜ்ய மோடம் வடமாகும் (Null Modem Cable); கன்சோல் கேபிள் (Console Cable) என்றும் அழைக்கப்படும். மற்ற வலைவடங்களில் இருந்து வேறுபடுத்திக் காட்ட இது பொதுவாக இளம் நீல நிறத்தில் தட்டை நாடா வடிவில் (flat ribbon) வடிவமைக்கப்பட்டிருக்கும்.'}
+};
+const WIRE_PIN_COLORS = ['#f97316','#f97316','#16a34a','#2563eb','#2563eb','#16a34a','#92400e','#92400e'];
+
+function renderColorCoding(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 13 › 13.5</div>
+    <h2>ஈத்தர்நெட் வட வண்ணக் குறிமுறை தொழில்நுட்பம் <span class="eng">(Ethernet Cable Colour Coding Technique)</span></h2>
+  </div>
+  <div class="card">
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>ஈத்தர்நெட் வடத்தைக் கட்டமைக்க மூன்று வகையான வயரிங் நுட்பங்கள் உள்ளன. இது வண்ணக் குறிமுறை நுட்பம் (Color coding technique) எனவும் அறியப்படுகிறது: நேர் நேர்-வயரிங் நுட்பம் (Straight-Through Wiring) · குறுக்கீடு-வயரிங் நுட்பம் (Cross-over Wiring) · நேர் எதிர்-வயரிங் நுட்பம் (Roll-over Wiring).</div>
+    <div class="tab-row" id="wireTabs"></div>
+    <div class="diagram-box">
+      <div class="conn-wrap"><div style="flex:1;text-align:center;"><b>PC 1</b></div><div style="width:40px;"></div><div style="flex:1;text-align:center;"><b>PC 2 / Device</b></div></div>
+      <svg id="wireSvg" width="100%" height="270" viewBox="0 0 340 270" style="margin-top:10px;"></svg>
+      <div class="diagram-cap" id="wireCap"></div>
+    </div>
+    <div id="wireDescBox"></div>
+  </div>
+  <div class="card">
+    <h3>வகையைத் தீர்மானிப்பது எப்படி? <span class="eng">(How to decide the cable type)</span></h3>
+    <ul>
+      <li><b>Straight-Through:</b> வடத்தின் வண்ணக் கம்பிகள் இரு முனையங்களிலும் ஒரே வரிசையில் இருக்கும்.</li>
+      <li><b>Cross-over Wiring:</b> ஒரு முனையத்தின் முதல் வண்ணக் கம்பி அடுத்த முனையில் மூன்றாவது வண்ணக் கம்பியாக இருக்கும்.</li>
+      <li><b>Roll-over Wiring:</b> வண்ணக் கம்பிகள் இரண்டு முனையங்களிலும் எதிர்எதிர் வரிசையில் இருக்கும்.</li>
+    </ul>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>இம்மூன்று ஏற்பாடுகளும் ஒரே இடைமுக மாற்றத்தை (Pin mapping) உருவாக்கப் பயன்படுகின்றன. ஆனால் இவை அனைத்தும் ஒரே வேகத்தில் தரவைக் கடத்துகின்றன.</div>
+  </div>
+  <div class="card">
+    <h3>🧪 ஈத்தர்நெட் வரலாறு <span class="eng">(Did You Know — from textbook)</span></h3>
+    <div class="activity-box"><span class="lbl">ஈத்தர்நெட் வரலாறு</span>1973 இல் பாப் மெட்கால்ப் ஈத்தர்நெட் கண்டுபிடித்தார். அதே நேரத்தில் Xerox PARC (கலிபோர்னியாவில் உள்ள பாலோ ஆல்டோ ஆராய்ச்சி மையம்) நிறுவனம் 1975 ஆம் ஆண்டில் காப்புரிமை பெற்றது. இது மேம்பட்ட கணினி பணிநிலையங்களை ஒன்றிணைக்கவும், அவற்றுக்கிடையே தகவலைப் பரிமாறிக் கொள்ளவும், வேக லேசர் அச்சுப்பொறிக்கு அனுப்பவும் பயன்படுத்தப்பட்டது. மெட்காஃப் மற்றும் பிறர் 1980 ஆம் ஆண்டில் திறந்த ஈத்தர்நெட் தரத்தை முடித்தார்கள். மேலும் 1985 ஆம் ஆண்டில் அது IEEE தரநிலையாக மாறியது. இதன் மூலம் புதிய தொழில்நுட்பம் உருவாகி மாபெரும் எழுச்சிக்குத் தயாராக இருந்தது.<br><br>802.3 (ஈத்தர்நெட்) மற்றும் 802.5 (டோக்கன் ரிங்) உள்ளிட்டு IEEE இன் 802 பரிவுகளில் பல வலையமைப்பு தரநிலைகள் வெளியிடப்பட்டன. IEEE தரநிலை முதன் முதலில் 1985 ஆம் ஆண்டில் IEEE 802.3 (CSMA/CD) என்ற தலைப்பில் வெளியிடப்பட்டது. ஜெராக்ஸ் நிறுவனம் ஈத்தர்நெட் என்ற பெயரை வர்த்தக முத்திரைகளிலிருந்து விலக்கிக் கொண்ட போதிலும், IEEE தரநிலையானது "ஈத்தர்நெட்" என்ற பெயரைப் பயன்படுத்தவில்லை. ஏனெனில் திறந்த தரநிலைக் குழுக்கள் (Open Standard Committee) ஒரு குறிப்பிட்ட நிறுவனத்தின் வர்த்தகப் பெயர்களைப் பயன்படுத்துவதை ஆதரிப்பதில்லை. இதன் விளைவாக, IEEE இந்தத் தொழில்நுட்பத்தை 802.3 CSMA/CD அல்லது வெறும் 802.3 என அழைக்கிறது. இருப்பினும், 802.3 தரநிலையில் உருவாக்கப்பட்ட நெட்வொர்க் அமைப்பைக் குறிப்பிடும் போது பெரும்பாலான மக்கள் "ஈத்தர்நெட்" என்னும் பெயரைப் பயன்படுத்துகின்றனர்.<br><br>குறிப்பு: www.wikipedia.org</div>
+  </div>
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-colorcoding"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 9 — Practice & Debugging Lab
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Debugging Lab <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — வடம் ↔ பயன்பாடு <span class="eng">(Enrichment)</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Debugging Lab — வடமிடல் (Cabling) தவறுகள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு அட்டையையும் படித்து, தவறு என்ன, அது எந்த வகை என அடையாளம் காணவும். பிறகு ✅ "என்ன தவறு?" பொத்தானை கிளிக் செய்து, விளக்கத்தையும் சரியான வடிவத்தையும் பார்க்கவும்.</p>
+    <div id="debugWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. ARPANET என்பது', o:['American Research Project Agency Network','Advanced Research Project Agency Network','Advanced Research Project Area Network','American Research Program And Network'], c:1},
+  'b2': {q:'2. WWW – ஐ கண்டுபிடித்தவர்', o:['டிம் பெர்னர்ஸ் லீ','சார்லஸ் பாபேஜ்','பிளைய்ஸ் பாஸ்கல்','ஜான் நேப்பியர்'], c:0},
+  'b3': {q:'3. கேபிள் டிவியில் எந்த வடம் பயன்படுத்தப்படுகிறது?', o:['UTP வடம்','ஒளியிழை வடம்','இணையச்சு வடம்','USB வடம்'], c:2},
+  'b4': {q:'4. UTP – இன் விரிவாக்கம்', o:['Uninterrupted Twisted Pair','Uninterrupted Twisted Protocol','Unshielded Twisted Pair','Universal Twisted Protocol'], c:2},
+  'b5': {q:'5. ஒளியிழை தரவு பரிமாற்றத்திற்கு வடங்களில் எந்த ஊடகம் பயன்படுத்தப்படுகிறது?', o:['நுண்ணலை','அகச்சிவப்பு','ஒளி','ஒலி'], c:2},
+  'b6': {q:'6. கீழ்கண்டவற்றில் எது கணினிகளை இணையத்துடன் இணைக்க, சிம் ஸ்லாட் கொண்ட ஒரு சிறிய புற சாதனமாகும்?', o:['USB','டாங்கிள்ஸ்','மெமரி கார்டு','மொபைல்கள்'], c:1},
+  'b7': {q:'7. ஈத்தர்நெட் வடங்களில் எந்த இணைப்பி (Connector) பயன்படுத்தப்படுகிறது?', o:['RJ11','RJ21','RJ61','RJ45'], c:3},
+  'b8': {q:'8. பின்வரும் இணைப்பானில் எது சேம்ப் இணைப்பி என அழைக்கப்படுகிறது?', o:['RJ11','RJ21','RJ61','RJ45'], c:1},
+  'b9': {q:'9. RJ45 வடங்களில் எத்தனை ஊசிகள் (Pins) பயன்படுத்தப்படுகின்றன?', o:['8','6','50','25'], c:0},
+  'b10': {q:'10. எந்த வயரிங் தரநிலை இரண்டு கணினிகளை நேரடியாக இணைக்கப் பயன்படுகிறது?', o:['Straight-through','Cross-over','Roll-over','RJ21'], c:1},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'முறுக்கு இணை கம்பிகளில் விலை மலிவானது, நிறுவுவதும் பராமரிப்பதும் எளிதானது எது?', o:['STP','UTP','Coaxial','Fiber Optic'], c:1, exp:'UTP (Unshielded Twisted Pair) விலை மலிவானது; நிறுவுவதும் பராமரிப்பதும் எளிது.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'ஈத்தர்நெட் வடத்தில் பயன்படுத்தப்படும் இணைப்பி எது?', o:['RJ11','RJ45','RJ21','USB'], c:1, exp:'ஈத்தர்நெட் வடங்களின் இருமுனைகளிலும் RJ45 (8P8C) இணைப்பி பயன்படுத்தப்படுகிறது.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'T-568B வயரிங் திட்டத்தில் Pin 1 இன் வண்ணம் என்ன?', o:['white/green stripe','white/orange stripe','blue','brown'], c:1, exp:'T-568B இல் Pin1 = white/orange stripe (Tx+); T-568A இல் Pin1 = white/green stripe.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'ஈத்தர்நெட் RJ45 வடங்களில் ஆரஞ்சு, பச்சை தவிர வேறு எந்த இரு வண்ணங்கள் உள்ளன?', o:['சிவப்பு, மஞ்சள்','நீலம், பழுப்பு','கருப்பு, வெள்ளை','ஊதா, இளஞ்சிவப்பு'], c:1, exp:'4 ஜோடி கம்பிகளில் ஈத்தர்நெட் ஆரஞ்சு, பச்சை ஜோடிகளை மட்டுமே பயன்படுத்தும்; நீலம், பழுப்பு ஜோடிகள் ISDN/தொலைபேசிக்குப் பயன்படும்.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'இரண்டு கணினிகளை Hub இல்லாமல் நேரடியாக இணைக்க எந்த வயரிங் தரம் தேவை?', o:['Straight-Through','Cross-over','Roll-over','RJ21 Trunking'], c:1, exp:'Cross-over வயரிங் (ஒரு முனையில் T568A, மறு முனையில் T568B) இரண்டு கணினிகளை நேரடியாக இணைக்கப் பயன்படுகிறது.'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'RS-232 வடம் மூலம் மோடமின்றி இரு கணினிகளை நேரடியாக இணைப்பதை என்ன என்று அழைப்பர்?', o:['Patch Cable','Null Modem Cable','Crossover Ethernet','Console Cable'], c:1, exp:'RS-232 வடம் மூலம் மோடமின்றி இரு சாதனங்களை நேரடியாக இணைப்பது பூஜ்ய மோடம் வடம் (Null Modem Cable) எனப்படும்.'},
+};
+
+const TF_QS = [
+  {q:'UTP வடங்களில் மின்காந்த தடுப்பு கவசம் (shielding) உள்ளது.', a:false, exp:'தவறு — UTP-இல் வெளிக் கவசம் இல்லை; கூடுதல் கவசம் உள்ளது STP-இல்.'},
+  {q:'ஒளியிழை வடம் முக்கியமாக WAN-இல் பயன்படுத்தப்படுகிறது.', a:true, exp:'சரி — ஒளியிழை வடம் முக்கியமாக பரந்த வலையமைப்பில் (WAN) பயன்படுத்தப்படுகிறது.'},
+  {q:'RJ45 இணைப்பியில் 6 ஊசிகள் உள்ளன.', a:false, exp:'தவறு — RJ45 இல் 8 ஊசிகள் உள்ளன (8P8C); 6 ஊசிகள் கொண்டது RJ11.'},
+  {q:'நேர் எதிர் வயரிங் (Roll-over) கன்சோல் கேபிள் என்றும் அழைக்கப்படுகிறது.', a:true, exp:'சரி — Roll-over வயரிங் வடம் Console Cable என்றும் அழைக்கப்படுகிறது.'},
+  {q:'Cross-over வயரிங்கில் இரு முனையங்களிலும் ஒரே வண்ண வரிசை இருக்கும்.', a:false, exp:'தவறு — ஒரே வண்ண வரிசை இருப்பது Straight-Through வயரிங்கில்; Cross-over-இல் Pin1,2 ↔ Pin3,6 என மாறி இணைக்கப்படும்.'},
+];
+
+const FIB_QS = [
+  {text:'RJ45 ______________ இணைப்பி என்றும் அழைக்கப்படுகிறது.', ans:'8p8c'},
+  {text:'ஈத்தர்நெட் வடங்கள் ______________ (Twisted Pair) வகையைச் சார்ந்தவை.', ans:'twisted pair'},
+  {text:'RJ-21 ______________ அல்லது Amphenol இணைப்பி என்றும் அழைக்கப்படுகிறது.', ans:'champ'},
+  {text:'இரு கணினிகளை மோடமின்றி நேரடியாக இணைக்கும் வடம் ______________ வடம் எனப்படும்.', ans:'null modem'},
+];
+
+const MATCH_LEFT = ['இணையச்சு வடம்','ஒளியிழை வடம்','USB','RS-232'];
+const MATCH_RIGHT = ['Cable TV இணைப்பு','WAN தொலைதூர பரிமாற்றம்','Keyboard/Mouse இணைப்பு','இரு கணினிகளை நேரடி இணைப்பு (Null Modem)'];
+const MATCH_ANSWER = {'இணையச்சு வடம்':'Cable TV இணைப்பு','ஒளியிழை வடம்':'WAN தொலைதூர பரிமாற்றம்','USB':'Keyboard/Mouse இணைப்பு','RS-232':'இரு கணினிகளை நேரடி இணைப்பு (Null Modem)'};
+
+const DEBUG_CASES = [
+  {wrong:'Straight-Through cable ஐப் பயன்படுத்தி இரண்டு கணினிகளை நேரடியாக (Hub இல்லாமல்) இணைத்தல்', errorType:'தருக்கப் பிழை (Logical Error)', why:'Straight-Through வயரிங் ஒரே மாதிரியான இரு கணினிகளை நேரடியாக இணைக்க பொருந்தாது — இது PC-ஐ Hub/Switch உடன் இணைக்கப் பயன்படுகிறது.', fix:'Cross-over cable பயன்படுத்தவும் (ஒரு முனையில் T568A, மறு முனையில் T568B).'},
+  {wrong:'ஈத்தர்நெட் வடத்தின் முனையில் RJ11 இணைப்பியைப் பொருத்துதல்', errorType:'வன்பொருள் பொருத்தமின்மை (Hardware Mismatch)', why:'RJ11 இல் 6 ஊசிகள் மட்டுமே உள்ளன (தொலைபேசிக்கு); ஈத்தர்நெட்டிற்கு 8 ஊசிகள் கொண்ட RJ45 தேவை.', fix:'RJ45 (8P8C) இணைப்பியைப் பயன்படுத்தவும்.'},
+  {wrong:'T568A நிலையில் Pin 1 = white/orange, Pin 2 = green என வயரிங் செய்தல்', errorType:'தொடரியல் பிழை (Wiring Error)', why:'T568A-இல் Pin1 = white/green, Pin2 = green என இருக்க வேண்டும். வண்ணங்களை தவறாக மாற்றினால் Tx/Rx இணைப்பு பிழைக்கும்.', fix:'T568A வரிசையை சரியாகப் பின்பற்றவும்: 1-white/green, 2-green, 3-white/orange, 4-blue, 5-white/blue, 6-orange, 7-white/brown, 8-brown.'},
+  {wrong:'கம்பிகளை இணைப்பியின் பள்ளங்களில் முழுவதுமாக செருகாமல் Crimp செய்தல்', errorType:'இயக்க நேரப் பிழை (Runtime Error)', why:'கம்பிகள் முழுவதுமாக முன்னே செருகப்படாவிடில், Crimping கருவி உலோக ஊசிகளை கம்பியுடன் சரியாக தொடர்பு கொள்ளாது — இணைப்பு அவ்வப்போது துண்டிக்கும்.', fix:'செருகும் முன் பிளாஸ்டிக் உறை இணைப்பியின் முன்பகுதி வரை முழுவதுமாக சென்றுள்ளதா எனச் சரிபார்க்கவும்.'},
+];
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு பள்ளியின் Computer Lab-இல் 2 கணினிகளை மட்டும் Hub இல்லாமல் நேரடியாக இணைத்து கோப்புகளைப் பகிர வேண்டும். எந்த வடத்தை பயன்படுத்த வேண்டும்?', o:['Straight-Through','Cross-over','Roll-over','RJ11 cable'], c:1, exp:'இரு கணினிகளை நேரடியாக இணைக்க Cross-over வயரிங் தேவை.'},
+  'c2': {q:'🔴 ஒரு Router-இன் Console Port வழியாக அதன் அமைப்புகளை மாற்ற விரும்பினால் எந்த வடம் தேவை?', o:['Straight-Through','Cross-over','Roll-over (Console Cable)','Patch Cable'], c:2, exp:'Console Port வழியாக சாதன அமைப்புகளை மாற்ற Roll-over (Console) Cable பயன்படுத்தப்படுகிறது.'},
+};
+
+/* =========================================================================
+   TOPIC 10 — Exam Preparation
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>கணினி வலையமைப்பு என்பது தரவுகள் மற்றும் வளங்களைப் பகிர்ந்து கொள்வதற்காக ஒன்றோடொன்று இணைக்கப்பட்ட கணினிகளின் தொகுப்பாகும். கம்பி ஊடகம் (UTP, STP, ஒளியிழை) அல்லது கம்பியில்லா ஊடகம் (Infrared, Bluetooth, Wi-Fi) மூலம் இணைக்கலாம்.</li>
+      <li>இணையச்சு வடம் (Coaxial Cable) — Cable TV/Antenna இணைப்பிற்குப் பயன்படும்; Thinnet &amp; Thicknet என இரு வகைகள்.</li>
+      <li>முறுக்கு இணை வடம் (Twisted Pair) — STP (கவசம் உண்டு) மற்றும் UTP (கவசம் இல்லை) என இரு வகைகள்; UTP மலிவானது.</li>
+      <li>ஒளியிழை வடம் (Fiber Optic) — கண்ணாடி இழை, ஒளி துடிப்புகள் மூலம் தகவல் அனுப்பும்; Single mode (தொலைதூரம், விலை அதிகம்) &amp; Multimode (குறுகிய தூரம், மலிவு) என இரு வகைகள்.</li>
+      <li>USB கேபிள் — Keyboard, Mouse, Smartphone போன்றவற்றை இணைக்கும்; சமீபத்திய பதிப்பு USB 3.0 (4.85 Gbps). Dongle = SIM Slot கொண்ட சிறிய USB புற சாதனம்.</li>
+      <li>தொடர் &amp; இணை வடங்கள் — இணை வடம் 8 பிட்/நேரம் அனுப்பும்; தொடர் வடம் 1 பிட்/நேரம் அனுப்பும். RS-232 = Null Modem Cable.</li>
+      <li>ஈத்தர்நெட் வடமிடலில் (Ethernet Cabling) 4 முக்கிய பகுதிகள்: இணைப்பு வடம் (Patch Cable), RJ45 இணைப்பி, ஈத்தர்நெட் தொடர்பி, கிரிம்பிங் கருவி.</li>
+      <li>RJ45 = 8P8C இணைப்பி, 8 ஊசிகள் கொண்டது. இரு வயரிங் திட்டங்கள்: T-568A &amp; T-568B. Pin1=TX+, Pin2=TX−, Pin3=RX+, Pin6=RX−; Pin 4,5,7,8 Reserved.</li>
+      <li>ஈத்தர்நெட் தொடர்பி (Ethernet Port) RJ45 இணைப்பியை ஏற்கும் திறப்பு; NIC = Network Interface Card (Expansion card அல்லது Built-in).</li>
+      <li>கிரிம்பிங் கருவி RJ45 இணைப்பியை வடத்துடன் இணைக்கும் 7-படி செயல்முறையைப் பயன்படுத்துகிறது.</li>
+      <li>Registered Jack (RJ) வகைகள்: RJ-11 (6 ஊசி, தொலைபேசி), RJ-14 (6 ஊசி, 4 பயன்பாட்டில்), RJ-45 (8 ஊசி, Ethernet), RJ-61 (8 ஊசி, Network), RJ-21 (50 ஊசி, Champ/Amphenol, Trunking).</li>
+      <li>வண்ணக் குறிமுறை தொழில்நுட்பம் (Color Coding) — மூன்று வயரிங் நுட்பங்கள்: Straight-Through (PC↔Hub), Cross-over (PC↔PC நேரடி), Roll-over (Console Cable).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>தமிழ் சொல் / English Term</th><th>விளக்கம்</th></tr>
+      <tr><td><b>வலையமைப்பு வடமிடல்</b><br>Network Cabling</td><td>கணினிகளை மற்ற சாதனங்களுடன் இணைக்க வடங்களைப் பயன்படுத்தும் செயல்</td></tr>
+      <tr><td><b>இணையச்சு வடம்</b><br>Coaxial Cable</td><td>தாமிரக் கம்பி மைய கடத்தி கொண்ட, Cable TV இணைப்பிற்குப் பயன்படும் வடம்</td></tr>
+      <tr><td><b>முறுக்கு இணை வடம்</b><br>Twisted Pair Cable</td><td>இரண்டு அல்லது அதற்கு மேற்பட்ட முறுக்கப்பட்ட கம்பிகளின் தொகுப்பு (STP/UTP)</td></tr>
+      <tr><td><b>ஒளியிழை வடம்</b><br>Fiber Optic Cable</td><td>கண்ணாடி இழைகளால் ஆன, ஒளி துடிப்புகள் மூலம் தகவல் பரிமாறும் வடம்</td></tr>
+      <tr><td><b>டாங்கிள்</b><br>Dongle</td><td>SIM Slot கொண்ட சிறிய USB புற சாதனம்; மொபைல் Broadband மூலம் இணைய இணைப்பு அளிக்கும்</td></tr>
+      <tr><td><b>பூஜ்ய மோடம் வடம்</b><br>Null Modem Cable</td><td>மோடமின்றி இரு கணினிகளை நேரடியாக இணைக்கும் வடம் (RS-232)</td></tr>
+      <tr><td><b>இணைப்பு வடம்</b><br>Patch Cable</td><td>இருமுனைகளிலும் RJ45 இணைப்பி பொருத்தப்பட்ட முறுக்கு இணை வடம்</td></tr>
+      <tr><td><b>RJ45 இணைப்பி</b><br>RJ45 Connector</td><td>8 ஊசிகள் கொண்ட ஈத்தர்நெட் இணைப்பி (8P8C)</td></tr>
+      <tr><td><b>ஈத்தர்நெட் தொடர்பி</b><br>Ethernet Port</td><td>RJ45 இணைப்பியை ஏற்கும் ஈத்தர்நெட் அட்டையின் திறப்பு</td></tr>
+      <tr><td><b>கிரிம்பிங் கருவி</b><br>Crimping Tool</td><td>RJ45 இணைப்பியை வடத்துடன் இணைக்கப் பயன்படும் கருவி</td></tr>
+      <tr><td><b>NIC</b><br>Network Interface Card</td><td>சாதனங்களை வலையமைப்புடன் இணைக்கும் இடைமுக அட்டை</td></tr>
+      <tr><td><b>பதிவு செய்யப்பட்ட ஜாக்</b><br>Registered Jack (RJ)</td><td>இணைப்பி, தொடர்பி மற்றும் வயரிங்கை ஒன்றாகக் குறிக்கும் தர அமைப்பு</td></tr>
+      <tr><td><b>சேம்ப் / ஆம்பனோல் இணைப்பி</b><br>Champ / Amphenol Connector</td><td>RJ-21 இன் மாற்றுப் பெயர் (50 ஊசிகள்)</td></tr>
+      <tr><td><b>நேர் நேர் வயரிங்</b><br>Straight-Through Wiring</td><td>இரு முனைகளிலும் ஒரே வண்ண வரிசை கொண்ட வயரிங் (PC↔Hub)</td></tr>
+      <tr><td><b>குறுக்கீடு வயரிங்</b><br>Cross-over Wiring</td><td>Tx/Rx ஜோடிகள் மாற்றப்பட்ட வயரிங் (PC↔PC நேரடி இணைப்பு)</td></tr>
+      <tr><td><b>நேர் எதிர் வயரிங் / கன்சோல் கேபிள்</b><br>Roll-over Wiring / Console Cable</td><td>தலைகீழ் வரிசையில் இணைக்கப்பட்ட வயரிங், சாதன கன்சோல் அமைப்புகளை மாற்றப் பயன்படும்</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி <span class="eng">(Part-wise Answer-Writing Guide)</span></h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லை (keyword) கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். ஊசிகளின் எண்ணிக்கை தொடர்பான கேள்விகளுக்கு (RJ11=6, RJ45=8, RJ21=50) குறிப்பேடு வைத்துக்கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>2 / 3-மதிப்பெண் — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் / பட்டியல் → (3) தேவைப்பட்டால் ஒரு வரி முக்கியத்துவம்.<br>
+        <b>எ.கா.</b> "கிரிம்பிங் கருவியின் பயன் யாது?" → "Crimping கருவி என்பது RJ45 இணைப்பியை ஈத்தர்நெட் வடத்தின் முனையில் பொருத்த பயன்படும் கருவி. இது வடத்தை வெட்டவும் இணைப்பை உறுதி செய்யவும் உதவுகிறது."
+      </div>
+    </details>
+    <details class="acc"><summary>5-மதிப்பெண் — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) வகைகள் / பகுதிகள் (தலைப்பு வாரியாக) → (3) ஒவ்வொன்றையும் 1-2 வரிகளில் விளக்குதல் → (4) படம்/அட்டவணை → (5) முடிவுரை ஒரு வரி.<br>
+        <b>எ.கா.</b> "வலையமைப்பு வடங்களின் வகைகளை விளக்குக" → Coaxial → Twisted Pair (STP/UTP) → Fiber Optic → USB → Serial/Parallel → Ethernet, ஒவ்வொன்றையும் வரையறை + பயன்பாட்டுடன் விளக்கி ஒரு ஒப்பீட்டு அட்டவணையுடன் முடிக்கவும்.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ <span class="eng">(Part II, III, IV — reference)</span></h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும் (2 மதிப்பெண்கள்)</summary>
+      <div class="acc-body">
+        <ol>
+          <li>இணையச்சு வடம் பற்றி குறிப்பு வரைக.</li>
+          <li>USB வடங்களின் பயன்கள் யாவை?</li>
+          <li>ஈத்தர்நெட் தொடர்பி என்பது யாது?</li>
+          <li>கிரிம்பிங் கருவியின் பயன் யாது?</li>
+          <li>முறுக்கு இணை வடங்களின் வகைகள் யாவை?</li>
+          <li>சேம்ப் (Champ) இணைப்பி என்பது யாது?</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும் (3 மதிப்பெண்கள்)</summary>
+      <div class="acc-body">
+        <ol>
+          <li>RJ45 இணைப்பி பற்றி சிறு குறிப்பு வரைக.</li>
+          <li>பூஜ்ய மோடம் கேபிள் என்றால் என்ன? எடுத்துக்காட்டாக தருக?</li>
+          <li>ஈத்தர்நெட் வடமிடலில் (Cabling) தொடர்புடைய கூறுகள் யாவை?</li>
+          <li>ஒளியிழை வடங்களின் வகைகள் யாவை?</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும் (5 மதிப்பெண்கள்)</summary>
+      <div class="acc-body">
+        <ol>
+          <li>பதிவு செய்யப்பட்ட ஜாக் (RJ) என்றால் என்ன? ஜாக் வகைகளை சுருக்கமாக விளக்குக.</li>
+          <li>ஈத்தர்நெட் வடமிடலில் (Cabling) பயன்படுத்தப்படும் கூறுகளை விளக்குக.</li>
+          <li>வலையமைப்பு வடங்களின் வகைகளை விளக்குக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>மாணவர் செயல்பாடு <span class="eng">(Student Activity — reference)</span></summary>
+      <div class="acc-body">
+        <ol>
+          <li>கிராஸ்ஓவர் வடம் ஒன்றை சொந்தமாக உருவாக்குக.
+            <ul>
+              <li>அ) பின்வருபவற்றை வாங்குக: தேவையான நீளத்தில் ஒரு இணைப்பு கேபிள் (UTP cat 5e/6), இரண்டு வயரிங் திட்டங்களுடன் (T568A &amp; T568B) RJ45 இணைப்பி (8P8C பிளக்), கிரிம்பிங் கருவி.</li>
+              <li>ஆ) கிரிம்பிங் கருவியின் உதவியுடன், பாடப் புத்தகத்தில் விவரிக்கப்பட்ட முறையைப் பயன்படுத்தி வடங்களைக் கட்டமைக்கவும்.</li>
+            </ul>
+          </li>
+          <li>கணினி வளங்களைப் பகிர்வதற்கு, கிராஸ்ஓவர் கேபிள் மூலம் இரண்டு கணினிகளை இணைக்கவும்.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (10 கேள்விகள்)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   QUICK-CHECK MCQ HELPER (generic renderer + event wiring)
+   ========================================================================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* =========================================================================
+   QUICK-CHECK QUESTION BANKS (one per topic, small, 1-2 Qs each)
+   ========================================================================= */
+const QC_BANKS = {
+  overview: {
+    'qc1': {q:'கீழ்கண்டவற்றில் எது கம்பியில்லா ஊடகத்திற்கு (Wireless Media) உதாரணம் இல்லை?', o:['Wi-Fi','Bluetooth','UTP வடம்','Infrared'], c:2, exp:'UTP வடம் ஒரு கம்பி ஊடகம் (Wired Media); Wi-Fi, Bluetooth, Infrared கம்பியில்லா ஊடகங்கள்.'}
+  },
+  cabletypes: {
+    'qc2': {q:'எந்த வடம் Cable TV இணைப்பிற்குப் பயன்படுகிறது?', o:['UTP','Fiber Optic','இணையச்சு வடம் (Coaxial)','USB'], c:2, exp:'இணையச்சு வடம் (Coaxial Cable) தொலைக்காட்சியை அலைவாங்கியுடன் இணைக்கப் பயன்படுகிறது.'}
+  },
+  ethparts: {
+    'qc3': {q:'ஈத்தர்நெட் வடமிடலில் எத்தனை முக்கிய பகுதிகள் உள்ளன?', o:['2','3','4','5'], c:2, exp:'4 பகுதிகள்: இணைப்பு வடம், RJ45 இணைப்பி, ஈத்தர்நெட் தொடர்பி, கிரிம்பிங் கருவி.'}
+  },
+  rj45: {
+    'qc4': {q:'T-568B வயரிங் திட்டத்தில் Pin 1 இன் வண்ணம் எது?', o:['white/green stripe','white/orange stripe','நீலம் (blue)','பழுப்பு (brown)'], c:1, exp:'T-568B இல் Pin1 = white/orange stripe (Tx+).'}
+  },
+  ethport: {
+    'qc5': {q:'இணைய இணைப்பு கிடைத்தவுடன் எந்த LED தொடர்ந்து ஒளிரும்?', o:['பச்சை','ஆரஞ்சு','சிவப்பு','நீலம்'], c:1, exp:'இணைய இணைப்பு கிடைத்தவுடன் ஆரஞ்சு LED ஒளிவிட்டு (Blink) ஒளிரத் தொடங்கும்.'}
+  },
+  crimping: {
+    'qc6': {q:'Crimping கருவியின் முக்கியச் செயல் என்ன?', o:['வடத்தை வெட்டுதல்','RJ45 இணைப்பியை வடத்துடன் பொருத்துதல்','வடத்தை சோதித்தல்','வண்ணம் தீட்டுதல்'], c:1, exp:'Crimping கருவியின் முக்கிய செயல் RJ45 இணைப்பியை முறுக்கு இணைக் கம்பியின் முனையில் பொருத்துவதாகும்.'}
+  },
+  otherjacks: {
+    'qc7': {q:'RJ-21 இல் எத்தனை ஊசிகள் (Pins) உள்ளன?', o:['6','8','25','50'], c:3, exp:'RJ-21 இல் ஒரு முனையில் 25 + அடுத்த முனையில் 25 = மொத்தம் 50 ஊசிகள் உள்ளன.'}
+  },
+  colorcoding: {
+    'qc8': {q:'இரண்டு கணினிகளை நேரடியாக இணைக்க எந்த வயரிங் தரம் பயன்படுகிறது?', o:['Straight-through','Cross-over','Roll-over','RJ21'], c:1, exp:'Cross-over வயரிங் இரண்டு கணினிகளை நேரடியாக (Hub இல்லாமல்) இணைக்கப் பயன்படுகிறது.'}
+  },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP: called after each renderMain() to attach interactive JS per page
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { overview:'qc-overview', cabletypes:'qc-cabletypes', ethparts:'qc-ethparts', rj45:'qc-rj45',
+                  ethport:'qc-ethport', crimping:'qc-crimping', otherjacks:'qc-otherjacks', colorcoding:'qc-colorcoding' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+
+  if(topicId === 'cabletypes') wireCableTypes();
+  if(topicId === 'rj45') wireRJ45();
+  if(topicId === 'crimping') wireCrimping();
+  if(topicId === 'colorcoding') wireColorCoding();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* ---- Cable type explorer wiring ---- */
+function wireCableTypes(){
+  let active = 'coax';
+  function render(){
+    document.getElementById('cableTabs').innerHTML = CABLE_TABS.map(([k,l]) =>
+      `<button class="tab-btn ${k===active?'active':''}" data-k="${k}">${l}</button>`).join('');
+    document.querySelectorAll('#cableTabs .tab-btn').forEach(b => b.addEventListener('click', () => { active = b.dataset.k; render(); }));
+    const d = CABLE_DATA[active];
+    document.getElementById('cableVisual').innerHTML = cableVisualHTML(active) + '<div class="diagram-cap">'+d.title+'</div>';
+    document.getElementById('cableDetail').innerHTML = `
+      <h4>${d.title}</h4>
+      <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>${d.def}</div>
+      <div class="easy"><span class="lbl">💡 வகைகள் (Types)</span>${d.types}</div>
+      <table class="tbl"><tr><th colspan="2">முக்கிய தகவல்கள்</th></tr>${d.facts.map(f=>'<tr><td style="width:24px;">•</td><td>'+f+'</td></tr>').join('')}</table>
+      <div class="analogy"><span class="lbl">🔗 உதாரணம் (Analogy)</span>${d.analogy}</div>
+      <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>${d.exam}</div>
+    `;
+  }
+  render();
+}
+
+/* ---- RJ45 pinout simulator wiring ---- */
+function wireRJ45(){
+  let std = 'b';
+  function render(){
+    document.getElementById('rj45Tabs').innerHTML = ['a','b'].map(k =>
+      `<button class="tab-btn ${k===std?'active':''}" data-std="${k}">${RJ45_STANDARDS[k].label}</button>`).join('');
+    document.querySelectorAll('#rj45Tabs .tab-btn').forEach(b => b.addEventListener('click', () => { std=b.dataset.std; render(); }));
+    document.getElementById('rj45StdLabel').textContent = RJ45_STANDARDS[std].label;
+    document.getElementById('rj45PinStrip').innerHTML = RJ45_STANDARDS[std].pins.map(p =>
+      `<div class="pin-unit"><div class="pin-swatch" style="${pinSwatchStyle(p)}"></div><div class="pin-num">Pin ${p.num}</div><div class="pin-fn">${p.fn}</div></div>`).join('');
+  }
+  render();
+}
+
+/* ---- Crimping tool step simulator wiring ---- */
+let crimpStep = -1;
+function wireCrimping(){
+  crimpStep = -1;
+  renderCrimpStep();
+  document.getElementById('crimpNextBtn').addEventListener('click', () => { if(crimpStep < CRIMP_STEPS.length-1){ crimpStep++; renderCrimpStep(); } });
+  document.getElementById('crimpPrevBtn').addEventListener('click', () => { if(crimpStep > 0){ crimpStep--; renderCrimpStep(); } });
+  document.getElementById('crimpResetBtn').addEventListener('click', () => { crimpStep = -1; renderCrimpStep(); });
+}
+function renderCrimpStep(){
+  const dotsWrap = document.getElementById('crimpDots');
+  let dotsHtml = '';
+  CRIMP_STEPS.forEach((s,i) => {
+    dotsHtml += '<div class="flow-node '+(i===crimpStep?'active':'')+' '+(i>crimpStep?'muted':'')+'" style="min-width:36px;padding:8px 10px;">'+(i+1)+'</div>';
+    if(i < CRIMP_STEPS.length - 1) dotsHtml += '<div class="flow-arrow">→</div>';
+  });
+  dotsWrap.innerHTML = dotsHtml;
+  const panel = document.getElementById('crimpPanel');
+  if(crimpStep === -1){
+    panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி படிப்படியாகத் தொடங்குங்கள்…</p>';
+  } else {
+    const s = CRIMP_STEPS[crimpStep];
+    panel.innerHTML = `<h4>${s.title}</h4><p>${s.text}</p><div class="exam-point"><span class="lbl">ஏன்? (Why?)</span>${s.why}</div>`;
+  }
+  document.getElementById('crimpPrevBtn').disabled = crimpStep <= 0;
+  document.getElementById('crimpNextBtn').disabled = crimpStep >= CRIMP_STEPS.length - 1;
+}
+
+/* ---- Wiring pattern (color coding) simulator wiring ---- */
+function wireColorCoding(){
+  let wt = 'straight';
+  function render(){
+    document.getElementById('wireTabs').innerHTML = Object.keys(WIRING_PATTERNS).map(k =>
+      `<button class="tab-btn ${k===wt?'active':''}" data-w="${k}">${WIRING_PATTERNS[k].label}</button>`).join('');
+    document.querySelectorAll('#wireTabs .tab-btn').forEach(b => b.addEventListener('click', () => { wt=b.dataset.w; render(); }));
+    const pat = WIRING_PATTERNS[wt];
+    let lines = '';
+    for(let i=0;i<8;i++){
+      const y1 = 14 + i*33;
+      const target = pat.map[i]-1;
+      const y2 = 14 + target*33;
+      lines += `<line x1="34" y1="${y1}" x2="280" y2="${y2}" stroke="${WIRE_PIN_COLORS[i]}" stroke-width="3" opacity="0.85"/>`;
+      lines += `<circle cx="34" cy="${y1}" r="5" fill="${WIRE_PIN_COLORS[i]}"/><text x="8" y="${y1+4}" font-size="12" fill="#334155">${i+1}</text>`;
+      lines += `<circle cx="280" cy="${y2}" r="5" fill="${WIRE_PIN_COLORS[i]}"/><text x="292" y="${y2+4}" font-size="12" fill="#334155">${target+1}</text>`;
+    }
+    document.getElementById('wireSvg').innerHTML = lines;
+    document.getElementById('wireCap').textContent = 'படம் — ' + pat.label + ' வயரிங் (redrawn)';
+    document.getElementById('wireDescBox').innerHTML = `<div class="easy"><span class="lbl">💡 விளக்கம்</span>${pat.desc}</div>`;
+  }
+  render();
+}
+
+/* ---- Practice page wiring ---- */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  // True / False
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  // Fill in the blanks
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans || val.replace(/\s/g,'') === f.ans.replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  // Match the following
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>வடம்</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>பயன்பாடு</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='160px';
+      b.textContent = l + (matched[l] ? ' ✅ → ' + matched[l] : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); b.style.outline='3px solid var(--accent)'; });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='260px';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும் (மேலே உள்ள பட்டியலுடன் ஒப்பிடவும்).';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  // Debugging Lab
+  const debugWrap = document.getElementById('debugWrap');
+  debugWrap.innerHTML = DEBUG_CASES.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span style="font-weight:700;">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-dbg="${i}">என்ன தவறு? (What's wrong?)</button>
+      <div class="explain-box" id="dbg-${i}">
+        <b>வகை:</b> ${c.errorType}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான வடிவம்:</span> ${c.fix}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-dbg]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('dbg-'+this.dataset.dbg).classList.toggle('show'); });
+  });
+}
+
+/* ---- Exam prep page wiring ---- */
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
