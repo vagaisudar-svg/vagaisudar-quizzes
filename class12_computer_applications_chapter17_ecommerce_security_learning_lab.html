@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 17 — மின்-வணிக பாதுகாப்பு அமைப்புகள் | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#f3f8f9;
+    --card:#ffffff;
+    --primary:#0e7490;
+    --primary-dark:#0b586c;
+    --primary-light:#e3f3f6;
+    --accent:#dc2626;
+    --accent-light:#fde8e8;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#d7e8ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#dff3f6;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#f1fbfc;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:900px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(14,116,144,.05);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:#f3e8ff;border-left:5px solid #9333ea;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:#7e22ce;font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .threat-box{background:var(--accent-light);border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .threat-box .lbl{font-weight:800;color:#b91c1c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;transition:all .25s;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(14,116,144,.4);}
+  .flow-node.muted{opacity:.35;}
+  .flow-node.done{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  .tab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0;}
+  .ex-chip{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:.85rem;font-weight:700;cursor:pointer;}
+  .ex-chip:hover{border-color:var(--primary);background:var(--primary-light);}
+  .ex-chip .cat{display:none;font-size:.74rem;font-weight:600;color:var(--muted);margin-top:6px;text-align:left;}
+  .ex-chip.revealed .cat{display:block;}
+  .ex-chip.revealed{border-color:var(--accent);}
+
+  .node-box{border:2px solid var(--border);border-radius:12px;padding:10px 14px;background:#fff;text-align:center;font-weight:700;font-size:.85rem;position:relative;}
+  .node-box.up{border-color:var(--correct);}
+  .node-box.down{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+  .dot.up{background:var(--correct);}
+  .dot.down{background:var(--incorrect);}
+  .log-panel{background:#0f172a;color:#cffafe;font-family:Consolas,Menlo,monospace;font-size:.78rem;border-radius:10px;padding:12px;max-height:220px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:4px;}
+  .log-panel .ln.alert{color:#fca5a5;}
+  .log-panel .ln.notice{color:#93c5fd;}
+  .log-panel .ln.ok{color:#86efac;}
+
+  .fcaps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0;}
+  .fcaps-card{border:2px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;background:#fff;font-weight:800;font-size:.88rem;}
+  .fcaps-card.active{border-color:var(--accent);background:var(--accent-light);}
+
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+  .cmp-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;}
+  .cmp-card h4{margin-top:0;}
+  @media (max-width:600px){.cmp-grid{grid-template-columns:1fr;}}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  /* ---- Chapter 17 specific widgets ---- */
+  .swatch-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;margin:10px 0;}
+  .swatch{width:52px;height:52px;border-radius:10px;border:2px solid rgba(0,0,0,.15);box-shadow:0 2px 6px rgba(0,0,0,.12);flex:0 0 auto;}
+  .swatch-lbl{font-size:.72rem;text-align:center;color:var(--muted);margin-top:4px;}
+  .swatch-col{display:flex;flex-direction:column;align-items:center;min-width:64px;}
+  .party-box{border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center;min-width:110px;}
+  .party-box.hacker{border-color:var(--accent);background:var(--accent-light);}
+  .party-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;align-items:flex-start;margin:10px 0;}
+
+  .browser-bar{display:flex;align-items:center;gap:8px;border-radius:10px;padding:10px 14px;font-family:Consolas,Menlo,monospace;font-size:.88rem;font-weight:700;max-width:420px;margin:14px auto;transition:all .3s;}
+  .browser-bar.insecure{background:#fde8e8;color:#991b1b;border:2px solid #f87171;}
+  .browser-bar.secure{background:#dcfce7;color:#166534;border:2px solid #4ade80;}
+
+  .cert-card{border:2px solid #94a3b8;border-radius:10px;background:#f8fafc;max-width:380px;margin:12px auto;font-size:.82rem;}
+  .cert-card .cert-head{background:#1e293b;color:#fff;padding:8px 12px;border-radius:8px 8px 0 0;font-weight:700;display:flex;justify-content:space-between;}
+  .cert-card .cert-body{padding:12px;}
+  .cert-card .cert-body div{margin-bottom:6px;}
+  .cert-card .cert-body b{color:var(--primary-dark);}
+
+  .url-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0;}
+  .url-chip{border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;background:#fff;font-family:Consolas,Menlo,monospace;font-size:.86rem;}
+  .url-chip .url-btns{display:flex;gap:6px;margin-top:8px;}
+  .url-chip .url-btns button{flex:1;padding:6px 8px;font-size:.78rem;}
+  .url-chip.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .url-chip.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+
+  .domain-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .domain-box{border:2px solid var(--primary);border-radius:12px;padding:14px;text-align:center;min-width:150px;background:var(--primary-light);font-weight:700;cursor:pointer;color:var(--primary-dark);}
+  .domain-box:hover{background:var(--primary);color:#fff;}
+
+  .cipher-wrap{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;}
+  .cipher-wrap .field{flex:1;min-width:180px;}
+  .cipher-out{background:#0f172a;color:#5eead4;font-family:Consolas,Menlo,monospace;padding:12px;border-radius:10px;margin-top:10px;min-height:1.4em;word-break:break-all;}
+
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media print{
+    header.top, nav.sidebar, .bottom-bar, footer.note, .sidebar-backdrop{display:none !important;}
+    main.content{padding:0;}
+    .card{box-shadow:none;break-inside:avoid;}
+  }
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .cmp-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 17 — மின்-வணிக பாதுகாப்பு அமைப்புகள் (E-Commerce Security Architecture)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 17: E-Commerce Security Architecture · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* ============================= STORAGE ============================= */
+const STORE_KEY = 'ca12_ecomsecurity_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable */ }
+  return { completed:[], lang:'ta' };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* ============================= TOPICS ============================= */
+const TOPICS = [
+  {id:'intro',    num:'17.1', title:'அறிமுகம் — மின்-வணிக பாதுகாப்பு'},
+  {id:'threats',  num:'17.2', title:'பாதுகாப்பு அச்சுறுத்தல் வகைகள்'},
+  {id:'dims',     num:'17.3', title:'பாதுகாப்பின் பரிமாணங்கள்'},
+  {id:'encrypt',  num:'17.4.1', title:'குறியாக்கத் தொழில்நுட்பம்'},
+  {id:'auth',     num:'17.4.2', title:'அங்கீகார தொழில்நுட்பம்'},
+  {id:'protocols',num:'17.4.3', title:'பாதுகாப்பு அங்கீகார நெறிமுறைகள்'},
+  {id:'practice', num:'Practice', title:'பயிற்சி & Mistake Museum'},
+  {id:'examprep', num:'Exam', title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* ============================= SIDEBAR / NAV ============================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* ============================= MAIN RENDER DISPATCH ============================= */
+const RENDERERS = {
+  intro: renderIntro,
+  threats: renderThreats,
+  dims: renderDims,
+  encrypt: renderEncrypt,
+  auth: renderAuth,
+  protocols: renderProtocols,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 17.1 — அறிமுகம்
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 17 › 17.1</div>
+    <h2>அறிமுகம் <span class="eng">(Introduction — E-Commerce Security)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      மின்-வணிக பாதுகாப்பு அமைப்புகளின் அடிப்படைகளைத் தெரிந்து கொள்ளுதல் · பல்வேறு வகையான மின்-வணிக அச்சுறுத்தல்களை புரிந்து கொள்ளுதல் · மின்-வணிக பாதுகாப்பின் பரிமாணங்கள் பற்றி அறிந்து கொள்ளுதல் · மின்-வணிக பரிமாற்றத்தில் பாதுகாப்பு தொழில்நுட்பங்கள் பற்றி அறிந்து கொள்ளுதல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>17.1 மின்-வணிக பாதுகாப்பு என்றால் என்ன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-வணிக பாதுகாப்பு என்பது இணையம் மூலம் மின்-வணிக பரிவர்த்தனைகளைப் பாதுகாப்பாக வழிநடத்தும் நெறிமுறைகளைக் கொண்ட ஒரு தொகுப்பு ஆகும். இணையத்தின் வேகமான வளர்ச்சியுடன், இணையதள பரிவர்த்தனைகள் முக்கிய வர்த்தக மாதிரியாக மாறிவிட்டன. இணைய வளங்களை அடிப்படையாகக் கொண்ட மின்-வணிக பரிவர்த்தனைகளைப் பொதுமக்கள் ஏற்றுக் கொள்ளத் தொடங்கியுள்ளனர். இணைய பரிவர்த்தனைகளால் ஏற்படும் வசதியைப் பயன்படுத்தும் போது, பரிமாற்றங்களின் பாதுகாப்பு மிகவும் கவனத்தைத் தேவைப்படுத்துகிறது. இணையத்தின் உள்ளார்ந்த வெளிப்படைத் தன்மை (Openness) மற்றும் வாய்ப்புகிரிவு மின் பரிவர்த்தனையின் பாதுகாப்பைக் கடுமையாக அச்சுறுத்துகிறது.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ரயில் நிலையத்தில் டிக்கெட் முன்பதிவு செய்யும் போது, நம்முடைய பெயர், பணப் பரிவர்த்தனை விவரம் எல்லாம் ஒரு பாதுகாப்பான கவுண்டர் வழியாகத்தான் செல்ல வேண்டும் — இல்லையெனில் யாரோ ஒருவர் நமது தகவலைத் திருடிவிடலாம் அல்லது மாற்றிவிடலாம். அதேபோல, இணையத்தில் பொருள் வாங்கும்போதும், நமது கடன் அட்டை எண், முகவரி போன்ற தகவல்கள் பாதுகாப்பான வழியில் மட்டுமே செல்ல வேண்டும். இதை உறுதி செய்வதே மின்-வணிக பாதுகாப்பு.
+    </div>
+    <p>எந்த ஒரு வளர்ந்துவரும் மின் வணிகத்திற்கும் பாதுகாப்பு முக்கிய காரணியாக உள்ளது. வணிக பரிமாற்ற நடவடிக்கைகளில் உள்ள பாதுகாப்பு அச்சுறுத்தல்களைத் தீர்த்தல் என்பது மின்-வணிகத்தின் சீரான வளர்ச்சியை உறுதிப்படுத்துவதற்கான அடிப்படையாகும்.</p>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>மின்-வணிக பாதுகாப்பு வரையறையைப் பாடநூல் வாசகப்படியே எழுத பழகவும்: "இணையம் மூலம் மின்-வணிக பரிவர்த்தனைகளைப் பாதுகாப்பாக வழிநடத்தும் நெறிமுறைகளைக் கொண்ட ஒரு தொகுப்பு".</div>
+  </div>
+
+  <div class="card">
+    <h3>🤔 ஏன் மின்-வணிக பாதுகாப்பு தேவை?</h3>
+    <div class="analogy">
+      <span class="lbl">🏪 நிகழ்வு ஒப்பீடு (Real-life Analogy)</span>
+      ஒரு சாதாரண கடையில் பொருள் வாங்கும்போது, கடைக்காரரை நேரில் பார்த்து, பணத்தைக் கையால் கொடுத்து பொருளைப் பெறுகிறோம் — மோசடி வாய்ப்பு குறைவு. ஆனால் மின்-வணிகத்தில் வாங்குபவரும் விற்பவரும் நேரில் சந்திப்பதில்லை; தகவல் முழுவதும் இணையம் வழியாகச் செல்கிறது. எனவே "யார் உண்மையான கடைக்காரர்?", "பணம் யாருக்குச் செல்கிறது?", "தகவல் வழியில் மாறிவிடுமா?" என்ற கேள்விகளுக்கு விடை தேடுவதே மின்-வணிக பாதுகாப்பின் வேலை.
+    </div>
+    <table class="tbl">
+      <tr><th>பாரம்பரிய வணிகம் (Traditional Business)</th><th>மின்-வணிகம் (E-Commerce)</th></tr>
+      <tr><td>நேரடி சந்திப்பு — அடையாளம் உறுதி</td><td>நேரில் சந்திப்பு இல்லை — அடையாளத்தை நெறிமுறைகள் மூலம் உறுதி செய்ய வேண்டும்</td></tr>
+      <tr><td>பணம் கையளவில் கையோடு</td><td>பணம் மின்னணு முறையில் — குறியாக்கம் தேவை</td></tr>
+      <tr><td>உள்ளூர் அளவில் அபாயம்</td><td>உலகளாவிய இணைய அளவில் அபாயம் (ஹேக்கர்கள், போட்டியாளர்கள், தீவிரவாதிகள்)</td></tr>
+    </table>
+    <div class="mistake-box"><span class="lbl">⚠️ பொதுவான தவறு</span>"மின்-வணிக பாதுகாப்பு பிரச்சினை பெரிய நிறுவனங்களுக்கு மட்டும்தான்" என நினைப்பது தவறு. வெளிநாட்டு / உள்நாட்டு, நிறுவனத்தின் உள்ளே / வெளியே, குழு / தனிநபர் வியாபார போட்டியாளர்கள், அதிருப்தி தொழிலாளர்கள், தீவிரவாதிகள் அல்லது ஹேக்கர்கள் என எவரும் ஒரு சாத்தியமான அச்சுறுத்தலாக இருக்க முடியும்.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-intro"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 17.2 — பாதுகாப்பு அச்சுறுத்தல் வகைகள்
+   ========================================================================= */
+const THREATS = [
+  {k:'leak', icon:'🕵️', ta:'தகவல் கசிவு', en:'Information Leakage',
+   def:'விற்பனையாளர் மற்றும் வாடிக்கையாளருக்கு இடையிலான பரிமாற்றத் தகவலை மூன்றாம் தரப்பினர் திருடுவது; அல்லது வணிகர்/வாடிக்கையாளரால் வழங்கப்பட்ட ஆவணங்களை மற்றவர் சட்டவிரோதமாகப் பயன்படுத்துவது. இவ்வாறு மின்-ஆவணங்களை இடைமறித்துத் திருத்துதல் "தகவல் கசிவு" என அழைக்கப்படுகிறது.'},
+  {k:'tamper', icon:'✍️', ta:'தரவு சிதைப்பு', en:'Tampering',
+   def:'இணையம் வழியாகத் தரவுகளைப் பரிமாறும்போது ஹேக்கர்களால் அத்தரவுகள் பல்வேறு தொழில்நுட்பங்கள் வாயிலாகத் தவறானதாக மாற்றப்பட்டு இலக்குக் கணிப்பொறிக்கு அனுப்பப்படுகிறது. இதனால் தரவுகளின் நம்பகத்தன்மை சிதைக்கப்படுகிறது.'},
+  {k:'fraud', icon:'💳', ta:'பண மோசடிகள்', en:'Payment Frauds',
+   def:'நட்பு மோசடி (Friendly Fraud) — வாடிக்கையாளர் பொய்யான தகவல் தந்து பணம் திரும்பக் கோருதல். தெளிவான மோசடி (Clean Fraud) — திருடப்பட்ட கடன் அட்டையைப் பயன்படுத்தி பொருட்கள் வாங்குதல். முக்கோண மோசடி (Triangulation Fraud) — போலி நிகழ்நிலைக் கடைகள் மலிவு விலை சலுகை அறிவித்து கடன் அட்டைத் தகவல்களைச் சேகரித்து விற்றல்.'},
+  {k:'malware', icon:'🐛', ta:'தீங்கிழைக்கும் நிரல் அச்சுறுத்தல்கள்', en:'Malicious Code Threats',
+   def:'தீங்கிழைக்கும் நிரல்கள், Cross Site Scripting அல்லது SQL Injection மூலம் ஒரு ஹேக்கர் கடன் அட்டைத் தகவல்களைத் திருடித் தொகுத்து, அதைக் களவு சந்தைகளில் (Black Market) விற்பனை செய்வார். பின் அத்தகவல்களைப் பயன்படுத்தி மோசடி நடைபெறும்.'},
+  {k:'ddos', icon:'🌊', ta:'பரவல் சேவை மறுக்கப்படல் தாக்குதல்', en:'Distributed Denial of Service (DDoS)',
+   def:'ஒரு மின்-வணிகத் தளத்தின் சேவையகத்திற்கு மிக அதிக வேண்டுகோள்களைத் தொடர்ந்து அனுப்புவதன் மூலம் அதை முடக்கும் செயல். Botnet-ஐப் பயன்படுத்தி பல அடையாளம் தெரியாத கணிப்பொறிகளில் இருந்து இத்தாக்குதல் நடத்தப்படும். இது Network Flooding என்றும் அழைக்கப்படுகிறது.'},
+  {k:'squat', icon:'🌐', ta:'சைபர் squatting', en:'Cyber Squatting',
+   def:'பின்னர் அதிக இலாபத்திற்கு விற்க வேண்டும் என்ற நோக்கத்தில் மற்றொரு நபர் விரும்பக்கூடிய ஒரு இணைய களப்பெயரை (Domain Name) முன்பே பதிவு செய்யும் சட்டவிரோத நடைமுறை. மேலும் ஒரு புகழ்பெற்ற நிறுவனத்தின் பெயரில் போலி வலைப்பக்கத்தை உருவாக்கி, அதை அதிகாரபூர்வ வலைப்பக்கம் எனக் காட்டி வாடிக்கையாளரை ஏமாற்றும் செயலும் இதில் அடங்கும்.'},
+  {k:'typo', icon:'⌨️', ta:'டைபோபைரஸி / தட்டச்சுப்போலி', en:'Typopiracy',
+   def:'சைபர் squatting-ன் ஒரு வகை. சில போலி வலைத்தளங்கள் பயனர்களின் பொதுவான தட்டச்சுப் பிழைகளைப் பயன்படுத்தி அவர்களைத் தங்கள் வலைத்தளத்திற்குத் திசை திருப்பும் மோசடி. எ.கா: www.goggle.com, www.faceblook.com'},
+];
+function renderThreats(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 17 › 17.2</div>
+    <h2>மின்-வணிக பாதுகாப்பு அச்சுறுத்தல் வகைகள் <span class="eng">(Types of E-Commerce Security Threats)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> மின்-வணிகத்தில் ஏற்படும் பல்வேறு வகையான பாதுகாப்பு அச்சுறுத்தல்களை அடையாளம் கண்டு புரிந்து கொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>17.2 அச்சுறுத்தல்கள் ஏன் உண்டாகின்றன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-வணிகமானது தகவல் தொழில்நுட்பம் மற்றும் கணிப்பொறி வலையமைப்புகளின் அடிப்படையில் செயல்படுவதால், மரபுசார் வணிகங்களுடன் ஒப்பிடுகையில் அது தொடர்ச்சியான பல பாதுகாப்பு பிரச்சினைகளை எதிர்கொள்ள வேண்டியுள்ளது. மின்-வணிகப் பாதுகாப்பு அச்சுறுத்தல்கள் தற்செயலானவையோ (மனிதத் தவறுகளால் ஏற்படுவது) அல்லது உள்நோக்கம் கொண்டவையாகவோ இருக்கலாம். வெளிநாடு அல்லது உள்நாடு, நிறுவனத்தின் உள்ளே அல்லது வெளியே, குழு அல்லது தனிநபர் வியாபார போட்டியாளர்கள் அல்லது அதிருப்தி தொழிலாளர்கள், தீவிரவாதிகள் அல்லது ஹேக்கர்கள், திறமை, தொழில்நுட்ப அறிவு, வாய்ப்பு மற்றும் தீங்கு விளைவிக்கும் நோக்கம் கொண்ட எவரும் மின்-வணிகத்திற்கு ஒரு சாத்தியமான அச்சுறுத்தலாக இருக்க முடியும்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🗂️ 7 முக்கிய அச்சுறுத்தல்கள் — கிளிக் செய்து அறியவும் <span class="eng">(Click to reveal)</span></h3>
+    <div class="ex-grid" id="threatGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>😈 ஃபிஷிங் (Phishing) — கூடுதல் அச்சுறுத்தல்</h3>
+    <div class="threat-box">
+      <span class="lbl">🎣 ஃபிஷிங் (Phishing)</span>
+      ஃபிஷிங் என்பது ஒரு வகை மின்-வணிக அச்சுறுத்தல் ஆகும். உண்மையான வங்கி அதிகாரியாகத் தன்னை பாசாங்கு செய்யும் ஒருவர், மின்னஞ்சல், தொலைபேசி அல்லது குறுஞ்செய்தி மூலம் பயனரைத் தொடர்பு கொண்டு அவர்களின் வங்கி கணக்கு எண், கடன் அட்டை விவரங்கள், OTP, PIN அல்லது கடவுச்சொற்கள் போன்ற முக்கியத் தகவல்களைக் கேட்டு திருடப் பார்ப்பார். இதன் விளைவு அடையாளத் திருட்டு மற்றும் நிதி இழப்பு போன்ற பேரழிவு செயல்களுக்கு வழிவகுக்கும்.
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>பிரிவு II MCQ-வில் "மின்-வணிக பாதுகாப்பு உறுப்பு அல்லாதது எது?" எனும் வகையிலான கேள்விகளில் ஃபிஷிங் (Phishing) ஒரு அச்சுறுத்தல்/தாக்குதல்-தான் — அது ஒரு பாதுகாப்பு பரிமாணம் (dimension) அல்ல என்பதை நினைவில் கொள்ளவும்.</div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 களப்பெயரை கண்டறி! <span class="eng">(Learning Activity — Spot the Fake Domain)</span></h3>
+    <p>டைபோபைரஸி (Typopiracy) பாடநூல் எடுத்துக்காட்டுகளான <code>www.goggle.com</code> மற்றும் <code>www.faceblook.com</code> ஐப் போலவே, கீழே உள்ள களப்பெயர்களில் எது உண்மையானது, எது போலியானது எனத் தேர்ந்தெடுக்கவும்.</p>
+    <div class="url-grid" id="urlGameGrid"></div>
+    <div class="mistake-box"><span class="lbl">⚠️ குறிப்பு</span>பாடநூலில் உள்ள இரண்டு எடுத்துக்காட்டுகள் (goggle.com, faceblook.com) தவிர, மற்ற உதாரணங்கள் இந்தச் செயல்பாட்டிற்காக உருவாக்கப்பட்ட கூடுதல் பயிற்சி (Enrichment) ஆகும்; அவை பாடநூல் பகுதி அல்ல.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-threats"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 17.3 — பாதுகாப்பின் பரிமாணங்கள்
+   ========================================================================= */
+const DIMENSIONS = [
+  {k:'auth', ta:'அங்கிகாரம்', en:'Authenticity', def:'தரவு மூலத்தை அங்கிகரித்தல் — தகவல் அனுப்பியவர் யார் என்பதை உறுதி செய்தல்.'},
+  {k:'avail', ta:'இருப்பு', en:'Availability', def:'தரவு தாமதம் அல்லது நீக்கத்தைத் தடுத்தல் — தேவையான நேரத்தில் தகவல்/சேவை கிடைக்குமாறு பார்த்தல்.'},
+  {k:'complete', ta:'முழுமை', en:'Completeness', def:'அனைத்து வர்த்தகத் தகவல்களையும் ஒன்றிணைத்தல்.'},
+  {k:'confid', ta:'இரகசியத்தன்மை', en:'Confidentiality', def:'அங்கீகரிக்கப்படாத நபர்களிடமிருந்து தரவைப் பாதுகாத்தல்.'},
+  {k:'effect', ta:'திறனுடைமை', en:'Effectiveness', def:'வன்பொருள், மென்பொருள் மற்றும் தரவை முழுமையாகவும் திறம்படவும் கையாளுதல்.'},
+  {k:'integ', ta:'நேர்மை', en:'Integrity', def:'அங்கீகரிக்கப்படாத தரவு மாற்றத்தைத் தடுத்தல் — தகவல் வழியில் மாறாமல் இருக்குமாறு உறுதி செய்தல்.'},
+  {k:'nonrep', ta:'மறுதலிக்கப்படாதிருத்தல்', en:'Non-repudiation', def:'உடன்படிக்கை மீறாதிருத்தல் — ஒப்பந்தம் செய்தவர் பின்னர் அதை மறுக்க முடியாதபடி உறுதிசெய்தல்.'},
+  {k:'priv', ta:'தனியுரிமை', en:'Privacy', def:'வாடிக்கையாளர்களின் தனிப்பட்ட தரவுகளைப் பிறர் பயன்படுத்தாமல் தடுத்தல்.'},
+  {k:'reli', ta:'நம்பகத்தன்மை', en:'Reliability', def:'தனிநபர்கள் அல்லது நிறுவனங்களின் நம்பகத்தன்மையை அடையாளங்காணல்.'},
+  {k:'review', ta:'மீளாய்வு திறன்', en:'Review ability', def:'தணிக்கை நடவடிக்கைகள் மற்றும் வணிகச் செயல்பாடுகளைக் கண்காணிக்கும் திறன்.'},
+];
+function renderDims(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 17 › 17.3</div>
+    <h2>மின்-வணிக பாதுகாப்பின் பரிமாணங்கள் <span class="eng">(Dimensions of E-Commerce Security)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> மின்-வணிக பாதுகாப்பு உறுதி செய்ய வேண்டிய 10 முக்கிய பரிமாணங்களைத் தெரிந்து கொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>17.3 பாதுகாப்பின் பரிமாணங்கள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      பாதுகாப்புச் சிக்கல்கள் மின்-வணிகத்திற்கு மிகவும் கவலையளிக்கும் பிரச்சனையாக இருப்பதால், மின்-வணிக செயல்பாடுகளின் பாதுகாப்பை உறுதி செய்வது மின்-வர்த்தகத்தின் முக்கிய ஆராய்ச்சித் துறையாக மாறிவிட்டது. மின்-வணிகம் தொடர்புடைய சில பாதுகாப்பு அம்சங்கள் பின்வருமாறு.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு பள்ளியில் தேர்வு நடத்த, தாள் கசியக்கூடாது (இரகசியத்தன்மை), தாள் நேரத்திற்கு வர வேண்டும் (இருப்பு), மதிப்பெண்கள் யாராலும் மாற்றப்படக்கூடாது (நேர்மை), விடை எழுதியவர் உண்மையிலேயே அந்த மாணவரே என உறுதி செய்ய வேண்டும் (அங்கிகாரம்) — இதேபோல மின்-வணிகத்திலும் ஒரு பரிவர்த்தனை பாதுகாப்பாக இருக்க வேண்டுமெனில் பல பரிமாணங்களை ஒரே நேரத்தில் கவனிக்க வேண்டும்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔟 பாதுகாப்பின் 10 பரிமாணங்கள் — கிளிக் செய்யவும்</h3>
+    <div class="fcaps-grid" id="dimGrid"></div>
+    <div id="dimDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>😕 குழப்பம் வருமா? — அச்சுறுத்தல் Vs பரிமாணம்</h3>
+    <div class="cmp-grid">
+      <div class="cmp-card"><h4>🔴 அச்சுறுத்தல்கள் (Threats — 17.2)</h4>இவை பாதுகாப்பிற்கு "ஏற்படும் ஆபத்துகள்" — எ.கா. ஃபிஷிங், DDoS, தகவல் கசிவு, தீங்கிழைக்கும் நிரல்கள்.</div>
+      <div class="cmp-card"><h4>🔵 பரிமாணங்கள் (Dimensions — 17.3)</h4>இவை "நாம் உறுதி செய்ய வேண்டிய பண்புகள்" — எ.கா. இரகசியத்தன்மை, நேர்மை, அங்கிகாரம். பரிமாணங்கள் பலமாக இருந்தால், அச்சுறுத்தல்களால் ஏற்படும் பாதிப்பு குறையும்.</div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>MCQ-வில் "பின்வருவனவற்றுள் எது மின்-வணிக பாதுகாப்பு உறுப்பு அல்ல?" என்று கேட்டால், பட்டியலில் உள்ள அச்சுறுத்தலைத் (எ.கா. ஃபிஷிங்) தேர்ந்தெடுக்கவும் — அதுவே "பரிமாணம் அல்ல" என்பதற்கான விடை.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-dims"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 17.4.1 — குறியாக்கத் தொழில்நுட்பம்
+   ========================================================================= */
+function renderEncrypt(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 17 › 17.4.1</div>
+    <h2>குறியாக்கத் தொழில்நுட்பம் <span class="eng">(Encryption Technology)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> குறியாக்கம்/மறைகுறியாக்கம் என்றால் என்ன, சமச்சீர் Vs சமச்சீரற்ற குறியீடு குறியாக்கம் வேறுபாடு என்ன என்பதை அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>17.4.1 குறியாக்கம் என்றால் என்ன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      குறியாக்கத் தொழில்நுட்பம் என்பது ஒரு செயல்திறன் மிக்க தகவல் பாதுகாப்பு அமைப்பாகும். குறியாக்க வழிமுறைகளைப் பயன்படுத்தி ஒரு மூல உரையை (Plain text) அர்த்தமற்ற மறைகுறியீட்டு உரையாக (Cipher text) மாற்றுவது குறியாக்கம் என வரையறுக்கப்படுகிறது. இதனால் தரவுகளின் இரகசியத்தன்மை உறுதி செய்யப்படுகிறது. குறியாக்கம் மற்றும் மறைகுறியாக்கம் செய்ய வழிமுறைகள் தரவைக் குறியாக்கம் அல்லது குறிநீக்கம் செய்ய ஒரு குறியீட்டை (Key) உபயோகப்படுத்துகின்றன. தற்போது இரண்டு குறியாக்க தொழில்நுட்பங்கள் பரவலாகப் பயன்படுத்தப்படுகின்றன — சமச்சீர் குறியீடு குறியாக்கம் (Symmetric key encryption) மற்றும் சமச்சீரற்ற குறியீடு குறியாக்கம் (Asymmetric key encryption).
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு கடிதத்தை ரகசியமாக அனுப்ப வேண்டுமெனில், அதை ஒரு பூட்டுப் பெட்டியில் வைத்து அனுப்பலாம். பெட்டியைத் திறக்க ஒரு "சாவி" (Key) தேவை. "மூல உரை" (Plain text) என்பது பூட்டாத கடிதம்; "மறைஎழுத்து உரை" (Cipher text) என்பது பூட்டிய பெட்டி. சாவி இல்லாமல் யாராலும் பெட்டியைத் திறந்து கடிதத்தைப் படிக்க முடியாது.
+    </div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">Plain text<br><span class="eng" style="font-size:.7rem;">மூல உரை</span></div>
+        <div class="flow-arrow">➕🔑➡</div>
+        <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#9a3412;">Encryption<br><span class="eng" style="font-size:.7rem;">(Algorithm)</span></div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-node">Cipher text<br><span class="eng" style="font-size:.7rem;">மறைஎழுத்து உரை</span></div>
+      </div>
+      <div class="diagram-cap">படம் 17.1 (redrawn) — தரவு குறியாக்கம் மற்றும் குறிநீக்கம் செய்முறை. Decryption இதன் தலைகீழ்: Cipher text + Key + Algorithm → Plain text.</div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>குறியாக்கம் (Encryption) = Plain text → Cipher text. மறைகுறியாக்கம் (Decryption) = Cipher text → Plain text. இரண்டிற்கும் ஒரு "Key" தேவை.</div>
+  </div>
+
+  <div class="card">
+    <h3>⚖️ சமச்சீர் Vs சமச்சீரற்ற குறியீடு குறியாக்கம் <span class="eng">(Interactive Comparison)</span></h3>
+    <p>கீழே உள்ள இரண்டு வகைகளில் ஒன்றைத் தேர்ந்தெடுத்து, அதன் செயல்முறையைப் பாருங்கள்.</p>
+    <div class="tab-row" id="encTabs"></div>
+    <div id="encDiagram" class="diagram-box"></div>
+    <table class="tbl">
+      <tr><th>சமச்சீர் குறியீடு குறியாக்கம் (Symmetric)</th><th>சமச்சீரற்ற குறியீடு குறியாக்கம் (Asymmetric)</th></tr>
+      <tr><td>மறைகுறியாக்கம் &amp; குறியாக்கம் இரண்டிற்கும் ஒரே குறியீடு பயன்படுத்தப்படுகிறது</td><td>மறைகுறியாக்கம் &amp; குறியாக்கம் இரண்டிற்கும் வெவ்வேறு குறியீடுகள் பயன்படுத்தப்படுகின்றன</td></tr>
+      <tr><td>வேகம் மிக அதிகம்</td><td>வேகம் குறைவு</td></tr>
+      <tr><td>மூல உரை &amp; மறைஎழுத்து உரை இரண்டும் ஒரே அளவானதாக இருக்கும்</td><td>தனி உரை &amp; மறைக்குறியீட்டு உரையின் அளவு வெவ்வேறானதாக இருக்கும்</td></tr>
+      <tr><td>DES, AES, RC4 போன்ற நெறிமுறைகள் இதைப் பயன்படுத்துகின்றன</td><td>RSA, ECC, DSA போன்ற நெறிமுறைகள் இதைப் பயன்படுத்துகின்றன</td></tr>
+      <tr><td>தரவுகளுக்கு இரகசியத்தன்மையை வழங்குகிறது</td><td>இரகசியத்தன்மை, அங்கிகாரம் மற்றும் மறுதலிக்கப்படாதிருத்தல் போன்ற நன்மைகளை வழங்குகிறது</td></tr>
+      <tr><td>பயனர் எண்ணிக்கைக்கு ஏற்ப பயன்படுத்தப்படும் குறியீடுகளின் எண்ணிக்கை அடுக்குகளில் அதிகரிக்கும்</td><td>பயனர் எண்ணிக்கைக்கு ஏற்ப பயன்படுத்தப்படும் குறியீடுகளின் எண்ணிக்கை நேர்கோட்டில் அதிகரிக்கும்</td></tr>
+    </table>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>MCQ: சமச்சீரற்ற குறியீடு குறியாக்கத்தில் குறியாக்கம் &amp; மறைகுறியாக்கத்திற்கு <b>வெவ்வேறு</b> குறியீடுகள் பயன்படுத்தப்படுகிறது.</div>
+  </div>
+
+  <div class="card">
+    <h3>🎨 பொது குறியீடு குறியாக்கம் — வண்ணக் கலவை விளையாட்டு <span class="eng">(Diffie–Hellman Learning Simulation)</span></h3>
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா?</span>
+      1976ல் விட்·பீல்ட் டிஃபி மற்றும் மார்ட்டின் இ. ஹெல்மேன், பொது குறியீடு குறியாக்கம் என்ற வழிமுறையை உருவாக்கினார்கள். வண்ண விளையாட்டைப் பயன்படுத்தி இந்த வழிமுறையைப் புரிந்து கொள்ளலாம். இது C-க்குத் தெரியாமல் A மற்றும் B எப்படித் தங்களின் ரகசியக் குறியீட்டைப் பெற முடியும் என்பதை விளக்குகிறது. இரண்டு நிகழ்வுகளை (facts) அடிப்படையாகக் கொண்டது: (1) இரண்டு வண்ணங்களைக் கலந்து மூன்றாம் வண்ணத்தைப் பெறுவது எளிது. (2) ஒரு வண்ணக் கலவையைக் கொடுத்து, பின் சென்று அதன் சரியான மூல வண்ணங்களைக் கண்டுபிடிப்பது கடினம்.
+    </div>
+    <p>கீழே "அடுத்த படி" பொத்தானை அழுத்தி, A, B, C (ஹேக்கர்) இடையே வண்ணங்கள் பரிமாறப்படும் விதத்தைப் படிப்படியாகக் காணவும்.</p>
+    <div class="diagram-box">
+      <div id="dhSteps" class="flow-row" style="margin-bottom:12px;"></div>
+      <div id="dhPanel"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="dhPrevBtn">⬅ முந்தைய படி</button>
+      <button class="btn btn-primary" id="dhNextBtn">அடுத்த படி ➡</button>
+      <button class="btn btn-ghost" id="dhResetBtn">🔄 Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 குறியாக்கம் முயற்சி செய் <span class="eng">(Try It — Learning Simulation, Caesar-style shift cipher)</span></h3>
+    <p>இது DES/RSA போன்ற உண்மையான நெறிமுறை அல்ல — குறியாக்கம் எவ்வாறு "Plain text + Key → Cipher text" ஆக மாறுகிறது என்ற கருத்தை எளிதில் புரிந்துகொள்ள உருவாக்கப்பட்ட Learning Simulation (எழுத்துகளை Key எண்ணின் அளவு நகர்த்தும் Shift Cipher).</p>
+    <div class="cipher-wrap">
+      <div class="field"><label>மூல உரை (Plain text — ஆங்கில எழுத்துகள் மட்டும்):<br><input type="text" id="cipherInput" placeholder="HELLO" value="HELLO"></label></div>
+      <div class="field"><label>குறியீடு (Key — 1 முதல் 25):<br><input type="number" id="cipherKey" value="3" min="1" max="25"></label></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="cipherEncBtn">🔒 குறியாக்கு (Encrypt)</button>
+      <button class="btn btn-ghost" id="cipherDecBtn">🔓 மறைகுறியாக்கு (Decrypt)</button>
+    </div>
+    <div class="cipher-out" id="cipherOut">இங்கே வெளியீடு தோன்றும்…</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-encrypt"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 17.4.2 — அங்கீகார தொழில்நுட்பம்
+   ========================================================================= */
+function renderAuth(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 17 › 17.4.2</div>
+    <h2>அங்கீகார தொழில்நுட்பம் <span class="eng">(Authentication Technology)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> எண்முறைச் சான்றிதழ் மற்றும் எண்முறைக் கையொப்பம் இடையேயான வேறுபாட்டைத் தெரிந்து கொள்ளுதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>17.4.2 அங்கீகார தொழில்நுட்பம்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      நம்பகத்தன்மை, நேர்மை மற்றும் மறுதலிக்கப்படாதிருத்தல் ஆகியவற்றை உறுதிசெய்வது அங்கீகார தொழில்நுட்பத்தின் முக்கிய பணியாகும். இதனை எண்முறைச் சான்றிதழ்கள் மற்றும் எண்முறைக் கையொப்பம் மூலம் அடையலாம்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📜 எண்முறைச் சான்றிதழ்கள் (Digital Certificates)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      ஒரு எண்முறைச் சான்றிதழ் என்பது ஒருவரது பொது குறியீட்டின் (Public Key) உரிமையை நிரூபிக்கப் பயன்படுத்தப்படும் ஒரு மின்னஞ் ஆவணம் ஆகும். இந்த சான்றிதழில் அனுப்புநரின் அடையாளம் பற்றிய தகவல்கள், அனுப்புநரின் எண்முறைக் கையொப்பம் மற்றும் அவரின் பொது குறியீடு போன்ற தகவல்கள் அடங்கியிருக்கும். கடவுச்சீட்டு மற்றும் ஓட்டுநர் உரிமம் போன்ற அடையாள அட்டைகளின் பயன்பாடு போன்றே எண்முறைச் சான்றிதழின் பயன்பாடு உள்ளது. இது அங்கீகரிக்கப்பட்ட சான்றளிப்பு அதிகாரிகளால் (Certification Authorities – CA) வழங்கப்படுகிறது. Pretty Good Privacy (PGP) மற்றும் X.509 ஆகியவை புகழ்பெற்ற எண்முறைச் சான்றிதழ் வகைகள்.
+    </div>
+    <div class="diagram-box">
+      <div class="cert-card">
+        <div class="cert-head"><span>📄 Certificate</span><span>✕</span></div>
+        <div class="cert-body">
+          <div><b>Issued to:</b> abc.com</div>
+          <div><b>Issued by:</b> Certification Authority (CA)</div>
+          <div><b>Valid from:</b> 01/01/2025 <b>to</b> 01/01/2026</div>
+          <div><b>Public Key:</b> <span class="mono">3F:AC:9B:…</span></div>
+          <div style="color:var(--correct);font-weight:700;">✔ You have a private key that corresponds to this certificate</div>
+        </div>
+      </div>
+      <div class="diagram-cap">படம் 17.2 (redrawn) — எண்முறைச் சான்றிதழ் ஒரு கணினி ஆவணம் போல் தோன்றும்; உண்மையான திரைப்பதிவு அல்ல.</div>
+    </div>
+    <div class="activity-box"><span class="lbl">💡 உங்களுக்குத் தெரியுமா?</span>எண்முறைச் சான்றிதழ், உரிமை பெற்ற சான்றளிக்கும் அதிகாரியால் (CA) வழங்கப்படுகிறது. NIC, Safescript, TCS, MTNL, e-Mudhra ஆகியவை இந்திய அரசால் அங்கீகரிக்கப்பட்ட சான்றளிக்கும் நிறுவனங்கள்.</div>
+    <div class="activity-box"><span class="lbl">💡 பாதுகாப்பு அடையாளம் (Security Token)</span>பாதுகாப்பு அடையாளம் என்பது பயனர்களை அடையாளம் கண்டு அங்கீகரிக்கப் பயன்படும் வன்பொருள் கூறு (எ.கா. USB eToken, Smart Card).</div>
+  </div>
+
+  <div class="card">
+    <h3>✒️ எண்முறைக் கையொப்பம் (Digital Signature)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      எண்முறைக் கையொப்பம் என்பது ஒரு குறிப்பிட்ட மின்னஞ் ஆவணம், செய்தி அல்லது பரிவர்த்தனையை நம்பகமானதா என சரிபார்க்கப் பயன்படும் ஒரு அமைப்பு ஆகும். இது ஒரு பெறுநருக்கு, தகவல் குறிப்பிட்ட அனுப்புநரால்தான் உருவாக்கப்பட்டது என்பதற்கான உத்தரவாதம் அளிக்கிறது. மேலும் இந்தத் தகவல், கையொப்பம் இடப்பட்ட புள்ளியிலிருந்து தோன்றியதாகவும், நடுவில் உள்ள cracker மூலம் மாற்றம் செய்யப்படவில்லை என்பதையும் உறுதிப்படுத்துகிறது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🆚 எண்முறைக் கையொப்பம் Vs எண்முறைச் சான்றிதழ் <span class="eng">(Interactive Comparison)</span></h3>
+    <div class="tab-row" id="authTabs"></div>
+    <div id="authDetail"></div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>எண்முறைச் சான்றிதழ் = <b>அனுப்புநரின்</b> நம்பகத்தன்மையை சரிபார்க்கிறது. எண்முறைக் கையொப்பம் = <b>அனுப்பப்படும் தரவின்</b> நம்பகத்தன்மையை சரிபார்க்கிறது.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-auth"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 17.4.3 — பாதுகாப்பு அங்கீகார நெறிமுறைகள்
+   ========================================================================= */
+const SSL_STEPS = [
+  {title:'படி 1 — பாதுகாப்பான இணைப்பு', text:'குமார் தனது கணினி உலாவி மூலம் abc.com வலைத்தளத்துடன் ஒரு பாதுகாப்பான இணைப்பின் மூலம் இணைக்கிறார்.'},
+  {title:'படி 2 — சான்றிதழ் &amp; பொது குறியீடு அனுப்புதல்', text:'abc.com வலைத்தளம் குமாருக்குத் தனது மின்னஞ் சான்றிதழ் மற்றும் பொது குறியீட்டை (P) அனுப்புகிறது. சான்றிதழ் வழங்கும் அதிகாரி (CA) வழங்கிய இந்த மின்னஞ் சான்றிதழ் abc.com-யின் அடையாளத்தை நிரூபிக்கிறது.'},
+  {title:'படி 3 — சான்றிதழ் சோதனை &amp; அமர்வு குறியீடு', text:'குமாரின் உலாவி சான்றிதழைச் சோதிக்கிறது. பின்னர் சமச்சீர் குறியாக்க நெறிமுறையைப் பயன்படுத்த சேவையகத்துடன் உடன்படுகிறது. இந்த வழிமுறைக்குத் தேவையான ஒரு குறியீட்டை (அமர்வு குறியீடு K) தோராயமாகத் தேர்வு செய்கிறது.'},
+  {title:'படி 4 — அமர்வு குறியீட்டைப் பகிர்தல்', text:'குமாரின் உலாவி abc.com-க்கு P(K)-ஐ அனுப்புகிறது. அதன் இரகசியக் குறியீடு S-ஐப் பயன்படுத்தி, abc.com சேவையகம் S(P(K)) = K கணக்கிடுகிறது. இப்போது குமாரின் உலாவி மற்றும் abc.com சேவையகம் ஆகிய இரண்டின் வசமும் ஒரே குறியீடு (K) உள்ளது.'},
+  {title:'படி 5 — தகவலைக் குறியாக்கி அனுப்புதல்', text:'குமார் தனது கணக்கு எண் மற்றும் பிற தரவுகளை உள்ளிடுகிறார். உலாவி, குறியீடு K-ஐப் பயன்படுத்தி குறியாக்கம் செய்யப்பட்ட இந்த "தகவலை" abc.com-க்கு அனுப்புகிறது; மேலும் ஹேஷ் செயற்கூறைப் பயன்படுத்தி "தகவல் சுருக்கம்" ஒன்றையும் அனுப்புகிறது.'},
+  {title:'படி 6 — மறைகுறியாக்கி சரிபார்த்தல்', text:'குறியீடு K-உடன் abc.com சேவையகம் "தகவலை" மறைகுறியாக்க முடியும். மேலும் அது தகவல் சுருக்கத்தையும் கணக்கிட்டு, குமாரின் உலாவி அனுப்பிய சுருக்கத்துடன் ஒப்பிடுகிறது. அவை ஒருங்கிணைந்தால், தரவு சரியாக அனுப்பப்பட்டது எனக் கருதப்படுகிறது.'},
+];
+function renderProtocols(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 17 › 17.4.3</div>
+    <h2>பாதுகாப்பு அங்கீகார நெறிமுறைகள் <span class="eng">(Authentication Protocols)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> SET, SSL, 3D பாதுகாப்பு நெறிமுறைகளைத் தெரிந்து கொள்ளுதல்; http Vs https வேறுபாடு அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>17.4.3 இரு முக்கிய பாதுகாப்பு அங்கீகார நெறிமுறைகள்</h3>
+    <p>தற்போது மின்-வணிகத்தில் பாதுகாப்பான மின்னணு பரிவர்த்தனை (SET) மற்றும் பாதுகாப்பான சாக்கெட் அடுக்கு (SSL) ஆகிய இரண்டு வகையான பாதுகாப்பு அங்கீகார நெறிமுறைகள் பரவலாகப் பயன்படுத்தப்படுகின்றன.</p>
+    <div class="cmp-grid">
+      <div class="cmp-card">
+        <h4>💳 SET — Secure Electronic Transaction</h4>
+        <div class="tb-def" style="margin:0;"><span class="lbl">📘 வரையறை</span>குறிப்பாக இணையம் வழியாகக் கடன் அட்டை மூலம் மின்னணு பணம் செலுத்தல்களுக்கான பாதுகாப்பு நெறிமுறை. GTE, IBM, மைக்ரோசாப்ட் மற்றும் நெட்ஸ்கேப் பங்களிப்புடன், 1996-ல் விசா மற்றும் மாஸ்டர்கார்டு நிறுவனங்களால் உருவாக்கப்பட்டது. எண்முறைக் கையொப்பம் மற்றும் பரிமாற்ற தரவின் குறியாக்கம் ஆகியவற்றின் அடிப்படையில் செயலாக்கப்படுகிறது; தனியுரிமையை (Privacy) உறுதிப்படுத்த இரட்டைக் கையொப்பங்களையும் பயன்படுத்துகிறது.</div>
+      </div>
+      <div class="cmp-card">
+        <h4>🔒 SSL — Secure Sockets Layer</h4>
+        <div class="tb-def" style="margin:0;"><span class="lbl">📘 வரையறை</span>மிகவும் பொதுவான மறைகுறியீட்டியல் நெறிமுறை — இணைய பரிமாற்றங்களைப் பாதுகாப்பதற்கான ஒரு கலப்பு குறியாக்க நெறிமுறை. மாஸ்டர்கார்டு, பாங்க் ஆஃப் அமெரிக்கா, MCI மற்றும் சிலிக்கான் கிராபிக்ஸ் ஆகியோருடன் இணைந்து நெட்ஸ்கேப் நிறுவனம் SSL தரநிலையை உருவாக்கியது. ஒரு அங்கீகார நடவடிக்கைக்குப் பிறகு முனையம் மற்றும் சேவையகம் இடையே பாதுகாப்பான தகவல்தொடர்புத் தடத்தை நிறுவுவதே இதன் நோக்கம்.</div>
+      </div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>SET = 1996, VISA &amp; Mastercard. SSL = Netscape + Mastercard/BoA/MCI/Silicon Graphics. இணைய வழி கடன் அட்டை பரிவர்த்தனைகளில் SET நெறிமுறை பயன்படுத்தப்படுகிறது.</div>
+  </div>
+
+  <div class="card">
+    <h3>🌐 http Vs https — உலாவியில் உள்ள வேறுபாடு <span class="eng">(Interactive Demo)</span></h3>
+    <p>இன்று, சந்தையில் உள்ள அனைத்து உலாவிகளும் SSL நெறிமுறையை ஆதரிக்கின்றன. பயனர் செய்ய வேண்டிய ஒரே செயல், உரலி <code>https://</code> உடன் தொடங்குவதை உறுதிப்படுத்துவது மட்டுமே. "s" (secured) என்பது பாதுகாக்கப்பட்டது எனப் பொருள்படும். இது ஒரு பச்சை நிறப் பூட்டுக் குறியையும் முன்னொட்டாகக் கொண்டிருக்கும்.</p>
+    <div id="httpsBar" class="browser-bar insecure">⚠ Not secure &nbsp; http://example.com</div>
+    <div class="btn-row" style="justify-content:center;"><button class="btn btn-primary" id="httpsToggleBtn">🔁 Toggle http ⇄ https</button></div>
+    <div class="diagram-cap">படம் 17.3 (redrawn) — http Vs https இடையே வேறுபாடு.</div>
+  </div>
+
+  <div class="card">
+    <h3>🛡️ 3D பாதுகாப்பு (3D Secure)</h3>
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா?</span>
+      3D பாதுகாப்பு என்பது இணையத்தில் ஒரு பாதுகாப்பான கட்டணம் செலுத்த உதவும் நெறிமுறை ஆகும். பரிமாற்ற பாதுகாப்பின் அளவை அதிகரிக்க VISA-ஆல் இது உருவாக்கப்பட்டது; பின்னர் மாஸ்டர்கார்டு-ஆல் ஏற்றுக்கொள்ளப்பட்டது. இது வலைத்தளம் மூலம் கொள்முதல் செய்யும்போது, கட்டண அட்டை வைத்திருப்பவரின் சிறந்த அங்கீகாரத்தை வழங்குகிறது. இந்த (XML அடிப்படையிலான) நெறிமுறையின் அடிப்படைக் கருத்து, நிதி அதிகாரமளித்தல் செயல்முறையை ஒரு நிகழ்நிலை சான்றளிப்பு அமைப்புடன் இணைப்பதாகும். இந்த சான்றளிப்பு மாதிரி 3 களங்களை (Domains) உள்ளடக்கியது (எனவே 3D எனப் பெயர் பெற்றது).
+    </div>
+    <p>ஒவ்வொரு களத்தையும் (Domain) கிளிக் செய்து அதன் பொருளை அறியவும்:</p>
+    <div class="domain-row" id="domainGrid"></div>
+    <div id="domainDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>📖 நிகழ்வு ஆய்வு — SSL இன் இயக்கம் <span class="eng">(Case Study — Kumar buys a mobile from abc.com)</span></h3>
+    <p>பொது குறியீடு குறியாக்கத்தைப் பயன்படுத்தி SSL-இன் இயக்கக் கொள்கையை பின்வரும் சூழலில் எளிதில் புரிந்து கொள்ள முடியும்: "குமார் ஒரு மின்-வணிகத் தளத்தில் (abc.com) இருந்து கைபேசியை வாங்குகிறார்."</p>
+    <div class="diagram-box">
+      <div id="sslSteps" class="flow-row" style="margin-bottom:12px;"></div>
+      <div id="sslPanel"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="sslPrevBtn">⬅ முந்தைய படி</button>
+      <button class="btn btn-primary" id="sslNextBtn">அடுத்த படி ➡</button>
+      <button class="btn btn-ghost" id="sslResetBtn">🔄 Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧠 நினைவில் கொள்க <span class="eng">(Remember — Textbook Summary Box)</span></h3>
+    <ul>
+      <li><b>ஃபிஷிங்:</b> ஹேக்கர் நம்பர்குரியவர் போல் வேடமிட்டு உள்நுழைவு சான்றுகள் போன்ற முக்கியமான தரவை தொலைபேசி, எஸ்எம்எஸ், மின்னஞ்சல் அல்லது சமூக ஊடகங்கள் மூலம் அடைவது.</li>
+      <li><b>சான்றளிப்பு:</b> அனுப்புநரின் தகவல் பெரும்பாலும் ஆவணத்தில் சேர்க்கப்படுகிறது, ஆனால் அவை துல்லியமற்றதாக இருக்கலாம். ஒரு ஆவணத்தின் ஆதாரத்தைச் சரிபார்க்க எண்முறைக் கையொப்பம் பயன்படுத்தப்படலாம்.</li>
+      <li><b>நேர்மை:</b> ஆவணம் எண்முறைக் கையொப்பமிடப்பட்டிருந்தால், பின் ஆவணத்தில் எந்தவொரு திருத்தமும் அந்தக் கையொப்பத்தைச் செயல்தகாததாக்கும்.</li>
+      <li><b>மறுதலிக்கப்படாதிருத்தல்:</b> மறுதலித்தல் என்பது ஒரு செய்திக்கான பொறுப்புடைமையைத் துறக்கும் செயலைக் குறிக்கிறது. ஆவணத்தில் எண்முறைக் கையொப்பமிட்டவர் அதை நிராகரிக்க முடியாது என்பதை இது உறுதிசெய்கிறது.</li>
+      <li><b>எண்முறைக் கையொப்பம் Vs சான்றிதழ்:</b> அனுப்புநரின் நம்பகத்தன்மையைச் சரிபார்க்க எண்முறைச் சான்றிதழ்கள் பயன்படுத்தப்படுகின்றன; அனுப்பப்படும் தரவின் நம்பகத்தன்மையைச் சரிபார்க்க எண்முறைக் கையொப்பங்கள் பயன்படுத்தப்படுகின்றன.</li>
+      <li><b>சான்றளிப்பு அதிகார அமைப்பு</b> "களஞ்சியம்" என அழைக்கப்படும் ஒரு பொது குறியீடு தரவுத்தளத்தைப் பராமரிக்கிறது; காலாவதியான சான்றிதழ்கள் அதிலிருந்து நீக்கப்படும்.</li>
+      <li><b>முரட்டு தாக்குதல்கள் (Brute Force):</b> சாத்தியமான எல்லாக் குறியீடுகளையும் ஒவ்வொன்றாக முயற்சி செய்து எந்த குறியாக்கத்தையும் உடைக்கும் எளிய தாக்குதல் முறை.</li>
+    </ul>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-protocols"></div></div>
+  `;
+}
+
+/* =========================================================================
+   PRACTICE PAGE
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Mistake Museum <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — <span class="eng">Enrichment</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Mistake Museum — பொதுவான தவறான கருத்துக்கள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு தவறான கருத்தையும் படித்து, அது ஏன் தவறு எனக் யூகிக்கவும். பிறகு "ஏன் தவறு?" பொத்தானை கிளிக் செய்து, சரியான புரிதலைப் பாருங்கள்.</p>
+    <div id="misWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. மின்-வணிகத்தில், திருடப்பட்ட கடன் அட்டை ஒன்றை பொருட்களை வாங்க பயன்படுத்தப்படும்போது, அது _______ என அழைக்கப்படுகிறது.', o:['நட்பு மோசடி','தெளிவான மோசடி','முக்கோண மோசடி','சைபர் SQUATTING'], c:1, exp:'திருடப்பட்ட கடன் அட்டையைப் பயன்படுத்தி பொருட்கள் வாங்குவது "தெளிவான மோசடி — Clean Fraud" என அழைக்கப்படுகிறது.'},
+  'b2': {q:'2. பின்வருவனவற்றுள் எது மின்-வணிக பாதுகாப்பு உறுப்பு அல்ல?', o:['நம்பகத்தன்மை','ரகசியத்தன்மை','ஃபிஷிங்','தனியுரிமை'], c:2, exp:'நம்பகத்தன்மை, ரகசியத்தன்மை, தனியுரிமை ஆகியவை பாதுகாப்பின் பரிமாணங்கள் (17.3); ஃபிஷிங் ஒரு அச்சுறுத்தல் (17.2) — பரிமாணம் அல்ல.'},
+  'b3': {q:'3. சமச்சீரற்ற குறியீட்டு குறியாக்கத்தில் குறியாக்கம் மற்றும் மறைகுறியாக்கம் இரண்டிற்கும் _______ குறியீடுகள் பயன்படுத்தப்படுகிறது.', o:['ஒரே','வெவ்வேறு','நேர்மறை','எதிர்மறை'], c:1, exp:'சமச்சீரற்ற குறியாக்கத்தில் குறியாக்கம் &amp; மறைகுறியாக்கத்திற்கு வெவ்வேறு குறியீடுகள் (பொது &amp; தனிப்பட்ட) பயன்படுத்தப்படுகின்றன.'},
+  'b4': {q:'4. கீழ்க்கண்ட எவை பாதுகாப்பு அங்கீகார தொழில்நுட்பம் ஆகும்? i. எண்முறைக் கையொப்பம் ii. எண்முறை நாணயம் iii. எண்முறை நிழற்படம் iv. எண்முறை சான்றிதழ்கள்', o:['i & iv','iii & iv','i, ii & iii','மேற்கூறிய அனைத்தும்'], c:0, exp:'எண்முறைக் கையொப்பம் (i) மற்றும் எண்முறைச் சான்றிதழ்கள் (iv) மட்டுமே அங்கீகார தொழில்நுட்பங்கள்; எண்முறை நாணயம் மற்றும் நிழற்படம் இவை அல்ல.'},
+  'b5': {q:'5. PGP-யின் விரிவாக்கம் ______.', o:['Pretty Good Privacy','Pretty Good Person','Private Good Privacy','Private Good Person'], c:0, exp:'PGP = Pretty Good Privacy — ஒரு புகழ்பெற்ற எண்முறைச் சான்றிதழ் வகை.'},
+  'b6': {q:'6. இணைய வழி கடன் அட்டை பரிவர்த்தனைகளில் கீழ்க்கண்ட _______ நெறிமுறை பயன்படுத்தப்படுகிறது.', o:['பாதுகாப்பான மின்னணு பரிவர்த்தனை (SET)','எண்முறைச் சான்றிதழ்கள்','சமச்சீர் குறியீடு குறியாக்கம்','பொது குறியீடு குறியாக்கம்'], c:0, exp:'SET (Secure Electronic Transaction) என்பது குறிப்பாக இணையம் வழியாக கடன் அட்டை மூலம் மின்னணு பணம் செலுத்தல்களுக்கான பாதுகாப்பு நெறிமுறை.'},
+  'b7': {q:'7. பாதுகாப்பான மின்னணு பரிவர்த்தனை (SET) _______ ஆண்டில் உருவாக்கப்பட்டது.', o:['1999','1996','1969','1997'], c:1, exp:'SET 1996-ல் GTE, IBM, மைக்ரோசாப்ட், நெட்ஸ்கேப் பங்களிப்புடன் விசா மற்றும் மாஸ்டர்கார்டு நிறுவனங்களால் உருவாக்கப்பட்டது.'},
+  'b8': {q:'8. பாதுகாப்பான சாக்கெட் அடுக்கு (SSL) நெறிமுறைகளைப் பயன்படுத்தும் இணையதளங்களை _______ மூலம் அடையாளம் காணலாம்.', o:['html://','http://','htmls://','https://'], c:3, exp:'SSL பயன்படுத்தும் தளங்கள் https:// உடன் தொடங்கும்; "s" (secured) என்பது பாதுகாக்கப்பட்டது எனப் பொருள்.'},
+  'b9': {q:'9. _______ என்பது மூல உரையை அர்த்தமற்ற மறை எழுத்து உரையாக மாற்றும் செயல்முறையாகும்.', o:['குறியாக்கம்','மறைகுறியாக்கம்','எண்முறைச் சான்றிதழ்கள்','எண்முறைக் கையொப்பம்'], c:0, exp:'Plain text-ஐ Cipher text ஆக மாற்றுவது குறியாக்கம் (Encryption) என வரையறுக்கப்படுகிறது.'},
+  'b10': {q:'10. பின்வருவனவற்றுள் RANSOMWARE தொடர்பான சரியான கூற்று எது?', o:['தீநிரலின் ஒரு உப தொகுப்பு அல்ல','RANSOMWARE உடனடியாகக் கோப்பை நீக்குகிறது','TYPOPIRACY என்பது ஒரு வகையான RANSOMWARE','பாதிக்கப்பட்டவர்களிடமிருந்து கோப்புகளை மீட்க பணம் கோரப்படும்'], c:3, exp:'Ransomware இலக்கு கணிப்பொறியின் கோப்புகளைக் குறியாக்கம் செய்து, பணம் செலுத்தப்படாவிட்டால் தரவை வெளியிடுவதாக அச்சுறுத்தும் தீநிரல்; கோப்புகளை உடனடியாக நீக்காது, TYPOPIRACY என்பது Cyber Squatting-ன் ஒரு வகை, RANSOMWARE அல்ல.'},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'DDoS தாக்குதல் வேறு எந்தப் பெயரில் அழைக்கப்படுகிறது?', o:['Network Flooding','Information Leakage','Cyber Squatting','Tampering'], c:0, exp:'DDoS (Distributed Denial of Service) தாக்குதல் Network Flooding என்றும் அழைக்கப்படுகிறது.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'ஃபிஷிங் தாக்குதல் முதன்மையாக எதைத் திருட முயல்கிறது?', o:['வன்பொருள் பகுதிகள்','உள்நுழைவு சான்றுகள் / கடன் அட்டை தகவல்','Network cables','Domain Name மட்டும்'], c:1, exp:'ஃபிஷிங் என்பது வங்கி அதிகாரி போல் வேடமிட்டு OTP, PIN, கடவுச்சொல் போன்ற முக்கியத் தகவல்களைத் திருடும் மோசடி.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'SSL தரநிலையை உருவாக்குவதில் பங்களித்த நிறுவனம் எது?', o:['Netscape','Adobe','Oracle','IBM மட்டும்'], c:0, exp:'மாஸ்டர்கார்டு, பாங்க் ஆஃப் அமெரிக்கா, MCI, சிலிக்கான் கிராபிக்ஸ் ஆகியோருடன் இணைந்து Netscape நிறுவனம் SSL தரநிலையை உருவாக்கியது.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'எண்முறைச் சான்றிதழை வழங்கும் அதிகாரம் பெற்ற அமைப்பு எது?', o:['ISP','Certification Authority (CA)','Web Browser','Domain Registrar'], c:1, exp:'எண்முறைச் சான்றிதழ் அங்கீகரிக்கப்பட்ட சான்றளிப்பு அதிகாரிகளால் (Certification Authorities – CA) வழங்கப்படுகிறது.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'3D பாதுகாப்பு நெறிமுறையின் 3 களங்கள் (Domains) எவை?', o:['Acquirer, Issuer, Interoperability','Buyer, Seller, Bank','Input, Process, Output','Client, Server, Database'], c:0, exp:'3D பாதுகாப்பு — பெறுநர் களம் (Acquirer Domain), வழங்குநர் களம் (Issuer Domain), இயங்குதன்மை களம் (Interoperability Domain) ஆகிய 3 களங்களைக் கொண்டது.'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'Diffie–Hellman வண்ணக் கலவை உதாரணத்தில், ஹேக்கர் "C" ஏன் சரியான ரகசிய நிறத்தைப் பெற முடியவில்லை?', o:['C-க்கு கணிதம் தெரியாது','A அல்லது B-யின் தனிப்பட்ட நிறம் (ரகசியம்) அவருக்குத் தெரியாது','C-யிடம் நிறம் கலக்கும் கருவி இல்லை','நெட்வொர்க் வேகம் குறைவு'], c:1, exp:'C இரண்டு கலவை நிறங்களைப் (ஆரஞ்சு, பச்சை) பெற்றாலும், இறுதி ரகசிய நிறத்தைப் பெற A அல்லது B-யின் தனிப்பட்ட ரகசிய நிறம் (சிவப்பு/நீலம்) ஒன்று தேவை — அது C-க்குத் தெரியாது.'},
+};
+
+const TF_QS = [
+  {q:'ஃபிஷிங் என்பது ஒரு வகை மின்-வணிக பாதுகாப்பு அச்சுறுத்தலாகும்.', a:true, exp:'சரி — ஃபிஷிங் வங்கி அதிகாரி போல வேடமிட்டு முக்கியத் தகவல்களைத் திருடும் அச்சுறுத்தல்.'},
+  {q:'சமச்சீர் குறியீடு குறியாக்கத்தில் குறியாக்கம் மற்றும் மறைகுறியாக்கத்திற்கு ஒரே குறியீடு பயன்படுத்தப்படுகிறது.', a:true, exp:'சரி — சமச்சீர் (Symmetric) குறியாக்கத்தில் ஒரே குறியீடு (Key) இரண்டிற்கும் பயன்படுத்தப்படுகிறது.'},
+  {q:'SSL நெறிமுறையைப் பயன்படுத்தும் வலைதளங்களின் URL http:// என தொடங்கும்.', a:false, exp:'தவறு — SSL பயன்படுத்தும் தளங்கள் https:// (s = secured) என தொடங்கும்.'},
+  {q:'எண்முறைச் சான்றிதழ் அனுப்புநரின் அடையாளத்தை நிரூபிக்கிறது.', a:true, exp:'சரி — எண்முறைச் சான்றிதழ் ஒருவரது பொது குறியீட்டின் உரிமையை நிரூபிக்க பயன்படுகிறது; இதன் மூலம் அடையாளம் நிரூபிக்கப்படுகிறது.'},
+  {q:'DDoS தாக்குதல் ஒரு சேவையகத்தின் செயல்திறனை அதிகரிக்கிறது.', a:false, exp:'தவறு — DDoS தாக்குதல் சேவையகத்தின் திறனைக் குறைத்து, அதை செயலிழக்கச் செய்யும்.'},
+];
+
+const FIB_QS = [
+  {text:'______________ என்பது ஒரு உரிமை பெற்ற நபர் போல நடித்து இரகசிய தகவல்களை திருடும் மோசடி.', ans:'பிஷிங்'},
+  {text:'SET 1996 ல் விசா மற்றும் ______________ நிறுவனங்களால் உருவாக்கப்பட்டது.', ans:'மாஸ்டர்கார்டு'},
+  {text:'3D பாதுகாப்பு நெறிமுறையை முதலில் உருவாக்கிய நிறுவனம் ______________.', ans:'VISA'},
+  {text:'குறியாக்கம் செய்யப்படாத தகவல் ______________ என அழைக்கப்படுகிறது.', ans:'Plaintext'},
+];
+
+const MATCH_LEFT = ['DDoS','ஃபிஷிங்','சைபர் Squatting','SSL','எண்முறைக் கையொப்பம்'];
+const MATCH_RIGHT = ['சேவையகத்திற்கு மிக அதிக வேண்டுகோள் அனுப்பி முடக்கும் தாக்குதல்','வங்கி அதிகாரி போல வேடமிட்டு முக்கியத் தகவல் திருடும் மோசடி','மற்றொரு நபர் விரும்பும் களப்பெயரை முன்பே பதிவு செய்யும் சட்டவிரோத செயல்','இணைய பரிமாற்றங்களைப் பாதுகாக்கும் கலப்பு குறியாக்க நெறிமுறை','அனுப்பப்படும் தரவின் நம்பகத்தன்மையை சரிபார்க்கும் அமைப்பு'];
+const MATCH_ANSWER = {'DDoS':'சேவையகத்திற்கு மிக அதிக வேண்டுகோள் அனுப்பி முடக்கும் தாக்குதல்','ஃபிஷிங்':'வங்கி அதிகாரி போல வேடமிட்டு முக்கியத் தகவல் திருடும் மோசடி','சைபர் Squatting':'மற்றொரு நபர் விரும்பும் களப்பெயரை முன்பே பதிவு செய்யும் சட்டவிரோத செயல்','SSL':'இணைய பரிமாற்றங்களைப் பாதுகாக்கும் கலப்பு குறியாக்க நெறிமுறை','எண்முறைக் கையொப்பம்':'அனுப்பப்படும் தரவின் நம்பகத்தன்மையை சரிபார்க்கும் அமைப்பு'};
+
+const MISCONCEPTIONS = [
+  {wrong:'"ஒரு வலைத்தளம் https:// உடன் தொடங்கினால், அது 100% பாதுகாப்பானது, மோசடி நடக்கவே நடக்காது" என்று நினைப்பது.', type:'கருத்தியல் குழப்பம் (Conceptual Misconception)', why:'https/SSL என்பது உலாவிக்கும் சேவையகத்திற்கும் இடையே செல்லும் தரவை மட்டும் குறியாக்கம் செய்து பாதுகாக்கிறது. அது அந்த வலைத்தளத்தை நடத்துபவர் நேர்மையானவரா என்பதை உறுதிப்படுத்தாது — ஃபிஷிங் தளங்களும் https பெற்றிருக்கலாம்.', fix:'https = "இந்தப் பாதை பாதுகாப்பானது" என்று மட்டுமே பொருள்; "இந்த நிறுவனம் நம்பகமானது" என்று பொருளல்ல. URL எழுத்துகளை (டைபோபைரஸி) கவனமாகச் சரிபார்க்க வேண்டும்.'},
+  {wrong:'"எண்முறைக் கையொப்பமும் (Digital Signature) எண்முறைச் சான்றிதழும் (Digital Certificate) ஒன்றுதான்" என்று நினைப்பது.', type:'வரையறைக் குழப்பம் (Definition Confusion)', why:'எண்முறைச் சான்றிதழ் ஒரு நபரின்/நிறுவனத்தின் பொது குறியீட்டு உரிமையை (அடையாளத்தை) நிரூபிக்கிறது. எண்முறைக் கையொப்பம் ஒரு குறிப்பிட்ட ஆவணம்/செய்தியின் நம்பகத்தன்மையையும் நேர்மையையும் சரிபார்க்கிறது.', fix:'சான்றிதழ் = "நீங்கள் யார் என்பதை நிரூபிக்கும் அடையாள அட்டை". கையொப்பம் = "இந்த ஆவணத்தை நீங்கள்தான் அனுப்பினீர்கள், அது மாறவில்லை என்பதற்கான முத்திரை".'},
+  {wrong:'"சமச்சீரற்ற குறியாக்கம் (Asymmetric) எப்போதும் சமச்சீர் குறியாக்கத்தை (Symmetric) விட வேகமானது" என்ற தவறான எண்ணம்.', type:'செயல்பாட்டுக் குழப்பம் (Functional Misconception)', why:'பாடநூல் அட்டவணையின்படி, சமச்சீர் குறியீடு குறியாக்கத்தின் வேகம் மிக அதிகம்; சமச்சீரற்ற குறியாக்கத்தின் வேகம் குறைவு. இருப்பினும் சமச்சீரற்ற குறியாக்கம் அங்கிகாரம் &amp; மறுதலிக்கப்படாதிருத்தல் போன்ற கூடுதல் நன்மைகளை வழங்குகிறது.', fix:'வேகம் வேண்டுமா? → சமச்சீர் (Symmetric). அங்கிகாரம்/கையொப்பம் வேண்டுமா? → சமச்சீரற்ற (Asymmetric). நடைமுறையில் இரண்டும் சேர்த்தே (hybrid) பயன்படுத்தப்படும்.'},
+  {wrong:'"Ransomware கோப்புகளை உடனடியாக நீக்கிவிடும்" என்று நினைப்பது.', type:'செயல்பாட்டுக் குழப்பம் (Functional Misconception)', why:'Ransomware கோப்புகளை நீக்காது; அனைத்துக் கோப்புகளையும் குறியாக்கம் செய்து, பணம் செலுத்தப்படாவிட்டால் அதிமுக்கிய தரவை வெளியிடுவதாக அச்சுறுத்தும். இதற்கான தீர்வு பணம் அல்ல — காப்புப் பிரதி (backup) வைத்திருப்பதே சிறந்த பாதுகாப்பு.', fix:'Ransomware = கோப்புகளைப் "பூட்டி வைத்து" மீட்கப் பணம் கேட்கும் தீநிரல் — கோப்பை அழிப்பது அல்ல, "பணயக்கைதியாக" வைத்திருப்பது.'},
+];
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு இணையதளம் https:// மூலம் தொடங்கினாலும் அது ஒரு ஃபிஷிங் தளமாக இருக்க முடியுமா?', o:['இல்லை, https இருந்தால் எப்போதும் உண்மையான தளம்தான்','ஆம், https வெறும் தரவுப் பாதையை மட்டுமே பாதுகாக்கிறது; தள உரிமையாளரின் நேர்மையை உறுதிசெய்யாது','இல்லை, CA எப்போதும் ஃபிஷிங் தளங்களுக்குச் சான்றிதழ் மறுக்கும்','ஆம், ஆனால் SSL இருந்தால் மட்டுமே'], c:1, exp:'HTTPS/SSL தரவுப் பாதையை (encryption channel) மட்டுமே பாதுகாக்கிறது; வலைத்தளத்தின் நோக்கத்தை உறுதிப்படுத்தாது. எனவே ஃபிஷிங் தளங்களும் https பெற்றிருக்கலாம் — எப்போதும் களப்பெயரை கவனமாகச் சரிபார்க்க வேண்டும்.'},
+  'c2': {q:'🔴 சமச்சீரற்ற குறியாக்கத்தின் தனிச்சிறப்பு எது — சமச்சீர் குறியாக்கத்தில் இல்லாதது?', o:['வேகம் அதிகம்','அங்கிகாரம் மற்றும் மறுதலிக்கப்படாதிருத்தல் வழங்குதல்','ஒரே குறியீடு பயன்பாடு','குறைந்த கணக்கீட்டு தேவை'], c:1, exp:'சமச்சீரற்ற குறியாக்கம் இரகசியத்தன்மையுடன் கூடுதலாக அங்கிகாரம் (Authenticity) மற்றும் மறுதலிக்கப்படாதிருத்தல் (Non-repudiation) போன்ற நன்மைகளை வழங்குகிறது; சமச்சீர் குறியாக்கம் இரகசியத்தன்மையை மட்டுமே வழங்கும்.'},
+};
+
+/* ============================= MCQ HELPER ============================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* ============================= QUICK-CHECK BANKS ============================= */
+const QC_BANKS = {
+  intro: { 'qc1': {q:'மின்-வணிக பாதுகாப்பு என்றால் என்ன?', o:['இணைய வேகத்தை அதிகரிக்கும் முறை','இணையம் மூலம் மின்-வணிக பரிவர்த்தனைகளைப் பாதுகாப்பாக வழிநடத்தும் நெறிமுறைகளின் தொகுப்பு','ஒரு மென்பொருள் நிறுவும் முறை','வலைத்தள வடிவமைப்பு முறை'], c:1, exp:'மின்-வணிக பாதுகாப்பு என்பது இணையம் மூலம் மின்-வணிக பரிவர்த்தனைகளைப் பாதுகாப்பாக வழிநடத்தும் நெறிமுறைகளைக் கொண்ட ஒரு தொகுப்பு.'} },
+  threats: { 'qc2': {q:'டைபோபைரஸி (Typopiracy) என்பது எதன் ஒரு வகை?', o:['DDoS','சைபர் Squatting','தரவு சிதைப்பு','பண மோசடி'], c:1, exp:'டைபோபைரஸி என்பது சைபர் Squatting-ன் ஒரு வகை — பொதுவான தட்டச்சுப் பிழைகளைப் பயன்படுத்தி பயனர்களை திசை திருப்பும் மோசடி.'} },
+  dims: { 'qc3': {q:'"அங்கீகரிக்கப்படாத தரவு மாற்றத்தைத் தடுத்தல்" என்பது எந்தப் பரிமாணம்?', o:['இருப்பு (Availability)','நேர்மை (Integrity)','திறனுடைமை (Effectiveness)','முழுமை (Completeness)'], c:1, exp:'நேர்மை (Integrity) என்பது அங்கீகரிக்கப்படாத தரவு மாற்றத்தைத் தடுப்பதாகும்.'} },
+  encrypt: { 'qc4': {q:'குறியாக்கத்தில் "Key" எதற்காகப் பயன்படுத்தப்படுகிறது?', o:['இணைய வேகத்தை அதிகரிக்க','தரவைக் குறியாக்கம்/மறைகுறியாக்கம் செய்ய','கோப்பை அழிக்க','Domain பதிவு செய்ய'], c:1, exp:'தரவைக் குறியாக்கம் அல்லது குறிநீக்கம் செய்ய ஒரு குறியீடு (Key) உபயோகப்படுத்தப்படுகிறது.'} },
+  auth: { 'qc5': {q:'எண்முறைச் சான்றிதழை வழங்குபவர் யார்?', o:['எந்த உலாவியும்','Certification Authority (CA)','வாடிக்கையாளர்','Domain Registrar மட்டும்'], c:1, exp:'எண்முறைச் சான்றிதழ் அங்கீகரிக்கப்பட்ட சான்றளிப்பு அதிகாரிகளால் (CA) வழங்கப்படுகிறது.'} },
+  protocols: { 'qc6': {q:'https:// இல் உள்ள "s" எதைக் குறிக்கிறது?', o:['Server','Secured','Software','Site'], c:1, exp:'"s" (secured) என்பது பாதுகாக்கப்பட்டது என்று பொருள்படும்.'} },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP DISPATCH
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { intro:'qc-intro', threats:'qc-threats', dims:'qc-dims', encrypt:'qc-encrypt', auth:'qc-auth', protocols:'qc-protocols' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+  if(topicId === 'threats') wireThreats();
+  if(topicId === 'dims') wireDims();
+  if(topicId === 'encrypt') wireEncrypt();
+  if(topicId === 'auth') wireAuth();
+  if(topicId === 'protocols') wireProtocols();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* =========================================================================
+   17.2 WIRING — Threat gallery + URL spotting game
+   ========================================================================= */
+function wireThreats(){
+  document.getElementById('threatGrid').innerHTML = THREATS.map((t,i) =>
+    `<div class="ex-chip" data-i="${i}">${t.icon} ${t.ta}<div class="cat"><b>${t.en}</b><br>${t.def}</div></div>`).join('');
+  document.querySelectorAll('#threatGrid .ex-chip').forEach(c => c.addEventListener('click', function(){ this.classList.toggle('revealed'); }));
+
+  const URLS = [
+    {u:'www.google.com', real:true},
+    {u:'www.goggle.com', real:false, note:'பாடநூல் எடுத்துக்காட்டு — "goggle" என்ற தட்டச்சுப் பிழையைப் பயன்படுத்தும் டைபோபைரஸி தளம்.'},
+    {u:'www.facebook.com', real:true},
+    {u:'www.faceblook.com', real:false, note:'பாடநூல் எடுத்துக்காட்டு — "faceblook" எனும் தட்டச்சுப் பிழை கொண்ட போலி தளம்.'},
+    {u:'www.flipkart.com', real:true},
+    {u:'www.flipkrat.com', real:false, note:'(Enrichment) எழுத்துகள் இடமாற்றம் செய்யப்பட்ட போலி-போன்ற களப்பெயர் உதாரணம்.'},
+  ];
+  document.getElementById('urlGameGrid').innerHTML = URLS.map((x,i) => `
+    <div class="url-chip" id="urlc-${i}">
+      <div>🔗 ${x.u}</div>
+      <div class="url-btns">
+        <button class="btn btn-ghost" data-i="${i}" data-ans="true">✅ உண்மையானது</button>
+        <button class="btn btn-ghost" data-i="${i}" data-ans="false">🚫 போலியானது</button>
+      </div>
+      <div class="feedback-line" id="urlfb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.url-chip button').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const chosen = this.dataset.ans === 'true';
+      const chip = document.getElementById('urlc-'+i);
+      if(chip.dataset.answered) return;
+      chip.dataset.answered = '1';
+      const correct = chosen === URLS[i].real;
+      chip.classList.add(correct ? 'correct' : 'incorrect');
+      const fb = document.getElementById('urlfb-'+i);
+      fb.className = 'feedback-line ' + (correct ? 'ok' : 'bad');
+      fb.textContent = (correct ? '✅ சரி! ' : '❌ தவறு. ') + (URLS[i].real ? 'இது உண்மையான, அறியப்பட்ட களப்பெயர்.' : URLS[i].note);
+    });
+  });
+}
+
+/* =========================================================================
+   17.3 WIRING — Dimensions grid
+   ========================================================================= */
+function wireDims(){
+  document.getElementById('dimGrid').innerHTML = DIMENSIONS.map((d,i) =>
+    `<div class="fcaps-card" data-i="${i}">${d.ta}<br><span class="eng" style="font-size:.72rem;">${d.en}</span></div>`).join('');
+  document.querySelectorAll('#dimGrid .fcaps-card').forEach(c => {
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#dimGrid .fcaps-card').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const d = DIMENSIONS[parseInt(this.dataset.i,10)];
+      const panel = document.getElementById('dimDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = `<span class="lbl">💡 ${d.ta} (${d.en})</span>${d.def}`;
+    });
+  });
+}
+
+/* =========================================================================
+   17.4.1 WIRING — Encryption tabs, Diffie-Hellman sim, cipher tool
+   ========================================================================= */
+const ENC_TYPES = {
+  symmetric: {label:'சமச்சீர் குறியீடு (Symmetric)', diagram:
+    `<div class="flow-row">
+      <div class="flow-node">Sender</div><div class="flow-arrow">🔑➡</div>
+      <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#9a3412;">Encrypt</div>
+      <div class="flow-arrow">➡</div><div class="flow-node">Ciphertext</div><div class="flow-arrow">➡🔑</div>
+      <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#9a3412;">Decrypt</div>
+      <div class="flow-arrow">➡</div><div class="flow-node">Recipient</div>
+    </div><div class="diagram-cap">ஒரே "Shared Secret Key" குறியாக்கம் &amp; மறைகுறியாக்கம் இரண்டிற்கும் பயன்படுகிறது.</div>`},
+  asymmetric: {label:'சமச்சீரற்ற குறியீடு (Asymmetric)', diagram:
+    `<div class="flow-row">
+      <div class="flow-node">Sender</div><div class="flow-arrow">🔑Public➡</div>
+      <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#9a3412;">Encrypt</div>
+      <div class="flow-arrow">➡</div><div class="flow-node">Ciphertext</div><div class="flow-arrow">➡🔑Private</div>
+      <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#9a3412;">Decrypt</div>
+      <div class="flow-arrow">➡</div><div class="flow-node">Recipient</div>
+    </div><div class="diagram-cap">பெறுநரின் "Public Key" குறியாக்கத்திற்கும், அவரது "Private Key" மறைகுறியாக்கத்திற்கும் பயன்படுகிறது — இரண்டும் வெவ்வேறு குறியீடுகள்.</div>`},
+};
+function wireEncrypt(){
+  let encActive = 'symmetric';
+  function renderEncTabs(){
+    document.getElementById('encTabs').innerHTML = Object.keys(ENC_TYPES).map(k =>
+      `<button class="tab-btn ${k===encActive?'active':''}" data-k="${k}">${ENC_TYPES[k].label}</button>`).join('');
+    document.querySelectorAll('#encTabs .tab-btn').forEach(b => b.addEventListener('click', () => { encActive=b.dataset.k; renderEncTabs(); }));
+    document.getElementById('encDiagram').innerHTML = ENC_TYPES[encActive].diagram;
+  }
+  renderEncTabs();
+
+  const DH_STEPS = [
+    {title:'படி 1 — பொதுவான தொடக்க வண்ணம் (Public)', a:'#f6e05e', b:'#f6e05e', c:'#f6e05e', text:'A மற்றும் B ஒரு பொதுவான தொடக்க வண்ணத்தை (மஞ்சள்) வெளிப்படையாக ஏற்கிறார்கள். இது அனைவருக்கும் (C உட்பட) தெரியும்.'},
+    {title:'படி 2 — A-யின் ரகசிய வண்ணம் + பொதுவானது', a:'#f56565', b:'#f6e05e', c:null, text:'A ஒரு தன்னிச்சையான ரகசிய நிறத்தை (சிவப்பு) தேர்ந்தெடுத்து, மஞ்சளுடன் கலந்து புதிய நிறத்தை (ஆரஞ்சு) B-க்கு அனுப்புகிறார்.'},
+    {title:'படி 3 — B-யின் ரகசிய வண்ணம் + பொதுவானது', a:'#f56565', b:'#4299e1', c:null, text:'B ஒரு தன்னிச்சையான ரகசிய நிறத்தை (நீலம்) தேர்ந்தெடுத்து, மஞ்சளுடன் கலந்து புதிய நிறத்தை (பச்சை) A-க்கு அனுப்புகிறார்.'},
+    {title:'படி 4 — C இரண்டு கலவைகளைப் பார்க்கிறார்', a:null, b:null, c:'hacker', text:'ஹேக்கர் C இரண்டு கலவை நிறங்களையும் (ஆரஞ்சு, பச்சை) பார்க்க முடியும் — ஆனால் A-யின் (சிவப்பு) அல்லது B-யின் (நீலம்) தனிப்பட்ட ரகசிய நிறங்கள் C-க்குத் தெரியாது.'},
+    {title:'படி 5 — A இறுதி ரகசியத்தைக் கணக்கிடுகிறார்', a:'#744210', b:null, c:null, text:'A தான் பெற்ற பச்சை நிறத்துடன் தனது ரகசிய சிவப்பை கலந்து, புதிய கலவை நிறமான "கருப்பு" (இறுதி பகிரப்பட்ட ரகசியம்) பெறுகிறார்.'},
+    {title:'படி 6 — B-யும் அதே இறுதி ரகசியத்தைக் கணக்கிடுகிறார்', a:'#744210', b:'#744210', c:null, text:'B தான் பெற்ற ஆரஞ்சுடன் தனது ரகசிய நீலத்தை கலந்து, அதே கலவை நிறமான "கருப்பு"-ஐப் பெறுகிறார். இப்போது A &amp; B-இடம் ஒரே ரகசிய நிறம் (Shared Secret Key) உள்ளது!'},
+    {title:'படி 7 — C-யால் இறுதி ரகசியத்தை அடைய முடியாது', a:'#744210', b:'#744210', c:'hacker-fail', text:'C-யிடம் இரண்டு கலவை நிறங்கள் இருந்தாலும், A அல்லது B-யின் தனிப்பட்ட ரகசிய நிறம் தேவைப்படுவதால், C-யால் சரியான இறுதி நிறத்தை ஒருபோதும் கண்டுபிடிக்க முடியாது.'},
+  ];
+  let dhStep = -1;
+  function renderDhStep(){
+    const dotsWrap = document.getElementById('dhSteps');
+    let dotsHtml = '';
+    DH_STEPS.forEach((s,i) => {
+      dotsHtml += '<div class="flow-node '+(i===dhStep?'active':(i<dhStep?'done':'muted'))+'" style="min-width:34px;padding:7px 9px;">'+(i+1)+'</div>';
+      if(i < DH_STEPS.length - 1) dotsHtml += '<div class="flow-arrow '+(i<dhStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = dotsHtml;
+    const panel = document.getElementById('dhPanel');
+    if(dhStep === -1){
+      panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி தொடங்குங்கள்…</p>';
+    } else {
+      const s = DH_STEPS[dhStep];
+      const mkSwatch = (label, color) => `<div class="swatch-col"><div class="swatch" style="background:${color||'#e2e8f0'};${color?'':'border-style:dashed;'}"></div><div class="swatch-lbl">${label}</div></div>`;
+      let partyHtml = '<div class="party-row">';
+      partyHtml += `<div class="party-box"><b>A</b>${mkSwatch('A இன் நிறம்', s.a)}</div>`;
+      partyHtml += `<div class="party-box ${s.c ? 'hacker' : ''}"><b>C 🕵️ (Hacker)</b>${mkSwatch('C பார்ப்பது', s.c==='hacker'?'#fbbf24':(s.c==='hacker-fail'?'#9ca3af':null))}</div>`;
+      partyHtml += `<div class="party-box"><b>B</b>${mkSwatch('B இன் நிறம்', s.b)}</div>`;
+      partyHtml += '</div>';
+      panel.innerHTML = `<h4>${s.title}</h4>${partyHtml}<p>${s.text}</p>`;
+    }
+    document.getElementById('dhPrevBtn').disabled = dhStep <= 0;
+    document.getElementById('dhNextBtn').disabled = dhStep >= DH_STEPS.length - 1;
+  }
+  dhStep = -1;
+  renderDhStep();
+  document.getElementById('dhNextBtn').addEventListener('click', () => { if(dhStep < DH_STEPS.length-1){ dhStep++; renderDhStep(); } });
+  document.getElementById('dhPrevBtn').addEventListener('click', () => { if(dhStep > 0){ dhStep--; renderDhStep(); } });
+  document.getElementById('dhResetBtn').addEventListener('click', () => { dhStep = -1; renderDhStep(); });
+
+  function shiftCipher(text, key, decrypt){
+    const k = ((decrypt ? -key : key) % 26 + 26) % 26;
+    return text.toUpperCase().split('').map(ch => {
+      if(ch < 'A' || ch > 'Z') return ch;
+      return String.fromCharCode((ch.charCodeAt(0) - 65 + k) % 26 + 65);
+    }).join('');
+  }
+  document.getElementById('cipherEncBtn').addEventListener('click', () => {
+    const text = document.getElementById('cipherInput').value || '';
+    const key = parseInt(document.getElementById('cipherKey').value,10) || 0;
+    document.getElementById('cipherOut').textContent = '🔒 Cipher text: ' + shiftCipher(text, key, false);
+  });
+  document.getElementById('cipherDecBtn').addEventListener('click', () => {
+    const text = document.getElementById('cipherInput').value || '';
+    const key = parseInt(document.getElementById('cipherKey').value,10) || 0;
+    document.getElementById('cipherOut').textContent = '🔓 Plain text: ' + shiftCipher(text, key, true);
+  });
+}
+
+/* =========================================================================
+   17.4.2 WIRING — Signature vs Certificate tabs
+   ========================================================================= */
+const AUTH_CMP = [
+  {k:'what', label:'என்ன இது?', sig:'ஒரு மின்னஞ் ஆவணம், செய்தி அல்லது பரிவர்த்தனையை நம்பகமானதா எனச் சரிபார்க்கப் பயன்படும் ஒரு செயல்முறை.', cert:'சான்றிதழ் வைத்திருப்பவருக்கும் ஒரு குறிப்பிட்ட பொது குறியீட்டுக்கும் இடையிலான உறவை அதிகாரபூர்வமாக அங்கீகரிக்கும் ஒரு கணிப்பொறி கோப்பு.'},
+  {k:'verify', label:'எதைச் சரிபார்க்கிறது?', sig:'அனுப்பப்படும் தரவின் நம்பகத்தன்மையை சரிபார்க்க பயன்படுகிறது.', cert:'அனுப்புநரின் நம்பகத்தன்மையை சரிபார்க்க பயன்படுகிறது.'},
+  {k:'guarantee', label:'என்ன உத்தரவாதம்?', sig:'தரவு பாதுகாப்பாக இருப்பதையும், மூன்றாம் தரப்பினரால் மாற்றப்படவில்லை என்பதையும் உறுதி செய்கிறது.', cert:'ஒரு பொருளுடன் ஒரு எண்முறைக் கையொப்பத்தைப் பிணைக்கிறது.'},
+  {k:'provides', label:'எதை வழங்குகிறது?', sig:'அங்கீகாரம், மறுதலிக்கப்படாதிருத்தல் மற்றும் நேர்மை ஆகியவற்றை வழங்குகிறது.', cert:'அங்கீகாரம் மற்றும் பாதுகாப்பை வழங்குகிறது.'},
+  {k:'standard', label:'அடிப்படை நெறிமுறை', sig:'Digital Signature Standard (DSS) — SHA-1 அல்லது SHA-2 வழிமுறையைப் பயன்படுத்துகிறது.', cert:'Public Key Cryptography Standards (PKCS) — X.509 அல்லது PGP வடிவத்தில் உருவாக்கப்படுகிறது.'},
+  {k:'contains', label:'என்ன கொண்டிருக்கும்?', sig:'ஆவணம் அனுப்பும் முடிவில் குறியாக்கம் செய்யப்பட்டு, சமச்சீரற்ற விசையைப் பயன்படுத்தி பெறும் முடிவில் மறைகுறியாக்கம் செய்யப்படுகிறது.', cert:'சான்றிதழ் உரிமையாளர் பெயர், பொது குறியீடு, காலாவதி தேதி, சான்றிதழ் ஆணையத்தின் பெயர், அதன் எண்முறைக் கையொப்பம் கொண்டிருக்கும்.'},
+];
+function wireAuth(){
+  let authActive = 'what';
+  function renderAuthTabs(){
+    document.getElementById('authTabs').innerHTML = AUTH_CMP.map(r =>
+      `<button class="tab-btn ${r.k===authActive?'active':''}" data-k="${r.k}">${r.label}</button>`).join('');
+    document.querySelectorAll('#authTabs .tab-btn').forEach(b => b.addEventListener('click', () => { authActive=b.dataset.k; renderAuthTabs(); }));
+    const r = AUTH_CMP.find(x => x.k === authActive);
+    document.getElementById('authDetail').innerHTML = `
+      <div class="cmp-grid">
+        <div class="cmp-card"><h4>✒️ எண்முறைக் கையொப்பம்</h4>${r.sig}</div>
+        <div class="cmp-card"><h4>📜 எண்முறைச் சான்றிதழ்</h4>${r.cert}</div>
+      </div>`;
+  }
+  renderAuthTabs();
+}
+
+/* =========================================================================
+   17.4.3 WIRING — http/https toggle, 3D domains, SSL case-study
+   ========================================================================= */
+function wireProtocols(){
+  let isSecure = false;
+  const bar = document.getElementById('httpsBar');
+  document.getElementById('httpsToggleBtn').addEventListener('click', () => {
+    isSecure = !isSecure;
+    if(isSecure){ bar.className = 'browser-bar secure'; bar.innerHTML = '🔒 Secure &nbsp; https://example.com'; }
+    else { bar.className = 'browser-bar insecure'; bar.innerHTML = '⚠ Not secure &nbsp; http://example.com'; }
+  });
+
+  const DOMAINS_3D = [
+    {k:'acq', t:'பெறுநர் களம்', en:'Acquirer Domain', d:'வணிகர் (Merchant) மற்றும் அவரது வங்கியைச் சேர்ந்த பகுதி — பணம் பெறும் தரப்பு.'},
+    {k:'iss', t:'வழங்குநர் களம்', en:'Issuer Domain', d:'கட்டண அட்டை வைத்திருப்பவர் மற்றும் அந்த அட்டையை வழங்கிய வங்கியைச் சேர்ந்த பகுதி.'},
+    {k:'int', t:'இயங்குதன்மை களம்', en:'Interoperability Domain', d:'மேற்கண்ட இரு களங்களும் பாதுகாப்பாக ஒன்றுடன் ஒன்று தொடர்பு கொள்ள உதவும் பொதுவான உள்கட்டமைப்பு.'},
+  ];
+  document.getElementById('domainGrid').innerHTML = DOMAINS_3D.map(d => `<div class="domain-box" data-k="${d.k}">${d.t}<br><span style="font-size:.76rem;font-weight:500;">(${d.en})</span></div>`).join('');
+  document.querySelectorAll('#domainGrid .domain-box').forEach(box => {
+    box.addEventListener('click', function(){
+      const d = DOMAINS_3D.find(x => x.k === this.dataset.k);
+      const panel = document.getElementById('domainDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = `<span class="lbl">💡 ${d.t} (${d.en})</span>${d.d}`;
+    });
+  });
+
+  let sslStep = -1;
+  function renderSslStep(){
+    const dotsWrap = document.getElementById('sslSteps');
+    let dotsHtml = '';
+    SSL_STEPS.forEach((s,i) => {
+      dotsHtml += '<div class="flow-node '+(i===sslStep?'active':(i<sslStep?'done':'muted'))+'" style="min-width:34px;padding:7px 9px;">'+(i+1)+'</div>';
+      if(i < SSL_STEPS.length - 1) dotsHtml += '<div class="flow-arrow '+(i<sslStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = dotsHtml;
+    const panel = document.getElementById('sslPanel');
+    if(sslStep === -1){
+      panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி தொடங்குங்கள்…</p>';
+    } else {
+      const s = SSL_STEPS[sslStep];
+      panel.innerHTML = `<h4>${s.title}</h4><p>${s.text}</p>`;
+    }
+    document.getElementById('sslPrevBtn').disabled = sslStep <= 0;
+    document.getElementById('sslNextBtn').disabled = sslStep >= SSL_STEPS.length - 1;
+  }
+  sslStep = -1;
+  renderSslStep();
+  document.getElementById('sslNextBtn').addEventListener('click', () => { if(sslStep < SSL_STEPS.length-1){ sslStep++; renderSslStep(); } });
+  document.getElementById('sslPrevBtn').addEventListener('click', () => { if(sslStep > 0){ sslStep--; renderSslStep(); } });
+  document.getElementById('sslResetBtn').addEventListener('click', () => { sslStep = -1; renderSslStep(); });
+}
+
+/* =========================================================================
+   PRACTICE PAGE WIRING
+   ========================================================================= */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans.toLowerCase() || val.replace(/\s/g,'') === f.ans.toLowerCase().replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>சொல்</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>விளக்கம்</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='160px';
+      b.textContent = l + (matched[l] ? ' ✅' : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='300px'; b.style.textAlign='left';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும்.';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  const misWrap = document.getElementById('misWrap');
+  misWrap.innerHTML = MISCONCEPTIONS.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span style="font-weight:700;">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-mis="${i}">ஏன் தவறு? (Why is this wrong?)</button>
+      <div class="explain-box" id="mis-${i}">
+        <b>வகை:</b> ${c.type}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான புரிதல்:</span> ${c.fix}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-mis]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('mis-'+this.dataset.mis).classList.toggle('show'); });
+  });
+}
+
+/* =========================================================================
+   EXAM PREPARATION PAGE
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+    <div class="btn-row"><button class="btn btn-ghost" id="printBtn">🖨️ அச்சிடக்கூடிய பார்வை (Print Cheat Sheet)</button></div>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>மின்-வணிக பாதுகாப்பு = இணையம் மூலம் மின்-வணிக பரிவர்த்தனைகளைப் பாதுகாப்பாக வழிநடத்தும் நெறிமுறைகளைக் கொண்ட ஒரு தொகுப்பு.</li>
+      <li>7 முக்கிய அச்சுறுத்தல்கள்: தகவல் கசிவு, தரவு சிதைப்பு, பண மோசடிகள் (நட்பு/தெளிவான/முக்கோண), தீங்கிழைக்கும் நிரல் அச்சுறுத்தல், DDoS (Network Flooding), சைபர் Squatting, டைபோபைரஸி. + ஃபிஷிங் தனி அச்சுறுத்தலாக.</li>
+      <li>10 பாதுகாப்புப் பரிமாணங்கள்: அங்கிகாரம், இருப்பு, முழுமை, இரகசியத்தன்மை, திறனுடைமை, நேர்மை, மறுதலிக்கப்படாதிருத்தல், தனியுரிமை, நம்பகத்தன்மை, மீளாய்வு திறன்.</li>
+      <li>3 பாதுகாப்புத் தொழில்நுட்பங்கள்: குறியாக்கத் தொழில்நுட்பம், அங்கீகார தொழில்நுட்பம், பாதுகாப்பு அங்கீகார நெறிமுறைகள்.</li>
+      <li>சமச்சீர் குறியாக்கம் = ஒரே Key, வேகம் அதிகம் (DES, AES, RC4). சமச்சீரற்ற குறியாக்கம் = வெவ்வேறு Key (பொது &amp; தனிப்பட்ட), வேகம் குறைவு, அங்கிகாரம்+மறுதலிக்கப்படாதிருத்தல் தரும் (RSA, ECC, DSA).</li>
+      <li>பொது குறியீடு குறியாக்கம் — 1976, விட்·பீல்ட் டிஃபி &amp; மார்ட்டின் ஹெல்மேன்.</li>
+      <li>எண்முறைச் சான்றிதழ் = அனுப்புநரின் அடையாளத்தை (பொது குறியீட்டு உரிமையை) நிரூபிக்கிறது; CA வழங்கும்; PGP &amp; X.509 வகைகள்.</li>
+      <li>எண்முறைக் கையொப்பம் = அனுப்பப்படும் தரவின் நம்பகத்தன்மையை சரிபார்க்கிறது; DSS நெறிமுறை, SHA-1/SHA-2 பயன்படுத்தும்.</li>
+      <li>SET (Secure Electronic Transaction) — 1996, VISA &amp; Mastercard; கடன் அட்டை மின்னணு பணம் செலுத்தலுக்கான நெறிமுறை.</li>
+      <li>SSL (Secure Sockets Layer) — Netscape + Mastercard/BoA/MCI/Silicon Graphics; https:// = பாதுகாப்பு; பச்சை பூட்டுக் குறியீடு.</li>
+      <li>3D பாதுகாப்பு — VISA உருவாக்கியது, Mastercard ஏற்றது; 3 களங்கள் = Acquirer, Issuer, Interoperability Domain.</li>
+      <li>முரட்டு தாக்குதல் (Brute Force) = சாத்தியமான எல்லா குறியீடுகளையும் முயற்சி செய்து குறியாக்கத்தை உடைத்தல்.</li>
+      <li>Ransomware = கோப்புகளைக் குறியாக்கம் செய்து, பணம் கோரி மிரட்டும் தீநிரல்.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>சொல்</th><th>விளக்கம்</th></tr>
+      <tr><td><b>மறைஎழுத்து (Ciphertext)</b></td><td>குறியாக்கம் செய்யப்பட்ட தரவு. பொதுவாக குறியாக்க வழிமுறையின் வெளியீடு.</td></tr>
+      <tr><td><b>மறையீட்டுப் பகுப்பாய்வு (Cryptanalysis)</b></td><td>மறைக்கப்பட்ட தரவு அல்லது மறைஎழுத்து உள்ள சந்தேகத்திற்குரிய ஆவணத்தை பகுப்பாய்வு செய்தல்.</td></tr>
+      <tr><td><b>Decipher (மறையீடு நீக்கம்)</b></td><td>மறையீடு நீக்கம் செய்ய ஒரு முறையான வழிமுறை.</td></tr>
+      <tr><td><b>மறைகுறியாக்கம்</b></td><td>அங்கீகரிக்கப்படாத அணுகலிலிருந்து தரவுகளைப் பாதுகாக்க/மறைக்க ஒரு வழிமுறையைப் பயன்படுத்தி தரவை மாற்றும் முறை.</td></tr>
+      <tr><td><b>நட்பான மோசடி</b></td><td>வாடிக்கையாளர் பொருட்களைப் பெறவில்லை என்ற பொய்யான தகவல் தந்து செலுத்திய பணம் திரும்ப கொடுக்க கோருதல்.</td></tr>
+      <tr><td><b>செய்தி சுருக்கம் / தொகுப்பு</b></td><td>ஒரு வகை ஹேஷ் செயற்கூறைப் பயன்படுத்தி இலக்கங்களின் ஒற்றை சர வடிவத்தில் தரவை உருவகித்தல்.</td></tr>
+      <tr><td><b>OTP (One-Time Password)</b></td><td>ஒரு உள்நுழைவு அமர்வு அல்லது பரிமாற்றத்திற்கு மட்டும் செல்லுபடியாகும் கடவுச்சொல்.</td></tr>
+      <tr><td><b>PIN (Personal Identification Number)</b></td><td>அட்டை அடிப்படையிலான பணம் செலுத்தும் முறையில் நுகர்வோர்களுக்கு ஒதுக்கப்படும் நிலையான எண்.</td></tr>
+      <tr><td><b>Plaintext / Cleartext (இயல் உரை)</b></td><td>குறியாக்கம் செய்யப்படாத தகவல்; உள்ளீடு தரவு எனவும் அழைக்கப்படுகிறது.</td></tr>
+      <tr><td><b>Traffic</b></td><td>ஒரு குறிப்பிட்ட தளத்திற்குப் பார்வையாளர்களின் எண்ணிக்கையைக் குறிக்கும் ஒரு குறியீடு.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி <span class="eng">(Part-wise Answer-Writing Guide)</span></h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லைக் கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். ஆண்டு தொடர்பான கேள்விகளுக்கு (SET=1996) குறிப்பேடு வைத்துக்கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>3-வரிகள் (பகுதி ஆ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் → (3) முக்கியத்துவம் ஒரு வரியில்.<br>
+        <b>எ.கா.</b> "ஃபிஷிங் பற்றி எழுதுக" → "ஃபிஷிங் என்பது ஹேக்கர் நம்பகமானவர் போல் வேடமிட்டு முக்கியத் தகவலைத் திருடும் மோசடி. உதாரணமாக வங்கி மின்னஞ்சல் போல் தோன்றும் போலி மின்னஞ்சல். இது OTP, PIN போன்ற ரகசியத் தகவலைத் திருட பயன்படுகிறது."
+      </div>
+    </details>
+    <details class="acc"><summary>ஒரு பத்தியளவு (பகுதி இ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரி → (2) 2-3 முக்கியப் புள்ளிகள் → (3) ஒரு உதாரணம்/முடிவுரை.<br>
+        <b>எ.கா.</b> "சமச்சீரற்ற குறியீடு குறியாக்கம் பற்றி குறிப்பு வரைக" → வரையறை → வெவ்வேறு Key என்ற முக்கிய அம்சம் → RSA/ECC/DSA எடுத்துக்காட்டு → அங்கிகாரம் &amp; மறுதலிக்கப்படாதிருத்தல் தரும் என முடிவுரை.
+      </div>
+    </details>
+    <details class="acc"><summary>ஒரு பக்க அளவு (பகுதி ஈ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) வகைகள்/புள்ளிகள் (தலைப்பு வாரியாக) → (3) ஒவ்வொன்றையும் 1-2 வரிகளில் விளக்குதல் → (4) அட்டவணை/படம் (இருந்தால்) → (5) முடிவுரை ஒரு வரி.<br>
+        <b>எ.கா.</b> "மின்-வணிக பாதுகாப்பின் பரிமாணங்கள் பற்றி எழுதுக" → அறிமுகம் (1 வரி) → 10 பரிமாணங்களையும் பெயர் + ஒரு வரி விளக்கத்துடன் பட்டியலிடுக → முடிவுரை.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ &amp; மாணவர் செயல்பாடு <span class="eng">(reference)</span></h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின் வணிகத்தில் தகவல் கசிவு பற்றி எழுதுக.</li>
+          <li>டைபோபைரஸி பற்றி சிறுகுறிப்பு வரைக.</li>
+          <li>ஃபிஷிங் (Phishing) பற்றி எழுதுக.</li>
+          <li>மின்-வணிகத்தின் பல்வேறு வகையான பாதுகாப்புத் தொழில்நுட்பங்களைப் பட்டியலிடுக.</li>
+          <li>எண்முறைக் கையொப்பம் பற்றி எழுதுக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின்-வணிக பாதுகாப்பு என்றால் என்ன?</li>
+          <li>ஏதேனும் இரண்டு மின்-வணிக பாதுகாப்பு அச்சுறுத்தல்களைப் பட்டியலிடுக.</li>
+          <li>சமச்சீரற்ற குறியீடு குறியாக்கம் பற்றி குறிப்பு வரைக.</li>
+          <li>எண்முறைச் சான்றிதழ் பற்றி குறிப்பு வரைக.</li>
+          <li>மூல உரை, மறைஎழுத்து உரை பற்றி எழுதுக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின்-வணிக பாதுகாப்பின் பரிமாணங்கள் பற்றி எழுதுக.</li>
+          <li>சமச்சீர் குறியீடு குறியாக்கம் மற்றும் சமச்சீரற்ற குறியீடு குறியாக்கம் வேறுபாடுகளை எழுதுக.</li>
+          <li>பாதுகாப்பு அங்கீகார நெறிமுறைகள் பற்றி விவரி.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>மாணவர் செயல்பாடு <span class="eng">(Student Activity — reference)</span></summary>
+      <div class="acc-body">
+        <ol>
+          <li>குறிப்பிட்ட கட்டணம் செலுத்தும் முறையில் பயன்படுத்தப்படும் பாதுகாப்பு நெறிமுறைகளை இனங்காணுதல்.</li>
+          <li>ஏதேனும் ஒரு பணம் செலுத்தும் முறையைப் பற்றி விளக்கப்படம் ஒன்றை உருவாக்கவும்.</li>
+          <li>அந்தப் பணம் செலுத்தும் முறையில் பயன்படுத்தப்படும் பாதுகாப்பு தொழில்நுட்பத்தை விவரி.</li>
+          <li>வேறு சில பணம் செலுத்தும் முறைக்கு செயல்பாடுகளை மீண்டும் செய்யவும்.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (பாடநூல் MCQ)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* ============================= INIT ============================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
