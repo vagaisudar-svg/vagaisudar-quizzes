@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 15 — மின்-வணிகம் | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#fbf5f8;
+    --card:#ffffff;
+    --primary:#be185d;
+    --primary-dark:#831843;
+    --primary-light:#fce7f3;
+    --accent:#d97706;
+    --accent-light:#fef3c7;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#241521;
+    --muted:#6b5a66;
+    --border:#f0dce7;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  [lang-ta]{font-size:1rem;}
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#fbe1ee;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#fdeef5;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#f6eef2;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:920px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(80,20,50,.05);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#92400e;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid #7c3aed;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:#7c3aed;font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+  .needs-verify{background:#fff1f2;border-left:5px solid #e11d48;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:.85rem;}
+  .needs-verify .lbl{font-weight:800;color:#be123c;font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fdfafc;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#f5ecf1;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;transition:all .25s;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(190,24,93,.4);}
+  .flow-node.muted{opacity:.35;}
+  .flow-node.done{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  .tab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .pillar-grid{display:flex;gap:4px;justify-content:center;align-items:stretch;margin:14px 0;flex-wrap:wrap;}
+  .pillar{flex:1;min-width:110px;background:var(--primary-light);border:2px solid var(--primary);border-top:6px solid var(--accent);border-radius:8px;padding:12px 8px;text-align:center;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--primary-dark);}
+  .pillar.active{background:var(--primary);color:#fff;}
+  .pillar-roof{background:var(--primary-dark);color:#fff;text-align:center;padding:10px;border-radius:10px 10px 0 0;font-weight:800;margin-bottom:0;}
+
+  .sort-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0;}
+  .sort-bin{border:2px dashed var(--border);border-radius:12px;padding:12px;min-height:90px;}
+  .sort-bin h4{margin:0 0 8px;text-align:center;}
+  .sort-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0;}
+  .sort-item{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.82rem;font-weight:700;cursor:pointer;}
+  .sort-item:hover{border-color:var(--primary);}
+  .sort-item.placed{opacity:.35;pointer-events:none;}
+  .sort-bin .item-in{display:inline-block;background:var(--primary-light);border-radius:8px;padding:4px 10px;margin:3px;font-size:.78rem;font-weight:700;}
+  @media (max-width:600px){.sort-grid{grid-template-columns:1fr;}}
+
+  .matrix-wrap{display:flex;gap:6px;justify-content:center;margin:14px 0;overflow-x:auto;}
+  .matrix-table{border-collapse:collapse;}
+  .matrix-table th, .matrix-table td{border:2px solid #fff;padding:0;text-align:center;}
+  .matrix-table th{background:var(--primary-dark);color:#fff;font-size:.78rem;padding:8px;min-width:90px;}
+  .matrix-cell{width:90px;height:60px;font-weight:800;font-size:.85rem;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+  .matrix-cell:hover{transform:scale(1.06);outline:3px solid var(--accent);}
+  .matrix-cell.active{outline:4px solid var(--primary-dark);}
+
+  .revmodel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0;}
+  .revmodel-card{border:2px solid var(--border);border-radius:12px;padding:12px;text-align:center;cursor:pointer;background:#fff;font-weight:700;font-size:.82rem;}
+  .revmodel-card.active{border-color:var(--accent);background:var(--accent-light);}
+
+  .ev-stage{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:10px;}
+  .ev-counter{font-weight:800;color:var(--primary-dark);font-size:.9rem;}
+
+  .wave-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0;}
+  .wave-card{border:2px solid var(--border);border-radius:12px;padding:14px;background:#fff;cursor:pointer;}
+  .wave-card.active{border-color:var(--primary);background:var(--primary-light);}
+  .wave-card h4{margin:0 0 6px;}
+
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:12px 0;}
+  .ex-chip{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:.82rem;font-weight:700;cursor:pointer;}
+  .ex-chip:hover{border-color:var(--primary);background:var(--primary-light);}
+  .ex-chip .cat{display:none;font-size:.7rem;font-weight:600;color:var(--accent);margin-top:4px;}
+  .ex-chip.revealed .cat{display:block;}
+
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+  .cmp-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;}
+  .cmp-card h4{margin-top:0;}
+  @media (max-width:600px){.cmp-grid{grid-template-columns:1fr;}}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#f6eef2;color:var(--text);}
+  .btn-ghost:hover{background:#ecdfe6;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfafb;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#efe4ea;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fdfafc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#a68a9a;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .cmp-grid{grid-template-columns:1fr;}
+    .matrix-cell{width:64px;height:48px;font-size:.68rem;}
+    .matrix-table th{min-width:64px;font-size:.66rem;padding:5px;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 15 — மின்-வணிகம் (E-Commerce)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 15: E-Commerce · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* ============================= STORAGE ============================= */
+const STORE_KEY = 'ca12_ecommerce_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable */ }
+  return { completed:[], lang:'ta' };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* ============================= TOPICS ============================= */
+const TOPICS = [
+  {id:'intro',      num:'15.1', title:'அறிமுகம் — மின்-தொழில் & மின்-வணிகம்'},
+  {id:'evolution',  num:'15.2', title:'பரிணாம வளர்ச்சி'},
+  {id:'waves',      num:'15.3', title:'வளர்ச்சி அலைகள்'},
+  {id:'models',     num:'15.4', title:'வர்த்தக மாதிரிகள்'},
+  {id:'revenue',    num:'15.5', title:'வருவாய் மாதிரிகள்'},
+  {id:'comparison', num:'15.6', title:'மரபு வணிகம் Vs மின்-வணிகம்'},
+  {id:'proscons',   num:'15.7', title:'நன்மைகள் & குறைபாடுகள்'},
+  {id:'practice',   num:'Practice', title:'பயிற்சி & Debugging Lab'},
+  {id:'examprep',   num:'Exam', title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* ============================= SIDEBAR / NAV ============================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* ============================= MAIN RENDER DISPATCH ============================= */
+const RENDERERS = {
+  intro: renderIntro,
+  evolution: renderEvolution,
+  waves: renderWaves,
+  models: renderModels,
+  revenue: renderRevenue,
+  comparison: renderComparison,
+  proscons: renderProsCons,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 15.1 — அறிமுகம் (மின்-தொழில் & மின்-வணிகம்)
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.1</div>
+    <h2>அறிமுகம் <span class="eng">(Introduction — e-Business &amp; e-Commerce)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      மின்-வணிகக் கோட்பாடுகளைக் கற்றல் · மின்-வணிகத்தின் வரலாற்றைச் சுருக்கமாக அறிதல் · பல்வேறு வகையான மின்-வணிக மாதிரிகள் மற்றும் வருவாய் மாதிரிகளைப் பகுப்பாய்வு செய்தல் · மரபு சார்ந்த வணிகம் மற்றும் மின்வணிகம் வேறுபாடு அறிதல் · மின்-வணிகத்தின் நன்மைகளையும் குறைபாடுகளையும் அறிந்து கொள்ளுதல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>15.1 அறிமுகம்</h3>
+    <div class="easy">
+      <span class="lbl">💬 பாடநூல் தொடக்க மேற்கோள்</span>
+      "அறிவுடையார் எல்லாம் உடையார்" — புதுமைகளை விரைவாக அடையாளம் கண்டு, பின்பற்றக் கூடிய எவரும் வெற்றி பெறுவார்கள். வணிகம் எப்போதும் புதுமைகளிலிருந்து இலாபம் ஈட்டும் பண்புடையது. வாடிக்கையாளர் நேரடியாக கடைக்குச் சென்று, பல்வேறு பொருட்களைப் பரிசோதித்து, தேவையான பொருட்களைத் தேர்வு செய்து, பின்னர் குறிப்பிட்ட தொகையைச் செலுத்தி அவற்றை வாங்குவது மரபு சார்ந்த வணிகம். தற்போது தொழில்நுட்பக் கண்டுபிடிப்புகளோடு பொருட்களை வாங்குதல் அல்லது விற்பனை செய்தலுக்கான வழிகள் மேம்படுத்தப்பட்டுள்ளன.
+    </div>
+
+    <h4>மின்-தொழில் (e-Business)</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      1996-ல் IBM, மின்-தொழில் என்ற சொல்லை முன்மொழிந்தது. தொழில் என்பது வணிகத்தைவிட பரந்த அளவில் இருப்பதால், மின்-வணிகம் என்பது மின்-தொழிலின் ஒரு உட்பிரிவு என்பதை அறியலாம். மின்-வணிகம் இணையம் மூலம் நடைபெறும் வர்த்தக பரிவர்த்தனை ஆகும். ஆனால் மின்-தொழில் என்பது நிறுவனத்தின் ஒவ்வொரு உள் மற்றும் வெளி நடவடிக்கைகளான மூலப் பொருட்கள் கொள்முதல், விற்பனை, நிதி, உற்பத்தி, மற்றும் பேச்சுவார்த்தை போன்ற அனைத்திற்கும் முற்றிலும் இணையத்தைச் சார்ந்துள்ளது.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு பள்ளியின் "நிர்வாகம்" (Administration) முழுப் பள்ளியையும் (கட்டிடம், ஆசிரியர்கள், நேரவாரம், தேர்வு, நூலகம் எல்லாம்) கவனித்துக் கொள்வது போல — மின்-தொழில் (e-Business) என்பது ஒரு நிறுவனத்தின் அனைத்து நடவடிக்கைகளும் இணையம் வழியாக நடப்பதைக் குறிக்கிறது. அதில் "பொருட்களை இணையம் வழியாக வாங்குதல்/விற்றல்" மட்டும் என்பது "மின்-வணிகம்" (e-Commerce) — இது பெரிய "மின்-தொழில்" வீட்டின் ஒரு அறை மட்டுமே!
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>மின்-தொழில் (e-Business) &gt; மின்-வணிகம் (e-Commerce) — மின்-வணிகம் என்பது மின்-தொழிலின் ஒரு உட்பிரிவு (subset) மட்டுமே.</div>
+
+    <h4>ஒரு நிறுவனம் மின்-வணிக நிறுவனம் எப்போது ஆகும்?</h4>
+    <div class="example-box">
+      <span class="lbl">🏢 பாடநூல் நிபந்தனைகள்</span>
+      <ul>
+        <li>இணையம் மூலம் மின்னணு முறையில் வணிகம் நடத்தும் திறன் கொண்டிருந்தால்</li>
+        <li>இணையம் மூலம் பணம் செலுத்தல் பரிவர்த்தனையை நிர்வகித்தால்</li>
+        <li>இணையம் மூலம் பொருட்களை விற்க &amp; சேவைகளை வழங்க ஒரு பணித்தளம் கொண்டிருந்தால்</li>
+      </ul>
+      மட்டுமே அதை மின்-வணிக நிறுவனம் என்று அழைக்கலாம்.
+    </div>
+
+    <h4>🏛️ மின்-தொழில் கட்டமைப்பு தொகுதிகள் <span class="eng">(Visual Explanation — Pic 15.2)</span></h4>
+    <p>கீழே உள்ள நான்கு தூண்களை (pillars) கிளிக் செய்து அவற்றின் பொருளை அறியவும்.</p>
+    <div class="diagram-box">
+      <div class="pillar-roof">மின்-தொழில் (e-Business)</div>
+      <div class="pillar-grid" id="pillarGrid"></div>
+    </div>
+    <div id="pillarDetail" class="easy" style="display:none;"></div>
+
+    <h4>மின்-வணிகம் (e-Commerce) என்றால் என்ன?</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-வணிகம் என்பது கணிப்பொறி வலையமைப்புகள் வழியாகப் பொருட்கள், சேவைகள் அல்லது தகவல்களை வாங்கும் அல்லது விற்கும் வழிமுறை ஆகும். மின்-வணிகம், நுகர்வோர் அடிப்படையிலான சில்லறை விற்பனைத் தளங்களாகவோ, ஏல வலைத்தளங்களாகவோ அல்லது பெரிய வியாபார அமைப்புகளுக்கிடையேயான வணிகமாகவோ இருக்கலாம். பண்டங்கள் (Commodity) என்பது நுகர்வோர் அடிப்படையிலான கைக்கடிகாரமாகவோ அல்லது அது ஒரு இயக்க அமைப்பு (Operating System), சிறு உலாவி-செருகுநிரலாகவோ (Browser plugin) இருக்கலாம்.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 உதாரணம் (Analogy — தமிழக மாணவர்களுக்கு)</span>
+      நம் ஊர் சந்தையில் காய்கறி வாங்குவது "மரபு சார்ந்த வணிகம்". அதே காய்கறியை Big Basket போன்ற App-இல் ஆர்டர் செய்வது "மின்-வணிகம்" — இரண்டிலும் நோக்கம் ஒன்றே (பொருளை வாங்குவது), ஆனால் வழிமுறை வேறுபடுகிறது.
+    </div>
+
+    <h4>🧩 புலனாகும் Vs புலனாகாப் பொருட்கள் <span class="eng">(Tangible vs Intangible — Learning Activity)</span></h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      இந்தப் பண்டங்களைப் புலனாகும் (tangible) பொருட்கள் மற்றும் புலனாகாப் (intangible) பொருட்கள் என வகைப்படுத்தலாம். புத்தகங்கள், குறுந்தகடுகள் மற்றும் டிஜிட்டல் வீடியோ வட்டு, மின் விளக்குகள் போன்றவை புலனாகும் பொருள்கள். உருவமற்ற மின்னணுக்கோப்புகள், பதிவிறக்கம் செய்யப்பட்ட விளையாட்டுகள், இசைக் கோப்புகள் அல்லது திரைப்படங்கள் போன்றவை புலனாகாப் பொருட்கள்.
+    </div>
+    <p>கீழே உள்ள பொருட்களைக் கிளிக் செய்து, அவை எந்த வகையைச் சார்ந்தவை எனச் சரியான பெட்டியில் வைக்கவும்.</p>
+    <div class="sort-pool" id="sortPool"></div>
+    <div class="sort-grid">
+      <div class="sort-bin" id="binTangible"><h4>📦 புலனாகும் (Tangible)</h4><div class="bin-items"></div></div>
+      <div class="sort-bin" id="binIntangible"><h4>💾 புலனாகாத (Intangible)</h4><div class="bin-items"></div></div>
+    </div>
+    <div id="sortResult" style="font-weight:700;margin-top:8px;"></div>
+    <div class="btn-row"><button class="btn btn-ghost" id="sortResetBtn">🔄 Reset</button></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-intro"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 15.2 — மின்னணு வணிகத்தின் பரிணாம வளர்ச்சி
+   ========================================================================= */
+function renderEvolution(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.2</div>
+    <h2>மின்னணு வணிகத்தின் பரிணாம வளர்ச்சி <span class="eng">(Evolution of e-Commerce)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> மின்-வணிகம் படிப்படியாக எவ்வாறு வளர்ந்தது என்பதை வரலாற்று நிகழ்வுகள் மூலம் அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>15.2 பரிணாம வளர்ச்சி</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-வணிகம் முற்றிலும் ஒரு புதிய நிகழ்வு அல்ல. மின்-வணிகத்தின் தோற்றம் சில தசாப்தங்களுக்கு முன்பு தொடங்கி, அதிவேகமாக வளர்ந்து வருகிறது. இது முதன் முதலில் 1970 களில் தனியார் வலையமைப்புகளில் உருவானது. மின்னணு தகவல் பரிமாற்றங்கள் (EDI) மற்றும் தொலை-கடைசெலவு (Tele-Shopping) இணைந்து மின்-வணிகத்திற்கு வழி வகுத்தது. தேசிய அறிவியல் அறக்கட்டளை 1991-ல் இணையத்தை பொது மக்களுக்குத் திறந்த போது நிகழ்நிலை-கடைசெலவு வர ஆரம்பித்தது. பின்னர் வணிக நிறுவனங்கள் வலைத்தளங்களில் குடியேறத் தொடங்கிவிட்டன.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      1970களில் நிறுவனங்களுக்கு இடையே (B2B) தரவு பரிமாற்றம் செய்ய EDI (Electronic Data Interchange) பயன்பட்டது — அதாவது தொலைபேசி/தொலைநகல் (Fax) மூலம் ஆர்டர் செய்வதற்குப் பதிலாக கணினி மூலம் நேரடியாக ஆர்டர் தகவலை அனுப்புவது. 1991-ல் இணையம் பொதுமக்களுக்குத் திறக்கப்பட்டவுடன்தான் சாதாரண மக்களும் மின்-வணிகத்தை பயன்படுத்த ஆரம்பித்தனர்.
+    </div>
+
+    <h4>🕰️ மின்-வணிகத்தின் காலக்கோடு <span class="eng">(Interactive Timeline — Pic 15.4)</span></h4>
+    <div class="diagram-box">
+      <div class="ev-stage">
+        <button class="btn btn-ghost" id="evPrevBtn">⬅</button>
+        <span class="ev-counter" id="evCounter">1 / 19</span>
+        <button class="btn btn-ghost" id="evNextBtn">➡</button>
+      </div>
+      <div id="evCard"></div>
+      <div class="btn-row" style="justify-content:center;"><button class="btn btn-ghost" id="evResetBtn">🔄 தொடக்கத்திற்குச் செல்</button></div>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா? — Michael Aldrich &amp; Teleputer</span>
+      1979-ல், ஆங்கிலேய தொழில் முனைவோர் மைக்கேல் ஆல்ட்ரிச், நுகர்வோர் மற்றும் நிறுவனங்கள் இடையே இணைய பரிவர்த்தனையைச் செயல்படுத்தும் ஒரு செயல் ரீதியான நுட்பத்தை முன்மொழிந்தார். பின்னாளில் அது தொழில்நுட்ப ரீதியாக "மின்-வணிகம்" என்று அழைக்கப்பட்டது. 1980-ல் அவர் தொலைக்காட்சி, கணினி மற்றும் தொலைத் தொடர்பு வலைப்பின்னல் தொழில்நுட்பங்கள் அடங்கிய Teleputer எனும் பல்நோக்கு இல்ல தகவமைவு (Multipurpose Home Infotainment) சாதனத்தைக் கண்டுபிடித்தார்.
+    </div>
+    <div class="activity-box">
+      <span class="lbl">💡 உங்களுக்குத் தெரியுமா? — முதல் மின்-வணிக பரிவர்த்தனை</span>
+      1994 ஆகஸ்ட் 11ம் நாள், அன்று மதியம், பிலடெல்பியாவில் (அமெரிக்கா) இருந்து Phil Brandenberger, நாஷ்வவில் (அமெரிக்கா) இருக்கும் Kohn என்பவரிடமிருந்து Sting's "Ten Summoners' Tales" என்ற ஒரு இசை குறுந்தகடு வாங்க, தனது கடன் அட்டையைப் பயன்படுத்தி $12.48 மற்றும் shipping கட்டணங்களை நிகழ்நிலையில் செலுத்தினார். இது முதல் மின்-வணிக பரிவர்த்தனை என குறிக்கப்படுகிறது.
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>1970s — EDI தொடக்கம் · 1979 — Teleputer (Michael Aldrich) · 1991 — இணையம் பொதுமக்களுக்குத் திறப்பு · Aug 1994 — முதல் பாதுகாப்பான மின்-வணிக பரிவர்த்தனை · Jul 1995 — Amazon முதல் விற்பனை · Sep 1995 — eBay முதல் விற்பனை.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-evolution"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 15.3 — மின் வணிக வளர்ச்சி அலைகள்
+   ========================================================================= */
+function renderWaves(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.3</div>
+    <h2>மின் வணிக வளர்ச்சி அலைகள் <span class="eng">(E-Commerce Growth Waves)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> மின்-வணிகம் மூன்று தனித்துவமான அலைகளில் எவ்வாறு வளர்ந்தது என அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>15.3 மின் வணிக வளர்ச்சி அலைகள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      பொருளாதார வல்லுநர்கள் தொழில்நுட்பத்தில் ஏற்பட்ட நான்கு தனித்துவமான அலைகளை (அல்லது கட்டங்களை) விவரிக்கின்றனர். ஒவ்வொரு அலையிலும் வெவ்வேறு வியாபார யுக்திகள் வெற்றியடைந்தன. இணையம் கொண்டு வந்த மின்னணு வணிகமும் தகவல் புரட்சியும் அதைத் தொடர் அலைகள் வழியாகவே விளக்கலாம்.
+    </div>
+
+    <h4>🌊 மூன்று அலைகளை ஆராயுங்கள் <span class="eng">(Interactive)</span></h4>
+    <div class="wave-grid" id="waveGrid"></div>
+    <div id="waveDetail" class="easy" style="display:none;"></div>
+
+    <div class="needs-verify">
+      <span class="lbl">⚠️ சரிபார்க்க வேண்டியது</span>
+      Part-A வினா 5-இல் "மின்-வணிகத்தின் முதல் அலை: 1985-1990" எனக் கொடுக்கப்பட்டுள்ள விருப்பத்தேர்வு <b>தவறானது</b> (இது தவறானதைக் கண்டறியும் வினா) — பாடநூலின் 15.3 பகுதியில் முதல் அலை உண்மையில் <b>1995 – 2003</b> எனக் குறிப்பிடப்பட்டுள்ளது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>💥 டாட்காம் குமிழி &amp; வெடிப்பு <span class="eng">(Dotcom Bubble &amp; Crash)</span></h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      டாட்காம் (Dotcom) குமிழி, சுமார் 1995 மற்றும் 2000க்கு இடையே டாட்காம் நிறுவனங்களின் ஒரு வரலாற்று மிதமிஞ்சிய வளர்ச்சி (மிதமிஞ்சிய அனுமானம்) ஆகும். NASDAQ — கூட்டுப் பங்குச் சந்தை குறியீடானது 5046.86 லிருந்து 1114.11 ஆகச் சரிந்தது. இது புகழ்பெற்ற டாட்காம் முறிவு அல்லது டாட்காம் வெடிப்பு என அறியப்படுகிறது. இது மார்ச் 11, 2000 அன்று தொடங்கி அக்டோபர் 9, 2002 வரை நீடித்தது. Pets.com போன்ற ஆயிரக்கணக்கான நிகழ்நிலை வணிக நிறுவனங்கள் தோல்வியடைந்து மூடப்பட்டன. Cisco போன்ற சில நிறுவனங்கள் தங்கள் சந்தை மூலதனத்தின் பெரும்பகுதியை இழந்தன ஆனால் பிழைத்தன. Amazon போன்ற சில நிறுவனங்களின் சந்தை மதிப்பு குறைந்தாலும், அவை விரைவாக மீண்டு வந்தன.
+    </div>
+    <div class="diagram-box">
+      <svg viewBox="0 0 360 180" style="width:100%;max-width:460px;display:block;margin:0 auto;">
+        <polyline points="10,150 60,130 100,95 140,70 180,25 220,45 260,120 300,160 340,155" fill="none" stroke="var(--primary)" stroke-width="3"/>
+        <circle cx="180" cy="25" r="5" fill="var(--accent)"/><text x="180" y="16" font-size="10" text-anchor="middle" fill="var(--primary-dark)" font-weight="700">5046.86 (உச்சம்)</text>
+        <circle cx="300" cy="160" r="5" fill="var(--incorrect)"/><text x="300" y="174" font-size="10" text-anchor="middle" fill="var(--incorrect)" font-weight="700">1114.11 (வீழ்ச்சி)</text>
+        <text x="10" y="168" font-size="9" fill="var(--muted)">1995</text>
+        <text x="180" y="40" font-size="9" fill="var(--muted)">Mar 2000</text>
+        <text x="300" y="175" font-size="9" fill="var(--muted)"></text>
+        <text x="330" y="168" font-size="9" fill="var(--muted)">Oct 2002</text>
+      </svg>
+      <div class="diagram-cap">படம் — NASDAQ குறியீடு, டாட்காம் குமிழி &amp; வெடிப்பு (redrawn, தோராயமான வடிவம் — exact data points அல்ல)</div>
+    </div>
+  </div>
+
+  <div class="tryit-box">
+    <span class="lbl">🧪 முயற்சி செய்</span>
+    அலை 1.0, 2.0, 3.0 ஆகிய மூன்றையும் ஒப்பிட்டு, "Read-only" என்பதிலிருந்து "Read-Write-Execute" வரை இணையம் எப்படி மாறியது என உங்கள் சொந்த வார்த்தைகளில் விளக்குக.
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-waves"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 15.4 — மின்-வணிக வர்த்தக மாதிரிகளின் வகைப்பாடு
+   ========================================================================= */
+function renderModels(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.4</div>
+    <h2>மின்-வணிக வர்த்தக மாதிரிகளின் வகைப்பாடு <span class="eng">(Classification of e-Commerce Trading Models)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> Business, Consumer, Government ஆகிய மூன்று பங்கேற்பாளர்களுக்கிடையேயான 9 வணிக மாதிரிகளை அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>15.4 மூன்று பங்கேற்பாளர்கள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      வணிக நிறுவனங்கள், நுகர்வோர் மற்றும் அரசாங்கம் (நிர்வாகம் என்றும் அழைக்கப்படுகிறது) ஆகியோர் மின் வணிகத்தில் முக்கிய பங்கேற்பாளர்கள் ஆவர். பரிவர்த்தனையில் ஈடுபடும் நிறுவனங்களின் அடிப்படையில் மின்-வணிகம் பின்வரும் வகைகளாகப் பிரிக்கப்பட்டுள்ளது. அரசாங்கம் ஒரு அங்கமாகச் செயல்படும் மாதிரிகள் மின் அரசாண்மை என்று அழைக்கப்படுகிறது.
+    </div>
+
+    <h4>🔢 ஊடாடும் 3×3 மாதிரி அட்டவணை <span class="eng">(Interactive Matrix — Pic 15.6)</span></h4>
+    <p>கீழே உள்ள 9 கலங்களில் ஒன்றைக் கிளிக் செய்து, அந்த மாதிரியின் விளக்கத்தையும் உதாரணத்தையும் காணவும்.</p>
+    <div class="matrix-wrap">
+      <table class="matrix-table" id="matrixTable"></table>
+    </div>
+    <div id="matrixDetail" class="easy" style="display:none;"></div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>9 மாதிரிகள்: B2B, B2C, B2G, C2B, C2C, C2G, G2B, G2C, G2G. முதல் எழுத்து = "யாரிடமிருந்து", கடைசி எழுத்து = "யாருக்கு".</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-models"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 15.5 — மின்-வணிக வருவாய் மாதிரிகள்
+   ========================================================================= */
+function renderRevenue(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.5</div>
+    <h2>மின்-வணிக வருவாய் மாதிரிகள் <span class="eng">(e-Commerce Revenue Models)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> ஒரு மின்-வணிக நிறுவனம் பணம் ஈட்டும் 8 வெவ்வேறு வழிகளை அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>15.5 மின்-வணிக வருவாய் மாதிரிகள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      வழக்கமான முறையில் பொருட்களை விற்பது மட்டுமின்றி, இணையத்தளம் மூலம் பணம் ஈட்ட ஒரு நிறுவனத்திற்கு பல வழிகள் உள்ளன. மின்-வணிக செயல்பாடுகளின் பிற வடிவங்கள் கீழே தரப்பட்டுள்ளன.
+    </div>
+    <h4>💰 8 வருவாய் மாதிரிகளை ஆராயுங்கள் <span class="eng">(Interactive)</span></h4>
+    <div class="revmodel-grid" id="revGrid"></div>
+    <div id="revDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="tryit-box">
+    <span class="lbl">🧪 முயற்சி செய்</span>
+    OLX, Flipkart, IGNOU வலைத்தளம், MMT (MakeMyTrip) ஆகியவற்றை மேலே உள்ள 8 வருவாய் மாதிரிகளில் எதனுடன் பொருத்தலாம் என யோசித்துப் பாருங்கள்.
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-revenue"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 15.6 — மரபு சார்ந்த வணிகம் Vs மின்-வணிகம்
+   ========================================================================= */
+function renderComparison(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.6</div>
+    <h2>மரபு சார்ந்த வணிகம் மற்றும் மின்-வணிகம் ஒப்பீடு</h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> இரு வகை வணிகங்களுக்கும் இடையேயான முக்கிய வேறுபாடுகளை அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>15.6 ஒப்பீடு</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-வணிகம் இனி வெறும் வணிகம் மட்டும் அல்ல. பொருட்கள், சேவைகளை வாங்குவது மற்றும் விற்பனை செய்வது என்ற முதன்மையான கோட்பாட்டை அவை இரண்டும் பகிர்ந்துகொண்டாலும், மரபு சார்ந்த வணிகம், மின்-வணிகம் இரண்டுக்குமிடையே சில வேறுபாடுகள் உள்ளன.
+    </div>
+    <table class="tbl">
+      <tr><th>மரபு சார்ந்த வணிகம்</th><th>மின்-வணிகம்</th></tr>
+      <tr><td>பொருட்கள் மற்றும் சேவைகளை நேரடியாக பரிமாற்றம் செய்கிறது.</td><td>இணையம் மூலம் மின்னணு முறையில் வணிக நடவடிக்கைகளை மேற்கொள்கிறது.</td></tr>
+      <tr><td>வாடிக்கையாளர் வியாபாரியை எளிதில் அடையாளம் காணவும், அங்கீகரிக்கவும், பேசவும் முடியும்.</td><td>வாடிக்கையாளரோ வியாபாரியோ மற்றவரைப் பார்ப்பதில்லை.</td></tr>
+      <tr><td>பொதுவாக கடைகள் அனைத்து நேரத்திலும் திறந்திருக்க முடியாது.</td><td>இணையம் மூலம் வருடத்தின் அனைத்து நாட்களிலும் எல்லா நேரத்திலும் வணிகம் நடைபெறும்.</td></tr>
+      <tr><td>வாங்கும் முன் பொருட்களை நேரடியாக ஆய்வு செய்யலாம்.</td><td>வாங்கும் முன் பொருட்களை நேரடியாக ஆய்வு செய்ய முடியாது.</td></tr>
+      <tr><td>வணிகத்தின் வரையெல்லை குறிப்பிட்ட பகுதிக்கு உட்பட்டது.</td><td>வணிகத்தின் வரையெல்லை உலகளாவியது. விற்பனையாளர்கள் உலகெங்கும் தங்கள் தொழிலை விரிவுபடுத்தலாம்.</td></tr>
+      <tr><td>மரபுசார் வணிகத்தில் விநியோக சார்ந்த (supply side) வள முன்னிருத்த கோட்பாடு பயன்படுத்தப்படுகிறது.</td><td>மின்-வணிகத்தில் தேவை சார்ந்த (demand side) வள முன்னிறுத்த கோட்பாடு பயன்படுத்தப்படுகிறது.</td></tr>
+      <tr><td>மரபுசார் வணிகத்தில் நேர்கோட்டு (Linear) வணிக உறவு முறை பின்பற்றப்படுகிறது.</td><td>மின் வணிகத்தில் End to End என்ற வணிக உறவுமுறை பின்பற்றப்படுகிறது.</td></tr>
+      <tr><td>மரபுசார் வணிகத்தில் ஒரு வழி சந்தைப்படுத்துதல் (one way marketing) முறை பின்பற்றப்படுகிறது.</td><td>மின் வணிகத்தில் ஒன்று – ஒன்று (one to one) என்ற சந்தைப்படுத்துதல் முறை பின்பற்றப்படுகிறது.</td></tr>
+      <tr><td>ரொக்கம், காசோலை, கடன் அட்டைகள் போன்றவற்றால் பணம் செலுத்தப்படுகிறது.</td><td>பணம் செலுத்தும் முறை பெரும்பாலும் மின்-செலுத்தல்கள் (கடன் அட்டை, நிதி பரிமாற்றம்) மூலமாகவும் நடைபெறும்.</td></tr>
+      <tr><td>பெரும்பாலான பொருட்கள் உடனடியாக விநியோகம் செய்யப்படுகின்றன.</td><td>பொருட்களை விநியோகம் செய்ய சில காலம் தாமதமாகும்.</td></tr>
+    </table>
+
+    <h4>🎮 வகைப்படுத்து விளையாட்டு <span class="eng">(Sorting Game — Learning Activity)</span></h4>
+    <p>கீழே உள்ள ஒவ்வொரு கூற்றையும் படித்து, அது "மரபு சார்ந்த வணிகம்" அல்லது "மின்-வணிகம்" எதைப் பற்றியது என தேர்ந்தெடுக்கவும்.</p>
+    <div id="cmpGameWrap"></div>
+    <div id="cmpGameScore" style="font-weight:700;margin-top:8px;"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-comparison"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 15.7 — நன்மைகள் & குறைபாடுகள்
+   ========================================================================= */
+function renderProsCons(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 15 › 15.7</div>
+    <h2>மின்-வணிகத்தின் நன்மைகள் மற்றும் குறைபாடுகள்</h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> மின்-வணிகம் நுகர்வோருக்கு அளிக்கும் நன்மைகளையும் அதனுடன் தொடர்புடைய குறைபாடுகளையும் அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>15.7 நன்மைகள் மற்றும் குறைபாடுகள்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      மின்-வணிகத்தின் சாதக பாதகங்கள் அதன் மூன்று முக்கிய பங்குதாரர்களைப் பாதிக்கிறது: நுகர்வோர், வணிக நிறுவனங்கள் மற்றும் சமூகம். மின்-வணிகத்தில் நுகர்வோருக்கான சில நன்மைகள் மற்றும் குறைபாடுகள் பின்வருமாறு.
+    </div>
+    <details class="acc" open><summary>✅ நன்மைகள்</summary>
+      <div class="acc-body">
+        <ul>
+          <li>மின்-வணிக அமைப்பு வாரத்தின் எல்லா நாட்களிலும் எல்லா நேரங்களிலும் (24 x 7) இயக்கப்படுகிறது. மக்கள் தங்கள் தேவைக்கேற்ப நேரங்களில் வணிகங்களுடன் தொடர்பு கொள்ளலாம்.</li>
+          <li>வேகம், மின்-வணிகத்தின் ஒரு முக்கிய நன்மை. மேம்பட்ட மின்னணு தகவல்தொடர்பு அமைப்புகள் செய்திகளை உடனடியாக உலகம் முழுவதும் சென்றடைய அனுமதிக்கிறது.</li>
+          <li>ஒரு சாதாரண கடையில் பொருட்கள் வாங்குவதை விட இணையத்தின் மூலம் பொருட்கள் மற்றும் சேவைகளைப் பெறுவது, விலை குறைவானது மற்றும் எளிதானதாகும்.</li>
+          <li>இது நுகர்வோருக்குக் குறைந்த செலவில் வாங்குவதற்கான வாய்ப்பை வழங்குகிறது. இணையத்தளத்தை ஆராய்ந்து, உற்பத்தியாளர்களை அடையாளம் காணவும், அதன்மூலம் மொத்த விற்பனையாளர்களைக் கடந்து, நேரடியாக உற்பத்தியாளரிடமிருந்தே குறைந்த விலையில் பொருட்கள் வாங்க முடியும்.</li>
+          <li>இன்றைய நுகர்வோர்களுக்கு உலகமே ஒரு சந்தையாக மாறியுள்ளது. வாங்குவதற்கான முடிவை எடுப்பதற்கு முன்பு பல்வேறு வலைத்தளங்களில் அதே பொருட்களை ஒப்பிட்டு, மதிப்பிடுவதன் மூலம் அவர்கள் பரவலான விருப்பத்தைப் பெற முடியும்.</li>
+          <li>வாடிக்கையாளர்கள் வீட்டிலோ அல்லது தங்கள் வசதிக்கேங்கு எங்கு வேண்டுமானாலும் பொருட்களைப் பெற்றுக் கொள்ளலாம். ஒரு விற்பனையாளரிடம் பேச நீண்ட நேர காத்திருப்பு தேவையில்லை. வலைத்தளத்திலிருந்து தயாரிப்பின் மாதிரி எண், விலை, அம்சங்கள் போன்றவற்றைப் படித்து அவர்கள் தங்கள் வசதிக்கேற்ப பொருட்களை வாங்க முடியும். அதற்கான கட்டணத்தையும் மின்-செலுத்தல் (e-Payment) மூலம் செய்யலாம்.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="acc"><summary>❌ குறைபாடுகள்</summary>
+      <div class="acc-body">
+        <ul>
+          <li>மின்-வணிகம் பெரும்பாலும் உள்ளூரில் கிடைக்காத பொருட்களையும் உலகம் முழுவதும் உள்ள விற்பனையாளர்களிடமிருந்து வாங்கப் பயன்படுத்தப்படுகிறது. பொருட்களை விநியோகிக்க அதை ஓர் இடத்திலிருந்து மற்றொரு இடத்திற்கு அனுப்ப வேண்டும். இது நீண்ட நேரத்தையும், பணத்தையும் எடுத்துக்கொள்ளும்.</li>
+          <li>மின்-வணிகம் மூலம் பெற்ற பொருட்களை திருப்பி அனுப்புவது ஒரு மரபு சார்ந்த கடைக்குப் பொருட்களைத் திருப்பி அனுப்புவது போலல்லாமல் ஒரு சிரமமான பணியாக உள்ளது. திரும்பி அனுப்பும் காலம் பற்றிய சந்தேகங்கள், திரும்பிய பொருட்கள் வணிகரைச் சென்றடையும் நேரம், பணத்தை திரும்பப் பெறுதல், பரிமாற்றம் மற்றும் அஞ்சல் செலவுகள் ஆகியவை களைப்பான செயலாகக் கருதப்படுகிறது.</li>
+          <li>தனியுரிமைச் சிக்கல்கள் மின்-வணிகத்தில் மிகவும் கவலைக்குரியவை. மின்-வணிகத்தில் ஒரு நிறுவனம் நுகர்வோர் பற்றிய தகவல்களைத் திரட்டுவது தவிர்க்க முடியாது. ஆனால் எல்லா நிறுவனங்களும் அவர்கள் பெற்ற தனிப்பட்ட தகவல்களை வாடிக்கையாளர்களுக்கான சேவைகளை மேம்படுத்த மட்டுமே பயன்படுத்துவதில்லை. பல நிறுவனங்கள் அந்த தகவல்களைப் பயன்படுத்தி அதிலிருந்து பணம் ஈட்டத் துவங்கியுள்ளனர். தனியுரிமைச் சிக்கல்கள் மின்-வணிகம் பற்றிய மக்களின் அச்சத்திற்கு ஒரு முக்கிய காரணம் ஆகும்.</li>
+          <li>இயல் பொருள் சார்ந்த சர்ச்சைகள் மின்-வணிகத்தின் ஒரு பெரும் குறைபாடு ஆகும். இதற்குக் காரணம், மின்-வணிகத்தில் பொருட்களை நாம் நேரடியாக அணுக முடியாது. ஒரு பொருள், அதன் நிலையின் அனுமானத்தில் அல்லது எதிர்பார்ப்பில் கொள்முதல் செய்யப்படுகிறது. மின்-வணிகத்தில் நம்மால் வரையறுக்கப்பட்ட மற்றும் சில தேர்ந்தெடுக்கப்பட்ட புலன் சார்ந்த தகவல்கள் மட்டுமே பெற முடியும். இணையம் என்பது காட்சி சார்ந்த மற்றும் ஒலி சார்ந்த ஊடகம் என்றாலும், அது நமது புலன்களுக்கு முழு வாய்ப்பையும் அனுமதிக்காது. வாசனைத் திரவியங்களின் படங்களைப் பார்க்க முடியும், ஆனால் அவற்றின் நறுமணத்தை நுகர முடியாது; ஆடைகளின் படங்களைப் பார்க்க முடியும், ஆனால் அதன் தரத்தைப் பரிசோதிக்க முடியாது. நாம் ஏதாவது ஒரு பொருளை நேரில் வாங்கும் பொழுது, அதனை ஆய்வு செய்ய விரும்பினால், அதை எப்படிச் சோதிக்க வேண்டும் என்பதை நாம் தேர்ந்தெடுக்கிறோம். மின்-வணிகத்தில் விற்பனையாளர் தேர்வு செய்த படத்தை மட்டுமே நாம் பார்க்க முடியும். பெரும்பாலும் நுகர்வோர் இணையம் வழியாகத் தனித்துவமான அல்லது சிக்கலான பொருட்களைக் காட்டிலும் ஒரு சிறிய குழப்பமற்ற (அவர்கள் ஏற்கனவே பார்த்த அல்லது முன் அனுபவம் பெற்ற) பொருட்களை வாங்குவதற்கு மட்டுமே மிகவும் பாதுகாப்பாக உணர்கின்றனர். இதனால் வாடிக்கையாளர்கள் நீடித்திலாத மற்றும் விரைவில் அழியக் கூடிய தன்மை கொண்ட பொருட்களை வாங்க மீண்டும் மரபு சார்ந்த அங்காடிகளுக்கே திரும்புவது வாடிக்கைக்குரியது.</li>
+          <li>விநியோக தெளிவின்மை: மின்-வணிகத்தில் வணிகங்கள் உலகம் முழுவதும் இருந்து நடத்தப்படுகின்றன என்பதால், வர்த்தக நிறுவனங்கள் நேர்மையானவையா அல்லது அவர்கள் நமது பணத்தை எடுத்துக் கொள்ளப் போகிறார்களா என்பது நிச்சயமில்லாமல் இருக்கலாம். புகார் கொடுக்கவோ சட்ட உதவியைப் பெறவோ நாம் அவர்களின் கதவைத் தட்டுவது கடினம். மேலும், பொருட்கள் அனுப்பப்பட்டாலும், அது வந்து சேருமா இல்லையா என ஐயம் கொள்வது எளிது.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⚡ குறுக்கீட்டுக் கண்டுபிடிப்புகள் <span class="eng">(Disruptive Innovations)</span></h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      தற்போதுள்ள தொழில்நுட்பங்களை மாற்றியமைக்கும் புதுமைகள், சீர்குலைவைக் குறுக்கீட்டு புதுமைகள் என்று அழைக்கப்படுகின்றன. குறுக்கீட்டுக் கண்டுபிடிப்புகள் புதிய சந்தையை உருவாக்குகின்றன. எல்லாப் புதுமைகளும் உடனடி குறுக்கீடுகள் அல்ல. பத்தொன்பதாம் நூற்றாண்டின் பிற்பகுதியில் முதல் மோட்டார் வாகனங்கள் ஒரு மாபெரும் கண்டுபிடிப்பு. ஆனால் அது அப்போதுள்ள குதிரை அடிப்படையிலான சாலைப் போக்குவரத்து சந்தையை 1908 ல் ஹென்றி போர்ட் மலிவு விலை மோட்டார் வாகனங்களை அறிமுகப்படுத்தியவரை பாதிக்கவில்லை. குறுக்கீட்டு புதுமை என்ற சொல்லை முதலில் கிளேடன் எம் தனது "The Innovator's Dilemma" என்ற நூலில் பயன்படுத்தினார்.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      எ.கா. மரபு சார்ந்த புகைப்பட கருவிகளின் சந்தை எண்ணியல் படக்கருவி கண்டுபிடிப்பு குறுக்கிட்டது. நெகிழ்வட்டு சந்தையை குறுந்தகடு மற்றும் USB புத்தாக்கங்கள் குறுக்கிட்டது. மின்-வணிகம் என்பதும் ஒரு குறுக்கீட்டு புதுமையே.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-proscons"></div></div>
+  `;
+}
+
+/* =========================================================================
+   PRACTICE PAGE
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Misconception Buster <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — <span class="eng">Enrichment</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Misconception Buster — மின்-வணிகம் பற்றிய தவறான கருத்துக்கள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு தவறான கருத்தையும் படித்து, அது ஏன் தவறு எனக் யூகிக்கவும். பிறகு ✅ "ஏன் தவறு?" பொத்தானை கிளிக் செய்து, சரியான புரிதலைப் பார்க்கவும்.</p>
+    <div id="misWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. ஒரு நிறுவனத்தை மின்-வணிக நிறுவனம் என்று எப்போது கூறலாம்?', o:['உலகம் முழுவதும் பல கிளைகள் கொண்டிருந்தால்','இணையம் மூலம் மின்னணு முறையில் வணிகம் நடைபெற்றால்','அயல்நாட்டிற்கு பொருட்களை விற்பனை செய்தால்','பல ஊழியர்களை பெற்றிருந்தால்'], c:1, exp:'இணையம் மூலம் மின்னணு முறையில் வணிக நடவடிக்கைகளை மேற்கொள்ளும் நிறுவனமே மின்-வணிக நிறுவனம்.'},
+  'b2': {q:'2. கீழ்க்கண்டவற்றுள் எது புலனாகும் வடிவில் உள்ள பொருள் அல்ல?', o:['கைப்பேசி','கைப்பேசி பயன்பாடுகள்','மருந்து','பூங்கொத்து'], c:1, exp:'கைப்பேசி பயன்பாடுகள் (apps) ஒரு மென்பொருள் — அது புலனாகாத (intangible) பொருள்.'},
+  'b3': {q:'3. SME ன் விரிவாக்கம்', o:['Small and medium-sized enterprises','Simple and medium enterprises','Sound messaging enterprises','Short messaging enterprises'], c:0, exp:'SME = Small and Medium sized Enterprises.'},
+  'b4': {q:'4. டாட்காம் நிகழ்வு எதனுடன் தொடர்புடையது?', o:['நெசவுத் தொழில்','கைப்பேசி நிறுவனங்கள்','இணையம் சார்ந்த நிறுவனங்கள்','மேற்கூறிய அனைத்தும்'], c:2, exp:'டாட்காம் (Dotcom) என்பது இணைய அடிப்படையிலான (.com) நிறுவனங்களைக் குறிக்கும்.'},
+  'b5': {q:'5. பின்வருவனவற்றில் எது சரியாகப் பொருந்தவில்லை', o:['மின்-வணிகத்தின் முதல் அலை: 1985-1990','மின்-வணிகத்தின் இரண்டாம் அலை: 2004-2009','மின்-வணிகத்தின் மூன்றாவது அலை: 2010-நாளது வரை','டாட்காம் வெடிப்பு: 2000-2002'], c:0, exp:'பாடநூலின்படி மின்-வணிகத்தின் முதல் அலை 1995-2003; "1985-1990" தவறானது.'},
+  'b6': {q:'6. கூற்று: முதல் அலை டாட்காம் நிறுவனங்களின் இணையதளங்கள் ஆங்கிலத்தில் மட்டுமே இருந்தன. காரணம்: முதல் அலையின் டாட்காம் நிறுவனங்கள் பெரும்பாலும் அமெரிக்க நிறுவனங்கள்.', o:['கூற்றும் காரணமும் சரி; காரணம் கூற்றை சரியாக விளக்குகிறது.','கூற்றும் காரணமும் சரி; ஆனால் கூற்றை காரணம் சரியாக விளக்கவில்லை.','கூற்று சரி; காரணம் தவறு.','கூற்றும் காரணமும் தவறானவை.'], c:0, exp:'முதல் அலை நிறுவனங்கள் பெரும்பாலும் அமெரிக்க நிறுவனங்களாக இருந்ததால் அவற்றின் தளங்கள் ஆங்கிலத்தில் மட்டுமே இருந்தன — காரணம் கூற்றை சரியாக விளக்குகிறது.'},
+  'b7': {q:'7. வெளி-புறத்திறனீட்டம் என்றால்____', o:['சொந்த நிறுவனத்தின் ஒரு கிளைக்குப் பணி ஒதுக்கல்','புதிய ஊழியர்களுக்குப் பணி ஒதுக்கல்','மூன்றாம் தரப்பினருக்கு உள்ளூரில் பணி ஒதுக்கல்','சொந்த நாட்டிற்கு வெளியே மூன்றாம் தரப்பினருக்கு பணி ஒதுக்கல்'], c:3, exp:'ஒரு நிறுவனம் வேறு நாட்டில் அமைந்துள்ள நிறுவனத்திற்கு வேலையை ஒதுக்கினால் அது வெளி-புறத்திறனீட்டம் (off-shoring) எனப்படும்.'},
+  'b8': {q:'8. G2G முறைகள் பின்வருமாறு வகைப்படுத்தப்படுகின்றன.', o:['உள் நோக்கல் மற்றும் வெளி நோக்கல்','அக இணையம் மற்றும் புற இணையம்','முதல் அலை மற்றும் இரண்டாம் அலை','இடது நோக்கல் மற்றும் வலது நோக்கல்'], c:0, exp:'G2G அமைப்புகள் உள் நோக்கல் (ஒரே அரசாங்கத்தின் அதிகாரத்துவத்துடன்) மற்றும் வெளி நோக்கல் (பல அரசாங்கங்களுக்கிடையே) என இரு வகைகளாகப் பிரிக்கப்படும்.'},
+  'b9': {q:'9. ________ தங்கள் தளங்களில் மின்-புத்தகங்களை பதிப்பிக்கிறது.', o:['மொத்தமாக வாங்கும் இணையதளம்','சமுதாய இணையதளம்','எண்முறை பதிப்பக இணையதளம்','உரிமம் வழங்கும் இணையதளம்'], c:2, exp:'எண்முறை பதிப்பக இணையதளம் (Digital Publishing website) மின்-புத்தகங்கள்/மின்-சஞ்சிகைகளைத் திறம்பட பதிப்பிக்கிறது.'},
+  'b10': {q:'10. பின்வருவனவற்றில் எது மின்-வணிகத்தின் பண்பு ஆகும்?', o:['கொள்முதல் செய்வதற்கு முன்பு பொருட்களை இயல் நிலையில் ஆய்வு செய்யலாம்','உடனடியாக விநியோகம் செய்யப்படும்','ஆதார குவிப்பு வழங்கல் பக்கம்','வணிகத்தின் வரையெல்லை உலகளாவியது'], c:3, exp:'மின்-வணிகத்தின் வரையெல்லை உலகளாவியது — விற்பனையாளர்கள் உலகெங்கும் தொழிலை விரிவுபடுத்தலாம்.'},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'மின்-தொழில் (e-Business) என்ற சொல்லை 1996-ல் முன்மொழிந்த நிறுவனம் எது?', o:['Microsoft','IBM','Apple','Amazon'], c:1, exp:'1996-ல் IBM நிறுவனம் "மின்-தொழில்" என்ற சொல்லை முன்மொழிந்தது.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'Teleputer எனும் கருவியை கண்டுபிடித்தவர் யார்?', o:['ரிச்சர்ட் ஸ்டால்மேன்','மைக்கேல் ஆல்ட்ரிச்','பில் கேட்ஸ்','ஹென்றி போர்ட்'], c:1, exp:'1980-ல் மைக்கேல் ஆல்ட்ரிச் Teleputer எனும் பல்நோக்கு இல்ல தகவமைவு சாதனத்தைக் கண்டுபிடித்தார்.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'ஒரு வாடிக்கையாளர் தான் விரும்பும் விலையைக் கூறி, நிறுவனங்கள் அந்த விலைக்கு சேவை வழங்க முன்வரும் மாதிரி எது?', o:['B2C','C2B','B2B','G2C'], c:1, exp:'C2B மாதிரியில் நுகர்வோர் விலையை நிர்ணயிக்கிறார்; நிறுவனம் அதற்கேற்ப சேவையை வழங்குகிறது (Name-your-own-price).'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'ஒரு நுகர்வோர் வீட்டு வரி ஆன்லைனில் செலுத்துவது எந்த மாதிரி?', o:['C2G','G2C','C2B','G2B'], c:0, exp:'குடிமகன் அரசாங்கத்திற்கு வரி செலுத்துவது C2G (Consumer to Government) மாதிரி.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'ஒரு இணையதளம் ஒவ்வொரு விற்பனையிலிருந்தும் தரகுக் கட்டணம் (commission) பெற்று, பொருட்களை ஏலம் மூலம் விற்க உதவுகிறது. இது எந்த வருவாய் மாதிரி?', o:['பதாகை விளம்பர இணையதளம்','மின்-ஏல இணையதளம்','உரிமம் இணையதளம்','எண்முறை பதிப்பக இணையதளம்'], c:1, exp:'மின்-ஏல இணையதளம் (Auction website) ஒவ்வொரு விற்பனையிலிருந்தும் தரகுக் கட்டணம் பெறும் (எ.கா. eBay).'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'மின்-வணிகத்தின் எந்த அலையில் "Smart Search, Virtual Shopping, Semantic Web" போன்ற அம்சங்கள் காணப்படுகின்றன?', o:['அலை 1.0','அலை 2.0','அலை 3.0','டாட்காம் குமிழி காலம்'], c:2, exp:'அலை 3.0 (2010 - நாளது வரை) Smart Search, Virtual Shopping, Semantic Web, Augmented Reality போன்ற அம்சங்களைக் கொண்டது.'},
+};
+
+const TF_QS = [
+  {q:'மின்-வணிகம் (e-Commerce) என்பது மின்-தொழிலை (e-Business) விட பரந்தது.', a:false, exp:'தவறு — மின்-தொழில் பரந்தது; மின்-வணிகம் அதன் ஒரு உட்பிரிவு மட்டுமே.'},
+  {q:'B2C மாதிரியில் வணிக நிறுவனங்களுக்கு இடையே பரிவர்த்தனை நடைபெறுகிறது.', a:false, exp:'தவறு — B2C என்பது வணிகத்திற்கும் நுகர்வோருக்கும் இடையேயான பரிவர்த்தனை. நிறுவனங்களுக்கிடையேயானது B2B.'},
+  {q:'டாட்காம் வெடிப்பு மார்ச் 2000 முதல் அக்டோபர் 2002 வரை நீடித்தது.', a:true, exp:'சரி — NASDAQ குறியீடு இந்த காலகட்டத்தில் 5046.86 லிருந்து 1114.11 ஆகச் சரிந்தது.'},
+  {q:'மின்-வணிகத்தில் பொதுவாக ஒரு வழி (one way) சந்தைப்படுத்துதல் முறை பின்பற்றப்படுகிறது.', a:false, exp:'தவறு — மின்-வணிகத்தில் ஒன்று-ஒன்று (one to one) சந்தைப்படுத்துதல் பின்பற்றப்படுகிறது; ஒரு வழி முறை மரபு சார்ந்த வணிகத்தில் பயன்படுகிறது.'},
+  {q:'குறுக்கீட்டு புதுமை என்ற சொல்லை முதலில் பயன்படுத்தியவர் கிளேடன் எம்.', a:true, exp:'சரி — "The Innovator’s Dilemma" நூலில் கிளேடன் எம் இச்சொல்லை முதலில் பயன்படுத்தினார்.'},
+];
+
+const FIB_QS = [
+  {text:'1996-ல் ______________ நிறுவனம் "மின்-தொழில்" என்ற சொல்லை முன்மொழிந்தது.', ans:'ibm'},
+  {text:'Amazon தனது முதல் பொருளை ______________ ஆண்டு விற்றது.', ans:'1995'},
+  {text:'NASDAQ குறியீடு டாட்காம் உச்சத்தில் ______________ புள்ளிகளாக இருந்தது.', ans:'5046.86'},
+  {text:'C2B மாதிரி வேறு பெயரில் ______________ மாதிரி என்றும் அழைக்கப்படுகிறது.', ans:'தலைகீழ் ஏல'},
+];
+
+const MATCH_LEFT = ['Affiliate','Dotcom','Teleputer','Webhost','Brick and Mortar'];
+const MATCH_RIGHT = ['தரகிற்காக மற்றொரு வணிகத்தின் தயாரிப்புகளை ஊக்குவிக்கும் வணிகம்','இணைய அடிப்படையிலான நிறுவனங்களுக்கு பொதுப் பெயர்','தந்தி, தொலைக்காட்சி, கணினி மற்றும் தொலைத் தொடர்பு வலையமைப்பு தொழில்நுட்பங்களின் கலவை','இணைய இணைப்பு வழங்குவதன் மூலம் தனிநபர்கள் தங்கள் வலைத்தளத்தை இயக்க அனுமதிக்கிறது','இயல் அங்காடி வைத்துள்ள தொழிலைக் குறிக்கும் பதம்; நிகழ்நிலை கடைகளுக்கு எதிர்சொல்'];
+const MATCH_ANSWER = {'Affiliate':'தரகிற்காக மற்றொரு வணிகத்தின் தயாரிப்புகளை ஊக்குவிக்கும் வணிகம்','Dotcom':'இணைய அடிப்படையிலான நிறுவனங்களுக்கு பொதுப் பெயர்','Teleputer':'தந்தி, தொலைக்காட்சி, கணினி மற்றும் தொலைத் தொடர்பு வலையமைப்பு தொழில்நுட்பங்களின் கலவை','Webhost':'இணைய இணைப்பு வழங்குவதன் மூலம் தனிநபர்கள் தங்கள் வலைத்தளத்தை இயக்க அனுமதிக்கிறது','Brick and Mortar':'இயல் அங்காடி வைத்துள்ள தொழிலைக் குறிக்கும் பதம்; நிகழ்நிலை கடைகளுக்கு எதிர்சொல்'};
+
+const MISCONCEPTIONS = [
+  {wrong:'"மின்-வணிகமும் (e-Commerce) மின்-தொழிலும் (e-Business) ஒன்றுதான்" என நினைப்பது.', type:'வரையறைக் குழப்பம் (Definition Confusion)', why:'மின்-தொழில் என்பது நிறுவனத்தின் அனைத்து உள்/வெளி நடவடிக்கைகளையும் (கொள்முதல், நிதி, உற்பத்தி உட்பட) உள்ளடக்கியது; மின்-வணிகம் என்பது அதில் பொருட்கள்/சேவைகளை வாங்குதல்-விற்றல் என்ற ஒரு உட்பிரிவு மட்டுமே.', fix:'மின்-தொழில் (e-Business) = பெரிய வட்டம். மின்-வணிகம் (e-Commerce) = அதற்குள் இருக்கும் ஒரு சிறிய வட்டம்.'},
+  {wrong:'"B2C மற்றும் C2B ஒரே மாதிரிதான்" என நினைப்பது.', type:'மாதிரி குழப்பம் (Model Confusion)', why:'B2C-இல் நிறுவனம் விலையை நிர்ணயித்து நுகர்வோருக்கு விற்கிறது. C2B-இல் நுகர்வோர்தான் விலையை நிர்ணயித்து, நிறுவனம் அதற்கேற்ப சேவையை வழங்குகிறது (தலைகீழ் ஏல மாதிரி).', fix:'B2C = நிறுவனம் → நுகர்வோர் (நிறுவனம் விலை நிர்ணயிக்கும்). C2B = நுகர்வோர் → நிறுவனம் (நுகர்வோர் விலை நிர்ணயிக்கும்).'},
+  {wrong:'"மின்-வணிகத்தில் வாங்கும் முன் பொருட்களை முழுமையாக ஆய்வு செய்யலாம் (தொட்டு, முகர்ந்து)" என நினைப்பது.', type:'செயல்பாட்டுக் குழப்பம் (Functional Misconception)', why:'பாடநூல் குறிப்பிடுவது போல், இணையம் காட்சி/ஒலி ஊடகம்தான் — வாசனைத் திரவியத்தின் படத்தைப் பார்க்க முடியும், ஆனால் நறுமணத்தை நுகர முடியாது; ஆடையின் படத்தைப் பார்க்க முடியும் ஆனால் தரத்தைப் பரிசோதிக்க முடியாது.', fix:'மின்-வணிகத்தில் விற்பனையாளர் தேர்வு செய்த படத்தை மட்டுமே நாம் பார்க்க முடியும் — இதுவே "இயல் பொருள் சார்ந்த சர்ச்சைகள்" எனும் குறைபாடு.'},
+  {wrong:'"முதல் அலையில் (1995-2003) இருந்த அனைத்து மின்-வணிக நிறுவனங்களும் வெற்றி பெற்றன" என நினைப்பது.', type:'வரலாற்றுக் குழப்பம் (Historical Misconception)', why:'டாட்காம் வெடிப்பு (2000-2002) காலத்தில் Pets.com போன்ற ஆயிரக்கணக்கான நிறுவனங்கள் தோல்வியடைந்தன; Amazon, eBay போன்ற சிலவே மீண்டு வந்தன.', fix:'முதல் அலையில் "முதல்-நகர்வு நன்மை" (First move advantage) இருந்தாலும், டாட்காம் குமிழி வெடித்தபோது பெரும்பாலான நிறுவனங்கள் மூடப்பட்டன.'},
+  {wrong:'"G2C மற்றும் C2G ஒரே திசையில் செயல்படும் ஒரே மாதிரி" என நினைப்பது.', type:'திசை குழப்பம் (Direction Confusion)', why:'G2C-இல் அரசாங்கம் → குடிமகனுக்கு சேவை/தகவல் வழங்குகிறது (எ.கா. சான்றிதழ் வழங்கல்). C2G-இல் குடிமகன் → அரசாங்கத்திற்கு பணம் செலுத்துகிறார் (எ.கா. வீட்டு வரி).', fix:'எழுத்துக்களின் வரிசையே திசையைக் குறிக்கும்: முதல் எழுத்து = அனுப்புநர், கடைசி எழுத்து = பெறுநர்.'},
+];
+
+/* =========================================================================
+   EXAM PREPARATION PAGE
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>மின்-தொழில் (e-Business) &gt; மின்-வணிகம் (e-Commerce) — மின்-வணிகம் மின்-தொழிலின் ஒரு உட்பிரிவு. 1996-ல் IBM "மின்-தொழில்" சொல்லை முன்மொழிந்தது.</li>
+      <li>மின்-தொழில் 4 கட்டமைப்பு தொகுதிகள்: வலையமைப்பு உட்கட்டமைப்பு, செய்தி &amp; தகவல் பகிர்வு உட்கட்டமைப்பு, பல்லூடக உள்ளடக்க &amp; வெளியீடு உட்கட்டமைப்பு, பொதுவான வணிக சேவை உட்கட்டமைப்பு.</li>
+      <li>புலனாகும் பொருட்கள் (tangible) = புத்தகங்கள், DVD, மின் விளக்குகள். புலனாகாப் பொருட்கள் (intangible) = பதிவிறக்கம் செய்யப்பட்ட விளையாட்டு/இசை/திரைப்படம்.</li>
+      <li>பரிணாம வளர்ச்சி: 1970s EDI தொடக்கம் → 1979 Teleputer (Michael Aldrich) → 1991 இணையம் பொதுமக்களுக்குத் திறப்பு → Aug 1994 முதல் பாதுகாப்பான பரிவர்த்தனை → Jul/Sep 1995 Amazon/eBay முதல் விற்பனை.</li>
+      <li>3 அலைகள்: அலை 1 (1995-2003, dotcom bubble/crash), அலை 2 (2004-2009, உலகளாவிய மறுமலர்ச்சி), அலை 3 (2010-நாளது வரை, கைப்பேசி அடிப்படையிலான).</li>
+      <li>டாட்காம் வெடிப்பு: Mar 2000 - Oct 2002; NASDAQ 5046.86 → 1114.11.</li>
+      <li>வலை 1.0 (Read-only), வலை 2.0 (Read-Write, Social), வலை 3.0 (Read-Write-Execute, Semantic Web).</li>
+      <li>9 வர்த்தக மாதிரிகள் (3×3): B2B, B2C, B2G, C2B, C2C, C2G, G2B, G2C, G2G.</li>
+      <li>8 வருவாய் மாதிரிகள்: Affiliate, Auction, Banner Ad, Bulk-buying, Digital Publishing, Licensing, Name-your-own-price, Online Shopping Mall.</li>
+      <li>மரபு வணிகம் = Linear, one-way marketing, supply-side. மின்-வணிகம் = End-to-End, one-to-one marketing, demand-side.</li>
+      <li>நன்மைகள்: 24x7, வேகம், குறைந்த விலை, பரந்த தேர்வு. குறைபாடுகள்: விநியோக தாமதம், தனியுரிமைச் சிக்கல், இயல் பொருள் சார்ந்த சர்ச்சை, விநியோக தெளிவின்மை.</li>
+      <li>குறுக்கீட்டு புதுமை (Disruptive Innovation) சொல்லை கிளேடன் எம் "The Innovator's Dilemma" நூலில் முதலில் பயன்படுத்தினார். மின்-வணிகமும் ஒரு குறுக்கீட்டு புதுமையே.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>சொல்</th><th>விளக்கம்</th></tr>
+      <tr><td><b>Affiliate</b></td><td>தரகிற்காக மற்றொரு வணிகத்தின் தயாரிப்புகளை ஊக்குவிக்கும் வணிகம்</td></tr>
+      <tr><td><b>Blog</b></td><td>ஒரு தலைப்பைப் பற்றி கட்டுரைகள் எழுதுவதற்காக ஒரு நிகழ்நிலை பணித்தளம்</td></tr>
+      <tr><td><b>Brick and Mortar</b></td><td>இயல் அங்காடி வைத்துள்ள தொழிலைக் குறிக்கும் பதம்; நிகழ்நிலை கடைகளுக்கு எதிர்சொல்</td></tr>
+      <tr><td><b>Dotcom</b></td><td>இணைய அடிப்படையிலான நிறுவனங்களுக்கு பொதுப் பெயர்</td></tr>
+      <tr><td><b>Mobile Commerce</b></td><td>கைப்பேசிகள் அல்லது பிற கம்பியில்லா தொலைத்தொடர்பு சாதனங்களை பயன்படுத்தி இணையம் வழியாக நடத்தப்படும் வணிக பரிமாற்றங்கள்</td></tr>
+      <tr><td><b>வெளி-புறத்திறனீட்டம்</b> (Off-shoring)</td><td>நிறுவனத்தின் பணி அயல் நாட்டு நிறுவனத்திற்கு வழங்கப்படுகிறது</td></tr>
+      <tr><td><b>புறத்திறனீட்டம்</b> (Outsourcing)</td><td>நிறுவனங்கள் சார்பாக வணிகத்தைக் கையாள மூன்றாம் தரப்பு சேவை வழங்குநர்களை பணியமர்த்தல்</td></tr>
+      <tr><td><b>சமூக ஊடகம்</b> (Social Media)</td><td>மின் வணிகம் அடிப்படையில் இலக்கு நுகர்வோர்களுக்கான விளம்பரங்களை வழங்கும் ஒரு தளம் எடுத்துக்காட்டு: ·பேஸ்புக், ட்விட்டர்</td></tr>
+      <tr><td><b>புலனாகும் வடிவம்</b> (Tangible form)</td><td>நாம் பெறுகின்ற இயல் பொருட்கள்</td></tr>
+      <tr><td><b>Teleputer</b></td><td>தந்தி, தொலைக்காட்சி, கணினி மற்றும் தொலைத் தொடர்பு வலையமைப்பு தொழில்நுட்பங்களின் கலவை</td></tr>
+      <tr><td><b>Webhost</b></td><td>இணைய இணைப்பு வழங்குவதன் மூலம், தனிநபர்கள் தங்கள் வலைத்தளத்தை இயக்க அனுமதிக்கிறது</td></tr>
+      <tr><td><b>வேர்ட்பிரஸ்</b> (WordPress)</td><td>ஒரு இலவச, திறந்த மூல நிகழ்நிலை வலைப்பதிவு மேடை</td></tr>
+    </table>
+    <div class="needs-verify">
+      <span class="lbl">⚠️ சரிபார்க்க வேண்டியது (Needs Verification)</span>
+      பதிவேற்றப்பட்ட PDF-இல் பாடநூலின் 237 மற்றும் 238 பக்கங்கள் காணப்படவில்லை (பக்கம் 236 முடிந்தவுடன் நேரடியாக பக்கம் 239 தொடங்குகிறது). எனவே FinTech, Mobile Commerce, Blog போன்ற சொற்களுக்கான விரிவான பத்தி-வடிவ விளக்கம் இந்த PDF-இல் கிடைக்கவில்லை — மேலே உள்ள "நினைவில் கொள்க" பெட்டி மற்றும் கலைச்சொற்கள் அட்டவணையில் கொடுக்கப்பட்ட அதிகாரப்பூர்வ பாடநூல் வரையறைகளை மட்டுமே இங்கு பயன்படுத்தியுள்ளோம். விடுபட்ட பக்கங்களை நீங்கள் வழங்கினால், அவற்றையும் சேர்த்து இந்த பாடத்தை புதுப்பிக்க முடியும்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி <span class="eng">(Part-wise Answer-Writing Guide)</span></h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லை (keyword) கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். 9 வர்த்தக மாதிரிகளின் எழுத்துக்களை (B2B, C2G முதலியன) "முதல் எழுத்து = அனுப்புநர், கடைசி எழுத்து = பெறுநர்" என நினைவில் கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>2 / 3-மதிப்பெண் (பகுதி ஆ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் → (3) தேவைப்பட்டால் ஒரு வரி முக்கியத்துவம்.<br>
+        <b>எ.கா.</b> "டாட்காம் குமிழி மற்றும் டாட்காம் வெடிப்பு என்றால் என்ன?" → "டாட்காம் குமிழி என்பது 1995-2000 காலத்தில் இணைய நிறுவனங்களின் மிதமிஞ்சிய வளர்ச்சி. இது 2000-2002ல் வெடித்து, NASDAQ 5046.86-லிருந்து 1114.11 ஆகச் சரிந்தது — இது டாட்காம் வெடிப்பு எனப்படும்."
+      </div>
+    </details>
+    <details class="acc"><summary>3-மதிப்பெண் (பகுதி இ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரி → (2) 2-3 முக்கிய புள்ளிகள் → (3) ஒரு உதாரணம்.<br>
+        <b>எ.கா.</b> "மின்-வணிகத்தில் B2B மாதிரியை விளக்குக" → வரையறை → "மொத்த கொள்முதல் மீதான தள்ளுபடி" அம்சம் → outsourcing/off-shoring தொடர்பு → ஒரு உதாரணம் (மிதிவண்டி தயாரிப்பு நிறுவனம் டையர் கொள்முதல்).
+      </div>
+    </details>
+    <details class="acc"><summary>5-மதிப்பெண் (பகுதி ஈ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) ஒவ்வொரு வகையையும் தலைப்பு வாரியாகப் பட்டியலிடுதல் → (3) 1-2 வரிகளில் விளக்குதல் + உதாரணம் → (4) அட்டவணை (இருந்தால்) → (5) முடிவுரை.<br>
+        <b>எ.கா.</b> "9 மின்-வணிக வர்த்தக மாதிரிகளைப் பட்டியலிட்டு நான்கை சுருக்கமாக விளக்குக" → B2B, B2C, B2G, C2B, C2C, C2G, G2B, G2C, G2G எனப் பட்டியலிட்டு, எவை வேண்டுமானாலும் 4ஐ விரிவாக எழுதவும்.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ &amp; மாணவர் செயல்பாடு <span class="eng">(reference)</span></h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின்-வணிகம் வரையறு.</li>
+          <li>மின்-தொழில் மற்றும் மின்-வணிகம் வேறுபடுத்துக.</li>
+          <li>புலனாகும் பொருட்கள் மற்றும் புலனாகாப் பொருட்களை உங்கள் சொந்த எடுத்துக்காட்டுடன் வேறுபடுத்துக.</li>
+          <li>டாட்காம் குமிழி மற்றும் டாட்காம் வெடிப்பு என்றால் என்ன?</li>
+          <li>புறத்திறனீட்டம் பற்றிச் சிறு குறிப்பு வரைக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>சமூக தொழில்நுட்ப மாற்றங்களுடன் மின்-வணிகம் எவ்வாறு தொடர்புடையது என்பதை விளக்கு.</li>
+          <li>மின்-வணிகத்தின் மூன்றாவது அலை பற்றி சிறுகுறிப்பு வரை.</li>
+          <li>மின்-வணிகத்தில் B2B மாதிரியை விளக்குக.</li>
+          <li>Name-your-own-price இணையதளங்கள் பற்றிக் குறிப்பு வரை.</li>
+          <li>மின்-வணிகத்தின் இயல் பொருள் சர்ச்சை பற்றிய குறிப்பு எழுது.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின்-வணிக வர்த்தக மாதிரிகளைப் பட்டியலிட்டு ஏதேனும் நான்கை சுருக்கமாக விளக்கவும்.</li>
+          <li>ஏதேனும் ஐந்து மின்-வணிக வருவாய் மாதிரிகளை விளக்குக.</li>
+          <li>மரபுசார்ந்தவணிகம் மற்றும் மின்-வணிகம் ஆகியவற்றை எவ்வாறு வேறுபடுத்துவீர்கள்?</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>மாணவர் செயல்பாடு <span class="eng">(Student Activity — reference)</span></summary>
+      <div class="acc-body">
+        <ol>
+          <li>மின்-வணிகத்தின் பல்வேறு நிகழ்வுகளை விவரிக்கும் காலக்கோடு வரைக.</li>
+          <li>உங்கள் சமூகத்தைச் சுற்றியுள்ள வணிகத்தைப் பட்டியலிடுங்கள், பின் அவற்றை வணிக மாதிரிகளுக்கு ஏற்றவாறு வகைப்படுத்துங்கள்.</li>
+          <li>நிகழ்நிலையில் சமீபத்தில் ஒரு பொருளை வாங்கிய வாடிக்கையாளரிடம் பேட்டி கண்டு அவரது அனுபவத்தை எழுதுங்கள்.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (பாடநூல் MCQ)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு இந்திய மென்பொருள் நிறுவனம் அமெரிக்காவில் உள்ள நிறுவனத்திற்கு அதன் வாடிக்கையாளர் ஆதரவு பணியை ஒதுக்குகிறது. இது எந்த வகை?', o:['Outsourcing (புறத்திறனீட்டம்) மட்டும்','Off-shoring (வெளி-புறத்திறனீட்டம்)','B2B மாதிரி மட்டும்','C2B மாதிரி'], c:1, exp:'வேலையை சொந்த நாட்டிற்கு வெளியே உள்ள நிறுவனத்திற்கு ஒதுக்குவது Off-shoring (வெளி-புறத்திறனீட்டம்) ஆகும்.'},
+  'c2': {q:'🔴 ஒரு அரசு திணைக்களம் மற்றொரு திணைக்களத்திடமிருந்து தரவைப் பகிர்ந்து கொள்கிறது, இரண்டும் ஒரே அரசாங்கத்தின் கீழ் உள்ளன. இது எந்த வகை G2G?', o:['வெளி நோக்கல் G2G','உள் நோக்கல் G2G','G2B','G2C'], c:1, exp:'ஒரே அரசாங்கத்தின் அதிகாரத்துவத்திற்குள் தரவு பகிரப்பட்டால் அது உள் நோக்கல் (intra-organizational) G2G ஆகும்.'},
+};
+
+/* ============================= MCQ HELPER ============================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* ============================= QUICK-CHECK BANKS ============================= */
+const QC_BANKS = {
+  intro: {
+    'qc1': {q:'மின்-தொழில் (e-Business) மற்றும் மின்-வணிகம் (e-Commerce) பற்றி எது சரி?', o:['இரண்டும் ஒரே பொருள்','மின்-வணிகம் மின்-தொழிலின் ஒரு உட்பிரிவு','மின்-தொழில் மின்-வணிகத்தின் ஒரு உட்பிரிவு','இரண்டுக்கும் தொடர்பில்லை'], c:1, exp:'மின்-வணிகம் என்பது மின்-தொழிலின் ஒரு உட்பிரிவு.'}
+  },
+  evolution: {
+    'qc2': {q:'இணையம் பொது மக்களுக்கு வர்த்தக நோக்கத்திற்காக எந்த ஆண்டு திறக்கப்பட்டது?', o:['1979','1991','1994','1995'], c:1, exp:'1991-ல் தேசிய அறிவியல் அறக்கட்டளை வர்த்தக நோக்கத்திற்காக இணையத்தை பயன்படுத்த அனுமதித்தது.'}
+  },
+  waves: {
+    'qc3': {q:'மின்-வணிகத்தின் முதல் அலை எந்த ஆண்டுகளுக்கு இடையே நடந்தது?', o:['1985-1990','1995-2003','2004-2009','2010-நாளது வரை'], c:1, exp:'முதல் அலை 1995-2003 ஆகும்.'}
+  },
+  models: {
+    'qc4': {q:'ஒரு அரசு நிறுவனம் தனது ஊழியர்களுக்கான மடிக்கணினிகளை ஒரு தனியார் நிறுவனத்திடமிருந்து வாங்குகிறது. இது எந்த மாதிரி?', o:['B2G','G2B','C2G','G2G'], c:1, exp:'அரசு நிறுவனத்திடமிருந்து வாங்கும் போது அது G2B (Government to Business) மாதிரி.'}
+  },
+  revenue: {
+    'qc5': {q:'IGNOU வலைத்தளத்தில் Google தேடுபொறி இருப்பது எந்த வருவாய் மாதிரிக்கு எடுத்துக்காட்டு?', o:['Auction website','Licensing website','Banner advertisement','Bulk-buying website'], c:1, exp:'உரிமம் இணையதளம் (Licensing website) மற்ற வலைத்தளங்களில் தங்கள் மென்பொருளைப் பயன்படுத்த அனுமதிக்கிறது.'}
+  },
+  comparison: {
+    'qc6': {q:'மின்-வணிகத்தில் பின்பற்றப்படும் சந்தைப்படுத்துதல் முறை எது?', o:['ஒரு வழி (one way)','ஒன்று-ஒன்று (one to one)','இரு வழி (two way) மட்டும்','எதுவும் இல்லை'], c:1, exp:'மின்-வணிகத்தில் ஒன்று-ஒன்று (one to one) சந்தைப்படுத்துதல் பின்பற்றப்படுகிறது.'}
+  },
+  proscons: {
+    'qc7': {q:'மின்-வணிகத்தின் முக்கிய நன்மை எது?', o:['24x7 கிடைக்கும் தன்மை','விநியோகம் எப்போதும் உடனடி','பொருட்களை தொட்டு பரிசோதிக்கலாம்','தனியுரிமைச் சிக்கல் இல்லை'], c:0, exp:'மின்-வணிக அமைப்பு வாரத்தின் எல்லா நாட்களிலும் எல்லா நேரங்களிலும் (24x7) இயக்கப்படுகிறது.'}
+  },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP DISPATCH
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { intro:'qc-intro', evolution:'qc-evolution', waves:'qc-waves', models:'qc-models', revenue:'qc-revenue', comparison:'qc-comparison', proscons:'qc-proscons' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+  if(topicId === 'intro') wireIntro();
+  if(topicId === 'evolution') wireEvolution();
+  if(topicId === 'waves') wireWaves();
+  if(topicId === 'models') wireModels();
+  if(topicId === 'revenue') wireRevenue();
+  if(topicId === 'comparison') wireComparison();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* =========================================================================
+   15.1 WIRING — Pillars + Tangible/Intangible sorter
+   ========================================================================= */
+const PILLARS = [
+  {k:'network', t:'வலையமைப்பு உட்கட்டமைப்பு', en:'Network Infrastructure', d:'இணையம், அகஇணையம் (Intranet), புறஇணையம் (Extranet) போன்ற வலையமைப்புகள் — மின்-வணிகத்தின் "சாலை" போன்றது; தரவு இதன் வழியாகவே பயணிக்கிறது.'},
+  {k:'multimedia', t:'பல்லூடக உள்ளடக்கம் & வெளியீடு உட்கட்டமைப்பு', en:'Multimedia Content & Publishing Infra', d:'HTML, நிகழ்நிலை சந்தைப்படுத்துதல் (online marketing) போன்றவை — வலைத்தளத்தில் தகவலை அழகாக காட்சிப்படுத்த உதவுகிறது.'},
+  {k:'messaging', t:'செய்தி & தகவல் பகிர்வு உட்கட்டமைப்பு', en:'Messaging & Information Distribution Infra', d:'EDI, மின்னஞ்சல், கணினிமயமாக்கப்பட்ட பொருள் இருப்பு நிலை மேலாண்மை போன்றவை — நிறுவனங்களுக்கிடையே தகவல் பரிமாற்றத்தை எளிதாக்குகிறது.'},
+  {k:'commonbiz', t:'பொதுவான வணிக சேவை உட்கட்டமைப்பு', en:'Common Business Service Infra', d:'மின்னணு செலுத்தல்கள், உலகளாவிய விநியோகத் தொடர் மேலாண்மை (SCM), நிகழ்நிலை பரிவர்த்தனை செயலாக்கம் போன்றவை — பணப் பரிவர்த்தனையையும் விநியோகத்தையும் நிர்வகிக்கிறது.'},
+];
+const SORT_ITEMS = [
+  {n:'புத்தகம் 📖', t:'tangible'}, {n:'DVD 💿', t:'tangible'}, {n:'மின் விளக்கு 💡', t:'tangible'},
+  {n:'பதிவிறக்கம் செய்யப்பட்ட விளையாட்டு 🎮', t:'intangible'}, {n:'இசைக் கோப்பு 🎵', t:'intangible'}, {n:'திரைப்படக் கோப்பு 🎬', t:'intangible'},
+];
+function wireIntro(){
+  document.getElementById('pillarGrid').innerHTML = PILLARS.map(p =>
+    `<div class="pillar" data-k="${p.k}">${p.t}</div>`).join('');
+  document.querySelectorAll('.pillar').forEach(el => {
+    el.addEventListener('click', function(){
+      document.querySelectorAll('.pillar').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const p = PILLARS.find(x=>x.k===this.dataset.k);
+      const panel = document.getElementById('pillarDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">💡 '+p.t+' <span class="eng">('+p.en+')</span></span>'+p.d;
+    });
+  });
+
+  let placed = {};
+  function renderSort(){
+    document.getElementById('sortPool').innerHTML = SORT_ITEMS.map((it,i) =>
+      `<div class="sort-item ${placed[i]?'placed':''}" data-i="${i}">${it.n}</div>`).join('');
+    document.querySelectorAll('.sort-item').forEach(el => {
+      el.addEventListener('click', function(){
+        const i = parseInt(this.dataset.i,10);
+        if(placed[i]) return;
+        placed[i] = SORT_ITEMS[i].t;
+        renderSort();
+        checkSort();
+      });
+    });
+    const tBin = document.querySelector('#binTangible .bin-items');
+    const iBin = document.querySelector('#binIntangible .bin-items');
+    tBin.innerHTML = Object.keys(placed).filter(i=>placed[i]==='tangible').map(i=>`<span class="item-in">${SORT_ITEMS[i].n}</span>`).join('');
+    iBin.innerHTML = Object.keys(placed).filter(i=>placed[i]==='intangible').map(i=>`<span class="item-in">${SORT_ITEMS[i].n}</span>`).join('');
+  }
+  function checkSort(){
+    const done = Object.keys(placed).length === SORT_ITEMS.length;
+    document.getElementById('sortResult').textContent = done ? '🎉 அனைத்தும் சரியாக வகைப்படுத்தப்பட்டது!' : (Object.keys(placed).length + ' / ' + SORT_ITEMS.length + ' வைக்கப்பட்டது.');
+  }
+  renderSort();
+  document.getElementById('sortResetBtn').addEventListener('click', () => { placed = {}; renderSort(); document.getElementById('sortResult').textContent=''; });
+}
+
+/* =========================================================================
+   15.2 WIRING — Timeline stepper
+   ========================================================================= */
+const EVOLUTION_EVENTS = [
+  {y:'1960s', t:'மின்னணு தரவு பரிமாற்றம் (EDI)', d:'வணிக நிறுவனங்களை மின்னணு பரிமாற்றங்களை மேற்கொள்ள அனுமதித்தல்.'},
+  {y:'1979', t:'Teleputer அறிமுகம்', d:'மைக்கேல் ஆல்ட்ரிச்சால் Teleputer கருவியை அறிமுகப்படுத்துதல்.'},
+  {y:'1981', t:'முதல் B2B பரிமாற்றம்', d:'Thompson Holidays இன் முதல் B2B பரிமாற்றம் நடைபெறல்.'},
+  {y:'1984', t:'CompuServe Electronic Mall', d:'110 நிகழ்நிலை வணிகர்களிடம் பொருட்களை வாங்க CompuServe நிறுவனம் Electronic Mall ஐ அறிமுகப்படுத்தியது.'},
+  {y:'1991', t:'இணையம் பொதுமக்களுக்குத் திறப்பு', d:'தேசிய அறிவியல் அறக்கட்டளை வர்த்தக நோக்கத்திற்காகவும் இணையத்தை பயன்படுத்த அனுமதித்தல்.'},
+  {y:'Aug 1994', t:'Netscape Navigator', d:'நெட்ஸ்கேப் நேவிகேட்டர் உலவி அறிமுகம் மற்றும் இணையத்தின் முதல் பாதுகாப்பான சில்லறை பரிவர்த்தனை நடைபெறல்.'},
+  {y:'Oct 1994', t:'முதல் நிகழ்நிலை விளம்பர பதாகை', d:'முதல் நிகழ்நிலை விளம்பர பதாகையை வெளியிட்டது. Hotwired.com போன 7 art museums-ஐ விளம்பரப்படுத்தியது.'},
+  {y:'Jul 1995', t:'Amazon முதல் விற்பனை', d:'Amazon அதன் முதல் பொருளை (ஒரு அறிவியல் பாடப்புத்தகம்) விற்றது.'},
+  {y:'Sep 1995', t:'ebay முதல் விற்பனை', d:'ebay அதன் முதல் பொருளை (ஒரு உடைந்த லேசர் சுட்டிக்காட்டி) விற்றது.'},
+  {y:'1999', t:'Zappo அறிமுகம்', d:'முதல் நிகழ்நிலையில் மட்டுமே இயங்கும் அங்காடி Zappo அறிமுகம்.'},
+  {y:'2005', t:'சமூக வணிகம் தொடக்கம்', d:'சமூக வணிகத்தின் (மக்கள் பொருட்களை வாங்கும் முடிவுகளில் சமூக ஊடகத்தின் பங்களிப்பு) தொடக்கம்.'},
+  {y:'2008', t:'Groupon தொடங்கப்பட்டது', d:'Groupon எனும் மொத்த-கொள்முதல் வலைத்தளம் தொடங்கப்பட்டது.'},
+  {y:'2009', t:'இந்தியாவின் மின்-வணிக விற்பனை', d:'இந்தியாவின் மொத்த மின்-வணிக விற்பனை 390 கோடி அமெரிக்க டாலர்.'},
+  {y:'2011', t:'Google Wallet', d:'Google Wallet பணம் செலுத்தும் முறை அறிமுகப்படுத்தப்பட்டது.'},
+  {y:'2014', t:'Apple Pay', d:'Apple Pay நிகழ்நிலை பணம் செலுத்தும் முறை தொடங்குதல்.'},
+  {y:'2015', t:'Alibaba ஒரே நாள் விற்பனை', d:'Alibaba வலைத்தளத்தின் வர்த்தகம் ஒரே நாளில் 14.3 பில்லியனைத் தொட்டது.'},
+  {y:'2018', t:'Flipkart - Walmart', d:'Flipkart நிகழ்நிலைச் சந்தை, Walmart நிறுவனத்தால் கையகப்படுத்தப்பட்டது.'},
+  {y:'2019', t:'இந்தியாவின் மொத்த மின் வர்த்தகம்', d:'இந்தியாவின் மொத்த மின் வர்த்தக பரிவர்த்தனை $850 கோடி வரை அதிகரிக்கும் என எதிர்பார்க்கப்படுகிறது.'},
+];
+let evIdx = 0;
+function wireEvolution(){
+  evIdx = 0;
+  renderEv();
+  document.getElementById('evPrevBtn').addEventListener('click', () => { if(evIdx>0){ evIdx--; renderEv(); } });
+  document.getElementById('evNextBtn').addEventListener('click', () => { if(evIdx<EVOLUTION_EVENTS.length-1){ evIdx++; renderEv(); } });
+  document.getElementById('evResetBtn').addEventListener('click', () => { evIdx=0; renderEv(); });
+}
+function renderEv(){
+  const e = EVOLUTION_EVENTS[evIdx];
+  document.getElementById('evCounter').textContent = (evIdx+1)+' / '+EVOLUTION_EVENTS.length;
+  document.getElementById('evCard').innerHTML = `
+    <div class="flow-row"><div class="flow-node active" style="min-width:140px;">${e.y}</div></div>
+    <h4 style="text-align:center;margin:10px 0 4px;">${e.t}</h4>
+    <p style="text-align:center;">${e.d}</p>`;
+  document.getElementById('evPrevBtn').disabled = evIdx===0;
+  document.getElementById('evNextBtn').disabled = evIdx===EVOLUTION_EVENTS.length-1;
+}
+
+/* =========================================================================
+   15.3 WIRING — Waves explorer
+   ========================================================================= */
+const WAVES = [
+  {k:'w1', y:'1995 – 2003', t:'அலை 1.0', d:'Read-only Web — Text, Catalogs, Forms, Search, Pictures, Flash. முதன்மையாக அமெரிக்க நிறுவனங்கள்; முதல்-நகர்வு நன்மை (First move advantage) இருந்தது; எனினும் நுகர்வோர் விருப்பத்தேர்வு குறைவு. இந்த அலை டாட்காம் குமிழி வெடிப்புடன் முடிந்தது.'},
+  {k:'w2', y:'2004 – 2009', t:'அலை 2.0', d:'Read-Write Web — Social Commerce, Auctions, Blogs, Wiki, Instant Messenger, 2D portals, Widgets, Pull web. உலகளாவிய அலையாகக் கருதப்படுகிறது; மொழிபெயர்ப்பு மற்றும் நாணய மாற்றத்தில் கவனம் செலுத்தப்பட்டது; B2C நிறுவனங்களுக்கு ஊக்கமளித்தது.'},
+  {k:'w3', y:'2010 – நாளது வரை', t:'அலை 3.0', d:'Read-Write-Execute Web — Smart Search, Virtual Shopping, Semantic Web, Augmented Reality, Gesture Technology, Avatar representations, Wearable Technology, Smart Personal Assistant, 3D Portals, Push web. கைப்பேசி தொழில்நுட்பங்களால் கொண்டு வரப்பட்டது; நிகழ் நேரம் &amp; தேவை அடிப்படையில் (on-demand) இணைக்கிறது.'},
+];
+function wireWaves(){
+  document.getElementById('waveGrid').innerHTML = WAVES.map(w =>
+    `<div class="wave-card" data-k="${w.k}"><h4>${w.t}</h4><div class="eng" style="font-size:.8rem;">${w.y}</div></div>`).join('');
+  document.querySelectorAll('.wave-card').forEach(el => {
+    el.addEventListener('click', function(){
+      document.querySelectorAll('.wave-card').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const w = WAVES.find(x=>x.k===this.dataset.k);
+      const panel = document.getElementById('waveDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">🌊 '+w.t+' ('+w.y+')</span>'+w.d;
+    });
+  });
+}
+
+/* =========================================================================
+   15.4 WIRING — 3x3 Trading Model Matrix
+   ========================================================================= */
+const MODEL_INFO = {
+  B2B: {t:'வணிகம் – வணிகம் (B2B)', d:'இணையத்தின் மூலம் பல்வேறு வணிக நிறுவனங்களுக்கு இடையே வர்த்தக பரிமாற்றங்கள் நடைபெறுகின்றன. "மொத்த கொள்முதல் மீதான தள்ளுபடி" அனுகூலமும் இவ்வகை நிறுவனத்திற்குக் கிடைக்கும். Out-sourcing &amp; Off-shoring இதனுடன் தொடர்புடையவை.', eg:'ஒரு மிதிவண்டி தயாரிப்பு நிறுவனம் தனது மிதிவண்டிகளுக்குத் தேவையான டையர்களை மற்றொரு நிறுவனத்திடமிருந்து கொள்முதல் செய்தல்.'},
+  B2C: {t:'வணிகம் – நுகர்வோர் (B2C)', d:'வணிக நிறுவனங்கள் மற்றும் இறுதி-நுகர்வோருக்கு இடையேயான இணையம் வழியாக நடைபெறும் நேரடி வர்த்தகம். B2C நிறுவனங்கள் வாடிக்கையாளர்களுக்கு நிகழ்நிலையில் பொருட்கள்/சேவைகளை அதிக தனிப்பட்ட மற்றும் சக்தி வாய்ந்த சூழலில் விற்பனை செய்கின்றன.', eg:'வாடிக்கையாளர்களுக்குப் புத்தகங்களை நேரடியாக விற்பனை செய்யும் ஒரு புத்தக நிறுவனம் (B2C "சில்லறை விற்பனை" எனவும் கூறலாம்).'},
+  B2G: {t:'வணிகம் – அரசாங்கம் (B2G)', d:'பொருட்கள், சேவைகள் அல்லது தகவல்களை அரசாங்கங்களுக்கோ அதன் நிர்வாகத்திற்கோ விற்பனை செய்யும் வியாபார அமைப்புகளைக் குறிப்பிடும் மாதிரி.', eg:'ஒரு அரசு அல்லது அதன் நிர்வாகம் ஒரு வணிக நிறுவனத்திடமிருந்து மாணவர்களுக்கான மடிக்கணினிகளை வாங்குதல்.'},
+  C2B: {t:'நுகர்வோர் – வணிகம் (C2B)', d:'வாடிக்கையாளர்களால் பரிவர்த்தனை துவக்கப்படுகிறது. குறிப்பிட்ட விலை அல்லது தேவைகளின் தொகுப்பை நிர்ணயித்து நுகர்வோர்கள் ஒரு சேவை அல்லது பொருளை கோருவார்கள். "தலைகீழ் ஏல மாதிரி" என்றும் அழைக்கப்படுகிறது.', eg:'eg.yatra.com போன்ற பயண வலைத்தளத்தில் ஒரு வாடிக்கையாளர் தேதி, இடம், எண்ணிக்கை குறிப்பிட, தளம் பொருத்தமான வாய்ப்புகளைக் காட்டுதல்; Name-your-own-price இணையதளங்கள்.'},
+  C2C: {t:'நுகர்வோர் – நுகர்வோர் (C2C)', d:'இணையம் மூலம் இணைக்கப்பட்ட நுகர்வோர்களிடையே பொருட்கள் அல்லது சேவைகளை வர்த்தகம் செய்ய வாய்ப்பளிக்கிறது. பொதுவாக C2B2C (நுகர்வோர்-வணிகம்-நுகர்வோர்) அமைப்பில் வேலை செய்கின்றன.', eg:'timesclassifieds.com போன்ற தளத்தில் தனது சொத்தைக் விற்க விரும்பும் ஒரு வாடிக்கையாளர் விளம்பரத்தைப் பதிவு செய்தல்.'},
+  C2G: {t:'நுகர்வோர் – அரசாங்கம் (C2G)', d:'ஒரு தனி நுகர்வோர் அரசாங்கத்துடன் தொடர்பு கொள்கிறார். வருமான வரி அல்லது வீட்டு வரி செலுத்துதல்கள், சான்றிதழ்கள் அல்லது பிற ஆவணங்களை வழங்குவதற்கான கட்டணங்கள் செலுத்துதல் ஆகியவை அடங்கும்.', eg:'மக்கள் இணையதளம் வழியாக பல்வேறு உரிமைகளை புதுப்பிக்கப் பணம் செலுத்துதல்.'},
+  G2B: {t:'அரசாங்கம் – வணிகம் (G2B)', d:'அரசு அதன் இணையத்தளம் மூலம் வணிக நிறுவனங்களுக்கு சேவை அல்லது தகவலை வழங்கும் மாதிரி. புதிய தொழில் தொடங்குவதற்குத் தேவையான தொழில் விதிமுறைகள், தகுதி மற்றும் அனுமதி போன்ற குறிப்புகளை அரசாங்கம் அதன் வலைப்பக்கத்தில் கொண்டிருக்கும்.', eg:'ஒரு சாலைத் திட்ட ஒப்பந்தம் பெறுவது; ebiz.gov.in.'},
+  G2C: {t:'அரசாங்கம் – நுகர்வோர் (G2C)', d:'அரசாங்கம் தனது குடிமக்களுக்கு இணையதளத்தின் மூலமாக அதன் சேவைகள் மற்றும் தகவல்களைப் பெறுவதற்கான தளத்தை வழங்குகிறது. நிகழ்நிலையில் சான்றிதழ்களை வழங்குவதும் இதில் அடங்கும்.', eg:'https://csc.gov.in/governmenttocitizen'},
+  G2G: {t:'அரசாங்கம் – அரசாங்கம் (G2G)', d:'அரசு நிறுவனங்கள் அல்லது அதன் துறைகளுக்கு இடையேயான இணையவழி (பொதுவாக வணிகம் அல்லாத) தொடர்பாடு. அரசின் முகமை/துறைகளுக்கு இடையே தரவு அல்லது தகவல்களைப் பகிர்ந்தளித்தல் மற்றும் அரசாங்கத்தின் கொள்கைகளை செயல்படுத்துவதற்கு ஆதரவை வழங்குகிறது. இரு வகைகள்: உள் நோக்கல் &amp; வெளி நோக்கல்.', eg:'உள் நோக்கல்: https://www.nic.in/ ; வெளி நோக்கல்: சர்வதேச அளவில் பல அரசாங்கங்களின் அதிகாரத்துவத்துடன் இணைத்தல்.'},
+};
+function wireModels(){
+  const rows = ['BUSINESS','CONSUMER','GOVERNMENT'];
+  const labels = {BUSINESS:'BUSINESS', CONSUMER:'CONSUMER', GOVERNMENT:'GOVERNMENT'};
+  const shortFrom = {BUSINESS:'B', CONSUMER:'C', GOVERNMENT:'G'};
+  const colors = {BUSINESS:'#be185d', CONSUMER:'#0891b2', GOVERNMENT:'#7c3aed'};
+  let html = '<tr><th></th>' + rows.map(c=>'<th>'+labels[c]+'</th>').join('') + '</tr>';
+  rows.forEach(r => {
+    html += '<tr><th>'+labels[r]+'</th>';
+    rows.forEach(c => {
+      const code = shortFrom[r]+'2'+shortFrom[c];
+      html += `<td><div class="matrix-cell" data-code="${code}" style="background:${colors[r]}">${code}</div></td>`;
+    });
+    html += '</tr>';
+  });
+  document.getElementById('matrixTable').innerHTML = html;
+  document.querySelectorAll('.matrix-cell').forEach(cell => {
+    cell.addEventListener('click', function(){
+      document.querySelectorAll('.matrix-cell').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const info = MODEL_INFO[this.dataset.code];
+      const panel = document.getElementById('matrixDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">📘 '+info.t+'</span>'+info.d+'<div class="example-box" style="margin-top:8px;"><span class="lbl">🧩 உதாரணம்</span>'+info.eg+'</div>';
+    });
+  });
+}
+
+/* =========================================================================
+   15.5 WIRING — Revenue model explorer
+   ========================================================================= */
+const REVENUE_MODELS = [
+  {k:'affiliate', t:'1. துணை இணையதளம்', en:'Affiliate website', d:'மூன்றாம் தரப்பு சந்தைப்படுத்துதலின் ஒரு வடிவம். தள உரிமையாளர் செயல்திறன் அடிப்படையில் பணம் பெறலாம். இது ஒரு விலை ஒப்பீடு சேவை, வணிக விவரக்குறிப்புகள், சாதாரண சில்லறை விற்பனை இணையதளத்திற்கு ஒரு மீத்தொடுப்பு கொண்ட வலைப்பக்கம் அல்லது வலைப்பதிவாகவும் இருக்கலாம்.', eg:'ஒரு வாடிக்கையாளர் மீத்தொடுப்பின் மூலம் பொருட்களை வாங்கும் போது தளத்தின் உரிமையாளர் பணம் பெறுகிறார்.'},
+  {k:'auction', t:'2. மின்-ஏல இணையதளம்', en:'Auction website', d:'இணையத்தில் பொருட்களை ஏலம் மூலம் விற்க உதவும் ஒரு வகை வலைத்தளம். ஒவ்வொரு விற்பனையிலிருந்தும் தரகுக் கட்டணம் (commission) பெறுகிறது.', eg:'https://www.ebay.com/'},
+  {k:'banner', t:'3. பதாகை விளம்பர இணையதளம்', en:'Banner advertisement website', d:'பிற நிறுவனங்களின் விளம்பரங்களை தனது வலைப்பக்கங்களில் காட்சிப்படுத்துகிறது, அதன்மூலம் வருவாய் ஈட்டவும் செய்கிறது.', eg:'ஒரு தகவல் தளத்தில் "banners" என குறிக்கப்பட்ட விளம்பரப் பகுதிகள்.'},
+  {k:'bulk', t:'4. மொத்த கொள்முதல் இணையதளம்', en:'Bulk-buying website', d:'ஒரே வகையான பொருட்களை வாங்க விரும்பும் பல நுகர்வோர்களையும் ஒன்றாகச் சேகரிக்கும். பின் தளம் உற்பத்தியாளருடன் தள்ளுபடி பேச்சுவார்த்தை செய்து அதில் ஒரு விற்பனை தரகுக் பெறுகிறது.', eg:'https://www.alibaba.com/'},
+  {k:'digipub', t:'5. எண்முறை பதிப்பக இணையதளம்', en:'Digital Publishing website', d:'இணையத்தில் மின்-புத்தகங்கள் அல்லது மின்-சஞ்சிகைகளைத் திறம்பட பதிப்பிக்கிறார்கள். விளம்பரம், விற்பனை போன்ற பல வழிகளில் அவர்கள் லாபம் ஈட்டுகிறார்கள்.', eg:'https://wordpress.org/'},
+  {k:'license', t:'6. உரிமம் இணையதளம்', en:'Licensing website', d:'மற்ற வலைத்தளங்களில் தங்களது மென்பொருளைப் பயன்படுத்த அனுமதிக்கிறது. தளத்தின் பார்வையாளர் ஒருவரை வலைப்பக்கங்களில் இன்னும் எளிதாகத் தேட அனுமதிக்கும் தேடுபொறிகள் இவ்வகையைச் சேர்ந்தவை.', eg:'IGNOU வலைத்தளத்தில் Google தேடுபொறி பயன்பாடு.'},
+  {k:'nyop', t:'7. Name-your-own-price இணையதளம்', en:'Name-your-own-price websites', d:'சாதாரண சில்லறை இணையதளங்கள் போல இருக்கும். மாறாக, நுகர்வோர் ஒரு குறிப்பிட்ட தயாரிப்பு அல்லது சேவைக்குச் சேவை வழங்குனருடன் பேச்சுவார்த்தை நடத்துகிறார் — இது C2B மின்-வணிக மாதிரி அடிப்படையில் இயங்குகிறது.', eg:'https://in.hotels.com/'},
+  {k:'mall', t:'8. நிகழ்நிலை வணிக வளாகத் இணையதளம்', en:'Online Shopping Mall', d:'பல மின்-வணிக வணிகர்களை ஒரே இணையதளத்தில் ஒன்றாக ஒருங்கிணைய அனுமதிக்கிறது. பெரும்பாலும் இந்த விற்பனையாளர்கள் ஒருவருக்கொருவர் தொடர்புடையவராக இருப்பார்கள், உதாரணமாக அவர்கள் அனைவரும் ஆடம்பர பொருட்களை விற்கலாம். அவர்களின் லாபத்தில் ஒரு தொகையை இந்த தளம் கட்டணமாகப் பெறும்.', eg:'ஆடம்பரப் பொருட்களை மட்டும் விற்கும் பல விற்பனையாளர்களைக் கொண்ட ஒரு நிகழ்நிலை "மால்".'},
+];
+function wireRevenue(){
+  document.getElementById('revGrid').innerHTML = REVENUE_MODELS.map(r =>
+    `<div class="revmodel-card" data-k="${r.k}">${r.t}</div>`).join('');
+  document.querySelectorAll('.revmodel-card').forEach(el => {
+    el.addEventListener('click', function(){
+      document.querySelectorAll('.revmodel-card').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const r = REVENUE_MODELS.find(x=>x.k===this.dataset.k);
+      const panel = document.getElementById('revDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">💰 '+r.t+' <span class="eng">('+r.en+')</span></span>'+r.d+'<div class="example-box" style="margin-top:8px;"><span class="lbl">🧩 உதாரணம்</span>'+r.eg+'</div>';
+    });
+  });
+}
+
+/* =========================================================================
+   15.6 WIRING — Traditional vs e-Commerce sorting game
+   ========================================================================= */
+const CMP_STATEMENTS = [
+  {s:'வாடிக்கையாளர் வியாபாரியை எளிதில் அடையாளம் கண்டு, பேசவும் முடியும்.', a:'trad'},
+  {s:'வாடிக்கையாளரோ வியாபாரியோ மற்றவரைப் பார்ப்பதில்லை.', a:'ecom'},
+  {s:'வணிகம் வருடத்தின் அனைத்து நாட்களிலும் எல்லா நேரத்திலும் நடைபெறும்.', a:'ecom'},
+  {s:'வாங்கும் முன் பொருட்களை நேரடியாக ஆய்வு செய்யலாம்.', a:'trad'},
+  {s:'வணிகத்தின் வரையெல்லை உலகளாவியது.', a:'ecom'},
+  {s:'நேர்கோட்டு (Linear) வணிக உறவுமுறை பின்பற்றப்படுகிறது.', a:'trad'},
+  {s:'ஒன்று-ஒன்று (one to one) சந்தைப்படுத்துதல் முறை பின்பற்றப்படுகிறது.', a:'ecom'},
+  {s:'பெரும்பாலான பொருட்கள் உடனடியாக விநியோகிக்கப்படுகின்றன.', a:'trad'},
+];
+function wireComparison(){
+  let score = {correct:0, total:0};
+  const wrap = document.getElementById('cmpGameWrap');
+  wrap.innerHTML = CMP_STATEMENTS.map((c,i) => `
+    <div class="q-block" id="cmp-block-${i}">
+      <div class="q-text">${i+1}. ${c.s}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost cmp-btn" data-i="${i}" data-val="trad">🛒 மரபு சார்ந்த வணிகம்</button>
+        <button class="btn btn-ghost cmp-btn" data-i="${i}" data-val="ecom">💻 மின்-வணிகம்</button>
+      </div>
+      <div class="feedback-line" id="cmp-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.cmp-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('cmp-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      score.total++;
+      const fb = document.getElementById('cmp-fb-'+i);
+      if(this.dataset.val === CMP_STATEMENTS[i].a){ score.correct++; fb.className='feedback-line ok'; fb.textContent='✅ சரி!'; }
+      else { fb.className='feedback-line bad'; fb.textContent='❌ தவறு. சரியான விடை: '+(CMP_STATEMENTS[i].a==='trad'?'மரபு சார்ந்த வணிகம்':'மின்-வணிகம்'); }
+      document.getElementById('cmpGameScore').textContent = 'மதிப்பெண்: ' + score.correct + ' / ' + score.total;
+    });
+  });
+}
+
+/* =========================================================================
+   PRACTICE PAGE WIRING
+   ========================================================================= */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans || val.replace(/\s/g,'') === f.ans.replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>சொல்</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>விளக்கம்</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='160px';
+      b.textContent = l + (matched[l] ? ' ✅' : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='320px'; b.style.textAlign='left';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும்.';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  const misWrap = document.getElementById('misWrap');
+  misWrap.innerHTML = MISCONCEPTIONS.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span style="font-weight:700;">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-mis="${i}">ஏன் தவறு? (Why is this wrong?)</button>
+      <div class="explain-box" id="mis-${i}">
+        <b>வகை:</b> ${c.type}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான புரிதல்:</span> ${c.fix}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-mis]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('mis-'+this.dataset.mis).classList.toggle('show'); });
+  });
+}
+
+/* =========================================================================
+   EXAM PREP WIRING
+   ========================================================================= */
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* ============================= INIT ============================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
