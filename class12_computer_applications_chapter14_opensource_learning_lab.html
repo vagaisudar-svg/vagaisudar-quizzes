@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 14 — திறந்த மூல கருத்துருக்கள் | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#f5f4fb;
+    --card:#ffffff;
+    --primary:#4f46e5;
+    --primary-dark:#3730a3;
+    --primary-light:#eef0fe;
+    --accent:#ea580c;
+    --accent-light:#ffedd9;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#e1e0f5;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  [lang-ta]{font-size:1rem;}
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#e6e4fb;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#f1f0fe;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:900px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(20,30,40,.04);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid #7c3aed;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:#7c3aed;font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;transition:all .25s;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(79,70,229,.4);}
+  .flow-node.muted{opacity:.35;}
+  .flow-node.done{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  .tab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .role-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:10px 0;}
+  .role-chip{border:2px solid var(--border);background:#fff;border-radius:12px;padding:10px 16px;font-weight:700;font-size:.85rem;cursor:pointer;min-width:110px;text-align:center;}
+  .role-chip.owner{border-color:#16a34a;color:#15803d;}
+  .role-chip.user{border-color:#dc2626;color:#b91c1c;}
+  .role-chip.vendor{border-color:#2563eb;color:#1d4ed8;}
+  .role-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .oss-diagram{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .oss-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .oss-diamond{background:var(--accent);color:#fff;border-radius:14px;padding:12px 26px;font-weight:800;margin:8px 0;transform:rotate(0deg);}
+  .oss-arrow{font-size:1.2rem;color:var(--muted);}
+
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:12px 0;}
+  .ex-chip{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:.82rem;font-weight:700;cursor:pointer;}
+  .ex-chip:hover{border-color:var(--primary);background:var(--primary-light);}
+  .ex-chip .cat{display:none;font-size:.7rem;font-weight:600;color:var(--accent);margin-top:4px;}
+  .ex-chip.revealed .cat{display:block;}
+
+  .node-box{border:2px solid var(--border);border-radius:12px;padding:10px 14px;background:#fff;text-align:center;font-weight:700;font-size:.85rem;position:relative;}
+  .node-box.up{border-color:var(--correct);}
+  .node-box.down{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+  .dot.up{background:var(--correct);}
+  .dot.down{background:var(--incorrect);}
+  .log-panel{background:#0f172a;color:#d1fae5;font-family:Consolas,Menlo,monospace;font-size:.78rem;border-radius:10px;padding:12px;max-height:220px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:4px;}
+  .log-panel .ln.alert{color:#fca5a5;}
+  .log-panel .ln.notice{color:#93c5fd;}
+  .log-panel .ln.ok{color:#86efac;}
+
+  .fcaps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:10px 0;}
+  .fcaps-card{border:2px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;background:#fff;font-weight:800;}
+  .fcaps-card.active{border-color:var(--accent);background:var(--accent-light);}
+
+  .hw-board{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:14px 0;padding:14px;background:#0f172a;border-radius:12px;}
+  .hw-chip{background:#1e293b;color:#e2e8f0;border:2px solid #475569;border-radius:8px;padding:14px 10px;font-size:.78rem;font-weight:700;text-align:center;min-width:100px;cursor:pointer;transition:all .2s;}
+  .hw-chip.suspect{border-color:#f59e0b;color:#fde68a;}
+  .hw-chip.removed{opacity:0;transform:scale(.4);pointer-events:none;}
+
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+  .cmp-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;}
+  .cmp-card h4{margin-top:0;}
+  @media (max-width:600px){.cmp-grid{grid-template-columns:1fr;}}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .cmp-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Applications Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 14 — திறந்த மூல கருத்துருக்கள் (Open Source Concepts)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Chapter 14: Open Source Concepts · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* ============================= STORAGE ============================= */
+const STORE_KEY = 'ca12_opensource_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable */ }
+  return { completed:[], lang:'ta' };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* ============================= TOPICS ============================= */
+const TOPICS = [
+  {id:'intro',    num:'14.1', title:'அறிமுகம் — திறந்த மூல மென்பொருள்'},
+  {id:'ns2',      num:'14.2', title:'Network Simulation Tool (NS2)'},
+  {id:'opennms',  num:'14.3', title:'Open NMS'},
+  {id:'hardware', num:'14.4', title:'திறந்த மூல வன்பொருள்'},
+  {id:'practice', num:'Practice', title:'பயிற்சி & Misconception Buster'},
+  {id:'examprep', num:'Exam', title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* ============================= SIDEBAR / NAV ============================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* ============================= MAIN RENDER DISPATCH ============================= */
+const RENDERERS = {
+  intro: renderIntro,
+  ns2: renderNS2,
+  opennms: renderOpenNMS,
+  hardware: renderHardware,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 14.1 — அறிமுகம் / Open Source Software
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 14 › 14.1</div>
+    <h2>அறிமுகம் <span class="eng">(Introduction — Open Source Software)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives):</b>
+      திறந்த மூல மென்பொருளின் தேவை பற்றி அறிதல் · NS2 மென்பொருள் மற்றும் அதன் பயன்களைக் கற்றல் · OpenNMS மற்றும் அதன் உருவாக்க குழு பற்றி அறிதல் · திறந்த மூல வன்பொருள் பற்றி அறிந்து கொள்ளல்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>14.1 திறந்த மூல மென்பொருள் என்றால் என்ன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      திறந்த மூல மென்பொருள் (Open Source Software) என்ற சொல், மென்பொருளின் மூலக் குறிமுறையை (Source Code) பயனர் மற்றும் பிற நிரலர் இலவசமாகப் பயன்படுத்த, மூல குறிமுறையில் மாற்றம் செய்ய அல்லது புதிய மென்பொருளாக உருவாக்கக் கூடிய நிரலைக் குறிக்கிறது. இது பலரது கூட்டு முயற்சியால் உருவாக்கப்பட்டு அனைவரும் இலவசமாக அணுகக் கூடியதாக உள்ளது. தனியுரிம மென்பொருள் (Proprietary Software) என்பது தனிநபர் அல்லது நிறுவனத்திற்குச் சொந்தமானது; அதன் மூலக்குறிமுறையை பயனர் அல்லது பிற நிரலர் பார்க்கவோ மாற்றவோ அனுமதிப்பதில்லை.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு பள்ளி நூலகத்தில் வைக்கப்பட்ட "சமையல் குறிப்பேடு" போல நினைத்துப் பாருங்கள். அதை யார் வேண்டுமானாலும் படிக்கலாம், தங்கள் சுவைக்கு ஏற்ப மாற்றி எழுதலாம், மேலும் அந்த மேம்படுத்தப்பட்ட குறிப்பை மீண்டும் நூலகத்தில் வைக்கலாம் — இதுவே Open Source Software. ஆனால் ஒரு உணவகத்தின் "ரகசிய சமையல் குறிப்பு" (proprietary) யாருக்கும் தெரியாது; உரிமையாளர் மட்டுமே அதை வைத்திருப்பார்.
+    </div>
+    <table class="tbl">
+      <tr><th>மென்பொருள் வகை</th><th>மூலக்குறிமுறை பார்க்கலாமா?</th><th>மாற்றம் செய்யலாமா?</th></tr>
+      <tr><td>திறந்த மூல மென்பொருள் (Open Source)</td><td>ஆம் ✅</td><td>ஆம் ✅</td></tr>
+      <tr><td>தனியுரிம மென்பொருள் (Proprietary)</td><td>இல்லை ❌</td><td>இல்லை ❌</td></tr>
+    </table>
+    <div class="mistake-box">
+      <span class="lbl">⚠️ பொதுவான தவறு</span>
+      "யார் வேண்டுமானாலும் திறந்த மூல மென்பொருளில் நேரடியாக மாற்றம் செய்துவிடலாம்" என நினைப்பது தவறு. மாற்றம் செய்யப்பட்ட குறிமுறையானது சார்ந்த நிரலர்களின் குழுவிற்கு அனுப்பப்பட்டு, அவர்கள் சோதித்து உரிய விதிமுறைகளுடன் இருந்தால் மட்டுமே பலருக்கும் விநியோகிக்கப்படும்.
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>திறந்த மூல மென்பொருளின் வரையறையை பாடநூல் வாசகப்படியே (verbatim) எழுத பழகவும் — "மூலக் குறிமுறையை பயனர் மற்றும் பிற நிரலர் இலவசமாகப் பயன்படுத்த, மாற்றம் செய்ய அல்லது புதிய மென்பொருளாக உருவாக்கக் கூடிய நிரல்".</div>
+  </div>
+
+  <div class="card">
+    <h3>⚖️ தனியுரிமம் Vs இலவசம் Vs திறந்த மூலம் — ஒப்பீட்டு கருவி <span class="eng">(Learning Simulation)</span></h3>
+    <p>கீழே உள்ள மூன்று வகைகளில் ஒன்றைத் தேர்ந்தெடுத்து, அதன் பண்புகளை ஒப்பிட்டுப் பாருங்கள்.</p>
+    <div class="tab-row" id="ossTabs"></div>
+    <div id="ossDetail"></div>
+  </div>
+
+  <div class="card">
+    <h3>🖼️ OSS திட்ட கூட்டுறவு மாதிரி <span class="eng">(Visual Explanation — redrawn from textbook diagram)</span></h3>
+    <p>பாடநூலில் உள்ள மூன்று OSS Project மாதிரிகளை கீழே தேர்ந்தெடுக்கவும். ஒவ்வொரு பங்கையும் (role) கிளிக் செய்து அதன் பொருளை அறியவும்.</p>
+    <div class="tab-row" id="ossDiagTabs"></div>
+    <div class="diagram-box"><div id="ossDiagramArea" class="oss-diagram"></div></div>
+    <div id="ossRoleDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>🌍 மூலக்குறிமுறை உலகம் முழுவதும் மேம்படும் விதம் <span class="eng">(Learning Simulation)</span></h3>
+    <p>பாடநூல் படத்தை அடிப்படையாகக் கொண்டது — Developer ஒரு மென்பொருளை வெளியிட்டதும், உலகெங்கும் உள்ள பல User/Developer-கள் அதை மேம்படுத்தி, இறுதியில் "மிகவும் மேம்படுத்தப்பட்ட மூலக்குறிமுறை" உருவாகும் விதத்தை காண்பிப்பு.</p>
+    <div class="diagram-box">
+      <div id="worldSimDots" class="flow-row" style="margin-bottom:14px;"></div>
+      <div id="worldSimPanel"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="worldPrevBtn">⬅ முந்தைய படி</button>
+      <button class="btn btn-primary" id="worldNextBtn">அடுத்த படி ➡</button>
+      <button class="btn btn-ghost" id="worldResetBtn">🔄 Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>✅ நன்மைகள் &amp; ❌ குறைபாடுகள்</h3>
+    <details class="acc" open><summary>திறந்த மூல மென்பொருளின் நன்மைகள்</summary>
+      <div class="acc-body">
+        <ul>
+          <li>நிரலர்களின் பங்களிப்பினால் திறமையை வளர்க்கவும், உறவுகளை ஏற்படுத்தவும் உதவுகிறது.</li>
+          <li>நமக்குத் தேவையான வசதியை மென்பொருளில் சேர்த்துக் கொள்ள முடியும் (மாற்றம் செய்ய முடிவதால்).</li>
+          <li>பல திறந்த மூல மென்பொருள்கள் பயனர் பயன்படுத்த எளிதானவை.</li>
+          <li>நமது திட்டம் / கருத்துக்களை குழுவிடம் பகிர்ந்து கொள்ளவும், குறிமுறைகளை எழுதி பலரிடம் பகிரவும் முடியும்.</li>
+          <li>குழுவில் உள்ள பலரது நிரல் எழுதும் உத்திகளை அறிய முடிவதால் நமது நிரல் எழுதும் திறனை வளர்த்துக் கொள்ள முடியும்.</li>
+          <li>குறிமுறைகள் ஆர்வத்துடன் இணைந்த பல நிரலர்கள் மூலம் உருவாக்கப்படுகின்றன; பிழை தெரிவித்தால் குழுவில் உள்ள பலரால் விரைவாக சரி செய்யப்படும்.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="acc"><summary>திறந்த மூல மென்பொருளின் குறைபாடுகள்</summary>
+      <div class="acc-body">
+        <ul>
+          <li>சில மென்பொருள்கள் புதிய பயனருக்கு பயன்படுத்த கடினமானவையாக உள்ளன.</li>
+          <li>சில மென்பொருள்கள் பிற மென்பொருள்களுடன் இணக்கமில்லாமல் இருப்பதால், அவற்றிற்கிடையே கோப்புகளை பரிமாறிக் கொள்ள முடிவதில்லை.</li>
+          <li>இலவசமாகக் கிடைப்பதால், பிழை திருத்தும் பணியில் உள்ள சிலர் முக்கியத்துவம் அளிப்பதில்லை.</li>
+          <li>சேவை மற்றும் வன்பொருளுடன் இணைந்து பணியாற்ற முடியாதது.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>🏛️ திறந்த மூலம் தொடர்புடைய அமைப்புகள், உரிமங்கள் &amp; இந்திய முயற்சிகள்</h3>
+    <table class="tbl">
+      <tr><th>திறந்த மூலம் தொடர்புடைய அமைப்புகள்</th><th>திறந்த மூலம் தொடர்புடைய உரிமைகள் (Licenses)</th></tr>
+      <tr><td>Apache Software Foundation</td><td>Apache License 2.0</td></tr>
+      <tr><td>Free Software Foundation</td><td>BSD 3-Clause "New" or "Revised" License</td></tr>
+      <tr><td>Linux Foundation</td><td>BSD 2-Clause "Simplified" or "Free BSD" License</td></tr>
+      <tr><td>Open Source Initiative</td><td>GNU General Public License (GPL)</td></tr>
+    </table>
+    <div class="activity-box">
+      <span class="lbl">💡 BOSS (உங்களுக்குத் தெரியுமா?)</span>
+      Bharat Operating System Solutions (BOSS) என்ற இயக்க அமைப்பு Centre for Development of Advanced Computing (C-DAC) என்ற இந்திய அரசமைப்பால் உருவாக்கப்பட்டது. இந்தியாவில் திறந்த மூல மென்பொருள் பயன்பாட்டை அதிகரிக்கப் பயன்படுகிறது; பல இந்திய மொழிகளில் வேலை செய்வதை ஆதரிக்கிறது.
+    </div>
+    <div class="activity-box">
+      <span class="lbl">💡 NRCFOSS (உங்களுக்குத் தெரியுமா?)</span>
+      National Resource Centre for Free and Open Source Software (NRCFOSS) என்ற இந்திய அரசாங்கத்தின் அமைப்பு இந்தியாவில் இலவச திறந்த மூல மென்பொருள் (Free and Open Source Software — FOSS) உருவாக்கம் மற்றும் மேம்பாட்டிற்கு உதவி செய்கிறது.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 இலவச மென்பொருள் Vs திறந்த மூல மென்பொருள் (Enrichment)</span>
+      இலவச மென்பொருள் (Free Software) கருத்தை 1980களில் MIT-ஐ சேர்ந்த ரிச்சர்ட் ஸ்டால்மேன் என்ற ஆராய்ச்சியாளர் உருவாக்கினார். இது இலாப நோக்கமற்ற Free Software Foundation தெரிவித்த நான்கு தத்துவங்களை அடிப்படையாகக் கொண்டது — இந்த வசதிகள் பயனர் தங்களது விருப்பம் போல மென்பொருளை பயன்படுத்த உரிமை அளிக்கின்றன். பத்தாண்டுகளுக்குப் பின்பு உருவான Open Source Software (OSS) கருத்துரு மென்பொருள் மாற்றம், தொடர்குறிமுறை திருத்தம், உரிமம் வழங்கல் மற்றும் விநியோகித்தல் ஆகியவற்றை வலியுறுத்துகிறது. இரண்டும் ஒன்றுபோல் தோன்றினாலும் இவற்றிற்கிடையேயான வேறுபாடு செய்முறையை விட அதிகம் கருத்தியல் சார்ந்தவை. இலவச மென்பொருள் என்பது பயனர் எந்தவித செலவுமின்றி தரவிறக்கம் செய்து பயன்படுத்தக்கூடிய தனியுரிம மென்பொருள் — ஆனால் அதன் மூலக்குறிமுறையை மாற்ற முடியாது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📡 திறந்த மூல வலையமைப்பு மென்பொருள்களின் தேவை</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      வலையமைப்பில் ஏற்படும் சிக்கல்களை கண்டறிவது கடினம் — குறிப்பாக பல கணிப்பொறிகள் இணைக்கப்படும்போது சிக்கல்களும் அதிகரிக்கும். இதுபோன்ற சூழ்நிலைகளில் நமக்கு வலையமைப்பு மென்பொருள்கள் தேவைப்படுகின்றன. இவை வலையமைப்பில் உள்ள சேவையகங்கள், உறுப்பு கணினிகள், நெறிமுறைகள், தகவல் பாய்வு மற்றும் செயல்படும்/செயல்படாத பகுதிகளைப் பற்றிய அறிக்கைகளை அளித்து உதவுகின்றன. இவை கீழ்கண்ட இரு முக்கிய செய்திகளை வழங்குகின்றன:
+      <ul>
+        <li><b>அறிவிப்புச் செய்தி (Notification):</b> வலையமைப்பு நிர்வாகி மற்றும் பயனர் எளிதாக வலையமைப்பின் வன்பொருள்கள் மற்றும் மென்பொருள்கள் செயல்படுகிறதா? இல்லையா? என அறிய உதவுகிறது.</li>
+        <li><b>எச்சரிக்கைச் செய்தி (Alert Message):</b> பிழை எந்த பகுதியில், எப்போது ஏற்பட்டது என தெரிவிக்கிறது.</li>
+      </ul>
+    </div>
+    <div class="cmp-grid">
+      <div class="cmp-card"><h4>🚶 முன்பு (கைமுறை கண்காணிப்பு)</h4>நிர்வாகி ஒவ்வொரு கணினியையும் நேரடியாகச் சென்று சரிபார்க்க வேண்டும் — நேரம் அதிகம், பிழை கண்டறிவது தாமதமாகும்.</div>
+      <div class="cmp-card"><h4>⚡ பின்பு (வலையமைப்பு மென்பொருளுடன்)</h4>மென்பொருள் தானாகவே Notification &amp; Alert அனுப்புகிறது — பிழை எங்கே, எப்போது என உடனடியாகத் தெரியும் (எ.கா. Open NMS — பாடம் 14.3).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧩 திறந்த மூல மென்பொருளுக்கான எடுத்துக்காட்டுகள் <span class="eng">(Textbook List)</span></h3>
+    <p>பாடநூலில் கொடுக்கப்பட்டுள்ள எடுத்துக்காட்டுகள் கீழே உள்ளன. ஒவ்வொன்றையும் கிளிக் செய்து, அது எந்த வகை மென்பொருள் எனக் கண்டறியும் Learning Activity-ஐ முயற்சி செய்யவும் (Enrichment — பாடநூலில் வகைப்படுத்தப்படவில்லை).</p>
+    <div class="ex-grid" id="exGrid"></div>
+    <div class="tryit-box">
+      <span class="lbl">🧪 முயற்சி செய் (Try It Yourself)</span>
+      இந்தப் பாடத்தில் தெரிவிக்காத திறந்த மூல மற்றும் இலவச மென்பொருள் பெயர்களை நீங்கள் அறிந்தவற்றிலிருந்து பட்டியலிடுக. (மாணவர் செயல்பாடு — பாடநூல்)
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-intro"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 14.2 — Network Simulation Tool (NS2)
+   ========================================================================= */
+function renderNS2(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 14 › 14.2</div>
+    <h2>Network Simulation Tool (NS2)</h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> Network Simulation என்றால் என்ன, Trace File என்றால் என்ன, NS2 மென்பொருளின் பண்புகள் என்ன என்பதை அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>14.2 Network Simulation &amp; NS2</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      கணிப்பொறி வலையமைப்பில் Network Simulation என்பது வலையமைப்பின் செயல்பாட்டை விளக்கும் ஒரு மாதிரி அமைப்பு ஆகும். இது வலையமைப்பின் செயல்பாட்டை அதன் பல உறுப்புகள் (routers, nodes, switches, access points, links etc.) ஒன்றோடொன்று தொடர்பு கொள்வதை கணிப்பதன் மூலம் விளக்குகிறது. Network Simulator என்ற மென்பொருள் கணினி வலையமைப்பின் செயல்பாட்டு மாதிரியை காட்டும் மென்பொருள் ஆகும். சிமுலேசனின் முக்கிய வெளியீடு <b>டிரேஸ் கோப்பு (Trace File)</b> ஆகும் — இது சிமுலேசனின் ஒவ்வொரு செயல்பாட்டையும் ஆவணமாக்குகிறது; இதன் மூலம் வலையமைப்பு செயல்பாட்டை சோதிக்கலாம். <b>NS2</b> என்பது Network Simulation பதிப்பு 2 என்பதன் சுருக்கமாகும் — இது வலையின் தொடர்பு மற்றும் நிகழ்வு சார்ந்த ஆய்வுக்கான திறந்த மூல சிமுலேசன் வகை சார்ந்த மென்பொருள் ஆகும்.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு புதிய பாலத்தை கட்டும் முன், பொறியாளர்கள் கணினியில் ஒரு 3D மாதிரியை உருவாக்கி, அதன் மேல் வாகனங்கள் எப்படி ஓடும், எடை தாங்குமா என சோதிப்பார்கள். அதேபோல், ஒரு பெரிய வலையமைப்பை (Network) உண்மையில் அமைக்கும் முன், அதை கணினியில் Simulate செய்து (NS2 போன்ற மென்பொருள் மூலம்) அதன் செயல்பாடு எப்படி இருக்கும் எனப் பார்க்கலாம்.
+    </div>
+    <table class="tbl">
+      <tr><th>NS2 பண்பு</th><th>விவரம்</th></tr>
+      <tr><td>உருவாக்க &amp; இயக்க மொழிகள்</td><td>OTCL (Object oriented Tool Command Language) மற்றும் C++</td></tr>
+      <tr><td>இயங்கு தளம் (OS)</td><td>விண்டோஸ் மற்றும் லினக்ஸ்</td></tr>
+      <tr><td>வலையமைப்பு வகை</td><td>கம்பி (Wired) மற்றும் கம்பியில்லா (Wireless) வலையமைப்பிற்கு ஆதரவு</td></tr>
+      <tr><td>இடைமுகம்</td><td>கட்டளை வரி பயனர் இடைமுகம் (CLI) மற்றும் API (நிகழ்வு சார்ந்த மென்பொருள் கருவி)</td></tr>
+      <tr><td>மாதிரிகள் (Models)</td><td>பல தயார் மாதிரிகள் மூலம் பயனர் விரும்பும் வெளியீட்டை எளிதில் பெறலாம்</td></tr>
+    </table>
+    <div class="mistake-box"><span class="lbl">⚠️ சரிபார்க்க வேண்டியது (Needs Verification)</span>பாடநூலின் சுருக்கப் பெட்டியில் "OTCL மற்றும் C++ யை இணைக்க TCICL உதவுகிறது" எனக் குறிப்பிடப்பட்டுள்ளது. இந்த சுருக்கமானது PDF-இல் சற்று தெளிவின்றி உள்ளது (பொதுவாக இது <b>TclCL</b> எனும் இணைப்பு நூலகத்தைக் குறிக்கலாம்). துல்லியமான எழுத்துக்கூர்ப்புக்கு உங்கள் அச்சுப் பாடநூலுடன் ஒப்பிட்டு உறுதி செய்து கொள்ளவும்.</div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>Trace File = சிமுலேசனின் ஒவ்வொரு நிரலைப் பற்றிய தகவலைக் கொண்ட ஆவண கோப்பு. NS2 = Network Simulation பதிப்பு 2. NS2 ஐ உருவாக்க OTCL &amp; C++ பயன்படுகின்றன.</div>
+  </div>
+
+  <div class="card">
+    <h3>🔄 Input → Simulation → Output ஓட்டப்படம் <span class="eng">(Visual Explanation)</span></h3>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">வலையமைப்பு உறுப்புகள்<br><span class="eng" style="font-size:.7rem;">(routers, nodes, switches, links)</span></div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-node" style="background:var(--accent-light);border-color:var(--accent);color:#9a3412;">NS2 Simulator<br><span class="eng" style="font-size:.7rem;">(OTCL + C++)</span></div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-node">Trace File<br><span class="eng" style="font-size:.7rem;">(வெளியீடு)</span></div>
+      </div>
+      <div class="diagram-cap">படம் — Network Simulation செயல்முறை (redrawn)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 NS2 Mini Learning Simulation <span class="eng">(கருத்துரு காட்சிப்படுத்தல் — உண்மையான NS2 மென்பொருள் அல்ல)</span></h3>
+    <p>கீழே 4 சிறு வலையமைப்பு Node-கள் உள்ளன. மூலம் (Source) மற்றும் இலக்கு (Destination) Node-களைத் தேர்ந்தெடுத்து, "தரவு பொதியை அனுப்பு" பொத்தானை அழுத்தவும். ஒவ்வொரு நிகழ்வும் கீழே ஒரு Trace Log-ஆக பதிவாகும்.</p>
+    <div class="diagram-box">
+      <svg id="ns2Svg" viewBox="0 0 320 180" style="width:100%;max-width:420px;display:block;margin:0 auto;">
+        <line x1="40" y1="30" x2="280" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+        <line x1="40" y1="150" x2="280" y2="150" stroke="#cbd5e1" stroke-width="2"/>
+        <line x1="40" y1="30" x2="40" y2="150" stroke="#cbd5e1" stroke-width="2"/>
+        <line x1="280" y1="30" x2="280" y2="150" stroke="#cbd5e1" stroke-width="2"/>
+        <line x1="40" y1="30" x2="280" y2="150" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <g id="ns2Nodes"></g>
+        <circle id="ns2Packet" cx="40" cy="30" r="7" fill="var(--accent)" style="display:none;"/>
+      </svg>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px;">
+        <label>மூலம் (Source): <select id="ns2Src"></select></label>
+        <label>இலக்கு (Destination): <select id="ns2Dst"></select></label>
+      </div>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="ns2SendBtn">▶ தரவு பொதியை அனுப்பு (Start)</button>
+        <button class="btn btn-ghost" id="ns2ResetBtn">🔄 Reset</button>
+      </div>
+      <div class="log-panel" id="ns2Log"></div>
+      <div class="diagram-cap">⚠️ இது கருத்துருவை எளிதில் புரிந்துகொள்ள உருவாக்கப்பட்ட Learning Simulation — இதில் காட்டப்படும் Trace வடிவமைப்பு விளக்கத்திற்காக எளிமைப்படுத்தப்பட்டது; உண்மையான NS2 தொடரியல் அல்ல.</div>
+    </div>
+  </div>
+
+  <div class="tryit-box">
+    <span class="lbl">🧪 முயற்சி செய்</span>
+    மூலம் &amp; இலக்கு Node-களை மாற்றி, 3 வெவ்வேறு தரவு பொதிகளை அனுப்பி Trace Log-இல் எத்தனை பதிவுகள் (events) உருவாகின்றன எனப் பாருங்கள்.
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-ns2"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 14.3 — Open NMS
+   ========================================================================= */
+function renderOpenNMS(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 14 › 14.3</div>
+    <h2>Open NMS <span class="eng">(Open Network Management System)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> OpenNMS என்றால் என்ன, அதன் உருவாக்க குழு, FCAPS, Meridian/Horizon பதிப்புகள் பற்றி அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>14.3 Open NMS என்றால் என்ன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      Open NMS (Open Network Management System) என்பது இலவச மற்றும் திறந்த மூல வசதியுடன் வெளிவந்த தொடக்க காலத்திய தரமான வலையமைப்பு கண்காணிப்பு மற்றும் மேலாண்மை அமைப்பு ஆகும். இது பல பயனர்கள், நிரலர்கள் மற்றும் Open NMS குழுவால் உருவாக்கப்பட்டு பராமரிக்கப்படுகிறது. Open NMS திறந்த மூல வசதியுடன் வெளிவந்த உலகின் <b>முதல்</b> வலையமைப்பு மேலாண்மை மற்றும் கண்காணிப்பு மென்பொருள் ஆகும்.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      ஒரு பெரிய கடையின் பாதுகாப்பு அறையில் உள்ள CCTV திரையை கற்பனை செய்யுங்கள் — நூற்றுக்கணக்கான கேமராக்களை ஒரே நபர் கண்காணிக்க முடியாது. ஆனால் ஒரு கேமரா பழுதானவுடன் திரையில் தானாக எச்சரிக்கை (Alert) வரும் என்றால் எளிது! Open NMS இதேபோல் பல ஆயிரம் கணினிகள்/சாதனங்கள் கொண்ட வலையமைப்பை தானாகக் கண்காணித்து, பிழை வந்தவுடன் அறிவிக்கும் மென்பொருள்.
+    </div>
+    <table class="tbl">
+      <tr><th>தகவல்</th><th>விவரம்</th></tr>
+      <tr><td>முதல் வெளியீடு</td><td>1999</td></tr>
+      <tr><td>Open NMS குழு உருவாக்கம்</td><td>2004</td></tr>
+      <tr><td>எழுதப்பட்ட மொழி</td><td>ஜாவா (Java)</td></tr>
+      <tr><td>உரிமம்</td><td>GNU (GPL)</td></tr>
+      <tr><td>பணித்தளங்கள் (Platforms)</td><td>பல வகையான Platform-களில் வேலை செய்யும்</td></tr>
+      <tr><td>கண்டறியும் சாதனம்</td><td>Discovery Engine — பயனர் குறுக்கீடு இன்றி தானாக வலையமைப்பை கட்டுப்படுத்தும்</td></tr>
+    </table>
+    <div class="example-box">
+      <span class="lbl">🧩 Open NMS வழங்கும் வசதிகள்</span>
+      கண்டுபிடித்து வழங்குதல் (Discovery &amp; Provisioning) · சேவைக் கண்காணிப்பு (Service Monitoring) · தரவு சேகரிப்பு (Data Collection) · நிகழ்வு மேலாண்மை அறிவிப்பு (Event Management Notification). சிறந்த திறந்த மூல மென்பொருளுக்கான பல விருதுகளைப் பெற்றுள்ளது.
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ தேர்வுக் குறிப்பு</span>Open NMS இன் குறிக்கோள் FCAPS (Fault, Configuration, Accounting, Performance and Security) இன் அனைத்து வசதிகளையும் வழங்குவதாகும். தற்போது Fault &amp; Performance க்கு முக்கியத்துவம் அளிக்கிறது.</div>
+  </div>
+
+  <div class="card">
+    <h3>🛠️ FCAPS — Open NMS இன் இலக்குகள் <span class="eng">(Interactive)</span></h3>
+    <p>ஒவ்வொரு கார்டையும் கிளிக் செய்து அதன் பொருளை அறியவும்.</p>
+    <div class="fcaps-grid" id="fcapsGrid"></div>
+    <div id="fcapsDetail" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>🆚 Meridian Vs Horizon</h3>
+    <div class="cmp-grid">
+      <div class="cmp-card"><h4>🏢 Meridian</h4>திறன் மற்றும் நீண்ட கால சேவை வேண்டுமெனில் இந்த வகையைத் தேர்ந்தெடுக்கலாம். இது நிறுவனம் மற்றும் வியாபார அமைப்பிற்கு ஏற்றது.</div>
+      <div class="cmp-card"><h4>🚀 Horizon</h4>புதிய கண்டுபிடிப்புகள் அடிக்கடி தேவைப்படும் IT Ecosystems மற்றும் புதிய மேலாண்மை திட்டத்திற்கு ஏற்றது.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 OpenNMS Dashboard Learning Simulation</h3>
+    <p>கீழே உள்ள Node-களில் ஒன்றில் "பிழையை உருவாக்கு" பொத்தானை அழுத்தி, Open NMS எப்படி <b>அறிவிப்பு (Notification)</b> மற்றும் <b>எச்சரிக்கை (Alert)</b> செய்திகளை அனுப்புகிறது எனப் பாருங்கள்.</p>
+    <div id="nmsNodeList" style="display:flex;flex-direction:column;gap:10px;margin:12px 0;"></div>
+    <div class="log-panel" id="nmsLog"></div>
+    <div class="btn-row"><button class="btn btn-ghost" id="nmsResetBtn">🔄 அனைத்தையும் சரிசெய் (Reset All)</button></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-opennms"></div></div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 14.4 — திறந்த மூல வன்பொருள்
+   ========================================================================= */
+function renderHardware(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 14 › 14.4</div>
+    <h2>திறந்த மூல வன்பொருள் <span class="eng">(Open Source Hardware)</span></h2>
+    <div class="goals"><b>கற்றலின் நோக்கம்:</b> திறந்த மூல வன்பொருள் என்றால் என்ன, அது எவ்வாறு உதவுகிறது என அறிதல்.</div>
+  </div>
+
+  <div class="card">
+    <h3>14.4 திறந்த மூல வன்பொருள் என்றால் என்ன?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை (Textbook Definition)</span>
+      வளர்ந்து வரும் இக்காலகட்டத்தில் உலகில் போட்டி மற்றும் இணைய குற்றம் அதிகரித்துள்ளது. தனிநபர் / நிறுவனம் பயன்படுத்தும் பொருட்களில் போட்டி நிறுவனத்தால் வைக்கப்பட்ட உளவு பார்க்கும் வன்பொருட்கள் இருக்கக்கூடும். திறந்த மூல வன்பொருள் தொழில்நுட்பம் இந்த பிரச்சனைக்குத் தீர்வாக உள்ளது. இந்த முறையில் நமக்கு பொருளின் பகுதிகள், அதன் செயல் விளக்கப்படம் கிடைக்கிறது. எனவே நாம் தேவையற்ற பகுதிகள் ஏதேனும் இருந்தால் அதை கண்டறிந்து நீக்க முடியும்.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம் (Easy Explanation)</span>
+      நீங்கள் ஒரு புதிய கணக்குப்பொறி (calculator) வாங்கும்போது, அதை திருகாணி (screwdriver) கொண்டு திறந்து உள்ளே என்ன சில்லுகள் உள்ளன, ஒவ்வொன்றும் என்ன வேலை செய்கிறது எனப் பார்க்க முடிந்தால் — அதுவே Open Source Hardware கருத்து. ஏதேனும் தேவையில்லாத, சந்தேகத்திற்குரிய பகுதி இருந்தால் அதை அடையாளம் கண்டு நீக்கலாம்.
+    </div>
+    <div class="mistake-box"><span class="lbl">⚠️ பொதுவான தவறு</span>"திறந்த மூல வன்பொருள் என்பது திறந்த மூல மென்பொருள் போலவே" என நினைப்பது தவறு — மென்பொருளில் குறிமுறை (code) திறக்கப்படுகிறது; வன்பொருளில் பொருளின் உடல் பாக பகுதிகள் &amp; செயல் விளக்கப்படம் (design) திறக்கப்படுகிறது.</div>
+  </div>
+
+  <div class="card">
+    <h3>🆚 திறந்த மூல மென்பொருள் Vs திறந்த மூல வன்பொருள்</h3>
+    <div class="cmp-grid">
+      <div class="cmp-card"><h4>💻 திறந்த மூல மென்பொருள்</h4>மூலக் குறிமுறை (Source Code) திறந்து வைக்கப்படுகிறது — பயனர்/நிரலர் படித்து மாற்றலாம்.</div>
+      <div class="cmp-card"><h4>🔩 திறந்த மூல வன்பொருள்</h4>பொருளின் பகுதிகள் &amp; செயல் விளக்கப்படம் (design) கிடைக்கிறது — தேவையற்ற/சந்தேகத்திற்குரிய பகுதிகளை கண்டறிந்து நீக்கலாம்.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 வன்பொருள் பகுதி கண்டறிதல் — Learning Simulation</h3>
+    <p>கீழே ஒரு கற்பனை சுற்றுச் சீர்கலம் (circuit board) உள்ளது. ஒவ்வொரு சில்லையும் கிளிக் செய்து ஆய்வு செய்யவும். ❓ என்ற சந்தேகத்திற்குரிய சில்லை கண்டறிந்து நீக்கிப் பாருங்கள்.</p>
+    <div class="hw-board" id="hwBoard"></div>
+    <div id="hwDetail" class="easy" style="display:none;"></div>
+    <div class="btn-row"><button class="btn btn-ghost" id="hwResetBtn">🔄 Reset</button></div>
+  </div>
+
+  <div class="tryit-box">
+    <span class="lbl">🧪 முயற்சி செய்</span>
+    "நீங்கள் வாங்கிய ஒரு வீட்டு உபகரணத்தில் (எ.கா. ரவுட்டர்) ஒரு தேவையற்ற பகுதி இருப்பதாக சந்தேகித்தால், திறந்த மூல வன்பொருள் அணுகுமுறை அதை எவ்வாறு கண்டறிய உதவும்?" — உங்கள் சொந்த வார்த்தைகளில் விளக்குக.
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ விரைவு சோதனை</span><div id="qc-hardware"></div></div>
+  `;
+}
+
+/* =========================================================================
+   PRACTICE PAGE
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Misconception Buster <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — நிலைகளின்படி கேள்விகள் வரிசைப்படுத்தப்பட்டுள்ளன.</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>கூடுதல் பயிற்சி MCQ (Added Practice Questions — Enrichment)</h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>சரி/தவறு (True / False) — <span class="eng">Enrichment</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>இடம் நிரப்புக (Fill in the Blanks) — <span class="eng">Enrichment</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">சரிபார் (Check All)</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>பொருத்துக (Match the Following) — <span class="eng">Enrichment</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Misconception Buster — திறந்த மூலம் பற்றிய தவறான கருத்துக்கள்</h3>
+    <p>கீழே உள்ள ஒவ்வொரு தவறான கருத்தையும் படித்து, அது ஏன் தவறு எனக் யூகிக்கவும். பிறகு ✅ "ஏன் தவறு?" பொத்தானை கிளிக் செய்து, சரியான புரிதலைப் பார்க்கவும்.</p>
+    <div id="misWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. மென்பொருளின் மூலக்குறிமுறையை பொது மக்கள் இலவசமாக மாற்ற முடிந்தால் அது -----', o:['இலவச மென்பொருள்','மென்பொருள்','திறந்த மூல மென்பொருள்','பொது மூல மென்பொருள்'], c:2, exp:'மூலக்குறிமுறையை பொதுமக்கள் இலவசமாக மாற்றவும் பயன்படுத்தவும் முடிவது திறந்த மூல மென்பொருளின் அடையாளம்.'},
+  'b2': {q:'2. பின்வருவதில் எந்த நிரல் வலையமைப்பின் செயலை பிரதிபலிக்கிறது?', o:['Network software','Network simulation','Network testing','Network calculator'], c:1, exp:'Network Simulation என்பது வலையமைப்பின் செயல்பாட்டை அதன் உறுப்புகள் தொடர்பு கொள்வதை கணிப்பதன் மூலம் பிரதிபலிக்கும் மாதிரி அமைப்பு.'},
+  'b3': {q:'3. பின்வருவதில் எது சிமுலேட்டரின் ஒவ்வொரு நிகழ்வையும் ஆவணமாக்க மற்றும் சோதிக்க உதவுகிறது?', o:['வலை சோதிப்பான்','வலை மென்பொருள்','Trace கோப்பு','வலை ஆவணம்'], c:2, exp:'Trace File சிமுலேசனின் ஒவ்வொரு செயல்பாட்டையும் ஆவணமாக்கி, பின்னர் பரிசோதனைக்குப் பயன்படுத்த உதவுகிறது.'},
+  'b4': {q:'4. Network simulator மென்பொருளுக்கு எடுத்துக்காட்டு தருக.', o:['simulator','TCL','Ns2','C++'], c:2, exp:'NS2 (Network Simulator version 2) திறந்த மூல Network Simulator மென்பொருளுக்கு எடுத்துக்காட்டு.'},
+  'b5': {q:'5. சிறந்த பொருத்தத்தை தேர்ந்தெடுக்கவும் — NS2 ஐ உருவாக்க உதவும் சரியான தொகுப்பு எது?', o:['UNIX & TCL','UNIX & C++','C++ & OTCL','C++ & NS2'], c:2, exp:'NS2 உருவாக்கவும் இயக்கவும் OTCL மற்றும் C++ ஆகிய இரு மொழிகள் பயன்படுத்தப்படுகின்றன.'},
+  'b6': {q:'6. பின்வருவனவற்றுள் எது Network Simulation மென்பொருள் இல்லை?', o:['Ns2','OPNET','SSFNet','PYTHON'], c:3, exp:'Ns2, OPNET, SSFNet ஆகியவை Network Simulation மென்பொருள்கள்; PYTHON ஒரு programming language, simulation software அல்ல.'},
+  'b7': {q:'7. பின்வருவனவற்றுள் எது திறந்த மூல வலையமைப்பு மேலாண்மை மென்பொருள்?', o:['PYTHON','OPNET','Open NMS','OMNet++'], c:2, exp:'Open NMS இலவச மற்றும் திறந்த மூல வலையமைப்பு மேலாண்மை மற்றும் கண்காணிப்பு மென்பொருள்.'},
+  'b8': {q:'8. Open NMS முதல் பதிப்பு ---- ஆண்டு வெளியிடப்பட்டது.', o:['1999','2000','2003','2004'], c:0, exp:'ஓப்பன் என்எம்எஸ் 1999-ல் வெளியிடப்பட்டது; ஓப்பன் என்எம்எஸ் குழு 2004-ல் உருவாக்கப்பட்டது.'},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'இலவச மென்பொருள் கருத்தை 1980களில் உருவாக்கியவர் யார்?', o:['பில் கேட்ஸ்','ரிச்சர்ட் ஸ்டால்மேன்','லைனஸ் டோர்வால்ட்ஸ்','டெனிஸ் ரிட்சி'], c:1, exp:'1980களில் MIT-ஐ சேர்ந்த ரிச்சர்ட் ஸ்டால்மேன், Free Software Foundation மூலம் இலவச மென்பொருள் கருத்தை உருவாக்கினார்.'},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:'BOSS இயக்க அமைப்பை உருவாக்கிய இந்திய அரசு நிறுவனம் எது?', o:['ISRO','C-DAC','NIC','BSNL'], c:1, exp:'Bharat Operating System Solutions (BOSS) ஐ Centre for Development of Advanced Computing (C-DAC) உருவாக்கியது.'},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'திறந்த மூல தொடர்புடைய உரிமைகளில் (Licenses) இல்லாதது எது?', o:['GNU GPL','Apache License 2.0','BSD 3-Clause License','Windows License'], c:3, exp:'Windows License ஒரு தனியுரிம (Proprietary) உரிமம்; GPL, Apache 2.0, BSD ஆகியவை திறந்த மூல உரிமங்கள்.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:'Open NMS-இன் FCAPS இலக்குகளில் தற்போது முக்கியத்துவம் பெறும் இரண்டு பகுதிகள் எவை?', o:['Accounting & Security','Fault & Performance','Configuration & Accounting','Security & Configuration'], c:1, exp:'Open NMS தற்போது Fault (பிழை) மற்றும் Performance (செயல்திறன்) ஆகியவற்றிற்கு முக்கியத்துவம் அளிக்கிறது.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'நீண்ட கால நிலையான சேவை தேவைப்படும் நிறுவனங்களுக்கு OpenNMS-இன் எந்த பதிப்பு ஏற்றது?', o:['Horizon','Meridian','Discovery','Community'], c:1, exp:'Meridian பதிப்பு திறன் மற்றும் நீண்ட கால சேவைக்கு ஏற்றது; நிறுவனம்/வியாபார அமைப்புகளுக்குப் பொருத்தமானது.'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'திறந்த மூல வன்பொருள் தொழில்நுட்பம் முதன்மையாக எந்த பிரச்சனைக்குத் தீர்வு தருகிறது?', o:['மென்பொருள் விலை அதிகரிப்பு','போட்டி நிறுவனங்கள் வைக்கும் உளவு வன்பொருள்','இணைய வேகக் குறைவு','மென்பொருள் இணக்கமின்மை'], c:1, exp:'போட்டி நிறுவனங்களால் பொருட்களில் வைக்கப்படும் உளவு பார்க்கும் வன்பொருள் பிரச்சனைக்கு, பொருளின் பகுதிகள் &amp; செயல் விளக்கப்படம் கிடைக்கச் செய்யும் திறந்த மூல வன்பொருள் தொழில்நுட்பம் தீர்வாக உள்ளது.'},
+};
+
+const TF_QS = [
+  {q:'திறந்த மூல மென்பொருளின் மூலக்குறிமுறையை யாரும் பார்க்க முடியாது.', a:false, exp:'தவறு — திறந்த மூல மென்பொருளின் முக்கிய பண்பே மூலக்குறிமுறையை பயனர்/பிற நிரலர் பார்க்கவும் மாற்றவும் முடிவதுதான்.'},
+  {q:'இலவச மென்பொருள் (Freeware) இன் மூலக்குறிமுறையை மாற்ற முடியும்.', a:false, exp:'தவறு — Freeware இலவசமாகப் பயன்படுத்த முடிந்தாலும் அதன் மூலக்குறிமுறையை மாற்ற முடியாது; இது தனியுரிம மென்பொருள்.'},
+  {q:'NS2, OTCL மற்றும் C++ மொழிகளைப் பயன்படுத்தி உருவாக்கப்பட்டுள்ளது.', a:true, exp:'சரி — NS2ஐ உருவாக்கவும் இயக்கவும் OTCL மற்றும் C++ பயன்படுத்தப்படுகின்றன.'},
+  {q:'Open NMS ஜாவா மொழியில் எழுதப்பட்டு GNU உரிமையின் கீழ் வெளியிடப்படுகிறது.', a:true, exp:'சரி — Open NMS ஜாவாவில் எழுதப்பட்டு GNU உரிமையின் கீழ் வெளியிடப்படுகிறது.'},
+  {q:'திறந்த மூல வன்பொருளில் பொருளின் பகுதிகள் பற்றிய செயல் விளக்கப்படம் கிடைக்காது.', a:false, exp:'தவறு — திறந்த மூல வன்பொருள் முறையில் பொருளின் பகுதிகள் மற்றும் செயல் விளக்கப்படம் கிடைக்கும்; அதனால் தேவையற்ற பகுதிகளை கண்டறிந்து நீக்க முடியும்.'},
+];
+
+const FIB_QS = [
+  {text:'NS2 என்பது Network Simulation பதிப்பு ______________ என்பதன் சுருக்கமாகும்.', ans:'2'},
+  {text:'சிமுலேசனின் முக்கிய வெளியீடு ______________ கோப்பு ஆகும்.', ans:'trace'},
+  {text:'Open NMS குழு ______________ ஆண்டு உருவாக்கப்பட்டது.', ans:'2004'},
+  {text:'FCAPS இல் உள்ள P என்பது ______________ ஐக் குறிக்கிறது.', ans:'performance'},
+];
+
+const MATCH_LEFT = ['NS2','Trace File','OTCL','FCAPS','GNU-GPL'];
+const MATCH_RIGHT = ['Network Simulation பதிப்பு 2','சிமுலேசனின் ஒவ்வொரு நிகழ்வையும் பதிவுசெய்யும் ஆவண கோப்பு','Object Oriented Tool Command Language','Fault, Configuration, Accounting, Performance, Security','ஒரு திறந்த மூல உரிமம்'];
+const MATCH_ANSWER = {'NS2':'Network Simulation பதிப்பு 2','Trace File':'சிமுலேசனின் ஒவ்வொரு நிகழ்வையும் பதிவுசெய்யும் ஆவண கோப்பு','OTCL':'Object Oriented Tool Command Language','FCAPS':'Fault, Configuration, Accounting, Performance, Security','GNU-GPL':'ஒரு திறந்த மூல உரிமம்'};
+
+const MISCONCEPTIONS = [
+  {wrong:'"திறந்த மூல மென்பொருள் எப்போதும் இலவச மென்பொருளுக்கு (Freeware) சமமானது" என்று நினைப்பது.', type:'கருத்தியல் குழப்பம் (Conceptual Misconception)', why:'இரண்டும் ஒன்றுபோல் தோன்றினாலும், இவை இரண்டிற்கும் இடையேயான வேறுபாடு செய்முறையை விட கருத்தியல் சார்ந்தது. Freeware இலவசமாகக் கிடைத்தாலும் அதன் மூலக்குறிமுறையை மாற்ற முடியாது.', fix:'திறந்த மூல மென்பொருள் = மூலக்குறிமுறை பார்க்கவும் மாற்றவும் முடியும் + பெரும்பாலும் இலவசம். Freeware = இலவசம், ஆனால் மூலக்குறிமுறை மாற்ற முடியாத தனியுரிம மென்பொருள்.'},
+  {wrong:'"NS2 ஒரு இயக்க முறைமை (Operating System)" என நினைப்பது.', type:'வரையறைக் குழப்பம் (Definition Confusion)', why:'NS2 என்பது Network Simulation Tool — இது வலையமைப்பின் செயல்பாட்டை மாதிரியாக்கி ஆராயும் மென்பொருள்; இது ஒரு Operating System அல்ல.', fix:'NS2 = Network Simulator version 2 — OTCL மற்றும் C++ பயன்படுத்தி உருவாக்கப்பட்ட, வலையமைப்பு ஆய்வுக்கான திறந்த மூல simulation மென்பொருள்.'},
+  {wrong:'"Open NMS வலையமைப்பில் உள்ள பிழைகளை தானாகவே சரி செய்துவிடும்" என நினைப்பது.', type:'செயல்பாட்டுக் குழப்பம் (Functional Misconception)', why:'Open NMS பிழைகளை கண்டறிந்து அறிவிப்பு (Notification) மற்றும் எச்சரிக்கை (Alert) செய்திகள் மூலம் நிர்வாகிக்கு தெரிவிக்கிறது; பிழையை தானாகச் சரிசெய்யாது — நிர்வாகிதான் திருத்த வேண்டும்.', fix:'Open NMS = கண்காணிப்பு + அறிவிப்பு/எச்சரிக்கை மேலாண்மை மென்பொருள். பிழையை சரிசெய்வது நிர்வாகியின் பணி.'},
+  {wrong:'"திறந்த மூல மென்பொருளில் மாற்றம் செய்தவுடன் யாருக்கும் தெரிவிக்க வேண்டியதில்லை" என நினைப்பது.', type:'உரிமை தொடர்பான குழப்பம் (Licensing Misconception)', why:'மூலக்குறிமுறையில் மாற்றம் செய்தால் அதை திறந்த மூல மென்பொருளில் செய்த மாற்றம் மற்றும் திட்டத்தை தெரிவிக்க வேண்டும் என்பது பாடநூல் கூறும் விதி.', fix:'மாற்றம் செய்தப் பின் அதை சார்ந்த நிரலர் குழுவிற்கு தெரிவிக்க வேண்டும்; அவர்கள் சோதித்து விதிமுறைகளுடன் இருந்தால் மட்டுமே பலருக்கும் வெளியிடுவார்கள்.'},
+];
+
+/* =========================================================================
+   EXAM PREPARATION PAGE
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · Must Remember</h3>
+    <ul>
+      <li>திறந்த மூல மென்பொருள் = மூலக்குறிமுறையை பயனர்/பிற நிரலர் இலவசமாகப் பயன்படுத்த, மாற்றம் செய்ய அல்லது புதிய மென்பொருளாக உருவாக்கக் கூடிய நிரல்.</li>
+      <li>தனியுரிம மென்பொருள் (Proprietary) = தனிநபர்/நிறுவனத்திற்குச் சொந்தமானது, மூலக்குறிமுறை மூடப்பட்டது.</li>
+      <li>இலவச மென்பொருள் (Freeware) இலவசமாகக் கிடைத்தாலும் மூலக்குறிமுறையை மாற்ற முடியாது; OSS-இல் இருந்து இது வேறுபட்டது.</li>
+      <li>திறந்த மூலம் தொடர்புடைய அமைப்புகள்: Apache SF, Free Software Foundation, Linux Foundation, Open Source Initiative. உரிமங்கள் (Licenses): Apache 2.0, BSD 3-Clause, BSD 2-Clause, GNU GPL.</li>
+      <li>BOSS — C-DAC (இந்திய அரசு) உருவாக்கிய இயக்க அமைப்பு; பல இந்திய மொழிகளை ஆதரிக்கும். NRCFOSS — FOSS மேம்பாட்டிற்கு உதவும் இந்திய அரசு அமைப்பு.</li>
+      <li>வலையமைப்பு மென்பொருள் இரு முக்கிய செய்திகள்: அறிவிப்புச் செய்தி (Notification) &amp; எச்சரிக்கைச் செய்தி (Alert Message).</li>
+      <li>Network Simulation = வலையமைப்பின் செயல்பாட்டை விளக்கும் மாதிரி அமைப்பு. முக்கிய வெளியீடு = Trace File.</li>
+      <li>NS2 = Network Simulation பதிப்பு 2; OTCL &amp; C++ பயன்படுத்தி உருவாக்கப்பட்டது; Windows &amp; Linux-இல் இயங்கும்; கம்பி &amp; கம்பியில்லா வலையமைப்பிற்கு ஆதரவு.</li>
+      <li>Open NMS = இலவச &amp; திறந்த மூல வலையமைப்பு கண்காணிப்பு/மேலாண்மை அமைப்பு; 1999-ல் வெளியீடு; 2004-ல் குழு உருவாக்கம்; ஜாவாவில் எழுதப்பட்டு GNU உரிமையின் கீழ்; FCAPS இலக்கு (தற்போது Fault &amp; Performance); Meridian (நீண்ட கால/நிறுவனம்) &amp; Horizon (புதிய IT திட்டங்கள்) பதிப்புகள்.</li>
+      <li>திறந்த மூல வன்பொருள் — போட்டி நிறுவனங்களின் உளவு வன்பொருள் பிரச்சனைக்குத் தீர்வு; பொருளின் பகுதிகள் &amp; செயல் விளக்கப்படம் கிடைக்கும்.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 கலைச்சொற்கள் (Glossary) — பாடநூல் அட்டவணை</h3>
+    <table class="tbl">
+      <tr><th>சொல்</th><th>விளக்கம்</th></tr>
+      <tr><td><b>NS2</b></td><td>Network Simulation பதிப்பு 2</td></tr>
+      <tr><td><b>OpenNMS</b></td><td>முதல் திறந்த மூல வலையமைப்பு மேலாண்மை மென்பொருள்</td></tr>
+      <tr><td><b>Trace File</b></td><td>சிமுலேசனின் ஒவ்வொரு நிரலைப் பற்றிய தகவலைக் கொண்ட ஆவண கோப்பு</td></tr>
+      <tr><td><b>OTCL</b></td><td>Object oriented Tool Command Language</td></tr>
+      <tr><td><b>FCAPS</b></td><td>Fault, Configuration, Accounting, Performance, Security</td></tr>
+      <tr><td><b>GNU – GPL</b></td><td>GNU General Public License</td></tr>
+      <tr><td><b>API</b></td><td>Application Program Interface</td></tr>
+      <tr><td><b>SOURCE CODE</b></td><td>மென்பொருள் எவ்வாறு செயல்பட வேண்டும் என்பதை தீர்மானிக்கும் கட்டளைகளின் தொகுப்பு</td></tr>
+      <tr><td><b>BOSS</b></td><td>Bharat Operating System Solutions</td></tr>
+      <tr><td><b>CDAC</b></td><td>Centre for Development of Advanced Computing</td></tr>
+      <tr><td><b>FOSS</b></td><td>Free Open Source Software</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>✍️ பகுதி வாரியான விடை எழுதும் வழிகாட்டி <span class="eng">(Part-wise Answer-Writing Guide)</span></h3>
+    <details class="acc" open><summary>1-மதிப்பெண் (MCQ) — அணுகுமுறை</summary>
+      <div class="acc-body">கேள்வியில் உள்ள திறவுச்சொல்லை (keyword) கண்டறிந்து, பாடநூல் வரையறையுடன் பொருத்திப் பார்க்கவும். ஆண்டு/எண் தொடர்பான கேள்விகளுக்கு (OpenNMS வெளியீடு=1999, குழு=2004) குறிப்பேடு வைத்துக்கொள்ளவும்.</div>
+    </details>
+    <details class="acc"><summary>2 / 3-மதிப்பெண் (பகுதி ஆ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) வரையறை ஒரு வரியில் → (2) ஒரு சிறிய உதாரணம் → (3) தேவைப்பட்டால் ஒரு வரி முக்கியத்துவம்.<br>
+        <b>எ.கா.</b> "ட்ரேஸ் கோப்பு என்றால் என்ன?" → "சிமுலேசனின் ஒவ்வொரு செயல்பாட்டையும் ஆவணமாக்கும் கோப்பே Trace File. இது சிமுலேட்டரின் முக்கிய வெளியீடு; இதன் மூலம் வலையமைப்பு செயல்பாட்டை பின்னர் சோதிக்கலாம்."
+      </div>
+    </details>
+    <details class="acc"><summary>3-மதிப்பெண் (பகுதி இ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரி → (2) 2-3 முக்கிய புள்ளிகள் பட்டியலாக → (3) ஒரு உதாரணம்/முடிவுரை.<br>
+        <b>எ.கா.</b> "இலவச மென்பொருள் விவரி" → வரையறை (ரிச்சர்ட் ஸ்டால்மேன், 1980கள், MIT) → Free Software Foundation நான்கு தத்துவங்கள் → OSS-உடன் வேறுபாடு ஒரு வரியில்.
+      </div>
+    </details>
+    <details class="acc"><summary>5-மதிப்பெண் (பகுதி ஈ) — மாதிரி கட்டமைப்பு</summary>
+      <div class="acc-body">
+        <b>கட்டமைப்பு:</b> (1) அறிமுக வரையறை → (2) வகைகள்/புள்ளிகள் (தலைப்பு வாரியாக) → (3) ஒவ்வொன்றையும் 1-2 வரிகளில் விளக்குதல் → (4) அட்டவணை/படம் (இருந்தால்) → (5) முடிவுரை ஒரு வரி.<br>
+        <b>எ.கா.</b> "திறந்த மூல மென்பொருளின் நன்மைகளை விளக்குக" → திறன் வளர்ச்சி → தேவையான வசதி சேர்த்தல் → எளிதான பயன்பாடு → குழுவுடன் பகிர்தல் → விரைவான பிழை திருத்தம் — ஒவ்வொன்றையும் ஒரு வரியில் விளக்கி முடிக்கவும்.
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — பகுதி ஆ, இ, ஈ &amp; மாணவர் செயல்பாடு <span class="eng">(reference)</span></h3>
+    <details class="acc"><summary>பகுதி — ஆ : மூன்று வரிகளில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>திறந்த மூல மென்பொருள் என்றால் என்ன?</li>
+          <li>வலையமைப்பில் சிமுலேட்டர் என்றால் என்ன?</li>
+          <li>ட்ரேஸ் கோப்பு என்றால் என்ன?</li>
+          <li>NS2 சிறுகுறிப்பு தருக.</li>
+          <li>Open NMS சிறுகுறிப்பு வரைக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — இ : ஒரு பத்தியளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>திறந்த மூல வலையமைப்பு மென்பொருளின் பயன்களை விவரி.</li>
+          <li>இலவச மென்பொருள் விவரி.</li>
+          <li>புகழ்பெற்ற திறந்த மூல மென்பொருள்களை பட்டியலிடு.</li>
+          <li>திறந்த மூல வன்பொருள் குறிப்பு தருக.</li>
+          <li>திறந்த மூல கருத்துடன் தொடர்புடைய பல்வேறு அமைப்புகளை விவரி.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>பகுதி — ஈ : ஒரு பக்க அளவில் விடையளிக்கவும்</summary>
+      <div class="acc-body">
+        <ol>
+          <li>திறந்த மூல மென்பொருள் தனி உரிம மென்பொருள் வேறுபாடு தருக.</li>
+          <li>திறந்த மூல மென்பொருளின் நன்மைகளை விளக்குக.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>மாணவர் செயல்பாடு <span class="eng">(Student Activity — reference)</span></summary>
+      <div class="acc-body">
+        <ol>
+          <li>இந்தப் பாடத்தில் தெரிவிக்காத திறந்த மூல மற்றும் இலவச மென்பொருள் பெயர்களை கூறுக.</li>
+          <li>கணக்குப்பதிவியல் (Accountancy) தொடர்பான மென்பொருள்களை தெரிவி.</li>
+          <li>திறந்த மூல உருவாக்கம் மற்றும் பராமரிப்பு நிறுவனங்களைக் கூறுக.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (பாடநூல் MCQ)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 ஒரு நிறுவனம் நீண்ட கால, நிலையான Network Management தீர்வு தேடுகிறது. OpenNMS-இன் எந்த பதிப்பைத் தேர்வு செய்ய வேண்டும்?', o:['Horizon — புதிய கண்டுபிடிப்புகள் அதிகம்','Meridian — திறன் மற்றும் நீண்ட கால சேவைக்கு ஏற்றது','Discovery Engine — தானியங்கி கண்காணிப்பு','FCAPS — பாதுகாப்பு மட்டும்'], c:1, exp:'நிறுவனம்/வியாபார அமைப்புகளுக்கு திறன் மற்றும் நீண்ட கால சேவை தேவைப்பட்டால் Meridian பதிப்பு ஏற்றது.'},
+  'c2': {q:'🔴 ஒரு மென்பொருளின் மூலக்குறிமுறையை இலவசமாகப் பார்க்கலாம், ஆனால் மாற்றவோ மீண்டும் விநியோகிக்கவோ முடியாது. இது எந்த வகை?', o:['உண்மையான திறந்த மூல மென்பொருள்','"source-available" தனியுரிம மென்பொருள்','இலவச மென்பொருள் (Freeware)','FOSS'], c:1, exp:'மூலக்குறிமுறையைப் பார்க்க மட்டும் அனுமதித்து, மாற்ற/விநியோகிக்க அனுமதிக்காதது உண்மையான திறந்த மூல மென்பொருள் அல்ல — ஏனெனில் OSS-இன் முக்கிய அடையாளமே மாற்றம் செய்யவும் மறு-விநியோகிக்கவும் முடிவதுதான்.'},
+};
+
+/* ============================= MCQ HELPER ============================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* ============================= QUICK-CHECK BANKS ============================= */
+const QC_BANKS = {
+  intro: {
+    'qc1': {q:'பின்வருவதில் எது தனியுரிம மென்பொருளின் (Proprietary Software) பண்பு?', o:['மூலக்குறிமுறை அனைவருக்கும் திறந்தது','நிறுவனத்திற்கு/தனிநபருக்குச் சொந்தமானது','இலவசமாக மாற்றியமைக்கலாம்','சமூகத்தால் கூட்டாக உருவாக்கப்படுகிறது'], c:1, exp:'தனியுரிம மென்பொருள் என்பது தனிநபர் அல்லது நிறுவனத்திற்குச் சொந்தமானது.'}
+  },
+  ns2: {
+    'qc2': {q:'சிமுலேட்டரின் முக்கிய வெளியீடு என்ன?', o:['Compiled Program','Trace File','Source Code','API'], c:1, exp:'Trace File ஆகும் சிமுலேசனின் முக்கிய வெளியீடு.'}
+  },
+  opennms: {
+    'qc3': {q:'Open NMS எந்த மொழியில் எழுதப்பட்டது?', o:['C++','பைதான்','ஜாவா','PHP'], c:2, exp:'Open NMS ஜாவா மொழியில் எழுதப்பட்டு GNU உரிமையின் கீழ் வெளியிடப்படுகிறது.'}
+  },
+  hardware: {
+    'qc4': {q:'திறந்த மூல வன்பொருள் தொழில்நுட்பம் மூலம் நாம் என்ன பெறுகிறோம்?', o:['மென்பொருள் குறியீடு மட்டும்','பொருளின் பகுதிகள் மற்றும் செயல் விளக்கப்படம்','இலவச இணைய இணைப்பு','புதிய இயக்க முறைமை'], c:1, exp:'திறந்த மூல வன்பொருள் முறையில் பொருளின் பகுதிகள் மற்றும் செயல் விளக்கப்படம் கிடைக்கிறது; இதனால் தேவையற்ற பகுதிகளை கண்டறிந்து நீக்கலாம்.'}
+  },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP DISPATCH
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { intro:'qc-intro', ns2:'qc-ns2', opennms:'qc-opennms', hardware:'qc-hardware' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+  if(topicId === 'intro') wireIntro();
+  if(topicId === 'ns2') wireNS2();
+  if(topicId === 'opennms') wireOpenNMS();
+  if(topicId === 'hardware') wireHardware();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* =========================================================================
+   14.1 WIRING — OSS compare toggle, OSS diagram, World simulation, examples
+   ========================================================================= */
+const OSS_TYPES = {
+  proprietary: {label:'தனியுரிம மென்பொருள்', source:'மூடப்பட்டது ❌', modify:'முடியாது ❌', cost:'பெரும்பாலும் கட்டணம்', support:'உதவி, பயிற்சி, பாதுகாப்பு, நிலைப்புறுதி வழங்கும் ✅', who:'தனிநபர் அல்லது நிறுவனத்திற்குச் சொந்தமானது'},
+  freeware: {label:'இலவச மென்பொருள் (Freeware)', source:'மூடப்பட்டது ❌', modify:'முடியாது ❌', cost:'தரவிறக்கம் &amp; பயன்பாடு இலவசம் ✅', support:'வழங்காமல் இருக்கலாம்', who:'தனியுரிமையாளரால் இலவசமாக வழங்கப்படுகிறது'},
+  opensource: {label:'திறந்த மூல மென்பொருள் (OSS)', source:'திறந்தது ✅ (பார்க்கலாம்)', modify:'முடியும் ✅ (மாற்றி மேம்படுத்தலாம்)', cost:'பெரும்பாலும் இலவசம்', support:'சமூகம் (Community) வழங்கும்', who:'பலரது கூட்டு முயற்சியால் உருவாக்கப்படுகிறது'},
+};
+function wireIntro(){
+  let ossActive = 'opensource';
+  function renderOssTabs(){
+    document.getElementById('ossTabs').innerHTML = Object.keys(OSS_TYPES).map(k =>
+      `<button class="tab-btn ${k===ossActive?'active':''}" data-k="${k}">${OSS_TYPES[k].label}</button>`).join('');
+    document.querySelectorAll('#ossTabs .tab-btn').forEach(b => b.addEventListener('click', () => { ossActive=b.dataset.k; renderOssTabs(); }));
+    const d = OSS_TYPES[ossActive];
+    document.getElementById('ossDetail').innerHTML = `
+      <table class="tbl">
+        <tr><th>யாருக்குச் சொந்தம்?</th><td>${d.who}</td></tr>
+        <tr><th>மூலக்குறிமுறை பார்க்கலாமா?</th><td>${d.source}</td></tr>
+        <tr><th>மாற்றம் செய்யலாமா?</th><td>${d.modify}</td></tr>
+        <tr><th>செலவு</th><td>${d.cost}</td></tr>
+        <tr><th>உதவி/ஆதரவு</th><td>${d.support}</td></tr>
+      </table>`;
+  }
+  renderOssTabs();
+
+  const OSS_DIAGRAMS = {
+    single: {label:'ஒரே உரிமையாளர் மாதிரி', top:[{r:'owner',t:'Owner'}], bottom:[{r:'contributor',t:'Contributor'},{r:'contributor',t:'Contributor'}], bottom2:[{r:'user',t:'User'},{r:'user',t:'User'},{r:'user',t:'User'}]},
+    multi: {label:'பல உரிமையாளர் மாதிரி', top:[{r:'owner',t:'Owner'},{r:'owner',t:'Owner'},{r:'owner',t:'Owner'}], bottom:[], bottom2:[{r:'user',t:'User'},{r:'user',t:'User'},{r:'user',t:'User'}]},
+    vendor: {label:'விநியோகஸ்தர் மாதிரி', top:[{r:'vendor',t:'Vendor'},{r:'vendor',t:'Vendor'},{r:'vendor',t:'Vendor'}], bottom:[], bottom2:[{r:'owner',t:'Owner'},{r:'owner',t:'Owner'},{r:'owner',t:'Owner'}]},
+  };
+  const ROLE_INFO = {
+    owner: '👑 <b>Owner (உரிமையாளர்):</b> திட்டத்தைத் தொடங்கி, காப்புரிமை (Copyright) வைத்திருப்பவர். OSS திட்டத்தின் முக்கிய இயக்குநர்.',
+    contributor: '🧑‍💻 <b>Contributor (பங்களிப்பாளர்):</b> திட்டத்திற்கு புதிய குறிமுறை, பிழை திருத்தம் அல்லது வசதிகளைச் சேர்க்கும் நிரலர்.',
+    user: '🙋 <b>User (பயனர்):</b> மென்பொருளை பதிவிறக்கம் செய்து பயன்படுத்துபவர்; விரும்பினால் Contributor ஆகவும் மாறலாம்.',
+    vendor: '🏢 <b>Vendor (விநியோகஸ்தர்):</b> OSS திட்டத்தை அடிப்படையாகக் கொண்டு, சேவை/ஆதரவுடன் விநியோகிக்கும் நிறுவனம்.',
+  };
+  let diagActive = 'single';
+  function renderOssDiagram(){
+    document.getElementById('ossDiagTabs').innerHTML = Object.keys(OSS_DIAGRAMS).map(k =>
+      `<button class="tab-btn ${k===diagActive?'active':''}" data-k="${k}">${OSS_DIAGRAMS[k].label}</button>`).join('');
+    document.querySelectorAll('#ossDiagTabs .tab-btn').forEach(b => b.addEventListener('click', () => { diagActive=b.dataset.k; renderOssDiagram(); }));
+    const d = OSS_DIAGRAMS[diagActive];
+    const chip = (o) => `<button class="role-chip ${o.r}" data-role="${o.r}">${o.t}</button>`;
+    let html = '<div class="oss-row">' + d.top.map(chip).join('') + '</div>';
+    html += '<div class="oss-arrow">⬇</div><div class="oss-diamond">OSS Project</div><div class="oss-arrow">⬇</div>';
+    if(d.bottom.length){ html += '<div class="oss-row">' + d.bottom.map(chip).join('') + '</div>'; }
+    html += '<div class="oss-row">' + d.bottom2.map(chip).join('') + '</div>';
+    document.getElementById('ossDiagramArea').innerHTML = html;
+    document.querySelectorAll('#ossDiagramArea .role-chip').forEach(c => {
+      c.addEventListener('click', function(){
+        document.querySelectorAll('#ossDiagramArea .role-chip').forEach(x=>x.classList.remove('active'));
+        this.classList.add('active');
+        const panel = document.getElementById('ossRoleDetail');
+        panel.style.display = 'block';
+        panel.innerHTML = '<span class="lbl">💡 பங்கின் விளக்கம் (Role Explanation — Enrichment)</span>' + ROLE_INFO[this.dataset.role];
+      });
+    });
+  }
+  renderOssDiagram();
+
+  const WORLD_STEPS = [
+    {title:'படி 1 — Developer மென்பொருளை வெளியிடுகிறார்', text:'ஒரு Developer தனது Source Code மற்றும் Compiled Program-ஐ திறந்த மூலமாக வெளியிடுகிறார்.', why:'இதன் மூலம் யார் வேண்டுமானாலும் அந்த மென்பொருளைப் பயன்படுத்தவும், அதன் குறிமுறையைப் படிக்கவும் முடியும்.'},
+    {title:'படி 2 — பல User/Developer-கள் பெறுகிறார்கள்', text:'உலகெங்கும் உள்ள பல User/Developer-கள் இந்த Source Code-ஐ பதிவிறக்கம் செய்கிறார்கள்.', why:'ஒவ்வொரு User/Developer-க்கும் வெவ்வேறு தேவைகள் இருப்பதால், அவர்கள் தங்களுக்கான மாற்றங்களைச் செய்யத் தொடங்குகிறார்கள்.'},
+    {title:'படி 3 — ஒவ்வொருவரும் Improved Source Code உருவாக்குகிறார்கள்', text:'ஒவ்வொரு User/Developer-ம் தங்கள் பகுதியில் மென்பொருளை மேம்படுத்தி "Improved Source Code"-ஆக மாற்றுகிறார்கள்.', why:'பலரும் தனித்தனியாக பல்வேறு கோணங்களில் மேம்படுத்துவதால், பல்வேறு வகையான முன்னேற்றங்கள் ஒரே நேரத்தில் உருவாகின்றன.'},
+    {title:'படி 4 — அனைத்தும் உலகம் முழுவதும் பகிரப்படுகிறது', text:'இந்த Improved Source Code-கள் அனைத்தும் மீண்டும் இணையம் வழியாக (User/Developers Worldwide) பகிரப்படுகின்றன.', why:'OSS Project-இன் ஒருங்கிணைந்த கூட்டு முயற்சியால்தான் இது சாத்தியமாகிறது.'},
+    {title:'படி 5 — மிகவும் மேம்படுத்தப்பட்ட மூலக்குறிமுறை!', text:'அனைவரின் பங்களிப்பும் இணைந்து இறுதியில் "Vastly Improved Source Code" என்ற மிக மேம்பட்ட பதிப்பு உருவாகிறது.', why:'இதுவே திறந்த மூல மென்பொருளின் மிகப் பெரிய பலம் — ஒற்றை நபரால் முடியாத அளவிற்கு, கூட்டு முயற்சியால் மென்பொருள் வேகமாக மேம்படுகிறது.'},
+  ];
+  let worldStep = -1;
+  function renderWorldStep(){
+    const dotsWrap = document.getElementById('worldSimDots');
+    let dotsHtml = '';
+    WORLD_STEPS.forEach((s,i) => {
+      dotsHtml += '<div class="flow-node '+(i===worldStep?'active':(i<worldStep?'done':'muted'))+'" style="min-width:36px;padding:8px 10px;">'+(i+1)+'</div>';
+      if(i < WORLD_STEPS.length - 1) dotsHtml += '<div class="flow-arrow '+(i<worldStep?'active':'')+'">→</div>';
+    });
+    dotsWrap.innerHTML = dotsHtml;
+    const panel = document.getElementById('worldSimPanel');
+    if(worldStep === -1){
+      panel.innerHTML = '<p>▶ "அடுத்த படி" பொத்தானை அழுத்தி தொடங்குங்கள்…</p>';
+    } else {
+      const s = WORLD_STEPS[worldStep];
+      panel.innerHTML = `<h4>${s.title}</h4><p><b>என்ன நடந்தது?</b> ${s.text}</p><div class="exam-point"><span class="lbl">ஏன்? (Why?)</span>${s.why}</div>`;
+    }
+    document.getElementById('worldPrevBtn').disabled = worldStep <= 0;
+    document.getElementById('worldNextBtn').disabled = worldStep >= WORLD_STEPS.length - 1;
+  }
+  worldStep = -1;
+  renderWorldStep();
+  document.getElementById('worldNextBtn').addEventListener('click', () => { if(worldStep < WORLD_STEPS.length-1){ worldStep++; renderWorldStep(); } });
+  document.getElementById('worldPrevBtn').addEventListener('click', () => { if(worldStep > 0){ worldStep--; renderWorldStep(); } });
+  document.getElementById('worldResetBtn').addEventListener('click', () => { worldStep = -1; renderWorldStep(); });
+
+  const EXAMPLES = [
+    {n:'NS2', c:'வலையமைப்பு (Network)'}, {n:'OpenNMS', c:'வலையமைப்பு (Network)'}, {n:'Ubuntu', c:'இயக்க முறைமை (OS)'},
+    {n:'MySQL', c:'தரவுத்தளம் (Database)'}, {n:'PDF Creator', c:'உபயோக கருவி (Utility)'}, {n:'Open Office', c:'அலுவலக தொகுப்பு (Office Suite)'},
+    {n:'7zip', c:'உபயோக கருவி (Utility)'}, {n:'GNUCash', c:'கணக்குப்பதிவியல் (Accounting)'}, {n:'GIMP', c:'வரைகலை (Graphics)'},
+    {n:'Blender', c:'வரைகலை/3D (Graphics)'}, {n:'Audacity', c:'ஒலி தொகுப்பு (Audio)'}, {n:'VLC', c:'ஊடகம் (Media Player)'},
+    {n:'Mozilla FireFox', c:'உலாவி (Browser)'}, {n:'Magento', c:'வலை வணிகம் (e-Commerce/Web)'}, {n:'PHP', c:'வலை மொழி (Web Language)'}, {n:'Android', c:'இயக்க முறைமை (OS)'},
+  ];
+  document.getElementById('exGrid').innerHTML = EXAMPLES.map((e,i) =>
+    `<div class="ex-chip" data-i="${i}">${e.n}<div class="cat">${e.c}</div></div>`).join('');
+  document.querySelectorAll('#exGrid .ex-chip').forEach(c => c.addEventListener('click', function(){ this.classList.toggle('revealed'); }));
+}
+
+/* =========================================================================
+   14.2 WIRING — NS2 mini simulator
+   ========================================================================= */
+const NS2_NODE_POS = [{x:40,y:30},{x:280,y:30},{x:40,y:150},{x:280,y:150}];
+let ns2Time = 0;
+function wireNS2(){
+  ns2Time = 0;
+  const srcSel = document.getElementById('ns2Src');
+  const dstSel = document.getElementById('ns2Dst');
+  [srcSel, dstSel].forEach(sel => {
+    sel.innerHTML = NS2_NODE_POS.map((p,i) => `<option value="${i}">Node ${i}</option>`).join('');
+  });
+  dstSel.value = '1';
+  function renderNodes(){
+    document.getElementById('ns2Nodes').innerHTML = NS2_NODE_POS.map((p,i) =>
+      `<circle cx="${p.x}" cy="${p.y}" r="14" fill="#fff" stroke="var(--primary)" stroke-width="2.5"/>
+       <text x="${p.x}" y="${p.y+4}" font-size="11" font-weight="700" text-anchor="middle" fill="var(--primary-dark)">N${i}</text>`).join('');
+  }
+  renderNodes();
+  const log = document.getElementById('ns2Log');
+  log.innerHTML = '';
+  function addLog(line, cls){ const d = document.createElement('div'); d.className='ln '+(cls||''); d.textContent = line; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  document.getElementById('ns2SendBtn').addEventListener('click', () => {
+    const s = parseInt(srcSel.value,10), d = parseInt(dstSel.value,10);
+    if(s === d){ addLog('⚠ மூலமும் இலக்கும் ஒரே Node ஆக இருக்கக்கூடாது.', 'alert'); return; }
+    const p1 = NS2_NODE_POS[s], p2 = NS2_NODE_POS[d];
+    const packet = document.getElementById('ns2Packet');
+    packet.style.display = 'block';
+    packet.setAttribute('cx', p1.x); packet.setAttribute('cy', p1.y);
+    ns2Time += (0.1 + Math.random()*0.4);
+    addLog('+ t='+ns2Time.toFixed(2)+'s  N'+s+' → N'+d+'  (தரவு பொதி அனுப்பப்பட்டது)', 'notice');
+    let steps = 30, cur = 0;
+    const timer = setInterval(() => {
+      cur++;
+      const t = cur/steps;
+      packet.setAttribute('cx', p1.x + (p2.x-p1.x)*t);
+      packet.setAttribute('cy', p1.y + (p2.y-p1.y)*t);
+      if(cur>=steps){
+        clearInterval(timer);
+        ns2Time += (0.05 + Math.random()*0.1);
+        addLog('r t='+ns2Time.toFixed(2)+'s  N'+d+'  (தரவு பொதி பெறப்பட்டது ✔)', 'ok');
+        packet.style.display = 'none';
+      }
+    }, 25);
+  });
+  document.getElementById('ns2ResetBtn').addEventListener('click', () => { ns2Time = 0; log.innerHTML=''; document.getElementById('ns2Packet').style.display='none'; });
+}
+
+/* =========================================================================
+   14.3 WIRING — Open NMS dashboard + FCAPS
+   ========================================================================= */
+let NMS_NODES = [];
+function wireOpenNMS(){
+  NMS_NODES = [
+    {name:'Router-1', up:true}, {name:'Switch-2', up:true}, {name:'Server-3', up:true}, {name:'Server-4', up:true},
+  ];
+  const log = document.getElementById('nmsLog');
+  function addLog(line, cls){ const d = document.createElement('div'); d.className='ln '+(cls||''); d.textContent=line; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  function renderNodes(){
+    document.getElementById('nmsNodeList').innerHTML = NMS_NODES.map((n,i) => `
+      <div class="node-box ${n.up?'up':'down'}" style="display:flex;align-items:center;justify-content:space-between;">
+        <span><span class="dot ${n.up?'up':'down'}"></span>${n.name} — ${n.up?'இயங்குகிறது (UP)':'செயலிழந்தது (DOWN)'}</span>
+        <button class="btn ${n.up?'btn-ghost':'btn-primary'}" data-i="${i}">${n.up ? 'பிழையை உருவாக்கு (Simulate Fault)' : 'சரிசெய் (Resolve)'}</button>
+      </div>`).join('');
+    document.querySelectorAll('#nmsNodeList button').forEach(btn => {
+      btn.addEventListener('click', function(){
+        const i = parseInt(this.dataset.i,10);
+        const n = NMS_NODES[i];
+        const t = new Date().toLocaleTimeString('ta-IN');
+        if(n.up){
+          n.up = false;
+          addLog('🔔 அறிவிப்புச் செய்தி (Notification): '+n.name+' இயங்கவில்லை!', 'notice');
+          addLog('⚠ எச்சரிக்கைச் செய்தி (Alert): பிழை இடம் = '+n.name+', நேரம் = '+t, 'alert');
+        } else {
+          n.up = true;
+          addLog('✅ '+n.name+' மீண்டும் இயங்கத் தொடங்கியது — நேரம் = '+t, 'ok');
+        }
+        renderNodes();
+      });
+    });
+  }
+  renderNodes();
+  log.innerHTML = '';
+  document.getElementById('nmsResetBtn').addEventListener('click', () => {
+    NMS_NODES.forEach(n => n.up = true);
+    renderNodes();
+    log.innerHTML = '';
+  });
+
+  const FCAPS_INFO = {
+    'F': {t:'Fault (பிழை மேலாண்மை)', d:'வலையமைப்பில் ஏற்படும் பிழைகளைக் கண்டறிந்து அறிவிப்பது. Open NMS தற்போது இதற்கு அதிக முக்கியத்துவம் அளிக்கிறது.'},
+    'C': {t:'Configuration (அமைப்பு மேலாண்மை)', d:'சாதனங்களின் அமைப்புகளை (settings) கண்காணித்தல் மற்றும் மேலாண்மை செய்தல்.'},
+    'A': {t:'Accounting (கணக்கீட்டு மேலாண்மை)', d:'வலையமைப்பு வளங்களின் பயன்பாட்டைக் கண்காணித்தல்.'},
+    'P': {t:'Performance (செயல்திறன் மேலாண்மை)', d:'வலையமைப்பின் வேகம் &amp; செயல்திறனைக் கண்காணித்தல். இதுவும் Open NMS-இன் தற்போதைய முன்னுரிமை.'},
+    'S': {t:'Security (பாதுகாப்பு மேலாண்மை)', d:'வலையமைப்பு பாதுகாப்பை உறுதி செய்தல்.'},
+  };
+  document.getElementById('fcapsGrid').innerHTML = Object.keys(FCAPS_INFO).map(k =>
+    `<div class="fcaps-card" data-k="${k}">${k}</div>`).join('');
+  document.querySelectorAll('#fcapsGrid .fcaps-card').forEach(c => {
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#fcapsGrid .fcaps-card').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const info = FCAPS_INFO[this.dataset.k];
+      const panel = document.getElementById('fcapsDetail');
+      panel.style.display = 'block';
+      panel.innerHTML = '<span class="lbl">💡 '+info.t+' (Enrichment)</span>'+info.d;
+    });
+  });
+}
+
+/* =========================================================================
+   14.4 WIRING — Hardware component inspector
+   ========================================================================= */
+const HW_COMPONENTS = [
+  {n:'மைக்ரோ கட்டுப்பாட்டு சில்லு', en:'Microcontroller', suspect:false, info:'சாதனத்தின் முக்கிய செயல்பாடுகளைக் கட்டுப்படுத்தும் சில்லு.'},
+  {n:'மின் அளவு மாற்றி', en:'Power Regulator', suspect:false, info:'சாதனத்திற்குத் தேவையான மின்னழுத்தத்தை சீராக்கும் பகுதி.'},
+  {n:'ஞாபக சில்லு', en:'Memory Chip', suspect:false, info:'தரவு &amp; நிரலைச் சேமிக்கும் பகுதி.'},
+  {n:'❓ அடையாளம் தெரியாத சில்லு', en:'Unknown Chip', suspect:true, info:'ஆய்வு செய்தபின் இது வெளியே தரவு அனுப்பும் உளவு சில்லுவாக (spy chip) இருக்கலாம் என சந்தேகிக்கப்படுகிறது!'},
+  {n:'இணைப்பு முனையம்', en:'Connector', suspect:false, info:'வெளிப்புற சாதனங்களுடன் இணைக்கும் பகுதி.'},
+];
+function wireHardware(){
+  let removed = {};
+  function render(){
+    document.getElementById('hwBoard').innerHTML = HW_COMPONENTS.map((c,i) =>
+      `<div class="hw-chip ${c.suspect?'suspect':''} ${removed[i]?'removed':''}" data-i="${i}">${c.n}<br><span style="font-size:.68rem;opacity:.8;">${c.en}</span></div>`).join('');
+    document.querySelectorAll('#hwBoard .hw-chip').forEach(chip => {
+      chip.addEventListener('click', function(){
+        const i = parseInt(this.dataset.i,10);
+        if(removed[i]) return;
+        const c = HW_COMPONENTS[i];
+        const panel = document.getElementById('hwDetail');
+        panel.style.display = 'block';
+        panel.innerHTML = '<span class="lbl">🔍 ஆய்வு முடிவு</span>' + c.info +
+          (c.suspect ? '<div class="btn-row"><button class="btn btn-accent" id="hwRemoveBtn" data-i="'+i+'">🗑️ கண்டறிந்து நீக்கு (Remove)</button></div>' : '');
+        if(c.suspect){
+          document.getElementById('hwRemoveBtn').addEventListener('click', function(){
+            removed[i] = true;
+            render();
+            panel.innerHTML = '<span class="lbl">✅ முடிந்தது</span>சந்தேகத்திற்குரிய சில்லு நீக்கப்பட்டது — இப்போது பொருள் பாதுகாப்பானது! இதுவே திறந்த மூல வன்பொருள் அணுகுமுறையின் நடைமுறைப் பயன்பாடு.';
+          });
+        }
+      });
+    });
+  }
+  render();
+  document.getElementById('hwResetBtn').addEventListener('click', () => {
+    removed = {};
+    document.getElementById('hwDetail').style.display = 'none';
+    render();
+  });
+}
+
+/* =========================================================================
+   PRACTICE PAGE WIRING
+   ========================================================================= */
+function wirePractice(){
+  document.getElementById('mcqBookWrap').innerHTML = Object.keys(MCQ_BOOK).map(k => mcqHTML(k, MCQ_BOOK[k], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  document.getElementById('mcqExtraWrap').innerHTML = Object.keys(MCQ_EXTRA).map(k => mcqHTML(k, MCQ_EXTRA[k], MCQ_EXTRA[k].tier, MCQ_EXTRA[k].tierLabel)).join('');
+  wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+
+  const tfWrap = document.getElementById('tfWrap');
+  tfWrap.innerHTML = TF_QS.map((tf,i) => `
+    <div class="q-block" id="tf-block-${i}">
+      <div class="q-text">${i+1}. ${tf.q}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="true">சரி (True)</button>
+        <button class="btn btn-ghost tf-btn" data-i="${i}" data-val="false">தவறு (False)</button>
+      </div>
+      <div class="feedback-line" id="tf-fb-${i}"></div>
+    </div>`).join('');
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const i = parseInt(this.dataset.i,10);
+      const block = document.getElementById('tf-block-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const chosen = this.dataset.val === 'true';
+      const fb = document.getElementById('tf-fb-'+i);
+      if(chosen === TF_QS[i].a){ fb.className='feedback-line ok'; fb.textContent = '✅ சரி! ' + TF_QS[i].exp; }
+      else { fb.className='feedback-line bad'; fb.textContent = '❌ தவறு. ' + TF_QS[i].exp; }
+    });
+  });
+
+  const fibWrap = document.getElementById('fibWrap');
+  fibWrap.innerHTML = FIB_QS.map((f,i) => `<div class="fib-row">${i+1}. ${f.text.replace('______________','')} <input type="text" id="fib-${i}" placeholder="விடையை இங்கே தட்டச்சு செய்யவும்"></div>`).join('');
+  document.getElementById('fibCheckBtn').addEventListener('click', () => {
+    let correct = 0;
+    FIB_QS.forEach((f,i) => {
+      const val = (document.getElementById('fib-'+i).value || '').trim().toLowerCase();
+      const ok = val === f.ans || val.replace(/\s/g,'') === f.ans.replace(/\s/g,'');
+      document.getElementById('fib-'+i).style.borderColor = val === '' ? 'var(--border)' : (ok ? 'var(--correct)' : 'var(--incorrect)');
+      if(ok) correct++;
+    });
+    document.getElementById('fibResult').innerHTML = correct + ' / ' + FIB_QS.length + ' சரியானவை. (சரியான விடைகள்: ' + FIB_QS.map(f=>f.ans).join(', ') + ')';
+  });
+
+  const matchWrap = document.getElementById('matchWrap');
+  let selectedLeft = null;
+  const matched = {};
+  function renderMatch(){
+    matchWrap.innerHTML = `
+      <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div><b>சொல்</b><div id="matchLeftCol" style="margin-top:8px;"></div></div>
+        <div><b>விளக்கம்</b><div id="matchRightCol" style="margin-top:8px;"></div></div>
+      </div>
+      <div id="matchResult" style="margin-top:10px;font-weight:700;"></div>`;
+    const leftCol = document.getElementById('matchLeftCol');
+    const rightCol = document.getElementById('matchRightCol');
+    MATCH_LEFT.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='160px';
+      b.textContent = l + (matched[l] ? ' ✅' : '');
+      if(matched[l]) b.disabled = true;
+      b.addEventListener('click', () => { selectedLeft = l; renderMatch(); });
+      leftCol.appendChild(b);
+    });
+    MATCH_RIGHT.forEach(r => {
+      const usedUp = Object.values(matched).includes(r);
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost'; b.style.display='block'; b.style.marginBottom='8px'; b.style.minWidth='300px'; b.style.textAlign='left';
+      b.textContent = r + (usedUp ? ' ✅' : '');
+      if(usedUp) b.disabled = true;
+      b.addEventListener('click', () => {
+        if(!selectedLeft) return;
+        matched[selectedLeft] = r;
+        selectedLeft = null;
+        renderMatch();
+        if(Object.keys(matched).length === MATCH_LEFT.length){
+          const allCorrect = MATCH_LEFT.every(l => matched[l] === MATCH_ANSWER[l]);
+          document.getElementById('matchResult').textContent = allCorrect ? '🎉 அனைத்தும் சரி!' : 'முடிந்தது — சில பொருத்தங்களை சரிபார்க்கவும்.';
+        }
+      });
+      rightCol.appendChild(b);
+    });
+  }
+  renderMatch();
+
+  const misWrap = document.getElementById('misWrap');
+  misWrap.innerHTML = MISCONCEPTIONS.map((c,i) => `
+    <div class="card" style="margin-bottom:12px;">
+      <div><span style="color:var(--incorrect);font-weight:800;">❌ </span><span style="font-weight:700;">${c.wrong}</span></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" data-mis="${i}">ஏன் தவறு? (Why is this wrong?)</button>
+      <div class="explain-box" id="mis-${i}">
+        <b>வகை:</b> ${c.type}<br>
+        <b>ஏன்?:</b> ${c.why}<br>
+        <span style="color:var(--correct);font-weight:800;">✅ சரியான புரிதல்:</span> ${c.fix}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-mis]').forEach(btn => {
+    btn.addEventListener('click', function(){ document.getElementById('mis-'+this.dataset.mis).classList.toggle('show'); });
+  });
+}
+
+/* =========================================================================
+   EXAM PREP WIRING
+   ========================================================================= */
+function wireExamPrep(){
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => {
+    const idx = TOPICS.findIndex(t => t.id === 'practice');
+    goTo(idx);
+  });
+  document.getElementById('challengeWrap').innerHTML = Object.keys(CHALLENGE_QS).map(k => mcqHTML(k, CHALLENGE_QS[k], 'tier-red', '🔴 Challenge')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* ============================= INIT ============================= */
+setLang(state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
