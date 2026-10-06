@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 11 — Functions | Computer Applications Learning Lab</title>
+<style>
+  :root{
+    --bg:#f3f5fa;
+    --card:#ffffff;
+    --primary:#1d4ed8;
+    --primary-dark:#1734a0;
+    --primary-light:#e7edfd;
+    --accent:#ea580c;
+    --accent-light:#fff1e6;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#dfe6ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Segoe UI',Tahoma,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  /* ---- Header ---- */
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#d7e2fd;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#eef3ff;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  /* ---- Sidebar ---- */
+  nav.sidebar{
+    width:290px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.9rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.7rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:46px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  /* ---- Main ---- */
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:920px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(20,30,40,.04);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid #7c3aed;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:#7c3aed;font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+
+  .ta{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+  pre.code-block{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px 16px;overflow-x:auto;font-family:'JetBrains Mono',Consolas,Menlo,monospace;font-size:.85rem;line-height:1.6;margin:10px 0;}
+  pre.code-block .cmt{color:#64748b;}
+  pre.code-block .kw{color:#38bdf8;}
+  pre.code-block .str{color:#4ade80;}
+  pre.code-block .out{color:#facc15;}
+  .code-line{display:block;cursor:pointer;border-radius:4px;padding:1px 4px;}
+  .code-line:hover{background:#1e293b;}
+  .code-line.active-line{background:#334155;outline:2px solid #38bdf8;}
+  .line-explain{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;min-height:1.4em;}
+
+  /* Diagrams */
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(29,78,216,.4);}
+  .flow-node.muted{opacity:.45;}
+  .flow-node.clickable{cursor:pointer;}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+
+  /* memory boxes */
+  .mem-box{border:2px solid var(--primary);border-radius:10px;padding:10px 14px;min-width:140px;text-align:center;background:#fff;}
+  .mem-box .mem-name{font-size:.78rem;color:var(--muted);font-weight:700;}
+  .mem-box .mem-val{font-size:1.3rem;font-weight:800;color:var(--primary-dark);margin-top:4px;}
+  .mem-box .mem-addr{font-size:.68rem;color:#94a3b8;margin-top:2px;}
+  .mem-box.linked{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}
+  .mem-box.changed{animation:pulseBox .6s;}
+  @keyframes pulseBox{0%{background:#fef9c3;}100%{background:#fff;}}
+  .mem-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;margin:14px 0;}
+  .mem-link-line{font-size:1.4rem;color:var(--accent);font-weight:900;}
+
+  /* call stack */
+  .stack-wrap{display:flex;flex-direction:column-reverse;gap:6px;max-width:360px;margin:12px auto;min-height:60px;}
+  .stack-frame{border:2px solid var(--primary);background:var(--primary-light);border-radius:8px;padding:8px 12px;font-family:monospace;font-size:.85rem;color:var(--primary-dark);font-weight:700;text-align:center;}
+  .stack-frame.returning{border-color:var(--accent);background:var(--accent-light);color:#9a3412;}
+  .stack-frame.topmost{box-shadow:0 0 0 3px #bfdbfe;}
+
+  /* Buttons */
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;width:100%;
+  }
+  .narrow-input{width:120px;}
+
+  /* MCQ option styling (shared) */
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .q-text pre.code-block{margin:8px 0;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:180px;}
+
+  .log-panel{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px 14px;font-family:monospace;font-size:.82rem;max-height:260px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #334155;}
+  .log-panel .ln:last-child{border-bottom:none;}
+  .log-panel .ln .step-no{color:#38bdf8;font-weight:700;}
+
+  .debug-card{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+  .debug-wrong{background:var(--incorrect-bg);border-radius:8px;padding:8px 12px;font-family:monospace;font-size:.85rem;margin-bottom:8px;white-space:pre-wrap;}
+  .debug-fix{display:none;background:var(--correct-bg);border-radius:8px;padding:8px 12px;font-family:monospace;font-size:.85rem;margin-top:8px;white-space:pre-wrap;}
+  .debug-fix.show{display:block;}
+  .debug-why{display:none;background:#f8fafc;border-radius:8px;padding:8px 12px;font-size:.85rem;margin-top:8px;}
+  .debug-why.show{display:block;}
+
+  /* Bottom bar */
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  [data-lang="ta"] .lang-en-only{display:none;}
+  [data-lang="en"] .lang-ta-hint{display:none;}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.9rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+    .mem-box{min-width:110px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="Menu">☰</button>
+    <div class="title-wrap">
+      <h1>C++ Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>Unit III — Introduction to C++ · Chapter 11: Functions</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langEn" class="active" data-lang="en">English</button>
+      <button id="langTa" data-lang="ta">தமிழ்</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Topic list">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Progress / முன்னேற்றம்</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">Topics / தலைப்புகள்</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ Previous</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">Next ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Applications · Unit III · Chapter 11: Functions · Based on Tamil Nadu State Board textbook · Offline Learning Lab</footer>
+</div>
+
+<script>
+/* =========================================================================
+   STORAGE (safe wrapper)
+   ========================================================================= */
+const STORE_KEY = 'ca12_ch11_functions_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable - continue with defaults */ }
+  return { completed:[], lang:'en', quiz:{} };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* =========================================================================
+   TOPIC DATA
+   ========================================================================= */
+const TOPICS = [
+  {id:'intro',        num:'11.1-11.2', title:'Introduction & Need for Functions'},
+  {id:'types',         num:'11.3-11.4', title:'Types of Functions & Header Files'},
+  {id:'stdio',         num:'11.4.1',    title:'Standard I/O Functions (stdio.h)'},
+  {id:'ctype',         num:'11.4.2',    title:'Character Functions (ctype.h)'},
+  {id:'stringfn',      num:'11.4.3',    title:'String Functions (string.h)'},
+  {id:'mathfn',        num:'11.4.4',    title:'Mathematical Functions (math.h)'},
+  {id:'userdef',       num:'11.5',      title:'User-defined Functions'},
+  {id:'defaultconst',  num:'11.5.5.2-3',title:'Default & Constant Arguments'},
+  {id:'calling',       num:'11.6',      title:'Methods of Calling Functions'},
+  {id:'forms',         num:'11.7-11.8', title:'Forms of Functions & Returning Values'},
+  {id:'recursion',     num:'11.9',      title:'Recursive Functions'},
+  {id:'scope',         num:'11.10',     title:'Scope Rules of Variables'},
+  {id:'practice',      num:'Practice',  title:'Practice & Debugging Lab'},
+  {id:'examprep',      num:'Exam',      title:'Exam Preparation'},
+];
+let currentIdx = 0;
+
+/* =========================================================================
+   SIDEBAR / NAV RENDERING
+   ========================================================================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ Completed' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+/* mobile sidebar */
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+/* language toggle — UI chrome + Tamil explanation blocks switch; textbook
+   definitions and C++ code always stay in English (source textbook is
+   English-medium; keywords/identifiers are never translated). */
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+document.body.setAttribute('data-lang', state.lang || 'en');
+if(state.lang === 'ta'){ document.getElementById('langTa').classList.add('active'); document.getElementById('langEn').classList.remove('active'); }
+
+/* =========================================================================
+   MAIN RENDER DISPATCH
+   ========================================================================= */
+const RENDERERS = {};
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 1 — 11.1 Introduction & 11.2 Need for Functions
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.1 &amp; 11.2</div>
+    <h2>Introduction &amp; Need for Functions</h2>
+    <div class="goals">
+      <b>Learning Objectives (Textbook):</b>
+      Understand the Definition of Functions and uses of Functions · Understand the Types of Functions — pre-defined and user-defined functions.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.1 Introduction</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      A large program can be split into small sub-programs (blocks) called as <b>functions</b> where each sub-program can perform some specific functionality. Functions reduce the size and complexity of a program, makes it easier to understand, test, and check for errors. The functions which are available by default are known as <b>"Built-in"</b> functions and user can create their own functions known as <b>"User-defined"</b> functions.
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation (எளிய விளக்கம்)</span>
+      ஒரு பெரிய வேலையை (program) ஒரே நேரத்தில் செய்வது கடினம். அதை சிறு சிறு பகுதிகளாக (functions) பிரித்து, ஒவ்வொரு பகுதியும் ஒரு குறிப்பிட்ட வேலையை மட்டும் செய்தால், புரிந்துகொள்ளவும், தவறுகளைக் கண்டுபிடிக்கவும் (debug) எளிதாக இருக்கும். C++ மொழியிலேயே தயாராக உள்ள functions-ஐ <b>Built-in functions</b> என்றும், நாமே எழுதும் functions-ஐ <b>User-defined functions</b> என்றும் அழைக்கிறோம்.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      ஒரு பள்ளி நிகழ்ச்சியை (school function) நடத்த ஒரே மாணவர் அனைத்தையும் செய்ய முடியாது — ஒருவர் அழைப்பிதழ், ஒருவர் அலங்காரம், ஒருவர் ஒலிபெருக்கி என பணிகள் பிரிக்கப்படுகின்றன. ஒவ்வொரு குழுவும் ஒரு "function" போல, தனது பணியை மட்டும் சிறப்பாக செய்கிறது. முழு நிகழ்ச்சியும் (main program) இந்த குழுக்களை (functions) அழைத்து (call) இயங்குகிறது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.2 Need for Functions</h3>
+    <p>To reduce size and complexity of the program we use Functions. The programmers can make use of sub programs either writing their own functions or calling them from standard library.</p>
+
+    <h4>1. Divide and Conquer</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Points</span>
+      <ul>
+        <li>Complicated programs can be divided into manageable sub programs called functions.</li>
+        <li>A programmer can focus on developing, debugging and testing individual functions.</li>
+        <li>Many programmers can work on different functions simultaneously.</li>
+      </ul>
+    </div>
+
+    <h4>2. Reusability</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Points</span>
+      <ul>
+        <li>Few lines of code may be repeatedly used in different contexts. Duplication of the same code can be eliminated by using functions which improves the maintenance and reduce program size.</li>
+        <li>Some functions can be called multiple times with different inputs.</li>
+      </ul>
+    </div>
+
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">📦 Large, Complex Program</div>
+        <div class="flow-arrow">➜</div>
+        <div class="flow-node">🧩 function1()</div>
+      </div>
+      <div class="flow-row" style="margin-top:8px;">
+        <div class="flow-node">🧩 function2()</div>
+        <div class="flow-node">🧩 function3()</div>
+        <div class="flow-node">🧩 function4()</div>
+      </div>
+      <div class="diagram-cap">Divide and Conquer — a large program is broken into small, manageable functions, each doing one job.</div>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Two main reasons for using functions (textbook headings): <b>1. Divide and Conquer</b> and <b>2. Reusability</b>. Functions can be <b>Built-in (Pre-defined / Library)</b> or <b>User-defined</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-intro"></div>
+  </div>
+  `;
+}
+RENDERERS.intro = renderIntro;
+
+/* =========================================================================
+   TOPIC 2 — 11.3 Types of Functions & 11.4 Header Files overview
+   ========================================================================= */
+function renderTypes(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.3 &amp; 11.4</div>
+    <h2>Types of Functions &amp; C++ Header Files</h2>
+  </div>
+
+  <div class="card">
+    <h3>11.3 Types of Functions</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      Functions can be classified into two types,
+      <ol>
+        <li>Pre-defined or Built-in or Library Functions</li>
+        <li>User-defined Function.</li>
+      </ol>
+      C++ provides a rich collection of functions ready to be used for various tasks. The tasks to be performed by each of these are already written, debugged and compiled, their definitions alone are grouped and stored in files called <b>header files</b>. Such ready-to-use sub programs are called <b>pre-defined functions or built-in functions</b>.
+      <br><br>
+      C++ also provides the facility to create new functions for specific task as per user requirement. The name of the task and data required (arguments) are decided by the user and hence they are known as <b>User-defined functions</b>.
+    </div>
+
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">⚙️ Functions in C++</div>
+      </div>
+      <div class="flow-row" style="margin-top:10px;">
+        <div class="flow-arrow">↙</div>
+        <div class="flow-arrow" style="visibility:hidden;">↘</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-node" style="border-color:#2563eb;">📚 Pre-defined / Built-in / Library<br><small>e.g. getchar(), strlen(), sqrt()</small></div>
+        <div class="flow-node" style="border-color:#ea580c;">🛠️ User-defined<br><small>written by the programmer</small></div>
+      </div>
+      <div class="diagram-cap">Figure — Two types of Functions in C++ (Learning Diagram)</div>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      C++ மொழியுடன் ஏற்கனவே தயாராக வரும் functions-ஐ <b>Built-in functions</b> என்கிறோம் — அவை ஏற்கனவே எழுதி, சோதித்து, header files-ல் சேமிக்கப்பட்டவை. நாம் ஒரு task-க்காக நாமே எழுதும் functions-ஐ <b>User-defined functions</b> என்கிறோம்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.4 C++ Header Files and Built-in Functions</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      Header files provide function prototype and definitions for library functions. Data types and constants used with the library functions are also defined in them. A header file can be identified by their file extension <b>.h</b>. A single header file may contain multiple built-in functions.
+      <br><br>
+      For example: <b>stdio.h</b> is a header file that contains pre-defined "standard input/output" functions.
+    </div>
+
+    <table class="tbl">
+      <tr><th>Header File</th><th>Purpose (as used in this chapter)</th><th>Example Functions</th></tr>
+      <tr><td class="mono">stdio.h</td><td>Standard input / output</td><td class="mono">getchar(), putchar(), gets(), puts()</td></tr>
+      <tr><td class="mono">ctype.h</td><td>Character testing &amp; conversion</td><td class="mono">isalnum(), isalpha(), isdigit(), islower(), isupper(), toupper(), tolower()</td></tr>
+      <tr><td class="mono">string.h</td><td>String manipulation (also called cstring)</td><td class="mono">strcpy(), strlen(), strcmp(), strcat(), strupr(), strlwr()</td></tr>
+      <tr><td class="mono">math.h</td><td>Mathematical functions</td><td class="mono">cos(), sqrt(), sin(), pow()</td></tr>
+    </table>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Header files are identified by the extension <b class="mono">.h</b>. A single header file may contain <b>multiple</b> built-in functions. (Evaluation Q1 asks exactly which header file defines standard I/O functions — the answer is <span class="mono">stdio.h</span>.)
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Forgetting to <span class="mono">#include</span> the correct header file before using a built-in function causes a compile error, even though the function name is spelled correctly. Each family of functions needs its own header: character functions need <span class="mono">ctype.h</span>, string functions need <span class="mono">string.h</span>, maths functions need <span class="mono">math.h</span>.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-types"></div>
+  </div>
+  `;
+}
+RENDERERS.types = renderTypes;
+
+/* =========================================================================
+   TOPIC 3 — 11.4.1 stdio.h (getchar/putchar, gets/puts)
+   ========================================================================= */
+function renderStdio(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.4.1</div>
+    <h2>Standard Input / Output Functions <span class="ta">(stdio.h)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      This header file defines the standard I/O predefined functions <b>getchar()</b>, <b>putchar()</b>, <b>gets()</b>, <b>puts()</b> and etc.
+    </div>
+
+    <h4>11.4.1.1 getchar() and putchar() functions</h4>
+    <div class="tb-def">
+      The predefined function <b>getchar()</b> is used to get a single character from keyboard and <b>putchar()</b> function is used to display it.
+    </div>
+
+    <div class="example-box">
+      <span class="lbl">📗 Textbook Program 11.1 — accept a character and display it</span>
+      <pre class="code-block">#include&lt;iostream&gt;
+#include&lt;stdio.h&gt;
+using namespace std;
+int main()
+{
+        cout&lt;&lt;"\\n Type a Character : ";
+        char ch = getchar();
+        cout &lt;&lt; "\\n The entered Character is: ";
+        putchar(ch);
+        return 0;
+}</pre>
+      <b>Output:</b>
+      <pre class="code-block">Type a Character : T
+The entered Character is: T</pre>
+    </div>
+
+    <h4>11.4.1.2 gets() and puts() functions</h4>
+    <div class="tb-def">
+      Function <b>gets()</b> reads a string from standard input and stores it into the string pointed by the variable. Function <b>puts()</b> prints the string read by <b>gets()</b> function in a newline.
+    </div>
+    <div class="example-box">
+      <span class="lbl">📗 Textbook Program 11.2 — accept and display a string</span>
+      <pre class="code-block">#include&lt;iostream&gt;
+#include&lt;stdio.h&gt;
+using namespace std;
+int main()
+{
+        char str[50];
+        cout&lt;&lt;"Enter a string : ";
+        gets(str);
+        cout&lt;&lt;"You entered: "
+        puts(str);
+        return(0);
+}</pre>
+      <b>Output:</b>
+      <pre class="code-block">Enter a string : Computer Science
+You entered: Computer Science</pre>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — getchar()/putchar() vs gets()/puts()</span>
+      Type something below and see which function would be used to read/display it.
+      <div style="margin-top:10px;"><input type="text" id="stdioInput" placeholder="Type a character or a sentence..." maxlength="60"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="stdioCheckBtn">🔍 Check</button>
+      </div>
+      <div class="line-explain" id="stdioOut">Type one character (e.g. T) or a sentence (e.g. Computer Science) and click Check.</div>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Using <span class="mono">getchar()</span> when you actually need a whole word/sentence — it only reads <b>one character</b>. For a full line of text, use <span class="mono">gets()</span> (textbook) into a char array.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      getchar() → reads one character · putchar() → displays one character · gets() → reads a string · puts() → prints a string and moves to a newline.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-stdio"></div>
+  </div>
+  `;
+}
+RENDERERS.stdio = renderStdio;
+
+/* =========================================================================
+   TOPIC 4 — 11.4.2 ctype.h (character functions) + Character Tester Simulation
+   ========================================================================= */
+function renderCtype(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.4.2</div>
+    <h2>Character Functions <span class="ta">(ctype.h)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      This header file defines various operations on characters. The header file <b>ctype.h</b> is to be included to use these functions in a program.
+    </div>
+
+    <table class="tbl">
+      <tr><th>Function</th><th>General Form</th><th>What it checks / does (Textbook)</th></tr>
+      <tr><td class="mono">isalnum()</td><td class="mono">int isalnum(char c);</td><td>Checks whether a character is alphanumeric or not. Returns non-zero if c is a digit or a letter, else returns 0.</td></tr>
+      <tr><td class="mono">isalpha()</td><td class="mono">isalpha(char c);</td><td>Checks whether the given character is an alphabet or not. Returns 1 if alphabet, 0 otherwise.</td></tr>
+      <tr><td class="mono">isdigit()</td><td class="mono">isdigit(char c);</td><td>Checks whether a given character is a digit or not. Returns 1 if digit, 0 otherwise.</td></tr>
+      <tr><td class="mono">islower()</td><td class="mono">islower(char c)</td><td>Checks whether a character is lower case. Returns non-zero if lower case, 0 otherwise.</td></tr>
+      <tr><td class="mono">isupper()</td><td class="mono">isupper(char c)</td><td>Checks whether the given character is uppercase. Returns 1 if true, otherwise 0.</td></tr>
+      <tr><td class="mono">toupper()</td><td class="mono">char toupper(char c);</td><td>Converts the given character into its uppercase. If already uppercase, output is the same.</td></tr>
+      <tr><td class="mono">tolower()</td><td class="mono">char tolower(char c)</td><td>Converts the given character into its lowercase. If already lowercase, output is the same.</td></tr>
+    </table>
+
+    <div class="example-box">
+      <span class="lbl">📗 Textbook Example — isalnum()</span>
+      <pre class="code-block">int r = isalnum('5');
+cout &lt;&lt; isalnum('A') &lt;&lt;'\\t'&lt;&lt;r;
+// But: char c = '$'; int n = isalnum(c); → n is 0 (not a digit or alphabet)</pre>
+    </div>
+    <div class="example-box">
+      <span class="lbl">📗 Textbook Program 11.3 — isalnum() with getchar()</span>
+      <pre class="code-block">#include&lt;iostream&gt;
+#include&lt;stdio.h&gt;
+#include&lt;ctype.h&gt;
+using namespace std;
+int main()
+{
+        char ch; int r;
+        cout&lt;&lt;"\\n Type a Character :";
+        ch = getchar();
+        r = isalnum(ch);
+        cout&lt;&lt;"\\nThe Return Value of isalnum(ch) is :"&lt;&lt;r;
+}</pre>
+      <b>Output-1:</b> Type a Character :A → The Return Value of isalnum(ch) is :1
+      <br><b>Output-2:</b> Type a Character :? → The Return Value of isalnum(ch) is :0
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — ctype.h Character Tester</span>
+      Type ONE character below. This simulator computes what each ctype.h function would return for it (the logic mirrors the textbook's functions exactly).
+      <div style="margin-top:10px;"><input type="text" id="ctypeInput" maxlength="1" value="A" class="narrow-input" style="font-size:1.4rem;text-align:center;"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" data-ctype-sample="A">Try 'A'</button>
+        <button class="btn btn-ghost" data-ctype-sample="7">Try '7'</button>
+        <button class="btn btn-ghost" data-ctype-sample="$">Try '$'</button>
+        <button class="btn btn-ghost" data-ctype-sample="z">Try 'z'</button>
+      </div>
+      <table class="tbl" style="margin-top:12px;">
+        <tr><th>Function call</th><th>Return value</th></tr>
+        <tr><td class="mono">isalnum(ch)</td><td class="mono" id="out-isalnum">—</td></tr>
+        <tr><td class="mono">isalpha(ch)</td><td class="mono" id="out-isalpha">—</td></tr>
+        <tr><td class="mono">isdigit(ch)</td><td class="mono" id="out-isdigit">—</td></tr>
+        <tr><td class="mono">islower(ch)</td><td class="mono" id="out-islower">—</td></tr>
+        <tr><td class="mono">isupper(ch)</td><td class="mono" id="out-isupper">—</td></tr>
+        <tr><td class="mono">toupper(ch)</td><td class="mono" id="out-toupper">—</td></tr>
+        <tr><td class="mono">tolower(ch)</td><td class="mono" id="out-tolower">—</td></tr>
+      </table>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Confusing <span class="mono">isalpha()</span> (alphabet only) with <span class="mono">isalnum()</span> (alphabet <b>or</b> digit). <span class="mono">isalpha('7')</span> is 0, but <span class="mono">isalnum('7')</span> is non-zero.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      isupper()/isalpha()/isdigit()/isalnum() <b>test and return a true/false (1/0) value</b>. toupper()/tolower() <b>convert and return a character</b>. Don't mix the two groups up.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-ctype"></div>
+  </div>
+  `;
+}
+RENDERERS.ctype = renderCtype;
+
+/* =========================================================================
+   TOPIC 5 — 11.4.3 string.h + String Sandbox Simulation
+   ========================================================================= */
+function renderStringFn(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.4.3</div>
+    <h2>String Manipulation Functions <span class="ta">(string.h)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      The library <b>string.h</b> (also referred as cstring) has several common functions for dealing with strings stored in array of characters. The string.h header file is to be included before using any string function.
+    </div>
+
+    <h4>11.4.3.1 strcpy()</h4>
+    <div class="tb-def"><span class="lbl">General Form</span><span class="mono">strcpy(Target String, Source String);</span><br>The strcpy() function takes two arguments: target and source. It copies the character string pointed by the source to the memory location pointed by the target. The null terminating character (\\0) attached to the string is also copied.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.6</span><pre class="code-block">char source[] = "Computer Science";
+char target[20]="target";
+strcpy(target,source);
+// Output: String in Target After strcpy function Executed :Computer Science</pre></div>
+
+    <h4>11.4.3.2 strlen()</h4>
+    <div class="tb-def"><span class="lbl">General Form</span><span class="mono">strlen(string);</span><br>The strlen() takes a null terminated string as its argument and returns its length. The length does not include the null(\\0) character.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.7</span><pre class="code-block">char source[ ] = "Computer Science";
+cout&lt;&lt;"Given String is "&lt;&lt;source&lt;&lt;" its Length is "&lt;&lt;strlen(source);
+// Output: Given String is Computer Science its Length is 16</pre></div>
+
+    <h4>11.4.3.3 strcmp()</h4>
+    <div class="tb-def"><span class="lbl">General Form</span><span class="mono">strcmp(String1, String2);</span><br>Compares string1 and string2 lexicographically (ASCII values). Returns: <b>positive</b> if first differing char of string1 &gt; string2, <b>negative</b> if less than, <b>0</b> if equal.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.8</span><pre class="code-block">char string1[] = "Computer";
+char string2[] = "Science";
+result = strcmp(string1,string2);
+// Output: String1 : Computer and String2 : Science Are Not Equal</pre></div>
+
+    <h4>11.4.3.4 strcat()</h4>
+    <div class="tb-def"><span class="lbl">General Form</span><span class="mono">strcat(Target, source);</span><br>Appends a copy of the character string pointed by source to the end of string pointed by the target.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.9</span><pre class="code-block">char target[50] = "Learning C++ is fun";
+char source[50] = " , easy and Very useful";
+strcat(target, source);
+// Output: Learning C++ is fun , easy and Very useful</pre></div>
+
+    <h4>11.4.3.5 strupr()</h4>
+    <div class="tb-def"><span class="lbl">General Form</span><span class="mono">strupr(string);</span><br>Converts the given string into Uppercase letters.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.10</span><pre class="code-block">gets(str1); // "computer science"
+cout&lt;&lt;strupr(str1);
+// Output: COMPUTER SCIENCE</pre></div>
+
+    <h4>11.4.3.6 strlwr()</h4>
+    <div class="tb-def"><span class="lbl">General Form</span><span class="mono">strlwr(string);</span><br>Converts the given string into Lowercase letters.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.11</span><pre class="code-block">gets(str1); // "COMPUTER SCIENCE"
+cout&lt;&lt;strlwr(str1);
+// Output: computer science</pre></div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — string.h Sandbox</span>
+      Enter a target and a source string, pick a function, and see the result exactly as the textbook's functions would compute it.
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:160px;"><label style="font-size:.78rem;">Target string</label><input type="text" id="strTarget" value="target"></div>
+        <div style="flex:1;min-width:160px;"><label style="font-size:.78rem;">Source string</label><input type="text" id="strSource" value="Computer Science"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" data-strfn="strcpy">strcpy(target,source)</button>
+        <button class="btn btn-primary" data-strfn="strlen">strlen(source)</button>
+        <button class="btn btn-primary" data-strfn="strcmp">strcmp(target,source)</button>
+        <button class="btn btn-primary" data-strfn="strcat">strcat(target,source)</button>
+        <button class="btn btn-primary" data-strfn="strupr">strupr(source)</button>
+        <button class="btn btn-primary" data-strfn="strlwr">strlwr(source)</button>
+      </div>
+      <div class="line-explain" id="strOut">Pick a function to see what happens to Target / Source.</div>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      The <b>target</b> array in strcpy()/strcat() must be big enough to hold the result, otherwise memory beyond the array gets overwritten. Also, strcmp() returning 0 means the strings are <b>equal</b> — students often wrongly assume non-zero means "equal".
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      strcmp() return values: 0 = equal, positive = string1 &gt; string2, negative = string1 &lt; string2 (by ASCII comparison of first differing character).
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-stringfn"></div>
+  </div>
+  `;
+}
+RENDERERS.stringfn = renderStringFn;
+
+/* =========================================================================
+   TOPIC 6 — 11.4.4 math.h + Calculator Simulation
+   ========================================================================= */
+function renderMathFn(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.4.4</div>
+    <h2>Mathematical Functions <span class="ta">(math.h)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      Most of the mathematical functions are defined in math.h header file which includes basic mathematical functions.
+    </div>
+
+    <h4>11.4.4.1 cos()</h4>
+    <div class="tb-def">The cos() function takes a single argument in radians. The cos() function returns the value in the range of [-1, 1]. The returned value is either in double, float, or long double.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.12</span><pre class="code-block">double x = 0.5, result;
+result = cos(x);
+cout &lt;&lt; "COS("&lt;&lt;x&lt;&lt;")= "&lt;&lt;result;
+// Output: COS(0.5)= 0.877583</pre></div>
+
+    <h4>11.4.4.2 sqrt()</h4>
+    <div class="tb-def">The sqrt() function returns the square root of the given value. It takes a single non-negative argument. If a <b>negative value</b> is passed, a <b>domain error</b> occurs.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.13</span><pre class="code-block">double x = 625, result;
+result = sqrt(x);
+cout &lt;&lt; "sqrt("&lt;&lt;x&lt;&lt;") = "&lt;&lt;result;
+// Output: sqrt(625) = 25</pre></div>
+
+    <h4>11.4.4.3 sin()</h4>
+    <div class="tb-def">The sin() function takes a single argument in radians. It returns the value in the range of [-1, 1]. The returned value is either in double, float, or long double.</div>
+
+    <h4>11.4.4.4 pow()</h4>
+    <div class="tb-def">The pow() function returns base raised to the power of an exponent. If any argument passed to pow() is long double, the return type is promoted to long double; otherwise the return type is double. pow() takes two arguments: <b>base</b> and <b>exponent</b>.</div>
+    <div class="example-box"><span class="lbl">📗 Program 11.14</span><pre class="code-block">double base = 5, exponent = 4, result;
+result = pow(base, exponent);
+cout &lt;&lt; "pow("&lt;&lt;base&lt;&lt;"^"&lt;&lt;exponent&lt;&lt;") = "&lt;&lt;result;
+double x = 25;
+result = sin(x);
+cout &lt;&lt; "\\nsin("&lt;&lt;x&lt;&lt;")= "&lt;&lt;result;
+// Output: pow(5^4) = 625
+// Output: sin(25)= -0.132352</pre></div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — math.h Calculator</span>
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+        <div><label style="font-size:.78rem;display:block;">x (radians, for cos/sin)</label><input type="number" id="mathX" value="0.5" step="any" class="narrow-input"></div>
+        <div><label style="font-size:.78rem;display:block;">value (for sqrt)</label><input type="number" id="mathSqrtVal" value="625" step="any" class="narrow-input"></div>
+        <div><label style="font-size:.78rem;display:block;">base</label><input type="number" id="mathBase" value="5" step="any" class="narrow-input"></div>
+        <div><label style="font-size:.78rem;display:block;">exponent</label><input type="number" id="mathExp" value="4" step="any" class="narrow-input"></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-primary" id="mathCalcBtn">🔢 Compute all four</button></div>
+      <table class="tbl" style="margin-top:12px;">
+        <tr><th>Function call</th><th>Result</th></tr>
+        <tr><td class="mono" id="mathCosLbl">cos(0.5)</td><td class="mono" id="out-cos">—</td></tr>
+        <tr><td class="mono" id="mathSinLbl">sin(0.5)</td><td class="mono" id="out-sin">—</td></tr>
+        <tr><td class="mono" id="mathSqrtLbl">sqrt(625)</td><td class="mono" id="out-sqrt">—</td></tr>
+        <tr><td class="mono" id="mathPowLbl">pow(5,4)</td><td class="mono" id="out-pow">—</td></tr>
+      </table>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Passing a <b>negative</b> value to <span class="mono">sqrt()</span> — this causes a domain error, since square roots of negative numbers are not real numbers. Also remember cos()/sin() expect the angle in <b>radians</b>, not degrees.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      pow(base, exponent) takes exactly <b>two</b> arguments. cos() and sin() return values only in the range <b>[-1, 1]</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-mathfn"></div>
+  </div>
+  `;
+}
+RENDERERS.mathfn = renderMathFn;
+
+/* =========================================================================
+   TOPIC 7 — 11.5 User-defined Functions (definition, prototype, void,
+   accessing a function, formal/actual parameters)
+   ========================================================================= */
+function renderUserdef(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.5</div>
+    <h2>User-defined Functions</h2>
+  </div>
+
+  <div class="card">
+    <h3>11.5.1 Introduction</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      We can also define new functions to perform a specific task. These are called as <b>user-defined functions</b>. User-defined functions are created by the user. A function can optionally define input parameters that enable callers to pass arguments into the function. A function can also optionally return a value as output. Functions are useful for encapsulating common operations in a single reusable block, ideally with a name that clearly describes what the function does.
+    </div>
+
+    <h3>11.5.2 Function Definition</h3>
+    <div class="tb-def">
+      In C++, a function must be defined before it is used anywhere in the program. The general syntax of a function definition is:
+      <pre class="code-block">Return_Data_Type Function_name(parameter list)
+{
+        Body of the function
+}</pre>
+      <b>Note:</b>
+      <ol>
+        <li>The Return_Data_Type is any valid data type of C++.</li>
+        <li>The Function_name is a user-defined identifier.</li>
+        <li>The parameter list, which is optional, is a list of parameters, i.e. a list of variables preceded by data types and separated by commas.</li>
+        <li>The body of the function comprises C++ statements that are required to perform the intended task of this function.</li>
+      </ol>
+    </div>
+
+    <h3>11.5.3 Function Prototype</h3>
+    <div class="tb-def">
+      C++ program can contain any number of functions. But, it must always have <b>only one main() function</b> to begin the program execution. We can write the definitions of functions in any order as we wish. We can define the main() function first and all other functions after that, or we can define all the needed functions prior to main(). Like a variable declaration, a function must be declared before it is used in the program. The declaration statement may be given outside the main() function.
+    </div>
+
+    <div class="diagram-box">
+      <div style="text-align:center;font-family:monospace;font-size:1.1rem;margin-bottom:10px;">long fact (int, double)</div>
+      <div class="flow-row" id="protoDiagram">
+        <div class="flow-node clickable" data-part="long" style="border-color:#2563eb;">long<br><small>Return type</small></div>
+        <div class="flow-node clickable" data-part="fact" style="border-color:#ea580c;">fact<br><small>Function name</small></div>
+        <div class="flow-node clickable" data-part="args" style="border-color:#16a34a;">(int, double)<br><small>List of arguments</small></div>
+      </div>
+      <div class="line-explain" id="protoExplain">Click a part of the prototype above to see what it tells the compiler.</div>
+      <div class="diagram-cap">Figure 11.1 — Function Prototype breakdown (Textbook)</div>
+    </div>
+
+    <div class="tb-def">
+      <span class="lbl">📘 The prototype above provides the following information to the compiler</span>
+      <ul>
+        <li>The return value of the function is of type <b>long</b>.</li>
+        <li><b>fact</b> is the name of the function.</li>
+        <li>The function is called with two arguments: the first argument is of <b>int</b> data type; the second argument is of <b>double</b> data type.</li>
+      </ul>
+      <span class="mono">int display(int, int); // function prototype</span><br>
+      The above function prototype provides details about the return data type, name of the function and a list of formal parameters or arguments.
+    </div>
+
+    <h3>11.5.4 Use of void command</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      void type has two important purposes:
+      <ul>
+        <li>To indicate the function does not return a value</li>
+        <li>To declare a generic pointer.</li>
+      </ul>
+      <br><b>Notes:</b> void data type indicates the compiler that the function does not return a value, or in a larger context void indicates that it holds nothing.
+      <br><b>Example:</b> <span class="mono">void fun(void)</span> — tells compiler that the function fun() neither receives values from calling program nor returns a value to the calling program.
+    </div>
+
+    <h3>11.5.5 Accessing a function</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      The user-defined function should be called explicitly using its name and the required arguments to be passed. The compiler refers to the function prototype to check whether the function has been called correctly. If the argument type does not match exactly with the data type defined in the prototype, the compiler will perform type conversion, if possible. If type conversion is impossible, the compiler generates an error message.
+    </div>
+    <table class="tbl">
+      <tr><th>#</th><th>Call</th><th>Meaning (Textbook)</th></tr>
+      <tr><td>1</td><td class="mono">display()</td><td>calling the function without a return value and without any argument</td></tr>
+      <tr><td>2</td><td class="mono">display(x, y)</td><td>calling the function without a return value and with arguments</td></tr>
+      <tr><td>3</td><td class="mono">x = display()</td><td>calling the function with a return value and without any argument</td></tr>
+      <tr><td>4</td><td class="mono">x = display(x, y)</td><td>calling the function with a return value and with arguments</td></tr>
+    </table>
+
+    <h4>11.5.5.1 Formal Parameters and Actual Parameters or Arguments</h4>
+    <div class="tb-def">
+      Arguments or parameters are the means to pass values from the calling function to the called function. The variables used in the function definition as parameters are known as <b>formal parameters</b>. The constants, variables or expressions used in the function call are known as <b>actual parameters</b>.
+    </div>
+
+    <div class="diagram-box">
+      <pre class="code-block">#include &lt;iostream&gt;
+using namespace std;
+int sum (int x, int y)       <span class="out">// &lt;-- x, y are FORMAL parameters</span>
+{
+        return (x + y);
+}
+int main ()
+{
+        int a,b ;
+        cout&lt;&lt;"\\n Enter Number 1:";
+        cin&gt;&gt;a;
+        cout&lt;&lt;"\\n Enter Number 2:";
+        cin&gt;&gt;b;
+        cout&lt;&lt;"\\n The sum = "&lt;&lt;sum (a, b);  <span class="out">// &lt;-- a, b are ACTUAL parameters</span>
+}</pre>
+      <div class="diagram-cap">Figure 11.2 — Formal and Actual Parameters (Textbook)</div>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      <b>Formal parameters</b> என்பவை function-ஐ <u>வரையறுக்கும் (define)</u> போது பயன்படுத்தப்படும் variable பெயர்கள் (மேலே x, y). <b>Actual parameters</b> என்பவை function-ஐ <u>அழைக்கும் (call)</u> போது அனுப்பப்படும் மெய்யான மதிப்புகள்/variables (மேலே a, b). formal = "காலியிடம் (placeholder)", actual = "உண்மையான மதிப்பு".
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Thinking the formal parameter names must match the actual parameter names — they do not. Only the <b>order and data type</b> of arguments matter for the compiler.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      A C++ program can have any number of functions but exactly <b>one main()</b> function. Formal parameters live in the function definition; actual parameters/arguments live in the function call.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-userdef"></div>
+  </div>
+  `;
+}
+RENDERERS.userdef = renderUserdef;
+
+/* =========================================================================
+   TOPIC 8 — 11.5.5.2 Default Arguments, 11.5.5.3 Constant Arguments
+   ========================================================================= */
+function renderDefaultConst(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.5.5.2 &amp; 11.5.5.3</div>
+    <h2>Default Arguments &amp; Constant Arguments</h2>
+  </div>
+
+  <div class="card">
+    <h3>11.5.5.2 Default arguments</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      In C++, one can assign default values to the formal parameters of a function prototype. The Default arguments allows to omit some arguments when calling the function.
+      <br><br>When calling a function,
+      <ul>
+        <li>For any missing arguments, complier uses the values in default arguments for the called function.</li>
+        <li>The default value is given in the form of variable initialization.</li>
+      </ul>
+      Example: <span class="mono">void defaultvalue(int n1=10, n2=100);</span>
+      <ul>
+        <li>The default arguments facilitate the function call statement with partial or no arguments.</li>
+      </ul>
+      Example calls: <span class="mono">defaultvalue(x,y); defaultvalue(200,150); defaultvalue(150); defaultvalue(x,150);</span>
+      <br><br>
+      The default values can be included in the function prototype from <b>right to left</b>, i.e., we cannot have a default value for an argument in between the argument list.
+      <br><span class="mono">void defaultvalue(int n1=10, n2);//invalid prototype</span><br>
+      <span class="mono">void defaultvalue(int n1, n2 = 10);//valid prototype</span>
+    </div>
+
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.16</span>
+      <pre class="code-block">#include &lt;iostream&gt;
+using namespace std;
+double area(const double r,const double pi=3.14)
+{
+        return(pi*r*r);
+}
+int main ()
+{
+        double rad,res;
+        cout&lt;&lt;"\\nEnter Radius :";
+        cin&gt;&gt;rad;
+        res=area(rad);
+        cout &lt;&lt; "\\nThe Area of Circle ="&lt;&lt;res;
+        return 0;
+}
+// Output:
+// Enter Radius :5
+// The Area of Circle =78.5</pre>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — Default Argument Resolver</span>
+      Prototype: <span class="mono">void defaultvalue(int n1=10, int n2=100)</span>. Try different calls and see which value each parameter actually receives.
+      <div class="btn-row">
+        <button class="btn btn-ghost" data-defcall="">defaultvalue()</button>
+        <button class="btn btn-ghost" data-defcall="200,150">defaultvalue(200,150)</button>
+        <button class="btn btn-ghost" data-defcall="150">defaultvalue(150)</button>
+      </div>
+      <div class="line-explain" id="defOut">Click a call above.</div>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Giving a default value to an earlier parameter but not a later one, e.g. <span class="mono">void f(int a=5, int b)</span> — this is an <b>invalid prototype</b>. Default values must be assigned from right to left, with no gaps.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.5.5.3 Constant Arguments</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      The constant variable can be declared using <b>const</b> keyword. The const keyword makes variable value stable. The constant variable should be initialized while declaring. The const modifier enables to assign an initial value to a variable that cannot be changed later inside the body of the function.
+      <br><br><b>Syntax:</b> <span class="mono">&lt;returntype&gt;&lt;functionname&gt; (const &lt;datatype variable=value&gt;)</span>
+      <br><b>Example:</b> <span class="mono">int minimum(const int a=10);</span> &nbsp;·&nbsp; <span class="mono">float area(const float pi=3.14, int r=5);</span>
+      <br><br>
+      If the variable value "r" is changed as <span class="mono">r=25;</span> inside the body of the function "area" then compiler will throw an error as <b>"assignment of read-only parameter 'r'"</b>:
+      <pre class="code-block">double area(const double r,const double pi=3.14)
+{
+        r=25;              <span class="out">// ERROR: assignment of read-only parameter 'r'</span>
+        return(pi*r*r);
+}</pre>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      <span class="mono">const</span> என்பது "இந்த variable-இன் மதிப்பு மாற்றப்படக் கூடாது" என்று compiler-க்குச் சொல்வது. function-க்குள் யாராவது தவறாக அந்த மதிப்பை மாற்ற முயன்றால், compiler உடனே error காட்டி நிறுத்தி விடும் — இது தற்செயலான தவறுகளைத் தடுக்க உதவுகிறது.
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Default arguments go <b>right to left</b> (no gaps). A <span class="mono">const</span> formal parameter cannot be re-assigned inside the function body — doing so is a compile-time error.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-defaultconst"></div>
+  </div>
+  `;
+}
+RENDERERS.defaultconst = renderDefaultConst;
+
+/* =========================================================================
+   TOPIC 9 — 11.6 Methods of Calling Functions (Call by Value, Call by
+   Reference, Inline) — KEY SIMULATION
+   ========================================================================= */
+function renderCalling(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.6</div>
+    <h2>Methods of Calling Functions</h2>
+    <div class="goals">In C++, arguments can be passed to a function in two ways: <b>Call by Value</b> and <b>Call by Reference or Address</b>.</div>
+  </div>
+
+  <div class="card">
+    <h3>11.6.1 Call by Value Method</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      This method copies the value of an actual parameter into the formal parameter of the function. In this case, changes made to formal parameter within the function will have <b>no effect</b> on the actual parameter.
+    </div>
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.17</span>
+      <pre class="code-block">void display(int x)
+{
+        x=x*x;
+        cout&lt;&lt;"\\n\\nThe Value inside display function (x*x):"&lt;&lt;x;
+}
+int main()
+{
+        int a;
+        cin&gt;&gt;a;        <span class="out">// a = 5</span>
+        display(a);
+        cout&lt;&lt;"\\n\\nThe Value inside main function "&lt;&lt;a;
+}
+// Output:
+// The Value inside display function (a * a) : 25
+// The Value inside main function 5</pre>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Interactive Simulation — Call by Value</span>
+      Watch two <b>separate</b> memory boxes: main's <span class="mono">a</span> and display()'s <span class="mono">x</span>. A copy of the value is sent — they are not connected.
+      <div class="mem-row">
+        <div class="mem-box" id="valBoxMain"><div class="mem-name">main() → a</div><div class="mem-val" id="valMainVal">5</div><div class="mem-addr">address: 0x1000</div></div>
+        <div class="mem-box" id="valBoxFunc" style="opacity:.35;"><div class="mem-name">display() → x</div><div class="mem-val" id="valFuncVal">—</div><div class="mem-addr">address: 0x2000 (different!)</div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="valStartBtn">▶ Start</button>
+        <button class="btn btn-accent" id="valStepBtn">⏭ Next Step</button>
+        <button class="btn btn-ghost" id="valResetBtn">↺ Reset</button>
+      </div>
+      <div class="line-explain" id="valExplain">Click Start to begin the step-by-step walkthrough of Program 11.17.</div>
+      <div class="log-panel" id="valLog"></div>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Call by Value → formal and actual parameters live at <b>different memory addresses</b>. Changing the formal parameter <b>never</b> affects the actual parameter back in the caller.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.6.2 Call by Reference or Address Method</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      This method copies the <b>address</b> of the actual argument into the formal parameter. Since the address of the argument is passed, any change made in the formal parameter will be <b>reflected back</b> in the actual parameter.
+    </div>
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.18</span>
+      <pre class="code-block">void display(int &amp;x) <span class="cmt">//passing address of a//</span>
+{
+        x=x*x;
+        cout&lt;&lt;"\\n\\nThe Value inside display function ( x*x) :"&lt;&lt;x ;
+}
+int main()
+{
+        int n1;
+        cin&gt;&gt;n1;      <span class="out">// n1 = 45</span>
+        cout&lt;&lt;"\\nThe Value of N1 is inside main function Before passing : "&lt;&lt; n1;
+        display(n1);
+        cout&lt;&lt;"\\nThe Value of N1 is inside main function After passing (n1 x n1)  : "&lt;&lt; n1;
+}
+// Output:
+// Before passing : 45
+// Inside display function (n1 x n1) :2025
+// After passing (n1 x n1)  : 2025</pre>
+      The only change in the display() function is in the function header. The <b>&amp;</b> symbol in the declaration of parameter <b>x</b> means that the argument is a reference variable, so the function is called by passing reference. Hence when the argument n1 is passed to the display() function, the variable x gets the address of n1 so that the location will be shared. We use the name n1 in the main() function, and the name x in the display() function to refer the same storage location. So, when we change the value of x, we are actually changing the value of n1.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Interactive Simulation — Call by Reference</span>
+      This time <span class="mono">n1</span> and <span class="mono">x</span> share <b>one single</b> memory box — there is only one address.
+      <div class="mem-row">
+        <div class="mem-box linked" id="refBoxShared"><div class="mem-name" id="refBoxLabel">main() → n1</div><div class="mem-val" id="refVal">45</div><div class="mem-addr">address: 0x3000 (shared!)</div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="refStartBtn">▶ Start</button>
+        <button class="btn btn-accent" id="refStepBtn">⏭ Next Step</button>
+        <button class="btn btn-ghost" id="refResetBtn">↺ Reset</button>
+      </div>
+      <div class="line-explain" id="refExplain">Click Start to begin the step-by-step walkthrough of Program 11.18.</div>
+      <div class="log-panel" id="refLog"></div>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Forgetting the <span class="mono">&amp;</span> symbol in the function header — without it, C++ silently falls back to Call by Value, and the caller's variable will <b>not</b> be updated, even though the code "looks" similar.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.6.3 Inline Function</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      Normally the call statement to a function makes a compiler to jump to the functions (the definition of the functions are stored in STACKS) and also jump back to the instruction following the call statement. This reduces the speed of program execution. Inline functions can be used to reduce the overheads like STACKS for small function definition.
+      <br><br>
+      An <b>inline</b> function looks like normal function in the source file but inserts the function's code directly into the calling program. To make a function inline, one has to insert the keyword <b>inline</b> in the function header.
+      <br><b>Syntax:</b> <span class="mono">inline returntype functionname(datatype parameter 1, … datatype parameter n)</span>
+      <br><br><b>Advantages of inline functions:</b>
+      <ul>
+        <li>Inline functions execute faster but requires more memory space.</li>
+        <li>Reduce the complexity of using STACKS.</li>
+      </ul>
+    </div>
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.19</span>
+      <pre class="code-block">inline int add (int a , int b)
+{
+        int c=a+b;
+        return(c);
+}
+int main ()
+{
+        int x,y,z;
+        cin&gt;&gt;x;       <span class="out">// x = 10</span>
+        cin&gt;&gt;y;       <span class="out">// y = 20</span>
+        z=add(x,y);
+        cout &lt;&lt; "\\n sum of "&lt;&lt;x&lt;&lt;"+"&lt;&lt;y&lt;&lt;"="&lt;&lt;z;
+}
+// Output: sum of 10+20=30</pre>
+      Though the above program is written in the normal function definition format, during compilation the function code <span class="mono">a+b</span> will be directly inserted in the calling statement, i.e. <span class="mono">z=add(x,y);</span> this makes the calling statement to change as <span class="mono">z = a+b;</span>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — What the compiler does with inline</span>
+      <div class="btn-row"><button class="btn btn-primary" id="inlineToggleBtn">🔄 Show what the compiler inserts</button></div>
+      <div class="diagram-box" id="inlineOut">
+        <div style="text-align:center;font-family:monospace;">z = add(x,y); <span style="color:var(--muted);">(as written by programmer)</span></div>
+      </div>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      inline functions trade <b>more memory</b> for <b>faster execution</b>, since the normal "jump to function &amp; jump back" overhead (using STACKS) is avoided.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-calling"></div>
+  </div>
+  `;
+}
+RENDERERS.calling = renderCalling;
+
+/* =========================================================================
+   TOPIC 10 — 11.7 Different forms of function declarations + 11.8
+   Returning from a function
+   ========================================================================= */
+function renderForms(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.7 &amp; 11.8</div>
+    <h2>Forms of User-defined Functions &amp; Returning Values</h2>
+  </div>
+
+  <div class="card">
+    <h3>11.7 Different forms of User-defined Function declarations</h3>
+    <p>Based on whether a function returns a value and/or takes parameters, there are four possible forms.</p>
+
+    <details class="acc" open>
+      <summary>11.7.1 — Without return value, without parameter (Program 11.20)</summary>
+      <div class="acc-body">
+        The name of the function is <span class="mono">display()</span>, its return data type is <b>void</b> and it does not have any argument.
+        <pre class="code-block">void display()
+{       cout&lt;&lt;"First C++ Program with Function"; }
+int main()
+{       display(); <span class="cmt">// Function calling statement//</span>
+        return(0);
+}
+// Output: First C++ Program with Function</pre>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>11.7.2 — With return value, without parameter (Program 11.21)</summary>
+      <div class="acc-body">
+        The name of the function is <span class="mono">display()</span>, its return type is <b>int</b> and it does not have any argument. The <b>return</b> statement returns a value to the calling function and transfers the program control back to the calling statement.
+        <pre class="code-block">int display()
+{
+        int a=10, b=5, s;
+        s=a+b;
+        return s;
+}
+int main()
+{       int m=display();
+        cout&lt;&lt;"\\nThe Sum="&lt;&lt;m;
+        return(0);
+}
+// Output: The Sum=15</pre>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>11.7.3 — Without return value, with parameter (Program 11.22)</summary>
+      <div class="acc-body">
+        The name of the function is <span class="mono">display()</span>, its return type is <b>void</b> and it has two parameters x and y to receive two values.
+        <pre class="code-block">void display(int x, int y)
+{
+        int s=x+y;
+        cout&lt;&lt;"The Sum of Passed Values: "&lt;&lt;s;
+}
+int main()
+{
+        int a=50,b=45;
+        display(a,b);
+        return(0);
+}
+// Output: The Sum of Passed Values: 95</pre>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>11.7.4 — With return value, with parameter (Program 11.23)</summary>
+      <div class="acc-body">
+        The name of the function is display(), its return type is <b>int</b> and it has two parameters x and y to receive two values.
+        <pre class="code-block">int display(int x, int y)
+{
+        int s=x+y;
+        return s;
+}
+int main()
+{
+        int a=45,b=20;
+        int s=display(a,b);
+        cout&lt;&lt;"\\nThe Sum of Passed Values: "&lt;&lt;s;
+        return(0);
+}
+// Output: The Sum of Passed Values: 65</pre>
+      </div>
+    </details>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — Which form is this?</span>
+      Pick a function signature and the simulator tells you which of the four forms it is.
+      <div class="btn-row">
+        <button class="btn btn-ghost" data-form="void f()">void f()</button>
+        <button class="btn btn-ghost" data-form="int f()">int f()</button>
+        <button class="btn btn-ghost" data-form="void f(int x)">void f(int x)</button>
+        <button class="btn btn-ghost" data-form="int f(int x, int y)">int f(int x, int y)</button>
+      </div>
+      <div class="line-explain" id="formOut">Click a signature above.</div>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      The four forms depend independently on two yes/no choices: <b>does it return a value?</b> and <b>does it take parameters?</b> → 2 × 2 = 4 combinations.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.8 Returning from function</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      Returning from the function is done by using the <b>return</b> statement. The return statement stops execution and returns to the calling function. When a return statement is executed, the function is terminated immediately at that point.
+    </div>
+
+    <h4>11.8.1 The return statement</h4>
+    <div class="tb-def">
+      The return statement is used to return from a function. It is categorized as a <b>jump statement</b> because it terminates the execution of the function and transfer the control to the called statement. A return may or may not have a value associated with it. If return has a value associated with it, that value becomes the return value for the calling statement. Even for void function, return statement without parameter can be used to terminate the function.
+      <br><b>Syntax:</b> <span class="mono">return expression/variable;</span>
+      <br><b>Example:</b> <span class="mono">return(a+b); return(a); return; // to terminate the function</span>
+    </div>
+
+    <h4>11.8.2 Returning values</h4>
+    <div class="tb-def">
+      The functions that return no value is declared as <b>void</b>. The data type of a function is treated as <b>int</b>, if no data type is explicitly mentioned. For example, <span class="mono">int add (int, int);</span> and <span class="mono">add (int, int);</span> — in both prototypes, the return value is int, because by default the return value of a function in C++ is of type int when no return value is explicitly given.
+    </div>
+    <table class="tbl">
+      <tr><th>Sl.No</th><th>Function Prototype</th><th>Return type</th></tr>
+      <tr><td>1</td><td class="mono">int sum(int, float)</td><td>int</td></tr>
+      <tr><td>2</td><td class="mono">float area(float, float)</td><td>float</td></tr>
+      <tr><td>3</td><td class="mono">char result()</td><td>char</td></tr>
+      <tr><td>4</td><td class="mono">double fact(int n)</td><td>double</td></tr>
+    </table>
+
+    <h4>Returning Non-integer values</h4>
+    <div class="tb-def">A string can also be returned to a calling statement.</div>
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.24</span>
+      <pre class="code-block">char *display()
+{       return ("chennai"); }
+int main()
+{
+        char s[50];
+        strcpy(s,display());
+        cout&lt;&lt;"\\nExample:Function with Non Integer Return"&lt;&lt;s;
+        return(0);
+}
+// Output: Example: Function with Non Integer Return Chennai</pre>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Forgetting that a function's return type defaults to <b>int</b> when not written explicitly — relying on this is poor style and some compilers may warn or reject it; always write the return type explicitly.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-forms"></div>
+  </div>
+  `;
+}
+RENDERERS.forms = renderForms;
+
+/* =========================================================================
+   TOPIC 11 — 11.9 Recursive Function — KEY SIMULATION (call stack)
+   ========================================================================= */
+function renderRecursion(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.9</div>
+    <h2>Recursive Function</h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      A function that calls itself is known as <b>recursive function</b>. And, this technique is known as <b>recursion</b>.
+    </div>
+
+    <h4>Example 1: Factorial of a Number Using Recursion</h4>
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.25</span>
+      <pre class="code-block">int factorial(int); <span class="cmt">// Function prototype //</span>
+int main()
+{
+        int no;
+        cin &gt;&gt; no;             <span class="out">// no = 5</span>
+        cout &lt;&lt; "\\nFactorial of Number " &lt;&lt; no &lt;&lt;" = " &lt;&lt; factorial(no);
+        return 0;
+}
+int factorial(int m)
+{
+        if (m &gt; 1)
+        {
+        return m*factorial(m-1);
+        }
+        else
+        {
+        return 1;
+        }
+}
+// Output:
+// Enter a number to find its factorial: 5
+// Factorial of Number 5 = 120</pre>
+      <b>Note:</b> Function prototype is mandatory since the function factorial() is given after the main() function.
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      factorial(5) தன்னை factorial(4)-ஐ அழைக்கும் (call), factorial(4) தன்னை factorial(3)-ஐ அழைக்கும் — இப்படியே <b>m=1</b> வரும் வரை (base case) தொடரும். m=1 ஆகும்போது, function தன்னைத்தானே அழைப்பதை நிறுத்தி 1-ஐ திருப்பி அனுப்பும். பிறகு, ஒவ்வொரு அழைப்பும் படிப்படியாக (step by step) பெருக்கல் செய்து மேலே திரும்பி வரும் (unwind): 2×1=2, 3×2=6, 4×6=24, 5×24=120.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Interactive Simulation — Recursive Call Stack (factorial)</span>
+      Enter a small number (2–7, so the stack stays readable) and watch each recursive call <b>pushed</b> onto the call stack, and then each call <b>returning</b> (popped) with its computed value.
+      <div style="margin-top:10px;"><label style="font-size:.78rem;">Enter number (2–7)</label><input type="number" id="recInput" value="5" min="2" max="7" class="narrow-input"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="recStartBtn">▶ Start</button>
+        <button class="btn btn-accent" id="recStepBtn">⏭ Next Step</button>
+        <button class="btn btn-ghost" id="recResetBtn">↺ Reset</button>
+      </div>
+      <div class="line-explain" id="recExplain">Enter a number and click Start.</div>
+      <div class="stack-wrap" id="recStack"></div>
+      <div class="log-panel" id="recLog"></div>
+    </div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake</span>
+      Forgetting the <b>base case</b> (<span class="mono">if (m &gt; 1)</span>) — without it, the function keeps calling itself forever (infinite recursion) until the program crashes from stack overflow.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Since <span class="mono">factorial()</span> is defined <b>after</b> main(), its <b>function prototype is mandatory</b> before main(). Every recursive function needs: (1) a condition that calls itself (recursive case) and (2) a condition that stops it (base case).
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-recursion"></div>
+  </div>
+  `;
+}
+RENDERERS.recursion = renderRecursion;
+
+/* =========================================================================
+   TOPIC 12 — 11.10 Scope Rules of Variables — KEY SIMULATION
+   ========================================================================= */
+function renderScope(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 11 › 11.10</div>
+    <h2>Scope Rules of Variables</h2>
+  </div>
+
+  <div class="card">
+    <h3>11.10.1 Introduction</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      <b>Scope</b> refers to the accessibility of a variable. There are four types of scopes in C++. They are: <b>Local scope, Function scope, File scope</b> and <b>Class scope</b>.
+      <br><br>
+      A scope is a region or life of the variable and broadly speaking there are four places, where variables can be declared,
+      <ul>
+        <li>Inside a block which is called <b>local variables</b>.</li>
+        <li>Inside a function is called <b>function variables</b>.</li>
+        <li>Outside of all functions which is called <b>global variables</b>.</li>
+        <li>Inside a class is called <b>class variable</b> or data members.</li>
+      </ul>
+    </div>
+
+    <h3>11.10.2 Local Scope</h3>
+    <div class="tb-def">
+      <ul>
+        <li>A local variable is defined within a block. A block of code begins and ends with curly braces { }.</li>
+        <li>The scope of a local variable is the block in which it is defined.</li>
+        <li>A local variable cannot be accessed from outside the block of its declaration.</li>
+        <li>A local variable is created upon entry into its block and destroyed upon exit.</li>
+      </ul>
+    </div>
+
+    <h3>11.10.3 Function Scope</h3>
+    <div class="tb-def">
+      <ul>
+        <li>The scope of variables declared within a function is extended to the function block, and all sub-blocks therein.</li>
+        <li>The life time of a function scope variable, is the life time of the function block. The scope of formal parameters is function scope.</li>
+      </ul>
+    </div>
+
+    <h3>11.10.4 File Scope</h3>
+    <div class="tb-def">
+      <ul>
+        <li>A variable declared above all blocks and functions (including main()) has the scope of a file. The life time of a file scope variable is the life time of the program.</li>
+        <li>The file scope variable is also called as <b>global variable</b>.</li>
+      </ul>
+    </div>
+
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.26 — Demo to test all Scopes</span>
+      <pre class="code-block">#include&lt;iostream&gt;
+using namespace std;
+int file_var=20;           <span class="cmt">//Declared within File - file scope variable</span>
+void add(int x)
+{
+        int m;              <span class="cmt">//Declaration of variable m in add() - Function scope variable</span>
+        m=x+30+file_var;
+        cout&lt;&lt;"\\n The Sum = "&lt;&lt;m;
+}
+int main ( )
+{
+        int a =5,b=10;
+        if(a&gt;b)
+        {
+                int t;        <span class="cmt">// local to this if block - Local variable</span>
+                t=a+20;
+        }
+        cout&lt;&lt;t;             <span class="out">// ERROR: 't' was not declared in main()</span>
+        add(a);
+        cout&lt;&lt;m;             <span class="out">// ERROR: 'm' was not declared in this scope</span>
+        cout&lt;&lt;"\\nThe File Variable = "&lt;&lt;file_var;
+        return(0);
+}
+// Error — In function 'int main()':
+// [Error] 't' was not declared in main()
+// [Error] 'm' was not declared in this scope</pre>
+      On compilation, the compiler prompts an error message: the variable <b>t</b> is not accessible, because the life time of a local variable is the life time of a block in its state of execution. The variable <b>m</b> is not accessible, because the life time of the function scope variable is the life time of a block in its state of execution.
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Interactive Simulation — Scope Accessibility Map (Program 11.26)</span>
+      Click each variable usage below to see which scope it belongs to, and whether it is accessible at that point in the program.
+      <div class="diagram-box">
+        <pre class="code-block" id="scopeCodeBlock"><span class="code-line" data-scope="file_var_decl">int file_var=20;</span>  <span class="cmt">// file scope</span>
+<span class="code-line" data-scope="add_fn">void add(int x) { ... }</span>
+<span class="code-line" data-scope="main_fn">int main() {</span>
+  <span class="code-line" data-scope="a_b_decl">int a=5, b=10;</span>
+  <span class="code-line" data-scope="t_decl">if(a&gt;b) { int t; t=a+20; }</span>
+  <span class="code-line" data-scope="t_use">cout&lt;&lt;t;</span>   <span class="cmt">// is t accessible here?</span>
+  <span class="code-line" data-scope="add_call">add(a);</span>
+  <span class="code-line" data-scope="m_use">cout&lt;&lt;m;</span>   <span class="cmt">// is m accessible here?</span>
+  <span class="code-line" data-scope="filevar_use">cout&lt;&lt;file_var;</span>  <span class="cmt">// is file_var accessible here?</span>
+}</pre>
+      </div>
+      <div class="line-explain" id="scopeExplain">Click any highlighted line above to see its scope and accessibility.</div>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      <span class="mono">t</span> (declared inside the if-block) dies the moment that block ends — using it in <span class="mono">cout&lt;&lt;t;</span> afterwards is an error. <span class="mono">m</span> (declared inside add()) only exists while add() is executing — main() cannot see it at all.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.10.5 Class Scope</h3>
+    <div class="tb-def">
+      A class is a new way of creating and implementing a user defined data type. Classes provide a method for packing together data of different types. Data members are the data variables that represent the features or properties of a class.
+      <pre class="code-block">class  student
+{
+   private :
+   int mark1, mark2, total;
+};  <span class="cmt">// The class student contains mark1, mark2 and total — its scope is within the class student only.</span></pre>
+      <b>Note:</b> The class scope will be discussed later in chapter "Classes and Object".
+    </div>
+
+    <h3>11.10.6 Scope resolution operator</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      The scope operator reveals the hidden scope of a variable. The scope resolution operator <b>(::)</b> is used for the following purposes: to access a <b>Global</b> variable when there is a <b>Local</b> variable with the same name.
+    </div>
+    <div class="example-box">
+      <span class="lbl">📗 Program 11.27</span>
+      <pre class="code-block">int x=45;  <span class="cmt">// Global Variable x</span>
+int main()
+{
+  int x = 10; <span class="cmt">// Local Variable x</span>
+  cout &lt;&lt; "\\nValue of global x is " &lt;&lt; ::x;
+  cout &lt;&lt; "\\nValue of local x is " &lt;&lt; x;
+  return 0;
+}
+// Output:
+// Value of global x is 45
+// Value of local x is 10</pre>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 Learning Simulation — Scope Resolution Operator</span>
+      <div class="mem-row">
+        <div class="mem-box"><div class="mem-name">Global x (file scope)</div><div class="mem-val">45</div></div>
+        <div class="mem-box"><div class="mem-name">Local x (inside main)</div><div class="mem-val">10</div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="scopeResBtn1"><span class="mono">cout&lt;&lt;x;</span></button>
+        <button class="btn btn-ghost" id="scopeResBtn2"><span class="mono">cout&lt;&lt;::x;</span></button>
+      </div>
+      <div class="line-explain" id="scopeResOut">Click a statement above to see which x it prints.</div>
+    </div>
+
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Without <span class="mono">::</span>, C++ always prefers the <b>closest (local)</b> variable. <span class="mono">::x</span> forces access to the <b>global/file-scope</b> x even when a local x of the same name exists.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Points to Remember (Chapter Summary — Textbook)</h3>
+    <ul>
+      <li>A large program can typically be split into smaller sized blocks called as functions.</li>
+      <li>Functions can be classified into Pre-defined or Built-in or Library Functions and User-defined Functions.</li>
+      <li>User-defined functions are created by the user.</li>
+      <li>The void function tells the compiler that the function returns nothing.</li>
+      <li>The return statement returns a value to the calling function and transfers the program control back to the calling function.</li>
+      <li>The default return type of a function in C++ is of type int.</li>
+      <li>A function that calls itself is known as recursive function.</li>
+      <li>Scope refers to the accessibility of a variable.</li>
+      <li>There are four types of Scopes. They are: Local scope, Function scope, File scope and Class scope.</li>
+      <li>The scope operator (::) reveals the hidden scope of a variable.</li>
+    </ul>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-scope"></div>
+  </div>
+  `;
+}
+RENDERERS.scope = renderScope;
+
+/* =========================================================================
+   TOPIC 13 — Practice & Debugging Lab
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Practice</div>
+    <h2>Practice &amp; Debugging Lab</h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge — questions are tiered by difficulty.</div>
+  </div>
+
+  <div class="card">
+    <h3>📘 Hands on practice (Textbook — "Write C++ program to solve the following problems")</h3>
+    <ol>
+      <li>Program that reads two strings and appends the first string to the second. For example, if the first string is entered as Tamil and second string as nadu, the program should print Tamilnadu. Use string library header.</li>
+      <li>Program that reads a string and converts it to uppercase. Include required header files.</li>
+      <li>Program that checks whether a given character is an alphabet or not. If it is an alphabet, whether it is lowercase character or uppercase character? Include required header files.</li>
+      <li>Write definition for a function sumseries() in c++ with two arguments/ parameters - double x and int n. The function should return a value of type double and it should perform sum of the following series: x-x<sup>2</sup>/3! + x<sup>3</sup>/5! - x<sup>4</sup>/7! + x<sup>5</sup>/9! -... upto n terms.</li>
+      <li>Program that invokes a function calc() which intakes two integers and an arithmetic operator and prints the corresponding result.</li>
+    </ol>
+    <div class="easy"><span class="lbl">💡 How to approach these (Learning Activity)</span>Problem 1 needs <span class="mono">strcat()</span> (Topic: String Functions). Problem 2 needs <span class="mono">strupr()</span>. Problem 3 combines <span class="mono">isalpha()</span>, <span class="mono">islower()</span>/<span class="mono">isupper()</span> from the Character Functions topic. Problems 4 and 5 are user-defined functions with parameters and a return value — revisit Topics 7–10 for the exact syntax pattern.</div>
+  </div>
+
+  <div class="card">
+    <h3>Section — A: Choose the correct answer (Textbook Evaluation MCQ)</h3>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>Predict the Output — Textbook Programs <span class="ta">(Enrichment: options are added by this learning lab, the programs and outputs are from the textbook)</span></h3>
+    <div id="mcqExtraWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>True / False <span class="ta">(Enrichment)</span></h3>
+    <div id="tfWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>Fill in the Blanks <span class="ta">(Enrichment)</span></h3>
+    <div id="fibWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="fibCheckBtn">Check All</button></div>
+    <div id="fibResult" style="margin-top:8px;font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <h3>Match the Following — Header File ↔ Function Family <span class="ta">(Enrichment)</span></h3>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Debugging Lab</h3>
+    <p>Read each card, identify what is wrong and whether it is a <b>Syntax</b> or <b>Logical</b> error, then click to reveal the explanation and the fix.</p>
+    <div id="debugWrap"></div>
+  </div>
+  `;
+}
+RENDERERS.practice = renderPractice;
+
+/* =========================================================================
+   TOPIC 14 — Exam Preparation
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Exam Preparation</div>
+    <h2>Exam Preparation</h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know · One-Minute Revision</h3>
+    <ul>
+      <li>Functions = sub-programs that reduce size &amp; complexity. Two types: <b>Built-in (Pre-defined/Library)</b> and <b>User-defined</b>.</li>
+      <li>Need for functions: <b>Divide and Conquer</b> + <b>Reusability</b>.</li>
+      <li>Header files end in <span class="mono">.h</span>: stdio.h (getchar/putchar/gets/puts), ctype.h (is*/to* character functions), string.h (strcpy/strlen/strcmp/strcat/strupr/strlwr), math.h (cos/sqrt/sin/pow).</li>
+      <li>Function definition = Return type + Name + (parameter list) + body. Formal parameters appear in the <b>definition</b>; actual parameters/arguments appear in the <b>call</b>.</li>
+      <li>void → function returns nothing (or declares a generic pointer). Default return type (if omitted) = <b>int</b>.</li>
+      <li>Default arguments are assigned <b>right to left</b>, no gaps. <span class="mono">const</span> parameters cannot be reassigned inside the function.</li>
+      <li>Call by Value → copies the value, changes do NOT reflect back. Call by Reference (<span class="mono">&amp;</span>) → copies the address, changes DO reflect back.</li>
+      <li>inline function → compiler inserts the function's code directly at the call site; faster execution, more memory.</li>
+      <li>4 forms of user-defined functions: with/without return value × with/without parameters.</li>
+      <li>return statement is a jump statement — it stops the function immediately and can optionally carry a value back.</li>
+      <li>Recursion = a function calling itself; needs a base case to stop.</li>
+      <li>4 Scopes: Local (inside a block), Function (inside a function incl. sub-blocks), File/Global (outside all functions), Class (inside a class). Scope resolution operator <span class="mono">::</span> accesses a global variable hidden by a local one of the same name.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 Glossary — Key Terms</h3>
+    <table class="tbl">
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td><b>Function</b></td><td>A named, reusable sub-program block that performs a specific task.</td></tr>
+      <tr><td><b>Built-in / Pre-defined / Library function</b></td><td>A ready-to-use function provided by C++ via header files.</td></tr>
+      <tr><td><b>User-defined function</b></td><td>A function written by the programmer for a specific task.</td></tr>
+      <tr><td><b>Header file</b></td><td>A <span class="mono">.h</span> file containing function prototypes/definitions, data types and constants for library functions.</td></tr>
+      <tr><td><b>Function prototype</b></td><td>A declaration giving the compiler the return type, name and argument list of a function, before it is used.</td></tr>
+      <tr><td><b>Formal parameter</b></td><td>The variable named in the function definition's parameter list.</td></tr>
+      <tr><td><b>Actual parameter / Argument</b></td><td>The constant, variable or expression used in the function call.</td></tr>
+      <tr><td><b>Default argument</b></td><td>A value automatically used for a parameter when the caller omits it.</td></tr>
+      <tr><td><b>Call by Value</b></td><td>Passes a copy of the value; the caller's variable is unaffected.</td></tr>
+      <tr><td><b>Call by Reference</b></td><td>Passes the address so the function can modify the caller's variable.</td></tr>
+      <tr><td><b>Inline function</b></td><td>A function whose code is directly inserted at every call site by the compiler.</td></tr>
+      <tr><td><b>return statement</b></td><td>A jump statement that ends a function and optionally sends a value back.</td></tr>
+      <tr><td><b>Recursion</b></td><td>A technique where a function calls itself, with a base case to stop.</td></tr>
+      <tr><td><b>Scope</b></td><td>The region/lifetime over which a variable is accessible.</td></tr>
+      <tr><td><b>Scope resolution operator (::)</b></td><td>Accesses a global/file-scope variable hidden by a local variable of the same name.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>📘 Textbook Questions — Sections B, C, D (reference)</h3>
+    <details class="acc"><summary>Section — B: Very Short Answers</summary>
+      <div class="acc-body">
+        <ol>
+          <li>Define Functions.</li>
+          <li>Write about strlen() function.</li>
+          <li>What are importance of void data type.</li>
+          <li>What is Parameter and list its types?</li>
+          <li>Write a note on Local Scope.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>Section — C: Short Answers</summary>
+      <div class="acc-body">
+        <ol>
+          <li>What is Built-in functions?</li>
+          <li>What is the difference between isupper() and toupper() functions?</li>
+          <li>Write about strcmp() function.</li>
+          <li>Write short note on pow() function in C++.</li>
+          <li>What are the information the prototype provides to the compiler?</li>
+          <li>What is default arguments? Give example.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>Section — D: Explain in detail</summary>
+      <div class="acc-body">
+        <ol>
+          <li>Explain Call by value method with suitable example.</li>
+          <li>What is Recursion? Write a program to find the factorial of the given number using recursion.</li>
+          <li>What are the different forms of function return? Explain with example.</li>
+          <li>Explain scope of variable with example.</li>
+          <li>Write a program to accept any integer number and reverse it.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>✍️ Answer-Writing Guide <span class="ta">(Learning Activity)</span></h3>
+    <details class="acc" open><summary>1-mark (MCQ) — approach</summary>
+      <div class="acc-body">Spot the keyword in the question and match it to the exact textbook term (e.g. "copies the address" → Call by Reference). For header-file questions, remember: stdio.h / ctype.h / string.h / math.h each own a distinct family of functions.</div>
+    </details>
+    <details class="acc"><summary>2/3-mark — sample structure</summary>
+      <div class="acc-body"><b>Structure:</b> (1) one-line definition → (2) general form / syntax → (3) one short example.<br><b>e.g.</b> "What is strlen()?" → "strlen() takes a null terminated string as its argument and returns its length (excluding the null character). General Form: strlen(string); Example: strlen(\"Computer Science\") returns 16."</div>
+    </details>
+    <details class="acc"><summary>5-mark — sample structure</summary>
+      <div class="acc-body"><b>Structure:</b> (1) definition → (2) syntax/general form → (3) a full program → (4) output → (5) one-line note on why it behaves that way.<br><b>e.g.</b> "Explain Call by Reference" → definition → <span class="mono">void display(int &amp;x)</span> syntax → Program 11.18 → output 2025/2025 → note that x and n1 share the same memory address.</div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (10 Questions)</h3>
+    <p>The textbook's Section-A MCQs are reused here for a fast self-test. Visit the Practice page for full explanations.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ Go to Practice Page</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div id="challengeWrap"></div>
+  </div>
+  `;
+}
+RENDERERS.examprep = renderExamPrep;
+
+/* =========================================================================
+   QUICK-CHECK / GENERIC MCQ ENGINE
+   ========================================================================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['A','B','C','D','E'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ Correct!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ Not quite. Correct answer: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* =========================================================================
+   QUICK-CHECK QUESTION BANKS (one per topic)
+   ========================================================================= */
+const QC_BANKS = {
+  intro: { 'qc1': {q:'What are the two main reasons for using functions, as given in the textbook?', o:['Divide and Conquer &amp; Reusability','Speed and Security','Debugging and Testing only','Portability and Compatibility'], c:0, exp:'Section 11.2 lists exactly two reasons: Divide and Conquer, and Reusability.'} },
+  types: { 'qc2': {q:'Which type of function is ready-made and provided by the C++ library?', o:['User-defined','Built-in / Pre-defined / Library','Recursive','Inline'], c:1, exp:'Built-in (also called Pre-defined or Library) functions are already written, debugged and compiled, and stored in header files.'} },
+  stdio: { 'qc3': {q:'Which function reads a single character from the keyboard?', o:['gets()','getchar()','puts()','strcpy()'], c:1, exp:'getchar() gets a single character from keyboard; putchar() displays it.'} },
+  ctype: { 'qc4': {q:"What does isalpha('7') return?", o:['1','0',"'7'",'Error'], c:1, exp:"isalpha() checks only for alphabets; '7' is a digit, not an alphabet, so it returns 0."} },
+  stringfn: { 'qc5': {q:'What does strcmp() return when the two strings are exactly equal?', o:['A positive value','A negative value','0','1'], c:2, exp:'strcmp() returns 0 if string1 and string2 are equal.'} },
+  mathfn: { 'qc6': {q:'What is pow(5, 4) according to Program 11.14?', o:['20','625','120','25'], c:1, exp:'pow(base, exponent) = base raised to exponent → 5^4 = 625.'} },
+  userdef: { 'qc7': {q:'In the function definition int sum(int x, int y), x and y are called:', o:['Actual parameters','Formal parameters','Global variables','Constants'], c:1, exp:'Variables named in the function DEFINITION are formal parameters.'} },
+  defaultconst: { 'qc8': {q:'Default arguments must be assigned from ___ to ___ in the argument list (no gaps).', o:['left ... right','right ... left','top ... bottom','any order is fine'], c:1, exp:'Default values are filled from right to left — you cannot skip a middle argument.'} },
+  calling: { 'qc9': {q:"Which calling method allows a function to permanently change the caller's variable?", o:['Call by Value','Call by Reference','Inline function','Recursion'], c:1, exp:'Call by Reference passes the ADDRESS, so changes inside the function are reflected back in the caller.'} },
+  forms: { 'qc10': {q:'A function with no return value and no parameters has return type:', o:['int','float','void','char'], c:2, exp:'void explicitly tells the compiler that the function returns nothing.'} },
+  recursion: { 'qc11': {q:'What must every recursive function have, to avoid calling itself forever?', o:['A loop','A base case','A pointer','A header file'], c:1, exp:'A base case (like if (m&gt;1) ... else return 1;) is what stops the recursive calls.'} },
+  scope: { 'qc12': {q:'A variable declared outside all functions (including main) has:', o:['Local scope','Function scope','File / Global scope','Class scope'], c:2, exp:'This is called File scope, and the variable is also known as a global variable.'} },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   PRACTICE PAGE DATA
+   ========================================================================= */
+const MCQ_BOOK = {
+  'b1': {q:'1. Which of the following header file defines the standard I/O predefined functions?', o:['stdio.h','math.h','string.h','ctype.h'], c:0},
+  'b2': {q:'2. Which function is used to check whether a character is alphanumeric or not.', o:['isalpha()','isdigit()','isalnum()','islower()'], c:2},
+  'b3': {q:'3. Which function begins the program execution?', o:['isalpha()','isdigit()','main()','islower()'], c:2},
+  'b4': {q:'4. Which of the following function is with a return value and without any argument?', o:['x=display(int, int)','x=display()','y=display(float)','display(int)'], c:1},
+  'b5': {q:'5. Which is return data type of the function prototype of add(int, int); ?', o:['int','float','char','double'], c:0},
+  'b6': {q:'6. Which of the following is the scope operator?', o:['&gt;','&amp;','%','::'], c:3},
+};
+
+const MCQ_EXTRA = {
+  'e1': {tier:'tier-green', tierLabel:'🟢 Beginner', q:`Predict the output (based on Program 11.3): <pre class="code-block">char ch = 'A';
+cout &lt;&lt; isalnum(ch);</pre>`, o:['0','1',"'A'",'Error'], c:1, exp:"'A' is a letter, so isalnum() returns a non-zero value (1)."},
+  'e2': {tier:'tier-green', tierLabel:'🟢 Beginner', q:`Predict the output: <pre class="code-block">cout &lt;&lt; isalpha('3');</pre>`, o:['0','1','3','Error'], c:0, exp:"'3' is a digit, not an alphabet, so isalpha() returns 0."},
+  'e3': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:`Predict the output (based on Program 11.7): <pre class="code-block">char source[ ] = "Computer Science";
+cout &lt;&lt; strlen(source);</pre>`, o:['15','16','17','18'], c:1, exp:'"Computer Science" has 16 characters (not counting the null terminator): C-o-m-p-u-t-e-r (8) + space (1) + S-c-i-e-n-c-e (7) = 16.'},
+  'e4': {tier:'tier-yellow', tierLabel:'🟡 Practice', q:`Based on Program 11.17 (Call by Value): <pre class="code-block">void display(int x){ x=x*x; }
+int main(){ int a=5; display(a); cout&lt;&lt;a; }</pre> What does main() print for <span class="mono">a</span>?`, o:['5','25','0','Compile Error'], c:0, exp:'Call by Value copies the value into x. Changing x inside display() never affects a in main() — a stays 5.'},
+  'e5': {tier:'tier-red', tierLabel:'🔴 Challenge', q:`Based on Program 11.18 (Call by Reference): <pre class="code-block">void display(int &amp;x){ x=x*x; }
+int main(){ int n1=45; display(n1); cout&lt;&lt;n1; }</pre> What does main() print for <span class="mono">n1</span>?`, o:['45','90','2025','Compile Error'], c:2, exp:'With &amp;, x and n1 share the same memory address. x becomes 45*45=2025, so n1 also becomes 2025.'},
+  'e6': {tier:'tier-red', tierLabel:'🔴 Challenge', q:`Based on Program 11.25 (Recursion): what value does <span class="mono">factorial(4)</span> return?`, o:['4','24','10','120'], c:1, exp:'factorial(4) = 4×3×2×1 = 24. (factorial(5) is the one that equals 120, as shown in the textbook output.)'},
+};
+
+const TF_QS = [
+  {q:'A C++ program can have more than one main() function.', a:false, exp:'False — a C++ program must always have exactly ONE main() function to begin execution.'},
+  {q:'void means the function does not return any value.', a:true, exp:'True — void explicitly tells the compiler the function returns nothing.'},
+  {q:"In Call by Value, changes made inside the function affect the caller's variable.", a:false, exp:'False — Call by Value copies only the value; the caller\'s variable is never affected.'},
+  {q:"The default return type of a function in C++, when not specified, is int.", a:true, exp:'True — "the return value of a function in C++ is of type int when no return value is explicitly given."'},
+  {q:'A recursive function must always have a base case.', a:true, exp:'True — without a base case (a stopping condition), the function calls itself forever.'},
+];
+
+const FIB_QS = [
+  {text:'The ______ statement is used to return from a function and transfer control back to the caller.', ans:'return'},
+  {text:'The scope resolution operator is written as ______.', ans:'::'},
+  {text:'strcmp() returns ______ when the two strings are equal.', ans:'0'},
+  {text:'A function that calls itself is known as a ______ function.', ans:'recursive'},
+];
+
+const MATCH_LEFT = ['stdio.h','ctype.h','string.h','math.h'];
+const MATCH_RIGHT = ['cos(), sqrt(), sin(), pow()','getchar(), putchar(), gets(), puts()','strcpy(), strlen(), strcmp(), strcat()','isalpha(), isdigit(), toupper(), tolower()'];
+const MATCH_ANSWER = {
+  'stdio.h':'getchar(), putchar(), gets(), puts()',
+  'ctype.h':'isalpha(), isdigit(), toupper(), tolower()',
+  'string.h':'strcpy(), strlen(), strcmp(), strcat()',
+  'math.h':'cos(), sqrt(), sin(), pow()'
+};
+
+const DEBUG_CASES = [
+  {wrong:'if(a>b)\n{\n    int t;\n    t=a+20;\n}\ncout<<t;    // from Program 11.26', errorType:'Compile-time / Scope Error', why:'t is a local variable declared inside the if-block. Its scope is only that block — once the block ends, t is destroyed and cannot be used outside it. (This is exactly the textbook\'s Program 11.26 error.)', fix:'Declare "int t;" just after int a,b; (outside the if-block) if its value is needed after the block ends.'},
+  {wrong:'void display(int x)   // missing &\n{\n    x = x*x;\n}\nint main()\n{\n    int n1=45;\n    display(n1);\n    cout<<n1;   // programmer expected 2025\n}', errorType:'Logical Error', why:'The function header is missing the & symbol, so x is only a COPY of n1 (Call by Value), not a reference. Changing x inside display() does not change n1 — n1 still prints 45, not 2025.', fix:'void display(int &x)   // add & to make it Call by Reference'},
+  {wrong:'void defaultvalue(int n1=10, int n2);', errorType:'Syntax Error', why:"Default arguments must be assigned from right to left, with no gaps. Here n1 (on the left) has a default but n2 (on its right) does not — this is invalid.", fix:'void defaultvalue(int n1, int n2=10);'},
+  {wrong:'double area(const double r,const double pi=3.14)\n{\n    r=25;              // trying to change a const parameter\n    return(pi*r*r);\n}', errorType:'Syntax Error (compile-time)', why:"r is declared const, so its value is read-only inside the function body. The compiler reports: \"assignment of read-only parameter 'r'\".", fix:'Do not assign to a const parameter. Use a separate ordinary variable if the value needs to change.'},
+  {wrong:'int main()\n{\n    cout<<factorial(5);   // used before being declared\n}\nint factorial(int m)\n{\n    if(m>1) return m*factorial(m-1);\n    else return 1;\n}', errorType:'Compile Error (missing prototype)', why:'factorial() is defined AFTER main() but called inside main() with no prior declaration. The compiler has not seen factorial() yet when it compiles main().', fix:'Add "int factorial(int);" as a function prototype before main(), exactly as Program 11.25 does.'},
+];
+
+const CHALLENGE_QS = {
+  'c1': {tier:'tier-red', tierLabel:'🔴 Challenge', q:`<pre class="code-block">void display(int &amp;x){ x = x + x*x; }
+int main(){ int n1=6; display(n1); cout&lt;&lt;n1; }</pre> What is the final value of n1?`, o:['6','36','42','48'], c:2, exp:'x=n1=6. x = x + x*x = 6 + 36 = 42. Since x is a reference to n1, n1 becomes 42.'},
+  'c2': {tier:'tier-red', tierLabel:'🔴 Challenge', q:'Prototype: <span class="mono">void f(int a, int b=5, int c=10);</span> Which call is INVALID?', o:['f(1,2,3)','f(1)','f(1,2)','f(1,,3)'], c:3, exp:'You cannot "skip" a middle argument with an empty comma — f(1,,3) is a syntax error. Once you supply an argument, every argument to its left must also be supplied.'},
+};
+
+/* =========================================================================
+   WIRE-UP DISPATCH
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcEl = document.getElementById('qc-' + topicId);
+  if(qcEl && QC_BANKS[topicId]){
+    qcEl.innerHTML = renderQC(topicId);
+    wireMCQ('#qc-' + topicId, QC_BANKS[topicId]);
+  }
+  if(topicId === 'stdio') wireStdio();
+  if(topicId === 'ctype') wireCtype();
+  if(topicId === 'stringfn') wireStringFn();
+  if(topicId === 'mathfn') wireMathFn();
+  if(topicId === 'userdef') wireUserdef();
+  if(topicId === 'defaultconst') wireDefaultConst();
+  if(topicId === 'calling') wireCalling();
+  if(topicId === 'forms') wireForms();
+  if(topicId === 'recursion') wireRecursion();
+  if(topicId === 'scope') wireScope();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* ---- Topic 3: stdio.h ---- */
+function wireStdio(){
+  document.getElementById('stdioCheckBtn').addEventListener('click', () => {
+    const val = document.getElementById('stdioInput').value;
+    const out = document.getElementById('stdioOut');
+    if(!val){ out.textContent = 'Please type something first.'; return; }
+    if(val.length === 1){
+      out.innerHTML = `<b>getchar()</b> would read this ONE character: '${val}'. <b>putchar(ch)</b> would then display it back: ${val}`;
+    } else {
+      out.innerHTML = `<b>gets()</b> would read this WHOLE line as a string: "${val}". <b>puts(str)</b> would then print it back, followed by a newline: ${val}`;
+    }
+  });
+}
+
+/* ---- Topic 4: ctype.h Character Tester ---- */
+function ctypeCompute(ch){
+  const isAlpha = /[A-Za-z]/.test(ch);
+  const isDigit = /[0-9]/.test(ch);
+  return {
+    isAlnum: (isAlpha || isDigit) ? 1 : 0,
+    isAlpha: isAlpha ? 1 : 0,
+    isDigit: isDigit ? 1 : 0,
+    isLower: /[a-z]/.test(ch) ? 1 : 0,
+    isUpper: /[A-Z]/.test(ch) ? 1 : 0,
+    toUpper: isAlpha ? ch.toUpperCase() : ch,
+    toLower: isAlpha ? ch.toLowerCase() : ch,
+  };
+}
+function wireCtype(){
+  function update(){
+    const ch = (document.getElementById('ctypeInput').value || '').charAt(0);
+    const keys = ['isalnum','isalpha','isdigit','islower','isupper','toupper','tolower'];
+    if(!ch){ keys.forEach(k => document.getElementById('out-'+k).textContent = '—'); return; }
+    const r = ctypeCompute(ch);
+    document.getElementById('out-isalnum').textContent = r.isAlnum;
+    document.getElementById('out-isalpha').textContent = r.isAlpha;
+    document.getElementById('out-isdigit').textContent = r.isDigit;
+    document.getElementById('out-islower').textContent = r.isLower;
+    document.getElementById('out-isupper').textContent = r.isUpper;
+    document.getElementById('out-toupper').textContent = "'" + r.toUpper + "'";
+    document.getElementById('out-tolower').textContent = "'" + r.toLower + "'";
+  }
+  document.getElementById('ctypeInput').addEventListener('input', update);
+  document.querySelectorAll('[data-ctype-sample]').forEach(btn => {
+    btn.addEventListener('click', () => { document.getElementById('ctypeInput').value = btn.dataset.ctypeSample; update(); });
+  });
+  update();
+}
+
+/* ---- Topic 5: string.h Sandbox ---- */
+function wireStringFn(){
+  function out(msg){ document.getElementById('strOut').innerHTML = msg; }
+  document.querySelectorAll('[data-strfn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const fn = btn.dataset.strfn;
+      const targetInput = document.getElementById('strTarget');
+      const sourceInput = document.getElementById('strSource');
+      let target = targetInput.value, source = sourceInput.value;
+      if(fn === 'strcpy'){
+        const before = target; target = source; targetInput.value = target;
+        out(`<b>strcpy(target, source)</b><br>Before: target = "${before}"<br>After: target = "${target}" (the null-terminated copy of source is written into target)`);
+      } else if(fn === 'strlen'){
+        out(`<b>strlen(source)</b><br>source = "${source}"<br>Length = <b>${source.length}</b> (the null character \\0 is not counted)`);
+      } else if(fn === 'strcmp'){
+        let result = 0;
+        for(let i=0; i<Math.max(target.length, source.length); i++){
+          const a = target.charCodeAt(i) || 0, b = source.charCodeAt(i) || 0;
+          if(a !== b){ result = a - b; break; }
+        }
+        const desc = result === 0 ? '0 (Equal)' : (result > 0 ? `Positive (${result}) — target &gt; source` : `Negative (${result}) — target &lt; source`);
+        out(`<b>strcmp(target, source)</b><br>target = "${target}", source = "${source}"<br>Result = <b>${desc}</b>`);
+      } else if(fn === 'strcat'){
+        const before = target; target = target + source; targetInput.value = target;
+        out(`<b>strcat(target, source)</b><br>Before: target = "${before}"<br>After: target = "${target}" (source appended to the end of target)`);
+      } else if(fn === 'strupr'){
+        const before = source; source = source.toUpperCase(); sourceInput.value = source;
+        out(`<b>strupr(source)</b><br>Before: "${before}"<br>After: "${source}"`);
+      } else if(fn === 'strlwr'){
+        const before = source; source = source.toLowerCase(); sourceInput.value = source;
+        out(`<b>strlwr(source)</b><br>Before: "${before}"<br>After: "${source}"`);
+      }
+    });
+  });
+}
+
+/* ---- Topic 6: math.h Calculator ---- */
+function wireMathFn(){
+  function fmt(n){
+    if(!isFinite(n)) return 'domain error';
+    let s = n.toFixed(6).replace(/0+$/,'').replace(/\.$/,'');
+    return s === '' || s === '-' ? '0' : s;
+  }
+  document.getElementById('mathCalcBtn').addEventListener('click', () => {
+    const x = parseFloat(document.getElementById('mathX').value) || 0;
+    const sv = parseFloat(document.getElementById('mathSqrtVal').value) || 0;
+    const base = parseFloat(document.getElementById('mathBase').value) || 0;
+    const exp = parseFloat(document.getElementById('mathExp').value) || 0;
+    document.getElementById('mathCosLbl').textContent = `cos(${x})`;
+    document.getElementById('mathSinLbl').textContent = `sin(${x})`;
+    document.getElementById('mathSqrtLbl').textContent = `sqrt(${sv})`;
+    document.getElementById('mathPowLbl').textContent = `pow(${base},${exp})`;
+    document.getElementById('out-cos').textContent = fmt(Math.cos(x));
+    document.getElementById('out-sin').textContent = fmt(Math.sin(x));
+    document.getElementById('out-sqrt').textContent = sv < 0 ? 'domain error (negative input)' : fmt(Math.sqrt(sv));
+    document.getElementById('out-pow').textContent = fmt(Math.pow(base, exp));
+  });
+}
+
+/* ---- Topic 7: Function prototype diagram (Figure 11.1) ---- */
+function wireUserdef(){
+  const EXPL = {
+    long: 'Return type = long → the value sent back by fact() will be of type long.',
+    fact: 'Function name = fact → this is the identifier used to call the function.',
+    args: 'List of arguments = (int, double) → fact() is called with TWO arguments: the first of type int, the second of type double.',
+  };
+  document.querySelectorAll('#protoDiagram .flow-node').forEach(node => {
+    node.addEventListener('click', () => {
+      document.querySelectorAll('#protoDiagram .flow-node').forEach(n => n.classList.remove('active'));
+      node.classList.add('active');
+      document.getElementById('protoExplain').textContent = EXPL[node.dataset.part];
+    });
+  });
+}
+
+/* ---- Topic 8: Default Argument Resolver ---- */
+function wireDefaultConst(){
+  document.querySelectorAll('[data-defcall]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const raw = btn.dataset.defcall;
+      const parts = raw.length ? raw.split(',').map(s => s.trim()) : [];
+      const n1given = parts[0] !== undefined;
+      const n2given = parts[1] !== undefined;
+      const n1 = n1given ? parts[0] : '10';
+      const n2 = n2given ? parts[1] : '100';
+      document.getElementById('defOut').innerHTML =
+        `<b>defaultvalue(${raw})</b> → n1 = <b>${n1}</b> ${n1given ? '(given)' : '(default, since omitted)'}, n2 = <b>${n2}</b> ${n2given ? '(given)' : '(default, since omitted)'}`;
+    });
+  });
+}
+
+/* ---- Topic 9: Call by Value / Call by Reference / Inline ---- */
+let valIdx = -1, refIdx = -1;
+const STEPS_VAL = [
+  {main:5, func:null, op:.35, explain:'a = 5 is read into main(). display() has not been called yet.', log:null},
+  {main:5, func:5, op:1, explain:'display(a) is called. The VALUE of a (5) is COPIED into x. Two separate boxes now exist at two different addresses.', log:'Call by Value → x receives a COPY of a (x=5).'},
+  {main:5, func:25, op:1, pulse:'func', explain:"Inside display(): x = x*x → x becomes 25. Only the function's own box changes.", log:'x = x*x → x = 25 (only inside display())'},
+  {main:5, func:25, op:1, explain:'Output inside display(): "The Value inside display function (x*x):25"', log:'cout displays: The Value inside display function (x*x):25'},
+  {main:5, func:25, op:1, pulse:'main', explain:'Control returns to main(). a was NEVER touched by display() — it is still 5.', log:'Return to main(). a is unaffected = 5'},
+  {main:5, func:25, op:1, explain:'Output in main(): "The Value inside main function 5". Call by Value never changes the caller\'s variable.', log:'cout displays: The Value inside main function 5'},
+];
+function applyValStep(i){
+  const s = STEPS_VAL[i];
+  document.getElementById('valMainVal').textContent = s.main;
+  document.getElementById('valFuncVal').textContent = s.func === null ? '—' : s.func;
+  document.getElementById('valBoxFunc').style.opacity = s.op;
+  document.getElementById('valExplain').textContent = s.explain;
+  if(s.pulse){
+    const b = document.getElementById(s.pulse === 'func' ? 'valBoxFunc' : 'valBoxMain');
+    b.classList.remove('changed'); void b.offsetWidth; b.classList.add('changed');
+  }
+  if(s.log){
+    const log = document.getElementById('valLog');
+    log.innerHTML += `<div class="ln"><span class="step-no">#${i}</span> ${s.log}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+  document.getElementById('valStepBtn').disabled = i >= STEPS_VAL.length - 1;
+}
+function wireCallingValue(){
+  valIdx = -1;
+  document.getElementById('valStartBtn').addEventListener('click', () => {
+    valIdx = 0; document.getElementById('valLog').innerHTML = ''; applyValStep(0);
+  });
+  document.getElementById('valStepBtn').addEventListener('click', () => {
+    if(valIdx < STEPS_VAL.length - 1){ valIdx++; applyValStep(valIdx); }
+  });
+  document.getElementById('valResetBtn').addEventListener('click', () => {
+    valIdx = -1;
+    document.getElementById('valLog').innerHTML = '';
+    document.getElementById('valMainVal').textContent = '5';
+    document.getElementById('valFuncVal').textContent = '—';
+    document.getElementById('valBoxFunc').style.opacity = .35;
+    document.getElementById('valExplain').textContent = 'Click Start to begin the step-by-step walkthrough of Program 11.17.';
+    document.getElementById('valStepBtn').disabled = false;
+  });
+}
+
+const STEPS_REF = [
+  {label:'main() → n1', val:45, explain:'n1 = 45 is read in main(). display(n1) has not been called yet.', log:null},
+  {label:'main() n1 == display() x  (same box!)', val:45, explain:'display(n1) is called with int &x. x is just ANOTHER NAME for n1 — no copy is made, it is the same address.', log:'Call by Reference → x and n1 share the same memory.'},
+  {label:'main() n1 == display() x  (same box!)', val:2025, pulse:true, explain:'Inside display(): x = x*x → the SHARED box becomes 2025. Since x IS n1, n1 also becomes 2025 instantly.', log:'x = x*x → shared value becomes 2025'},
+  {label:'main() n1 == display() x  (same box!)', val:2025, explain:'Output inside display(): "The Value inside display function (x*x):2025"', log:'cout displays: The Value inside display function (x*x):2025'},
+  {label:'main() → n1', val:2025, explain:'Control returns to main(). n1 is now 2025 — permanently changed.', log:'Return to main(). n1 = 2025 (changed!)'},
+  {label:'main() → n1', val:2025, explain:'Output in main(): "The Value of N1 is inside main function After passing (n1 x n1): 2025"', log:'cout displays final n1 = 2025'},
+];
+function applyRefStep(i){
+  const s = STEPS_REF[i];
+  document.getElementById('refBoxLabel').textContent = s.label;
+  document.getElementById('refVal').textContent = s.val;
+  document.getElementById('refExplain').textContent = s.explain;
+  if(s.pulse){
+    const b = document.getElementById('refBoxShared');
+    b.classList.remove('changed'); void b.offsetWidth; b.classList.add('changed');
+  }
+  if(s.log){
+    const log = document.getElementById('refLog');
+    log.innerHTML += `<div class="ln"><span class="step-no">#${i}</span> ${s.log}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+  document.getElementById('refStepBtn').disabled = i >= STEPS_REF.length - 1;
+}
+function wireCallingRef(){
+  refIdx = -1;
+  document.getElementById('refStartBtn').addEventListener('click', () => {
+    refIdx = 0; document.getElementById('refLog').innerHTML = ''; applyRefStep(0);
+  });
+  document.getElementById('refStepBtn').addEventListener('click', () => {
+    if(refIdx < STEPS_REF.length - 1){ refIdx++; applyRefStep(refIdx); }
+  });
+  document.getElementById('refResetBtn').addEventListener('click', () => {
+    refIdx = -1;
+    document.getElementById('refLog').innerHTML = '';
+    document.getElementById('refBoxLabel').textContent = 'main() → n1';
+    document.getElementById('refVal').textContent = '45';
+    document.getElementById('refExplain').textContent = 'Click Start to begin the step-by-step walkthrough of Program 11.18.';
+    document.getElementById('refStepBtn').disabled = false;
+  });
+}
+function wireInlineToggle(){
+  let shown = false;
+  document.getElementById('inlineToggleBtn').addEventListener('click', () => {
+    shown = !shown;
+    const out = document.getElementById('inlineOut');
+    out.innerHTML = shown
+      ? `<div style="text-align:center;font-family:monospace;">z = a+b;  <span style="color:var(--accent);">// (10+20) — the compiler copies add()'s body directly here, no function-call / STACK overhead!</span></div>`
+      : `<div style="text-align:center;font-family:monospace;">z = add(x,y); <span style="color:var(--muted);">(as written by the programmer)</span></div>`;
+  });
+}
+function wireCalling(){ wireCallingValue(); wireCallingRef(); wireInlineToggle(); }
+
+/* ---- Topic 10: Which form is this? ---- */
+function wireForms(){
+  const MAP = {
+    'void f()': 'Form 11.7.1 — WITHOUT return value, WITHOUT parameter (like Program 11.20).',
+    'int f()': 'Form 11.7.2 — WITH return value, WITHOUT parameter (like Program 11.21).',
+    'void f(int x)': 'Form 11.7.3 — WITHOUT return value, WITH parameter (like Program 11.22).',
+    'int f(int x, int y)': 'Form 11.7.4 — WITH return value, WITH parameter (like Program 11.23).',
+  };
+  document.querySelectorAll('[data-form]').forEach(btn => {
+    btn.addEventListener('click', () => { document.getElementById('formOut').textContent = MAP[btn.dataset.form] || ''; });
+  });
+}
+
+/* ---- Topic 11: Recursive Call Stack (factorial) ---- */
+let recEvents = [], recPtr = -1, recRunning = null, recStack = [];
+function buildRecEvents(n){
+  const events = [];
+  for(let m=n; m>=1; m--) events.push({type:'push', m});
+  for(let m=1; m<=n; m++) events.push({type:'pop', m});
+  events.push({type:'final'});
+  return events;
+}
+function recLogLine(msg){
+  const log = document.getElementById('recLog');
+  log.innerHTML += `<div class="ln"><span class="step-no">#${recPtr+1}</span> ${msg}</div>`;
+  log.scrollTop = log.scrollHeight;
+}
+function renderRecStackUI(){
+  document.getElementById('recStack').innerHTML =
+    recStack.map(f => `<div class="stack-frame${f.returning ? ' returning' : ''}">${f.text}</div>`).join('');
+}
+function wireRecursion(){
+  recEvents = []; recPtr = -1; recRunning = null; recStack = [];
+  document.getElementById('recStartBtn').addEventListener('click', () => {
+    let n = parseInt(document.getElementById('recInput').value, 10);
+    if(isNaN(n)) n = 5;
+    n = Math.max(2, Math.min(7, n));
+    document.getElementById('recInput').value = n;
+    recEvents = buildRecEvents(n); recPtr = -1; recRunning = null; recStack = [];
+    document.getElementById('recLog').innerHTML = '';
+    renderRecStackUI();
+    document.getElementById('recExplain').textContent = `Ready. factorial(${n}) will be computed. Click "Next Step" to begin.`;
+    document.getElementById('recStepBtn').disabled = false;
+  });
+  document.getElementById('recStepBtn').addEventListener('click', () => {
+    if(recPtr >= recEvents.length - 1) return;
+    recPtr++;
+    const ev = recEvents[recPtr];
+    if(ev.type === 'push'){
+      recStack.push({text:`factorial(${ev.m})`, returning:false});
+      renderRecStackUI();
+      const note = ev.m > 1 ? `is ${ev.m}&gt;1? yes → will return ${ev.m} * factorial(${ev.m-1})` : `is 1&gt;1? no → base case, will return 1`;
+      recLogLine(`Call: factorial(${ev.m}) — ${note}`);
+      document.getElementById('recExplain').textContent = ev.m > 1
+        ? `factorial(${ev.m}) is pushed onto the stack and calls factorial(${ev.m-1}).`
+        : `factorial(1) is pushed — this is the base case.`;
+    } else if(ev.type === 'pop'){
+      const val = ev.m === 1 ? 1 : ev.m * recRunning;
+      if(recStack.length){
+        recStack[recStack.length-1].returning = true;
+        recStack[recStack.length-1].text = `factorial(${ev.m}) = ${val}`;
+      }
+      renderRecStackUI();
+      recLogLine(ev.m === 1
+        ? `Return: factorial(1) = 1 (base case)`
+        : `Return: factorial(${ev.m}) = ${ev.m} × factorial(${ev.m-1}) = ${ev.m} × ${recRunning} = ${val}`);
+      recRunning = val;
+      recStack.pop();
+      document.getElementById('recExplain').textContent = `factorial(${ev.m}) finishes and returns ${val} to its caller.`;
+    } else if(ev.type === 'final'){
+      recLogLine(`✅ Final result: factorial(${document.getElementById('recInput').value}) = ${recRunning}`);
+      document.getElementById('recExplain').textContent = `Done! Factorial of Number ${document.getElementById('recInput').value} = ${recRunning}`;
+    }
+    document.getElementById('recStepBtn').disabled = recPtr >= recEvents.length - 1;
+  });
+  document.getElementById('recResetBtn').addEventListener('click', () => {
+    recEvents = []; recPtr = -1; recRunning = null; recStack = [];
+    document.getElementById('recLog').innerHTML = '';
+    renderRecStackUI();
+    document.getElementById('recExplain').textContent = 'Enter a number and click Start.';
+    document.getElementById('recStepBtn').disabled = false;
+  });
+}
+
+/* ---- Topic 12: Scope Explorer ---- */
+const SCOPE_EXPLAIN = {
+  file_var_decl: 'file_var is declared OUTSIDE all functions → File scope (global variable). Accessible everywhere in the program, for its entire lifetime.',
+  add_fn: 'add(int x) is a function. x is its formal parameter — Function scope, alive only while add() executes.',
+  main_fn: 'main() is the function where program execution begins.',
+  a_b_decl: 'a and b are declared inside main() directly (not inside a sub-block) → Function scope within main().',
+  t_decl: 't is declared INSIDE the if-block { }. This gives t Local scope — it exists only within that block, and is destroyed the moment the block ends.',
+  t_use: '❌ ERROR: t was declared inside the if-block, which has already ended by this point. t no longer exists here — exactly the textbook\'s error: "\'t\' was not declared in main()".',
+  add_call: 'add(a) is called here — a (value 5) is passed in as the actual parameter.',
+  m_use: '❌ ERROR: m is a Function-scope variable belonging to add(). main() cannot see it at all, even though add() has already been called — exactly the textbook\'s error: "\'m\' was not declared in this scope".',
+  filevar_use: '✅ OK: file_var has File scope (global), so it is accessible here in main() — and everywhere else in the program.',
+};
+function wireScope(){
+  document.querySelectorAll('#scopeCodeBlock .code-line').forEach(line => {
+    line.addEventListener('click', () => {
+      document.querySelectorAll('#scopeCodeBlock .code-line').forEach(l => l.classList.remove('active-line'));
+      line.classList.add('active-line');
+      document.getElementById('scopeExplain').innerHTML = SCOPE_EXPLAIN[line.dataset.scope] || '';
+    });
+  });
+  const btn1 = document.getElementById('scopeResBtn1'), btn2 = document.getElementById('scopeResBtn2');
+  if(btn1) btn1.addEventListener('click', () => {
+    document.getElementById('scopeResOut').innerHTML = '<b>cout&lt;&lt;x;</b> → prints the LOCAL x = <b>10</b>. Without ::, C++ always prefers the closest (local) variable.';
+  });
+  if(btn2) btn2.addEventListener('click', () => {
+    document.getElementById('scopeResOut').innerHTML = '<b>cout&lt;&lt;::x;</b> → prints the GLOBAL x = <b>45</b>. :: forces access to the file-scope variable, even though a local x exists.';
+  });
+}
+
+/* ---- Topic 13: Practice page (MCQ book/extra, TF, FIB, Match, Debug) ---- */
+function wireTF(idx, qObj, container){
+  const div = document.createElement('div');
+  div.className = 'q-block';
+  div.innerHTML = `<div class="q-text">${idx+1}. ${qObj.q}</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" data-tf="true">True</button>
+      <button class="btn btn-ghost" data-tf="false">False</button>
+    </div>
+    <div class="feedback-line"></div>`;
+  container.appendChild(div);
+  div.querySelectorAll('[data-tf]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(div.dataset.answered) return;
+      div.dataset.answered = '1';
+      const chosen = btn.dataset.tf === 'true';
+      const fb = div.querySelector('.feedback-line');
+      if(chosen === qObj.a){ fb.textContent = '✅ Correct! ' + qObj.exp; fb.className = 'feedback-line ok'; }
+      else { fb.textContent = '❌ Not quite. ' + qObj.exp; fb.className = 'feedback-line bad'; }
+    });
+  });
+}
+function wirePractice(){
+  const bookWrap = document.getElementById('mcqBookWrap');
+  if(bookWrap){
+    bookWrap.innerHTML = Object.keys(MCQ_BOOK).map(qid => mcqHTML(qid, MCQ_BOOK[qid], '', '')).join('');
+    wireMCQ('#mcqBookWrap', MCQ_BOOK);
+  }
+  const extraWrap = document.getElementById('mcqExtraWrap');
+  if(extraWrap){
+    extraWrap.innerHTML = Object.keys(MCQ_EXTRA).map(qid => mcqHTML(qid, MCQ_EXTRA[qid], MCQ_EXTRA[qid].tier, MCQ_EXTRA[qid].tierLabel)).join('');
+    wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+  }
+  const tfWrap = document.getElementById('tfWrap');
+  if(tfWrap){ tfWrap.innerHTML = ''; TF_QS.forEach((q,i) => wireTF(i,q,tfWrap)); }
+
+  const fibWrap = document.getElementById('fibWrap');
+  if(fibWrap){
+    fibWrap.innerHTML = FIB_QS.map((q,i) => `<div class="fib-row">${i+1}. ${q.text} <input type="text" id="fib-${i}"></div>`).join('');
+  }
+  const fibCheckBtn = document.getElementById('fibCheckBtn');
+  if(fibCheckBtn){
+    fibCheckBtn.addEventListener('click', () => {
+      let correct = 0;
+      FIB_QS.forEach((q,i) => {
+        const inp = document.getElementById('fib-'+i);
+        const ok = (inp.value||'').trim().toLowerCase() === q.ans.toLowerCase();
+        inp.style.borderColor = ok ? 'var(--correct)' : 'var(--incorrect)';
+        if(ok) correct++;
+      });
+      document.getElementById('fibResult').textContent = `Score: ${correct} / ${FIB_QS.length}`;
+    });
+  }
+
+  const matchWrap = document.getElementById('matchWrap');
+  if(matchWrap){
+    matchWrap.innerHTML = MATCH_LEFT.map((l,i) => `
+      <div class="fib-row"><b class="mono">${l}</b>
+        <select id="match-${i}">
+          <option value="">-- choose the matching functions --</option>
+          ${MATCH_RIGHT.map(r => `<option value="${r.replace(/"/g,'&quot;')}">${r}</option>`).join('')}
+        </select>
+      </div>`).join('') +
+      '<div class="btn-row"><button class="btn btn-primary" id="matchCheckBtn">Check Matches</button></div><div id="matchResult" style="margin-top:8px;font-weight:700;"></div>';
+    document.getElementById('matchCheckBtn').addEventListener('click', () => {
+      let correct = 0;
+      MATCH_LEFT.forEach((l,i) => {
+        const sel = document.getElementById('match-'+i);
+        const ok = sel.value === MATCH_ANSWER[l];
+        sel.style.borderColor = ok ? 'var(--correct)' : 'var(--incorrect)';
+        if(ok) correct++;
+      });
+      document.getElementById('matchResult').textContent = `Score: ${correct} / ${MATCH_LEFT.length}`;
+    });
+  }
+
+  const debugWrap = document.getElementById('debugWrap');
+  if(debugWrap){
+    debugWrap.innerHTML = DEBUG_CASES.map((c,i) => `
+      <div class="debug-card">
+        <div class="debug-wrong">❌ ${c.wrong.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-debug-why="${i}">Show Why / Error Type</button>
+          <button class="btn btn-ghost" data-debug-fix="${i}">✅ Show Fix</button>
+        </div>
+        <div class="debug-why" id="debug-why-${i}"><b>${c.errorType}:</b> ${c.why}</div>
+        <div class="debug-fix" id="debug-fix-${i}">${c.fix.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>`).join('');
+    debugWrap.querySelectorAll('[data-debug-why]').forEach(btn => {
+      btn.addEventListener('click', () => document.getElementById('debug-why-'+btn.dataset.debugWhy).classList.toggle('show'));
+    });
+    debugWrap.querySelectorAll('[data-debug-fix]').forEach(btn => {
+      btn.addEventListener('click', () => document.getElementById('debug-fix-'+btn.dataset.debugFix).classList.toggle('show'));
+    });
+  }
+}
+
+/* ---- Topic 14: Exam Prep ---- */
+function wireExamPrep(){
+  const challengeWrap = document.getElementById('challengeWrap');
+  if(challengeWrap){
+    challengeWrap.innerHTML = Object.keys(CHALLENGE_QS).map(qid => mcqHTML(qid, CHALLENGE_QS[qid], CHALLENGE_QS[qid].tier, CHALLENGE_QS[qid].tierLabel)).join('');
+    wireMCQ('#challengeWrap', CHALLENGE_QS);
+  }
+  const goBtn = document.getElementById('goToPracticeBtn');
+  if(goBtn){
+    goBtn.addEventListener('click', () => {
+      const idx = TOPICS.findIndex(t => t.id === 'practice');
+      if(idx >= 0) goTo(idx);
+    });
+  }
+}
+
+/* =========================================================================
+   BOOTSTRAP
+   ========================================================================= */
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
