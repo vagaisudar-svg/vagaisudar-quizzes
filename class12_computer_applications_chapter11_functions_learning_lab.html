@@ -2059,27 +2059,490 @@ int main(){ int n1=6; display(n1); cout&lt;&lt;n1; }</pre> What is the final val
 };
 
 /* =========================================================================
-   WIRE-UP DISPATCH (WORK IN PROGRESS)
-   -------------------------------------------------------------------------
-   TODO (not yet implemented — tracked for the next session):
-   - Deep simulations: ctype tester, string sandbox, math calculator,
-     prototype diagram clicks, default-argument resolver, call-by-value /
-     call-by-reference step animations, inline-function toggle, form
-     identifier, recursion call-stack stepper, scope explorer + scope
-     resolution operator demo.
-   - Practice page: wiring MCQ_BOOK / MCQ_EXTRA / TF_QS / FIB_QS / match /
-     DEBUG_CASES into their containers.
-   - Exam Prep page: wiring CHALLENGE_QS and the "Go to Practice" button.
-   Until those are wired, every topic's STATIC content (textbook
-   definitions, diagrams, tables, code) renders and reads correctly, and
-   each page's Quick Check MCQ (QC_BANKS) is fully interactive. Buttons
-   belonging to the TODO list above are present but currently inert.
+   WIRE-UP DISPATCH
    ========================================================================= */
 function wireUpHandlers(topicId){
   const qcEl = document.getElementById('qc-' + topicId);
   if(qcEl && QC_BANKS[topicId]){
     qcEl.innerHTML = renderQC(topicId);
     wireMCQ('#qc-' + topicId, QC_BANKS[topicId]);
+  }
+  if(topicId === 'stdio') wireStdio();
+  if(topicId === 'ctype') wireCtype();
+  if(topicId === 'stringfn') wireStringFn();
+  if(topicId === 'mathfn') wireMathFn();
+  if(topicId === 'userdef') wireUserdef();
+  if(topicId === 'defaultconst') wireDefaultConst();
+  if(topicId === 'calling') wireCalling();
+  if(topicId === 'forms') wireForms();
+  if(topicId === 'recursion') wireRecursion();
+  if(topicId === 'scope') wireScope();
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* ---- Topic 3: stdio.h ---- */
+function wireStdio(){
+  document.getElementById('stdioCheckBtn').addEventListener('click', () => {
+    const val = document.getElementById('stdioInput').value;
+    const out = document.getElementById('stdioOut');
+    if(!val){ out.textContent = 'Please type something first.'; return; }
+    if(val.length === 1){
+      out.innerHTML = `<b>getchar()</b> would read this ONE character: '${val}'. <b>putchar(ch)</b> would then display it back: ${val}`;
+    } else {
+      out.innerHTML = `<b>gets()</b> would read this WHOLE line as a string: "${val}". <b>puts(str)</b> would then print it back, followed by a newline: ${val}`;
+    }
+  });
+}
+
+/* ---- Topic 4: ctype.h Character Tester ---- */
+function ctypeCompute(ch){
+  const isAlpha = /[A-Za-z]/.test(ch);
+  const isDigit = /[0-9]/.test(ch);
+  return {
+    isAlnum: (isAlpha || isDigit) ? 1 : 0,
+    isAlpha: isAlpha ? 1 : 0,
+    isDigit: isDigit ? 1 : 0,
+    isLower: /[a-z]/.test(ch) ? 1 : 0,
+    isUpper: /[A-Z]/.test(ch) ? 1 : 0,
+    toUpper: isAlpha ? ch.toUpperCase() : ch,
+    toLower: isAlpha ? ch.toLowerCase() : ch,
+  };
+}
+function wireCtype(){
+  function update(){
+    const ch = (document.getElementById('ctypeInput').value || '').charAt(0);
+    const keys = ['isalnum','isalpha','isdigit','islower','isupper','toupper','tolower'];
+    if(!ch){ keys.forEach(k => document.getElementById('out-'+k).textContent = '—'); return; }
+    const r = ctypeCompute(ch);
+    document.getElementById('out-isalnum').textContent = r.isAlnum;
+    document.getElementById('out-isalpha').textContent = r.isAlpha;
+    document.getElementById('out-isdigit').textContent = r.isDigit;
+    document.getElementById('out-islower').textContent = r.isLower;
+    document.getElementById('out-isupper').textContent = r.isUpper;
+    document.getElementById('out-toupper').textContent = "'" + r.toUpper + "'";
+    document.getElementById('out-tolower').textContent = "'" + r.toLower + "'";
+  }
+  document.getElementById('ctypeInput').addEventListener('input', update);
+  document.querySelectorAll('[data-ctype-sample]').forEach(btn => {
+    btn.addEventListener('click', () => { document.getElementById('ctypeInput').value = btn.dataset.ctypeSample; update(); });
+  });
+  update();
+}
+
+/* ---- Topic 5: string.h Sandbox ---- */
+function wireStringFn(){
+  function out(msg){ document.getElementById('strOut').innerHTML = msg; }
+  document.querySelectorAll('[data-strfn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const fn = btn.dataset.strfn;
+      const targetInput = document.getElementById('strTarget');
+      const sourceInput = document.getElementById('strSource');
+      let target = targetInput.value, source = sourceInput.value;
+      if(fn === 'strcpy'){
+        const before = target; target = source; targetInput.value = target;
+        out(`<b>strcpy(target, source)</b><br>Before: target = "${before}"<br>After: target = "${target}" (the null-terminated copy of source is written into target)`);
+      } else if(fn === 'strlen'){
+        out(`<b>strlen(source)</b><br>source = "${source}"<br>Length = <b>${source.length}</b> (the null character \\0 is not counted)`);
+      } else if(fn === 'strcmp'){
+        let result = 0;
+        for(let i=0; i<Math.max(target.length, source.length); i++){
+          const a = target.charCodeAt(i) || 0, b = source.charCodeAt(i) || 0;
+          if(a !== b){ result = a - b; break; }
+        }
+        const desc = result === 0 ? '0 (Equal)' : (result > 0 ? `Positive (${result}) — target &gt; source` : `Negative (${result}) — target &lt; source`);
+        out(`<b>strcmp(target, source)</b><br>target = "${target}", source = "${source}"<br>Result = <b>${desc}</b>`);
+      } else if(fn === 'strcat'){
+        const before = target; target = target + source; targetInput.value = target;
+        out(`<b>strcat(target, source)</b><br>Before: target = "${before}"<br>After: target = "${target}" (source appended to the end of target)`);
+      } else if(fn === 'strupr'){
+        const before = source; source = source.toUpperCase(); sourceInput.value = source;
+        out(`<b>strupr(source)</b><br>Before: "${before}"<br>After: "${source}"`);
+      } else if(fn === 'strlwr'){
+        const before = source; source = source.toLowerCase(); sourceInput.value = source;
+        out(`<b>strlwr(source)</b><br>Before: "${before}"<br>After: "${source}"`);
+      }
+    });
+  });
+}
+
+/* ---- Topic 6: math.h Calculator ---- */
+function wireMathFn(){
+  function fmt(n){
+    if(!isFinite(n)) return 'domain error';
+    let s = n.toFixed(6).replace(/0+$/,'').replace(/\.$/,'');
+    return s === '' || s === '-' ? '0' : s;
+  }
+  document.getElementById('mathCalcBtn').addEventListener('click', () => {
+    const x = parseFloat(document.getElementById('mathX').value) || 0;
+    const sv = parseFloat(document.getElementById('mathSqrtVal').value) || 0;
+    const base = parseFloat(document.getElementById('mathBase').value) || 0;
+    const exp = parseFloat(document.getElementById('mathExp').value) || 0;
+    document.getElementById('mathCosLbl').textContent = `cos(${x})`;
+    document.getElementById('mathSinLbl').textContent = `sin(${x})`;
+    document.getElementById('mathSqrtLbl').textContent = `sqrt(${sv})`;
+    document.getElementById('mathPowLbl').textContent = `pow(${base},${exp})`;
+    document.getElementById('out-cos').textContent = fmt(Math.cos(x));
+    document.getElementById('out-sin').textContent = fmt(Math.sin(x));
+    document.getElementById('out-sqrt').textContent = sv < 0 ? 'domain error (negative input)' : fmt(Math.sqrt(sv));
+    document.getElementById('out-pow').textContent = fmt(Math.pow(base, exp));
+  });
+}
+
+/* ---- Topic 7: Function prototype diagram (Figure 11.1) ---- */
+function wireUserdef(){
+  const EXPL = {
+    long: 'Return type = long → the value sent back by fact() will be of type long.',
+    fact: 'Function name = fact → this is the identifier used to call the function.',
+    args: 'List of arguments = (int, double) → fact() is called with TWO arguments: the first of type int, the second of type double.',
+  };
+  document.querySelectorAll('#protoDiagram .flow-node').forEach(node => {
+    node.addEventListener('click', () => {
+      document.querySelectorAll('#protoDiagram .flow-node').forEach(n => n.classList.remove('active'));
+      node.classList.add('active');
+      document.getElementById('protoExplain').textContent = EXPL[node.dataset.part];
+    });
+  });
+}
+
+/* ---- Topic 8: Default Argument Resolver ---- */
+function wireDefaultConst(){
+  document.querySelectorAll('[data-defcall]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const raw = btn.dataset.defcall;
+      const parts = raw.length ? raw.split(',').map(s => s.trim()) : [];
+      const n1given = parts[0] !== undefined;
+      const n2given = parts[1] !== undefined;
+      const n1 = n1given ? parts[0] : '10';
+      const n2 = n2given ? parts[1] : '100';
+      document.getElementById('defOut').innerHTML =
+        `<b>defaultvalue(${raw})</b> → n1 = <b>${n1}</b> ${n1given ? '(given)' : '(default, since omitted)'}, n2 = <b>${n2}</b> ${n2given ? '(given)' : '(default, since omitted)'}`;
+    });
+  });
+}
+
+/* ---- Topic 9: Call by Value / Call by Reference / Inline ---- */
+let valIdx = -1, refIdx = -1;
+const STEPS_VAL = [
+  {main:5, func:null, op:.35, explain:'a = 5 is read into main(). display() has not been called yet.', log:null},
+  {main:5, func:5, op:1, explain:'display(a) is called. The VALUE of a (5) is COPIED into x. Two separate boxes now exist at two different addresses.', log:'Call by Value → x receives a COPY of a (x=5).'},
+  {main:5, func:25, op:1, pulse:'func', explain:"Inside display(): x = x*x → x becomes 25. Only the function's own box changes.", log:'x = x*x → x = 25 (only inside display())'},
+  {main:5, func:25, op:1, explain:'Output inside display(): "The Value inside display function (x*x):25"', log:'cout displays: The Value inside display function (x*x):25'},
+  {main:5, func:25, op:1, pulse:'main', explain:'Control returns to main(). a was NEVER touched by display() — it is still 5.', log:'Return to main(). a is unaffected = 5'},
+  {main:5, func:25, op:1, explain:'Output in main(): "The Value inside main function 5". Call by Value never changes the caller\'s variable.', log:'cout displays: The Value inside main function 5'},
+];
+function applyValStep(i){
+  const s = STEPS_VAL[i];
+  document.getElementById('valMainVal').textContent = s.main;
+  document.getElementById('valFuncVal').textContent = s.func === null ? '—' : s.func;
+  document.getElementById('valBoxFunc').style.opacity = s.op;
+  document.getElementById('valExplain').textContent = s.explain;
+  if(s.pulse){
+    const b = document.getElementById(s.pulse === 'func' ? 'valBoxFunc' : 'valBoxMain');
+    b.classList.remove('changed'); void b.offsetWidth; b.classList.add('changed');
+  }
+  if(s.log){
+    const log = document.getElementById('valLog');
+    log.innerHTML += `<div class="ln"><span class="step-no">#${i}</span> ${s.log}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+  document.getElementById('valStepBtn').disabled = i >= STEPS_VAL.length - 1;
+}
+function wireCallingValue(){
+  valIdx = -1;
+  document.getElementById('valStartBtn').addEventListener('click', () => {
+    valIdx = 0; document.getElementById('valLog').innerHTML = ''; applyValStep(0);
+  });
+  document.getElementById('valStepBtn').addEventListener('click', () => {
+    if(valIdx < STEPS_VAL.length - 1){ valIdx++; applyValStep(valIdx); }
+  });
+  document.getElementById('valResetBtn').addEventListener('click', () => {
+    valIdx = -1;
+    document.getElementById('valLog').innerHTML = '';
+    document.getElementById('valMainVal').textContent = '5';
+    document.getElementById('valFuncVal').textContent = '—';
+    document.getElementById('valBoxFunc').style.opacity = .35;
+    document.getElementById('valExplain').textContent = 'Click Start to begin the step-by-step walkthrough of Program 11.17.';
+    document.getElementById('valStepBtn').disabled = false;
+  });
+}
+
+const STEPS_REF = [
+  {label:'main() → n1', val:45, explain:'n1 = 45 is read in main(). display(n1) has not been called yet.', log:null},
+  {label:'main() n1 == display() x  (same box!)', val:45, explain:'display(n1) is called with int &x. x is just ANOTHER NAME for n1 — no copy is made, it is the same address.', log:'Call by Reference → x and n1 share the same memory.'},
+  {label:'main() n1 == display() x  (same box!)', val:2025, pulse:true, explain:'Inside display(): x = x*x → the SHARED box becomes 2025. Since x IS n1, n1 also becomes 2025 instantly.', log:'x = x*x → shared value becomes 2025'},
+  {label:'main() n1 == display() x  (same box!)', val:2025, explain:'Output inside display(): "The Value inside display function (x*x):2025"', log:'cout displays: The Value inside display function (x*x):2025'},
+  {label:'main() → n1', val:2025, explain:'Control returns to main(). n1 is now 2025 — permanently changed.', log:'Return to main(). n1 = 2025 (changed!)'},
+  {label:'main() → n1', val:2025, explain:'Output in main(): "The Value of N1 is inside main function After passing (n1 x n1): 2025"', log:'cout displays final n1 = 2025'},
+];
+function applyRefStep(i){
+  const s = STEPS_REF[i];
+  document.getElementById('refBoxLabel').textContent = s.label;
+  document.getElementById('refVal').textContent = s.val;
+  document.getElementById('refExplain').textContent = s.explain;
+  if(s.pulse){
+    const b = document.getElementById('refBoxShared');
+    b.classList.remove('changed'); void b.offsetWidth; b.classList.add('changed');
+  }
+  if(s.log){
+    const log = document.getElementById('refLog');
+    log.innerHTML += `<div class="ln"><span class="step-no">#${i}</span> ${s.log}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+  document.getElementById('refStepBtn').disabled = i >= STEPS_REF.length - 1;
+}
+function wireCallingRef(){
+  refIdx = -1;
+  document.getElementById('refStartBtn').addEventListener('click', () => {
+    refIdx = 0; document.getElementById('refLog').innerHTML = ''; applyRefStep(0);
+  });
+  document.getElementById('refStepBtn').addEventListener('click', () => {
+    if(refIdx < STEPS_REF.length - 1){ refIdx++; applyRefStep(refIdx); }
+  });
+  document.getElementById('refResetBtn').addEventListener('click', () => {
+    refIdx = -1;
+    document.getElementById('refLog').innerHTML = '';
+    document.getElementById('refBoxLabel').textContent = 'main() → n1';
+    document.getElementById('refVal').textContent = '45';
+    document.getElementById('refExplain').textContent = 'Click Start to begin the step-by-step walkthrough of Program 11.18.';
+    document.getElementById('refStepBtn').disabled = false;
+  });
+}
+function wireInlineToggle(){
+  let shown = false;
+  document.getElementById('inlineToggleBtn').addEventListener('click', () => {
+    shown = !shown;
+    const out = document.getElementById('inlineOut');
+    out.innerHTML = shown
+      ? `<div style="text-align:center;font-family:monospace;">z = a+b;  <span style="color:var(--accent);">// (10+20) — the compiler copies add()'s body directly here, no function-call / STACK overhead!</span></div>`
+      : `<div style="text-align:center;font-family:monospace;">z = add(x,y); <span style="color:var(--muted);">(as written by the programmer)</span></div>`;
+  });
+}
+function wireCalling(){ wireCallingValue(); wireCallingRef(); wireInlineToggle(); }
+
+/* ---- Topic 10: Which form is this? ---- */
+function wireForms(){
+  const MAP = {
+    'void f()': 'Form 11.7.1 — WITHOUT return value, WITHOUT parameter (like Program 11.20).',
+    'int f()': 'Form 11.7.2 — WITH return value, WITHOUT parameter (like Program 11.21).',
+    'void f(int x)': 'Form 11.7.3 — WITHOUT return value, WITH parameter (like Program 11.22).',
+    'int f(int x, int y)': 'Form 11.7.4 — WITH return value, WITH parameter (like Program 11.23).',
+  };
+  document.querySelectorAll('[data-form]').forEach(btn => {
+    btn.addEventListener('click', () => { document.getElementById('formOut').textContent = MAP[btn.dataset.form] || ''; });
+  });
+}
+
+/* ---- Topic 11: Recursive Call Stack (factorial) ---- */
+let recEvents = [], recPtr = -1, recRunning = null, recStack = [];
+function buildRecEvents(n){
+  const events = [];
+  for(let m=n; m>=1; m--) events.push({type:'push', m});
+  for(let m=1; m<=n; m++) events.push({type:'pop', m});
+  events.push({type:'final'});
+  return events;
+}
+function recLogLine(msg){
+  const log = document.getElementById('recLog');
+  log.innerHTML += `<div class="ln"><span class="step-no">#${recPtr+1}</span> ${msg}</div>`;
+  log.scrollTop = log.scrollHeight;
+}
+function renderRecStackUI(){
+  document.getElementById('recStack').innerHTML =
+    recStack.map(f => `<div class="stack-frame${f.returning ? ' returning' : ''}">${f.text}</div>`).join('');
+}
+function wireRecursion(){
+  recEvents = []; recPtr = -1; recRunning = null; recStack = [];
+  document.getElementById('recStartBtn').addEventListener('click', () => {
+    let n = parseInt(document.getElementById('recInput').value, 10);
+    if(isNaN(n)) n = 5;
+    n = Math.max(2, Math.min(7, n));
+    document.getElementById('recInput').value = n;
+    recEvents = buildRecEvents(n); recPtr = -1; recRunning = null; recStack = [];
+    document.getElementById('recLog').innerHTML = '';
+    renderRecStackUI();
+    document.getElementById('recExplain').textContent = `Ready. factorial(${n}) will be computed. Click "Next Step" to begin.`;
+    document.getElementById('recStepBtn').disabled = false;
+  });
+  document.getElementById('recStepBtn').addEventListener('click', () => {
+    if(recPtr >= recEvents.length - 1) return;
+    recPtr++;
+    const ev = recEvents[recPtr];
+    if(ev.type === 'push'){
+      recStack.push({text:`factorial(${ev.m})`, returning:false});
+      renderRecStackUI();
+      const note = ev.m > 1 ? `is ${ev.m}&gt;1? yes → will return ${ev.m} * factorial(${ev.m-1})` : `is 1&gt;1? no → base case, will return 1`;
+      recLogLine(`Call: factorial(${ev.m}) — ${note}`);
+      document.getElementById('recExplain').textContent = ev.m > 1
+        ? `factorial(${ev.m}) is pushed onto the stack and calls factorial(${ev.m-1}).`
+        : `factorial(1) is pushed — this is the base case.`;
+    } else if(ev.type === 'pop'){
+      const val = ev.m === 1 ? 1 : ev.m * recRunning;
+      if(recStack.length){
+        recStack[recStack.length-1].returning = true;
+        recStack[recStack.length-1].text = `factorial(${ev.m}) = ${val}`;
+      }
+      renderRecStackUI();
+      recLogLine(ev.m === 1
+        ? `Return: factorial(1) = 1 (base case)`
+        : `Return: factorial(${ev.m}) = ${ev.m} × factorial(${ev.m-1}) = ${ev.m} × ${recRunning} = ${val}`);
+      recRunning = val;
+      recStack.pop();
+      document.getElementById('recExplain').textContent = `factorial(${ev.m}) finishes and returns ${val} to its caller.`;
+    } else if(ev.type === 'final'){
+      recLogLine(`✅ Final result: factorial(${document.getElementById('recInput').value}) = ${recRunning}`);
+      document.getElementById('recExplain').textContent = `Done! Factorial of Number ${document.getElementById('recInput').value} = ${recRunning}`;
+    }
+    document.getElementById('recStepBtn').disabled = recPtr >= recEvents.length - 1;
+  });
+  document.getElementById('recResetBtn').addEventListener('click', () => {
+    recEvents = []; recPtr = -1; recRunning = null; recStack = [];
+    document.getElementById('recLog').innerHTML = '';
+    renderRecStackUI();
+    document.getElementById('recExplain').textContent = 'Enter a number and click Start.';
+    document.getElementById('recStepBtn').disabled = false;
+  });
+}
+
+/* ---- Topic 12: Scope Explorer ---- */
+const SCOPE_EXPLAIN = {
+  file_var_decl: 'file_var is declared OUTSIDE all functions → File scope (global variable). Accessible everywhere in the program, for its entire lifetime.',
+  add_fn: 'add(int x) is a function. x is its formal parameter — Function scope, alive only while add() executes.',
+  main_fn: 'main() is the function where program execution begins.',
+  a_b_decl: 'a and b are declared inside main() directly (not inside a sub-block) → Function scope within main().',
+  t_decl: 't is declared INSIDE the if-block { }. This gives t Local scope — it exists only within that block, and is destroyed the moment the block ends.',
+  t_use: '❌ ERROR: t was declared inside the if-block, which has already ended by this point. t no longer exists here — exactly the textbook\'s error: "\'t\' was not declared in main()".',
+  add_call: 'add(a) is called here — a (value 5) is passed in as the actual parameter.',
+  m_use: '❌ ERROR: m is a Function-scope variable belonging to add(). main() cannot see it at all, even though add() has already been called — exactly the textbook\'s error: "\'m\' was not declared in this scope".',
+  filevar_use: '✅ OK: file_var has File scope (global), so it is accessible here in main() — and everywhere else in the program.',
+};
+function wireScope(){
+  document.querySelectorAll('#scopeCodeBlock .code-line').forEach(line => {
+    line.addEventListener('click', () => {
+      document.querySelectorAll('#scopeCodeBlock .code-line').forEach(l => l.classList.remove('active-line'));
+      line.classList.add('active-line');
+      document.getElementById('scopeExplain').innerHTML = SCOPE_EXPLAIN[line.dataset.scope] || '';
+    });
+  });
+  const btn1 = document.getElementById('scopeResBtn1'), btn2 = document.getElementById('scopeResBtn2');
+  if(btn1) btn1.addEventListener('click', () => {
+    document.getElementById('scopeResOut').innerHTML = '<b>cout&lt;&lt;x;</b> → prints the LOCAL x = <b>10</b>. Without ::, C++ always prefers the closest (local) variable.';
+  });
+  if(btn2) btn2.addEventListener('click', () => {
+    document.getElementById('scopeResOut').innerHTML = '<b>cout&lt;&lt;::x;</b> → prints the GLOBAL x = <b>45</b>. :: forces access to the file-scope variable, even though a local x exists.';
+  });
+}
+
+/* ---- Topic 13: Practice page (MCQ book/extra, TF, FIB, Match, Debug) ---- */
+function wireTF(idx, qObj, container){
+  const div = document.createElement('div');
+  div.className = 'q-block';
+  div.innerHTML = `<div class="q-text">${idx+1}. ${qObj.q}</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" data-tf="true">True</button>
+      <button class="btn btn-ghost" data-tf="false">False</button>
+    </div>
+    <div class="feedback-line"></div>`;
+  container.appendChild(div);
+  div.querySelectorAll('[data-tf]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(div.dataset.answered) return;
+      div.dataset.answered = '1';
+      const chosen = btn.dataset.tf === 'true';
+      const fb = div.querySelector('.feedback-line');
+      if(chosen === qObj.a){ fb.textContent = '✅ Correct! ' + qObj.exp; fb.className = 'feedback-line ok'; }
+      else { fb.textContent = '❌ Not quite. ' + qObj.exp; fb.className = 'feedback-line bad'; }
+    });
+  });
+}
+function wirePractice(){
+  const bookWrap = document.getElementById('mcqBookWrap');
+  if(bookWrap){
+    bookWrap.innerHTML = Object.keys(MCQ_BOOK).map(qid => mcqHTML(qid, MCQ_BOOK[qid], '', '')).join('');
+    wireMCQ('#mcqBookWrap', MCQ_BOOK);
+  }
+  const extraWrap = document.getElementById('mcqExtraWrap');
+  if(extraWrap){
+    extraWrap.innerHTML = Object.keys(MCQ_EXTRA).map(qid => mcqHTML(qid, MCQ_EXTRA[qid], MCQ_EXTRA[qid].tier, MCQ_EXTRA[qid].tierLabel)).join('');
+    wireMCQ('#mcqExtraWrap', MCQ_EXTRA);
+  }
+  const tfWrap = document.getElementById('tfWrap');
+  if(tfWrap){ tfWrap.innerHTML = ''; TF_QS.forEach((q,i) => wireTF(i,q,tfWrap)); }
+
+  const fibWrap = document.getElementById('fibWrap');
+  if(fibWrap){
+    fibWrap.innerHTML = FIB_QS.map((q,i) => `<div class="fib-row">${i+1}. ${q.text} <input type="text" id="fib-${i}"></div>`).join('');
+  }
+  const fibCheckBtn = document.getElementById('fibCheckBtn');
+  if(fibCheckBtn){
+    fibCheckBtn.addEventListener('click', () => {
+      let correct = 0;
+      FIB_QS.forEach((q,i) => {
+        const inp = document.getElementById('fib-'+i);
+        const ok = (inp.value||'').trim().toLowerCase() === q.ans.toLowerCase();
+        inp.style.borderColor = ok ? 'var(--correct)' : 'var(--incorrect)';
+        if(ok) correct++;
+      });
+      document.getElementById('fibResult').textContent = `Score: ${correct} / ${FIB_QS.length}`;
+    });
+  }
+
+  const matchWrap = document.getElementById('matchWrap');
+  if(matchWrap){
+    matchWrap.innerHTML = MATCH_LEFT.map((l,i) => `
+      <div class="fib-row"><b class="mono">${l}</b>
+        <select id="match-${i}">
+          <option value="">-- choose the matching functions --</option>
+          ${MATCH_RIGHT.map(r => `<option value="${r.replace(/"/g,'&quot;')}">${r}</option>`).join('')}
+        </select>
+      </div>`).join('') +
+      '<div class="btn-row"><button class="btn btn-primary" id="matchCheckBtn">Check Matches</button></div><div id="matchResult" style="margin-top:8px;font-weight:700;"></div>';
+    document.getElementById('matchCheckBtn').addEventListener('click', () => {
+      let correct = 0;
+      MATCH_LEFT.forEach((l,i) => {
+        const sel = document.getElementById('match-'+i);
+        const ok = sel.value === MATCH_ANSWER[l];
+        sel.style.borderColor = ok ? 'var(--correct)' : 'var(--incorrect)';
+        if(ok) correct++;
+      });
+      document.getElementById('matchResult').textContent = `Score: ${correct} / ${MATCH_LEFT.length}`;
+    });
+  }
+
+  const debugWrap = document.getElementById('debugWrap');
+  if(debugWrap){
+    debugWrap.innerHTML = DEBUG_CASES.map((c,i) => `
+      <div class="debug-card">
+        <div class="debug-wrong">❌ ${c.wrong.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-debug-why="${i}">Show Why / Error Type</button>
+          <button class="btn btn-ghost" data-debug-fix="${i}">✅ Show Fix</button>
+        </div>
+        <div class="debug-why" id="debug-why-${i}"><b>${c.errorType}:</b> ${c.why}</div>
+        <div class="debug-fix" id="debug-fix-${i}">${c.fix.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>`).join('');
+    debugWrap.querySelectorAll('[data-debug-why]').forEach(btn => {
+      btn.addEventListener('click', () => document.getElementById('debug-why-'+btn.dataset.debugWhy).classList.toggle('show'));
+    });
+    debugWrap.querySelectorAll('[data-debug-fix]').forEach(btn => {
+      btn.addEventListener('click', () => document.getElementById('debug-fix-'+btn.dataset.debugFix).classList.toggle('show'));
+    });
+  }
+}
+
+/* ---- Topic 14: Exam Prep ---- */
+function wireExamPrep(){
+  const challengeWrap = document.getElementById('challengeWrap');
+  if(challengeWrap){
+    challengeWrap.innerHTML = Object.keys(CHALLENGE_QS).map(qid => mcqHTML(qid, CHALLENGE_QS[qid], CHALLENGE_QS[qid].tier, CHALLENGE_QS[qid].tierLabel)).join('');
+    wireMCQ('#challengeWrap', CHALLENGE_QS);
+  }
+  const goBtn = document.getElementById('goToPracticeBtn');
+  if(goBtn){
+    goBtn.addEventListener('click', () => {
+      const idx = TOPICS.findIndex(t => t.id === 'practice');
+      if(idx >= 0) goTo(idx);
+    });
   }
 }
 
