@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 13 — Introduction to Object Oriented Programming Techniques | C++ Learning Lab</title>
+<style>
+  :root{
+    --bg:#f3f6fb;
+    --card:#ffffff;
+    --primary:#1d4ed8;
+    --primary-dark:#1e3a8a;
+    --primary-light:#eaf1ff;
+    --accent:#7c3aed;
+    --accent-light:#f1e9ff;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#dfe6ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{line-height:1.4;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;
+    position:sticky;top:0;z-index:40;box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#dce7ff;}
+  header.top .lang-toggle{display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;}
+  header.top .lang-toggle button{border:none;background:transparent;color:#eaf1ff;padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:700;cursor:pointer;}
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{width:290px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);padding:16px 10px 90px;overflow-y:auto;}
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;cursor:pointer;font-size:.9rem;color:var(--text);}
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.7rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:46px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:920px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(20,30,40,.04);}
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.8rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.8rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.8rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--accent);font-size:.8rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.8rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.8rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.8rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.8rem;margin-bottom:4px;display:block;}
+  .ans-box{background:var(--correct-bg);border-left:5px solid var(--correct);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .ans-box .lbl{font-weight:800;color:var(--correct);font-size:.8rem;margin-bottom:4px;display:block;}
+  body[data-lang="en"] .ta-only{display:none;}
+  body[data-lang="ta"] .ta-only{display:block;margin-top:8px;font-size:.92rem;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+  table.tbl td.c, table.tbl th.c{text-align:center;}
+
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:9px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:110px;}
+  .flow-node.alt{background:var(--accent-light);border-color:var(--accent);color:#5b21b6;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.06);box-shadow:0 4px 14px rgba(29,78,216,.4);}
+  .flow-arrow{font-size:1.2rem;color:var(--muted);}
+  .flow-arrow.down{font-size:1.1rem;}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.88rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn-ghost.active{background:var(--primary);color:#fff;}
+  .btn-sm{padding:6px 12px;font-size:.78rem;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.76rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  /* class / object illustrative diagram */
+  .cls-box{border:2px solid var(--accent);border-radius:12px;padding:14px 16px;margin:14px 0;background:var(--accent-light);}
+  .cls-box .cls-title{font-weight:800;color:#5b21b6;margin-bottom:10px;font-family:'JetBrains Mono',Consolas,monospace;font-size:.95rem;}
+  .cls-row{margin-bottom:10px;}
+  .cls-row:last-child{margin-bottom:0;}
+  .cls-row .tag{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:5px;}
+  .cls-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{background:#fff;border:1.5px solid var(--accent);color:#5b21b6;padding:4px 10px;border-radius:999px;font-size:.78rem;font-weight:700;font-family:'JetBrains Mono',Consolas,monospace;}
+  .chip.data{border-color:#0891b2;color:#0e7490;}
+  .chip.func{border-color:#7c3aed;color:#5b21b6;}
+  .obj-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+  .obj-card{border:2px solid var(--primary);border-radius:10px;padding:8px 12px;background:#fff;font-size:.78rem;text-align:center;min-width:120px;}
+  .obj-card b{display:block;color:var(--primary-dark);margin-bottom:3px;}
+
+  /* encapsulation capsule */
+  .capsule-wrap{text-align:center;margin:16px 0;}
+  .capsule{display:inline-block;min-width:260px;max-width:100%;border:3px solid var(--primary);border-radius:50px;padding:18px 26px;background:var(--primary-light);cursor:pointer;transition:all .35s ease;}
+  .capsule.open{border-radius:14px;background:#fff;border-color:var(--accent);}
+  .capsule .cap-label{font-weight:800;color:var(--primary-dark);font-size:.95rem;}
+  .capsule.open .cap-label{color:#5b21b6;}
+  .capsule .cap-sub{font-size:.76rem;color:var(--muted);margin-top:4px;}
+  .capsule .cap-inside{max-height:0;overflow:hidden;opacity:0;transition:all .4s ease;}
+  .capsule.open .cap-inside{max-height:240px;opacity:1;margin-top:14px;}
+  .cap-inside .cls-row{text-align:left;}
+
+  /* abstraction two-layer */
+  .abs-layer{border-radius:12px;padding:14px 16px;margin:10px 0;text-align:center;}
+  .abs-layer.visible{background:var(--correct-bg);border:2px solid var(--correct);}
+  .abs-layer.hidden-layer{background:#f1f5f9;border:2px dashed var(--muted);filter:blur(3px);opacity:.6;transition:all .35s ease;}
+  .abs-layer.hidden-layer.revealed{filter:blur(0);opacity:1;border-style:solid;border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .abs-layer .lyr-lbl{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;color:var(--muted);}
+
+  /* flip cards (pillars overview + flashcards) */
+  .flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:14px 0;}
+  .flip-card{perspective:1000px;height:170px;cursor:pointer;}
+  .flip-card.big{height:230px;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center;}
+  .flip-front{background:var(--primary-light);border:2px solid var(--primary);}
+  .flip-front .ic{font-size:1.9rem;margin-bottom:8px;}
+  .flip-front .nm{font-weight:800;color:var(--primary-dark);font-size:.94rem;}
+  .flip-front .hint{font-size:.68rem;color:var(--muted);margin-top:6px;}
+  .flip-back{background:var(--accent-light);border:2px solid var(--accent);transform:rotateY(180deg);font-size:.82rem;color:#4c1d95;}
+  .flip-back b{display:block;margin-bottom:4px;color:#5b21b6;}
+
+  .deck-wrap{max-width:420px;margin:0 auto;}
+  .deck-meta{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:8px;}
+  .deck-nav{display:flex;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .mastered-badge{background:var(--correct);color:#fff;font-size:.68rem;font-weight:800;padding:2px 10px;border-radius:999px;}
+
+  .score-pill{display:inline-block;background:var(--primary);color:#fff;font-weight:800;padding:4px 14px;border-radius:999px;font-size:.9rem;}
+
+  .adv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0;}
+  .adv-card{border:2px solid var(--correct);background:var(--correct-bg);border-radius:12px;padding:14px;text-align:center;}
+  .adv-card .ic{font-size:1.7rem;}
+  .adv-card b{display:block;color:var(--correct);margin:6px 0 4px;}
+  .adv-card p{margin:0;font-size:.82rem;color:var(--text);}
+  .dis-card{border:2px solid var(--incorrect);background:var(--incorrect-bg);}
+  .dis-card b{color:var(--incorrect);}
+
+  .bottom-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;}
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);width:84vw;max-width:320px;}
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.88rem;}
+    .flow-node{min-width:84px;font-size:.78rem;padding:7px 9px;}
+    .flip-card{height:190px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="Menu">☰</button>
+    <div class="title-wrap">
+      <h1>C++ Learning Lab · Class 11 · Tamil Nadu State Board</h1>
+      <p id="headerSub">Chapter 13 — Introduction to Object Oriented Programming Techniques</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langEn" class="active" data-lang="en">English</button>
+      <button id="langTa" data-lang="ta">தமிழ்</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Topic list">
+      <div class="progress-wrap">
+        <div class="progress-label"><span id="progLabel">Chapter Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label" id="topicsLabel">Topics</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ Previous</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">Next ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 11 Computer Science · Unit IV · Chapter 13: Introduction to Object Oriented Programming Techniques · Based on the Tamil Nadu State Board textbook · Offline Learning Lab</footer>
+</div>
+
+<script>
+/* =========================================================================
+   STORAGE
+   ========================================================================= */
+const STORE_KEY = 'cs11_ch13_oop_intro_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return Object.assign({lang:'en', completed:[], flashMastered:[]}, JSON.parse(raw));
+  }catch(e){ /* ignore */ }
+  return {lang:'en', completed:[], flashMastered:[]};
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* =========================================================================
+   UTIL
+   ========================================================================= */
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* =========================================================================
+   TOPICS
+   ========================================================================= */
+const TOPICS = [
+  {id:'objectives',     num:'13',      en:'Learning Objectives & Overview',        ta:'கற்றல் நோக்கங்கள்'},
+  {id:'intro',          num:'13.1',    en:'Introduction to OOP',                   ta:'13.1 அறிமுகம்'},
+  {id:'paradigms',      num:'13.2',    en:'Programming Paradigms',                 ta:'13.2 நிரலாக்க முன்னுதாரணங்கள்'},
+  {id:'classobject',    num:'13.2.3',  en:'Class & Object',                        ta:'வர்க்கமும் பொருளும்'},
+  {id:'pillars',        num:'13.3',    en:'Basic Concepts of OOP — Overview',      ta:'13.3 OOP அடிப்படைக் கருத்துக்கள்'},
+  {id:'encapsulation',  num:'13.3.1',  en:'Encapsulation',                         ta:'உள்ளடக்கம்'},
+  {id:'abstraction',    num:'13.3.2',  en:'Data Abstraction',                      ta:'சுருக்கம்'},
+  {id:'modularity',     num:'13.3.3',  en:'Modularity',                            ta:'கூறுமைமை'},
+  {id:'inheritance',    num:'13.3.4',  en:'Inheritance',                           ta:'பாரம்பரியம்'},
+  {id:'polymorphism',   num:'13.3.5',  en:'Polymorphism',                          ta:'பலரூபம்'},
+  {id:'advantages',     num:'13.4',    en:'Advantages of OOP',                     ta:'13.4 நன்மைகள்'},
+  {id:'disadvantages',  num:'13.5',    en:'Disadvantages of OOP',                  ta:'13.5 தீமைகள்'},
+  {id:'pointstoremember',num:'Summary',en:'Points to Remember',                    ta:'நினைவில் கொள்ள வேண்டியவை'},
+  {id:'flashcards',     num:'Flashcards',en:'Flashcard Deck',                      ta:'மேற்கோள் அட்டைகள்'},
+  {id:'practice',       num:'Practice',en:'Practice: Section B / C / D',           ta:'பயிற்சி வினாக்கள்'},
+  {id:'examprep',       num:'Exam',    en:'Exam Preparation',                      ta:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* =========================================================================
+   NAV / SIDEBAR
+   ========================================================================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i===currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    const label = state.lang==='ta' ? t.ta : t.en;
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+label+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', ()=>{ goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length-1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx===0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx===TOPICS.length-1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  const doneTxt = state.lang==='ta' ? '✔ முடிந்தது' : '✔ Completed';
+  const todoTxt = state.lang==='ta' ? '✔ முடித்ததாக குறி' : '✔ Mark Complete';
+  markBtn.textContent = done ? doneTxt : todoTxt;
+  document.getElementById('prevTopicBtn').textContent = state.lang==='ta' ? '⬅ முந்தையது' : '⬅ Previous';
+  document.getElementById('nextTopicBtn').textContent = state.lang==='ta' ? 'அடுத்தது ➡' : 'Next ➡';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', ()=>goTo(currentIdx-1));
+document.getElementById('nextTopicBtn').addEventListener('click', ()=>goTo(currentIdx+1));
+document.getElementById('markCompleteBtn').addEventListener('click', ()=>{
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx===-1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', ()=>{
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langEn').addEventListener('click', ()=>setLang('en'));
+document.getElementById('langTa').addEventListener('click', ()=>setLang('ta'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.body.setAttribute('data-lang', l);
+  document.getElementById('headerSub').textContent = l==='ta' ? 'பாடம் 13 — பொருள் நோக்கிய நிரலாக்க நுட்பங்களுக்கான அறிமுகம் (OOP)' : 'Chapter 13 — Introduction to Object Oriented Programming Techniques';
+  document.getElementById('progLabel').textContent = l==='ta' ? 'பாட முன்னேற்றம்' : 'Chapter Progress';
+  document.getElementById('topicsLabel').textContent = l==='ta' ? 'தலைப்புகள்' : 'Topics';
+  renderSidebar();
+  updateBottomBar();
+}
+
+/* =========================================================================
+   GENERIC MCQ ENGINE
+   ========================================================================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['A','B','C','D'];
+  let optsHtml = qObj.o.map((opt,i)=>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${esc(opt)}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${esc(qObj.q)}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${esc(qObj.exp)}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap, onAnswered){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt=>{
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i)=>{
+        if(i===qObj.c) o.classList.add('correct');
+        if(i===idx && idx!==qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      const ok = idx===qObj.c;
+      fb.textContent = ok ? '🎉 Correct!' : '❌ Not quite. Correct answer: ' + qObj.o[qObj.c];
+      fb.className = 'feedback-line ' + (ok?'ok':'bad');
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+      if(onAnswered) onAnswered(qid, ok);
+    });
+  });
+}
+
+/* =========================================================================
+   FLIP CARD ENGINE (used by pillars overview + flashcards)
+   ========================================================================= */
+function wireFlipCards(containerSel){
+  document.querySelectorAll(containerSel + ' .flip-card').forEach(card=>{
+    card.addEventListener('click', function(e){
+      if(e.target.closest('[data-goto]')) return;
+      this.classList.toggle('flipped');
+    });
+  });
+}
+
+/* =========================================================================
+   MAIN RENDER DISPATCH
+   ========================================================================= */
+const RENDERERS = {
+  objectives: renderObjectives,
+  intro: renderIntro,
+  paradigms: renderParadigms,
+  classobject: renderClassObject,
+  pillars: renderPillars,
+  encapsulation: renderEncapsulation,
+  abstraction: renderAbstraction,
+  modularity: renderModularity,
+  inheritance: renderInheritance,
+  polymorphism: renderPolymorphism,
+  advantages: renderAdvantages,
+  disadvantages: renderDisadvantages,
+  pointstoremember: renderPTR,
+  flashcards: renderFlashcards,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+const WIRERS = {
+  objectives: wireObjectives,
+  intro: wireIntro,
+  paradigms: wireParadigms,
+  classobject: wireClassObject,
+  pillars: wirePillars,
+  encapsulation: wireEncapsulation,
+  abstraction: wireAbstraction,
+  modularity: wireModularity,
+  inheritance: wireInheritance,
+  polymorphism: wirePolymorphism,
+  advantages: wireAdvantages,
+  disadvantages: wireDisadvantages,
+  pointstoremember: wirePTR,
+  flashcards: wireFlashcards,
+  practice: wirePractice,
+  examprep: wireExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  if(WIRERS[t.id]) WIRERS[t.id]();
+}
+function gotoButtonsWire(){
+  document.querySelectorAll('[data-goto]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      const idx = TOPICS.findIndex(t=>t.id===this.dataset.goto);
+      if(idx>-1) goTo(idx);
+    });
+  });
+}
+
+/* =========================================================================
+   TOPIC 1 — Learning Objectives & Overview
+   ========================================================================= */
+function renderObjectives(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Unit IV · Chapter 13</div>
+    <h2>Introduction to Object Oriented Programming Techniques</h2>
+    <div class="goals">
+      <b>Learning Objectives (textbook):</b> After learning this chapter, students will be able to — Understand the concept of OOPS · Know the difference between Procedural, Modular and Object Oriented Programming · Understand the advantages and disadvantages of Object Oriented Programming.
+      <div class="ta-only"><b>தமிழில்:</b> OOPS கருத்தைப் புரிந்துகொள்ளுதல் · Procedural, Modular, Object Oriented நிரலாக்கங்களுக்கு இடையேயான வேறுபாட்டை அறிதல் · OOP-இன் நன்மைகள் மற்றும் தீமைகளைப் புரிந்துகொள்ளுதல்.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why this chapter matters</h3>
+    <p>Every C++ program needs some way of organising code and data. Over the years, programmers tried a few different <b>approaches</b> — this chapter compares three of them, and then zooms into the approach that modern languages (including C++) are built around: <b>Object Oriented Programming (OOP)</b>.</p>
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      Think of this chapter in two halves: first, <b>how</b> OOP is different from older styles of programming (13.1 – 13.2); then <b>what</b> OOP is actually made of — its five basic building-block concepts (13.3) — and finally <b>why</b> it is worth the trouble (13.4 – 13.5).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Chapter Concept Map</h3>
+    <div class="diagram-box">
+      <div class="flow-col">
+        <div class="flow-node">Programming Paradigms</div>
+        <div class="flow-arrow down">↓</div>
+        <div class="flow-row">
+          <div class="flow-node alt">Procedural</div>
+          <div class="flow-node alt">Modular</div>
+          <div class="flow-node active">Object Oriented</div>
+        </div>
+        <div class="flow-arrow down">↓ built from Classes &amp; Objects, using 5 basic concepts</div>
+        <div class="flow-row">
+          <div class="flow-node alt">Encapsulation</div>
+          <div class="flow-node alt">Abstraction</div>
+          <div class="flow-node alt">Modularity</div>
+          <div class="flow-node alt">Inheritance</div>
+          <div class="flow-node alt">Polymorphism</div>
+        </div>
+        <div class="flow-arrow down">↓</div>
+        <div class="flow-row">
+          <div class="flow-node">Advantages</div>
+          <div class="flow-node">Disadvantages</div>
+        </div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — not from the textbook, built to show how the topics in this chapter connect.</div>
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-objectives"></div>
+  </div>
+  `;
+}
+function wireObjectives(){
+  const qs = {
+    q1:{q:'The term used to describe a programming approach based on classes and objects is', o:['OOP','POP','ADT','SOP'], c:0, exp:'Textbook Evaluation, Section A, Q1. OOP = Object Oriented Programming, organised around classes and objects.'}
+  };
+  document.getElementById('qc-objectives').innerHTML = mcqHTML('q1', qs.q1, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-objectives', qs);
+}
+
+/* =========================================================================
+   TOPIC 2 — 13.1 Introduction
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.1</div>
+    <h2>13.1 Introduction</h2>
+    <div class="goals"><b>Goal:</b> Understand, in plain words, what "Object-Oriented Programming" actually means.</div>
+  </div>
+
+  <div class="card">
+    <h3>What is OOP?</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Object-Oriented Programming (OOP) is the term used to describe a programming approach based on classes and objects. The object-oriented paradigm allows us to organize software as a collection of objects that consist of both data and behaviour. This is in contrast to conventional functional programming practice, that loosely connects data and behaviour."
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Note</span>
+      "Since 1980's the word 'object' has appeared in relation to programming languages, with almost all languages developed since 1990 having object-oriented features. This chapter introduces general OOP concepts."
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      In OOP, every real-world "thing" you are modelling (a student, a car, a bank account) becomes an <b>object</b> that carries its <b>data</b> (what it HAS) and its <b>behaviour</b> (what it CAN DO) <i>together, as one bundle</i> — instead of keeping data in loose variables and behaviour in separate, unrelated functions.
+      <div class="ta-only"><b>தமிழில்:</b> OOP-இல் ஒவ்வொரு பொருளும் (object) தரவு (data) மற்றும் செயல்பாடு (behaviour) இரண்டையும் ஒன்றாக சேர்த்து வைத்திருக்கும்.</div>
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      Think of a <b>Car</b>. It has <i>data</i> — colour, speed, fuel level — and <i>behaviour</i> — start(), accelerate(), brake(). In real life you never think of "colour" floating around separately from "the car that can start and stop" — they belong together. OOP simply lets your program organise things the same natural way.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Remember the contrast: OOP binds <b>data + behaviour together</b>; the older "functional/procedural" style keeps them <b>loosely connected</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-intro"></div></div>
+  `;
+}
+function wireIntro(){
+  const qs = {
+    q1a:{q:'OOP organises software as a collection of objects that consist of', o:['only data','only behaviour','both data and behaviour','neither data nor behaviour'], c:2, exp:'Textbook, 13.1 Introduction — "a collection of objects that consist of both data and behaviour."'}
+  };
+  document.getElementById('qc-intro').innerHTML = mcqHTML('q1a', qs.q1a, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-intro', qs);
+}
+
+/* =========================================================================
+   TOPIC 3 — 13.2 Programming Paradigms
+   ========================================================================= */
+function renderParadigms(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.2</div>
+    <h2>13.2 Programming Paradigms</h2>
+    <div class="goals"><b>Goal:</b> Compare the three approaches to problem-solving with a computer that the textbook introduces.</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Paradigm means organizing principle of a program. It is an approach to programming. There are different approaches available for problem solving using computer. They are Procedural programming, Modular Programming and Object Oriented Programming."
+    </div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node alt">Procedural Programming</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node alt">Modular Programming</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node active">Object Oriented Programming</div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — programming paradigms, roughly in the order they are commonly introduced in this chapter.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Compare the three paradigms</h3>
+    <div class="btn-row" id="paraTabs">
+      <button class="btn btn-ghost active" data-tab="proc">13.2.1 Procedural</button>
+      <button class="btn btn-ghost" data-tab="mod">13.2.2 Modular</button>
+      <button class="btn btn-ghost" data-tab="oop">13.2.3 Object Oriented</button>
+    </div>
+
+    <div id="pan-proc" class="pan">
+      <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"Procedural means a list of instructions were given to the computer to do something. Procedural programming aims more at procedures. This emphasis on doing things."</div>
+      <h4>Important features of procedural programming</h4>
+      <ul>
+        <li>Programs are organized in the form of subroutines or sub programs</li>
+        <li>All data items are global</li>
+        <li>Suitable for small sized software application</li>
+        <li>Difficult to maintain and enhance the program code as any change in data type needs to be propagated to all subroutines that use the same data type. This is time consuming.</li>
+      </ul>
+      <p><b>Example:</b> FORTRAN and COBOL.</p>
+    </div>
+
+    <div id="pan-mod" class="pan" style="display:none;">
+      <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"Modular programming consist of a list of instructions that instructs the computer to do something. But this Paradigm consists of multiple modules, each module has a set of functions of related types. Data is hidden under the modules. Arrangement of data can be changed only by modifying the module."</div>
+      <h4>Important features of Modular programming</h4>
+      <ul>
+        <li>Emphasis on algorithm rather than data</li>
+        <li>Programs are divided into individual modules</li>
+        <li>Each module is independent of each other and has its own local data</li>
+        <li>Modules can work with its own data as well as with the data passed to it</li>
+      </ul>
+      <p><b>Example:</b> Pascal and C.</p>
+    </div>
+
+    <div id="pan-oop" class="pan" style="display:none;">
+      <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"Object Oriented Programming paradigm emphasizes on the data rather than the algorithm. It implements programs using classes and objects."</div>
+      <h4>Important features of Object oriented programming</h4>
+      <ul>
+        <li>Emphasizes on data rather than algorithm</li>
+        <li>Data abstraction is introduced in addition to procedural abstraction</li>
+        <li>Data and its associated operations are grouped in to single unit</li>
+        <li>Programs are designed around the data being operated</li>
+        <li>Relationships can be created between similar, yet distinct data types</li>
+      </ul>
+      <p><b>Example:</b> C++, Java, VB.Net, Python etc.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Side-by-side comparison</h3>
+    <div class="easy"><span class="lbl">💡 Easy Explanation — comparison table</span>Built directly from the three feature lists above, placed side by side.</div>
+    <table class="tbl">
+      <tr><th>Aspect</th><th>Procedural</th><th>Modular</th><th>Object Oriented</th></tr>
+      <tr><td>Main emphasis</td><td>Doing things (procedures)</td><td>Algorithm, grouped into modules</td><td>Data</td></tr>
+      <tr><td>Data visibility</td><td>Global</td><td>Hidden inside each module; local</td><td>Bound inside class, hidden (encapsulated)</td></tr>
+      <tr><td>Organised as</td><td>Subroutines / sub-programs</td><td>Independent modules</td><td>Classes &amp; objects</td></tr>
+      <tr><td>Maintainability</td><td>Difficult — changes propagate everywhere</td><td>Better — change stays inside a module</td><td>Easiest — new objects with small differences</td></tr>
+      <tr><td>Example languages</td><td>FORTRAN, COBOL</td><td>Pascal, C</td><td>C++, Java, VB.Net, Python</td></tr>
+    </table>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-paradigms"></div></div>
+  `;
+}
+function wireParadigms(){
+  document.querySelectorAll('#paraTabs [data-tab]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#paraTabs [data-tab]').forEach(b=>b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.pan').forEach(p=>p.style.display='none');
+      document.getElementById('pan-'+this.dataset.tab).style.display='block';
+    });
+  });
+  const qs = {
+    q2:{q:'The paradigm which aims more at procedures.', o:['Object Oriented Programming','Procedural programming','Modular programming','Structural programming'], c:1, exp:'Textbook Evaluation, Section A, Q2 — 13.2.1 "Procedural programming aims more at procedures."'}
+  };
+  document.getElementById('qc-paradigms').innerHTML = mcqHTML('q2', qs.q2, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-paradigms', qs);
+}
+
+/* =========================================================================
+   TOPIC 4 — Class & Object (13.2.3)
+   ========================================================================= */
+function renderClassObject(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.2.3</div>
+    <h2>Class &amp; Object</h2>
+    <div class="goals"><b>Goal:</b> Pin down exactly what a "class" and an "object" are — the two words every OOP sentence depends on.</div>
+  </div>
+
+  <div class="card">
+    <h3>Class</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "A Class is a construct in C++ which is used to bind data and its associated function together into a single unit using the encapsulation concept. Class is a user defined data type. Class represents a group of similar objects." &nbsp; "It can also be defined as a template or blueprint representing a group objects that share common properties and relationship."
+    </div>
+    <h3>Object</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Objects: Represents data and its associated function together into a single unit. Objects are the basic unit of OOP. Basically an object is created from a class. They are instances of class also called as class variables." &nbsp; "An identifiable entity with some characteristics and behaviour is called object."
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      A <b>Class</b> is like a cookie-cutter (or a house blueprint): a design that says "every cookie made from me has this shape". An <b>Object</b> is one actual cookie cut from it. You can bake many cookies (objects) from one cutter (class) — each one shares the same shape (structure) but can have its own icing/colour (its own data values).
+      <div class="ta-only"><b>தமிழில்:</b> Class என்பது ஒரு அச்சு (cookie-cutter) போன்றது; Object என்பது அந்த அச்சில் உருவாக்கப்பட்ட உண்மையான பொருள்.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Visualising it</h3>
+    <div class="diagram-box">
+      <div class="flow-col">
+        <div class="flow-node">Class: Student (blueprint)</div>
+        <div class="flow-arrow down">↓ creates many</div>
+        <div class="obj-row">
+          <div class="obj-card"><b>Object: student1</b>Name = Arun<br>Marks = 89</div>
+          <div class="obj-card"><b>Object: student2</b>Name = Priya<br>Marks = 95</div>
+          <div class="obj-card"><b>Object: student3</b>Name = Kumar<br>Marks = 77</div>
+        </div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — one class, many objects (instances), each with its own data values.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Illustrative Example <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(enrichment — not a program from the textbook; this chapter gives no C++ code)</span></h3>
+    <p>To make the definitions above concrete, here is how the <i>data</i> and <i>associated functions</i> of a "Student" class could be grouped together, shown as a diagram rather than runnable code:</p>
+    <div class="cls-box">
+      <div class="cls-title">class Student</div>
+      <div class="cls-row">
+        <span class="tag">Data members (the "characteristics")</span>
+        <div class="cls-chips"><span class="chip data">name</span><span class="chip data">rollNo</span><span class="chip data">marks</span></div>
+      </div>
+      <div class="cls-row">
+        <span class="tag">Member functions (the "behaviour")</span>
+        <div class="cls-chips"><span class="chip func">getData()</span><span class="chip func">showData()</span></div>
+      </div>
+    </div>
+    <div class="easy"><span class="lbl">💡 Why show this now?</span>This is exactly what the Class definition means by "bind data and its associated function together into a single unit" — you will see this same box again, in action, in the next section on Encapsulation.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-classobject"></div></div>
+  `;
+}
+function wireClassObject(){
+  const qs = {
+    q3:{q:'Which of the following is a user defined data type?', o:['class','float','int','object'], c:0, exp:'Textbook Evaluation, Section A, Q3 — "Class is a user defined data type."'},
+    q4:{q:'The identifiable entity with some characteristics and behaviour is.', o:['class','object','structure','member'], c:1, exp:'Textbook Evaluation, Section A, Q4 — the Object definition, word for word.'}
+  };
+  document.getElementById('qc-classobject').innerHTML = mcqHTML('q3', qs.q3, 'tier-green', '🟢 Beginner') + mcqHTML('q4', qs.q4, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-classobject', qs);
+}
+
+/* =========================================================================
+   TOPIC 5 — 13.3 Basic Concepts of OOP — overview
+   ========================================================================= */
+const PILLARS = [
+  {id:'encapsulation', ic:'🧪', nm:'Encapsulation', def:'Binding data and functions together into a single unit; implements abstraction.'},
+  {id:'abstraction',   ic:'🎭', nm:'Data Abstraction', def:'Showing only the essential features, hiding the background details.'},
+  {id:'modularity',    ic:'🧩', nm:'Modularity', def:'Dividing a system into functional units (modules) composed into a larger application.'},
+  {id:'inheritance',   ic:'🌳', nm:'Inheritance', def:'Building new classes (derived) from an existing class (base) — gives code reusability.'},
+  {id:'polymorphism',  ic:'🔀', nm:'Polymorphism', def:'The ability of a message or function to be displayed in more than one form.'},
+];
+function renderPillars(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.3</div>
+    <h2>13.3 Basic Concepts of OOP</h2>
+    <div class="goals"><b>Goal:</b> Meet the five pillars of OOP. Tap each card to flip it, then open its own lesson for the full detail.</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "The Object Oriented Programing has been developed to overcome the drawbacks of procedural and modular programming. It is widely accepted that object-oriented programming is the most important and powerful way of creating software."
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Note</span>
+      "The Object-Oriented Programming approach mainly encourages: <b>Modularisation</b>: where the program can be decomposed into modules. <b>Software re-use</b>: where a program can be composed from existing and new modules."
+    </div>
+    <p>The textbook lists the <b>Main Features of Object Oriented Programming</b> as: Data Abstraction, Encapsulation, Modularity, Inheritance, Polymorphism.</p>
+  </div>
+
+  <div class="card">
+    <h3>Tap a card 👇</h3>
+    <div class="flip-grid" id="pillarGrid"></div>
+  </div>
+  `;
+}
+function wirePillars(){
+  const grid = document.getElementById('pillarGrid');
+  grid.innerHTML = PILLARS.map(p=>`
+    <div class="flip-card">
+      <div class="flip-inner">
+        <div class="flip-front"><div class="ic">${p.ic}</div><div class="nm">${esc(p.nm)}</div><div class="hint">tap to flip</div></div>
+        <div class="flip-back"><b>${esc(p.nm)}</b>${esc(p.def)}<div class="btn-row" style="justify-content:center;"><button class="btn btn-primary btn-sm" data-goto="${p.id}">Full lesson →</button></div></div>
+      </div>
+    </div>
+  `).join('');
+  wireFlipCards('#pillarGrid');
+  gotoButtonsWire();
+}
+
+/* =========================================================================
+   TOPIC 6 — 13.3.1 Encapsulation
+   ========================================================================= */
+function renderEncapsulation(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.3.1</div>
+    <h2>Encapsulation</h2>
+    <div class="goals"><b>Goal:</b> Understand data binding and data hiding — the most striking feature of a class.</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "The mechanism by which the data and functions are bound together into a single unit is known as <b>Encapsulation</b>. It implements abstraction." &nbsp; "Encapsulation is about binding the data variables and functions together in class. It can also be called <b>data binding</b>."
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition — Data Hiding</span>
+      "Encapsulation is the most striking feature of a class. The data is not accessible to the outside world, and only those functions which are wrapped in the class can access it. These functions provide the interface between the object's data and the program. This encapsulation of data from direct access by the program is called <b>data hiding</b> or <b>information hiding</b>."
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      A medicine <b>capsule</b> binds the powder (data) inside a shell, together with the way you are meant to take it. You never touch the raw powder directly — you interact only through the capsule's outer shell. In a class, the "shell" is made of the class's own functions; outside code must go through them to reach the data.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Open the Capsule <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(Interactive Simulation)</span></h3>
+    <p>This is the same <span class="mono">Student</span> class box from the previous section. Click the capsule to open it and see what's bound inside.</p>
+    <div class="capsule-wrap">
+      <div class="capsule" id="capsuleBox">
+        <div class="cap-label" id="capLabel">🔒 class Student — tap to open the capsule</div>
+        <div class="cap-sub">Outside code cannot touch the data directly</div>
+        <div class="cap-inside">
+          <div class="cls-row">
+            <span class="tag">Data members (hidden)</span>
+            <div class="cls-chips"><span class="chip data">name</span><span class="chip data">rollNo</span><span class="chip data">marks</span></div>
+          </div>
+          <div class="cls-row">
+            <span class="tag">Member functions (the interface)</span>
+            <div class="cls-chips"><span class="chip func">getData()</span><span class="chip func">showData()</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="easy" id="capExplain" style="display:none;">
+      <span class="lbl">💡 What just happened?</span>
+      The data (<span class="mono">name, rollNo, marks</span>) stays wrapped inside. Any other part of the program that wants to read or change <span class="mono">marks</span> must call <span class="mono">getData()</span> or <span class="mono">showData()</span> — it cannot reach in and grab <span class="mono">marks</span> directly. That protective wrapping is exactly what <b>data hiding</b> means.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Encapsulation = <b>data binding</b> (data + functions in one unit) → this is what makes <b>data hiding / information hiding</b> possible → and the textbook states Encapsulation <b>implements abstraction</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-encap"></div></div>
+  `;
+}
+function wireEncapsulation(){
+  const cap = document.getElementById('capsuleBox');
+  const lbl = document.getElementById('capLabel');
+  cap.addEventListener('click', ()=>{
+    const open = cap.classList.toggle('open');
+    lbl.textContent = open ? '🔓 class Student — tap to close the capsule' : '🔒 class Student — tap to open the capsule';
+    document.getElementById('capExplain').style.display = open ? 'block' : 'none';
+  });
+  const qs = {
+    q5:{q:'The mechanism by which the data and functions are bound together into a single unit is known as', o:['Inheritance','Encapsulation','Polymorphism','Abstraction'], c:1, exp:'Textbook Evaluation, Section A, Q5 — the Encapsulation definition, word for word.'},
+    q6:{q:'Insulation of the data from direct access by the program is called as', o:['Data hiding','Encapsulation','Polymorphism','Abstraction'], c:0, exp:'Textbook Evaluation, Section A, Q6 — "This encapsulation of data from direct access by the program is called data hiding or information hiding."'}
+  };
+  document.getElementById('qc-encap').innerHTML = mcqHTML('q5', qs.q5, 'tier-green', '🟢 Beginner') + mcqHTML('q6', qs.q6, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-encap', qs);
+}
+
+/* =========================================================================
+   TOPIC 7 — 13.3.2 Data Abstraction
+   ========================================================================= */
+function renderAbstraction(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.3.2</div>
+    <h2>Data Abstraction</h2>
+    <div class="goals"><b>Goal:</b> Learn to show only what matters, and hide the rest.</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Abstraction refers to showing only the essential features without revealing background details. Classes use the concept of abstraction to define a list of abstract attributes and function which operate on these attributes. They encapsulate all the essential properties of the object that are to be created. The attributes are called <b>data members</b> because they hold information. The functions that operate on these data are called <b>methods</b> or <b>member function</b>."
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      A car's <b>dashboard</b> shows you the essentials — speed, fuel, a start button — without revealing the wiring, pistons, or fuel-injection logic underneath. You don't need that background detail to drive; the dashboard is an abstraction of a much more complex machine.
+      <div class="ta-only"><b>தமிழில்:</b> கார் டாஷ்போர்டு முக்கியமானவற்றை மட்டும் காட்டும்; உள்ளே இருக்கும் சிக்கலான பாகங்களை மறைக்கும் — இதுவே Abstraction.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Essential vs Hidden <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(Interactive)</span></h3>
+    <div class="abs-layer visible">
+      <div class="lyr-lbl">👁️ What you SEE (the interface)</div>
+      <div class="cls-chips" style="justify-content:center;"><span class="chip func">showData()</span><span class="chip func">getData()</span></div>
+    </div>
+    <div class="abs-layer hidden-layer" id="hiddenLayer">
+      <div class="lyr-lbl">🙈 What's HIDDEN (implementation details)</div>
+      <div class="cls-chips" style="justify-content:center;"><span class="chip data">how marks are stored</span><span class="chip data">how the average is calculated</span><span class="chip data">internal memory layout</span></div>
+    </div>
+    <div class="btn-row"><button class="btn btn-ghost btn-sm" id="revealHiddenBtn">👁️ Peek at the hidden details (for learning only)</button></div>
+    <div class="easy" id="absExplain" style="display:none;"><span class="lbl">💡 What just happened?</span>Normally this layer stays hidden — that's the whole point of abstraction! You just peeked at it only to understand what is being hidden from the normal user of the class.</div>
+  </div>
+
+  <div class="card">
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Attributes shown by abstraction are called <b>data members</b>; the functions that operate on them are called <b>methods / member functions</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-abs"></div></div>
+  `;
+}
+function wireAbstraction(){
+  document.getElementById('revealHiddenBtn').addEventListener('click', function(){
+    const layer = document.getElementById('hiddenLayer');
+    const revealed = layer.classList.toggle('revealed');
+    document.getElementById('absExplain').style.display = revealed ? 'block' : 'none';
+    this.textContent = revealed ? '🙈 Hide them again' : '👁️ Peek at the hidden details (for learning only)';
+  });
+  const qs = {
+    q7:{q:'Which of the following concept encapsulate all the essential properties of the object that are to be created?', o:['class','Encapsulation','Polymorphism','Abstraction'], c:3, exp:'Textbook Evaluation, Section A, Q7 — 13.3.2 "They encapsulate all the essential properties of the object that are to be created" is said of Abstraction.'}
+  };
+  document.getElementById('qc-abs').innerHTML = mcqHTML('q7', qs.q7, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-abs', qs);
+}
+
+/* =========================================================================
+   TOPIC 8 — 13.3.3 Modularity
+   ========================================================================= */
+function renderModularity(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.3.3</div>
+    <h2>Modularity</h2>
+    <div class="goals"><b>Goal:</b> See how OOP breaks a big system into smaller, composable units.</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Modularity is designing a system that is divided into a set of functional units (named modules) that can be composed into a larger application."
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      Don't confuse this with the <i>Modular Programming paradigm</i> from section 13.2.2! Here, "modularity" is a pillar of OOP itself — in OOP, each <b>class</b> naturally behaves like a module: it is a self-contained functional unit that you can combine with other classes to build a larger application.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Visualising it</h3>
+    <div class="diagram-box">
+      <div class="flow-col">
+        <div class="flow-row">
+          <div class="flow-node alt">Class: Student</div>
+          <div class="flow-node alt">Class: Teacher</div>
+          <div class="flow-node alt">Class: Course</div>
+          <div class="flow-node alt">Class: Report</div>
+        </div>
+        <div class="flow-arrow down">↓ composed together</div>
+        <div class="flow-node active">Complete School Management Application</div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — several class "modules" composed into one larger application.</div>
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-mod"></div></div>
+  `;
+}
+function wireModularity(){
+  const qs = {
+    q8m:{q:'Modularity means dividing a system into ______ that can be composed into a larger application.', o:['variables','functional units (modules)','loops only','objects only'], c:1, exp:'Textbook, 13.3.3 — "Modularity is designing a system that is divided into a set of functional units (named modules)..."'}
+  };
+  document.getElementById('qc-mod').innerHTML = mcqHTML('q8m', qs.q8m, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-mod', qs);
+}
+
+/* =========================================================================
+   TOPIC 9 — 13.3.4 Inheritance
+   ========================================================================= */
+function renderInheritance(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.3.4</div>
+    <h2>Inheritance</h2>
+    <div class="goals"><b>Goal:</b> Understand how new classes can be built from existing ones, and why that saves work.</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Inheritance is the technique of building new classes (<b>derived class</b>) from an existing Class (<b>base class</b>). The most important advantage of inheritance is <b>code reusability</b>."
+    </div>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Note (Points to Remember)</span>
+      "Inheritance is transitive in nature."
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      A child inherits traits from a parent — and can also inherit traits that the parent themselves inherited from a grandparent. That "passes-down-the-chain" idea is exactly what <b>transitive</b> means for inheritance between classes.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Visualising it</h3>
+    <div class="diagram-box">
+      <div class="flow-col">
+        <div class="flow-node">Vehicle <span style="font-weight:400;">(base class)</span></div>
+        <div class="flow-arrow down">↓ inherits from</div>
+        <div class="flow-row">
+          <div class="flow-node alt">Car <span style="font-weight:400;">(derived class)</span></div>
+          <div class="flow-node alt">Bike <span style="font-weight:400;">(derived class)</span></div>
+        </div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — Car and Bike both reuse whatever is already defined in Vehicle, instead of being written from scratch.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      Base class = existing class &nbsp;·&nbsp; Derived class = new class built from it &nbsp;·&nbsp; Biggest advantage = <b>code reusability</b> &nbsp;·&nbsp; Inheritance is <b>transitive</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-inh"></div></div>
+  `;
+}
+function wireInheritance(){
+  const qs = {
+    q8:{q:'Which of the following is the most important advantage of inheritance?', o:['data hiding','code reusability','code modification','accessibility'], c:1, exp:'Textbook Evaluation, Section A, Q8 — "The most important advantage of inheritance is code reusability."'},
+    q10:{q:'Which of the following supports the transitive nature of data?', o:['Inheritance','Encapsulation','Polymorphism','Abstraction'], c:0, exp:'Textbook Evaluation, Section A, Q10, and Points to Remember — "Inheritance is transitive in nature."'}
+  };
+  document.getElementById('qc-inh').innerHTML = mcqHTML('q8', qs.q8, 'tier-green', '🟢 Beginner') + mcqHTML('q10', qs.q10, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-inh', qs);
+}
+
+/* =========================================================================
+   TOPIC 10 — 13.3.5 Polymorphism
+   ========================================================================= */
+function renderPolymorphism(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.3.5</div>
+    <h2>Polymorphism</h2>
+    <div class="goals"><b>Goal:</b> Understand "one message, many forms".</div>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "Polymorphism is the ability of a message or function to be displayed in more than one form."
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      The word breaks down as <b>poly</b> (many) + <b>morph</b> (forms) = "many forms". The same instruction can behave differently depending on who (or what) receives it.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      The same person can be a <b>teacher</b> at school, a <b>parent</b> at home, and a <b>customer</b> at a shop — one person, many forms/roles depending on the situation. A single instruction in a program can behave just as differently depending on which object receives it.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Visualising it</h3>
+    <div class="diagram-box">
+      <div class="flow-col">
+        <div class="flow-node">message: draw()</div>
+        <div class="flow-arrow down">↓ same message, sent to different shapes</div>
+        <div class="flow-row">
+          <div class="flow-node alt">Circle → draws a circle</div>
+          <div class="flow-node alt">Square → draws a square</div>
+          <div class="flow-node alt">Triangle → draws a triangle</div>
+        </div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — one message (draw), many forms of response.</div>
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-poly"></div></div>
+  `;
+}
+function wirePolymorphism(){
+  const qs = {
+    q9p:{q:'The ability of a message or function to be displayed in more than one form is called', o:['Encapsulation','Abstraction','Polymorphism','Modularity'], c:2, exp:'Textbook, 13.3.5 — the Polymorphism definition, word for word.'}
+  };
+  document.getElementById('qc-poly').innerHTML = mcqHTML('q9p', qs.q9p, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-poly', qs);
+}
+
+/* =========================================================================
+   TOPIC 11 — 13.4 Advantages of OOP
+   ========================================================================= */
+function renderAdvantages(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.4</div>
+    <h2>13.4 Advantages of OOP</h2>
+    <div class="goals"><b>Goal:</b> Know the four benefits the textbook credits to Object Oriented Programming.</div>
+  </div>
+
+  <div class="card">
+    <div class="adv-grid">
+      <div class="adv-card">
+        <div class="ic">♻️</div><b>Re-usability</b>
+        <p>"Write once and use it multiple times" — you can achieve this by using class.</p>
+      </div>
+      <div class="adv-card">
+        <div class="ic">🧬</div><b>Redundancy</b>
+        <p>Inheritance is a good feature for data redundancy. A common class can be written once and inherited by every sub-class that needs the same functionality.</p>
+      </div>
+      <div class="adv-card">
+        <div class="ic">🛠️</div><b>Easy Maintenance</b>
+        <p>Easy to maintain and modify existing code, as new objects can be created with small differences to existing ones.</p>
+      </div>
+      <div class="adv-card">
+        <div class="ic">🔒</div><b>Security</b>
+        <p>Using data hiding and abstraction, only necessary data is provided — maintaining the security of data.</p>
+      </div>
+    </div>
+    <div class="exam-point"><span class="lbl">⭐ Exam Point</span>Notice how each advantage traces back to a pillar you already learned: Re-usability → Class, Redundancy → Inheritance, Security → Data hiding + Abstraction.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-adv"></div></div>
+  `;
+}
+function wireAdvantages(){
+  const qs = {
+    q9:{q:'"Write once and use it multiple time" can be achieved by', o:['redundancy','reusability','modification','composition'], c:1, exp:'Textbook Evaluation, Section A, Q9 — 13.4 Re-usability, word for word.'}
+  };
+  document.getElementById('qc-adv').innerHTML = mcqHTML('q9', qs.q9, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-adv', qs);
+}
+
+/* =========================================================================
+   TOPIC 12 — 13.5 Disadvantages of OOP
+   ========================================================================= */
+function renderDisadvantages(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · 13.5</div>
+    <h2>13.5 Disadvantages of OOP</h2>
+    <div class="goals"><b>Goal:</b> Be fair about OOP — know its costs as well as its benefits.</div>
+  </div>
+
+  <div class="card">
+    <div class="adv-grid">
+      <div class="adv-card dis-card">
+        <div class="ic">📦</div><b>Size</b>
+        <p>Object Oriented Programs are much larger than other programs.</p>
+      </div>
+      <div class="adv-card dis-card">
+        <div class="ic">💪</div><b>Effort</b>
+        <p>Object Oriented Programs require a lot of work to create.</p>
+      </div>
+      <div class="adv-card dis-card">
+        <div class="ic">🐢</div><b>Speed</b>
+        <p>Object Oriented Programs are slower than other programs, because of their size.</p>
+      </div>
+    </div>
+    <div class="easy"><span class="lbl">💡 Easy Explanation</span>Despite these costs, OOP is still the dominant style for building large, real-world software — the earlier advantages (reusability, easy maintenance, security) usually outweigh the extra size, effort, and speed cost as a project grows.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-dis"></div></div>
+  `;
+}
+function wireDisadvantages(){
+  const qs = {
+    qdis:{q:'Which of these is NOT listed in this chapter as a disadvantage of OOP?', o:['Size','Effort','Speed','Security'], c:3, exp:'Size, Effort and Speed are the textbook\'s three disadvantages (13.5). Security is actually listed as an advantage (13.4) — data hiding and abstraction protect data, they don\'t cost anything.'}
+  };
+  document.getElementById('qc-dis').innerHTML = mcqHTML('qdis', qs.qdis, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-dis', qs);
+}
+
+/* =========================================================================
+   TOPIC 13 — Points to Remember
+   ========================================================================= */
+function renderPTR(){
+  const points = [
+    'Paradigm means organizing principle of a program. It is an approach to programming.',
+    'Procedural or Modular programming means a list of instructions were given and each instructions tell the computer to do something.',
+    'Procedural programming aims more about procedures. In this Programs are organized in the form of subroutines or sub programs.',
+    'Modular programming combines related procedures in a module and hides data under modules.',
+    'Object Oriented programming Paradigm emphasizes on the data rather than the algorithm. It implements programs using classes and objects.',
+    'Class is a user defined data type. Class represents a group of similar objects.',
+    'Objects are the basic unit of OOP. It represents data and associated function together into a single unit.',
+    'The mechanism by which the data and functions are bound together into a single unit is known as ENCAPSULATION. It implements abstraction.',
+    'Abstraction refers to showing only the essential features without revealing background details.',
+    'Modularity is designing a system that is divided into a set of functional units that can be composed into a larger application.',
+    'Polymorphism is the ability of a message or function to be displayed in more than one form.',
+    'Inheritance is the technique of building new classes (derived class) from an existing class. The most important advantage of inheritance is code reusability. Inheritance is transitive in nature.',
+  ];
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 13 · Summary</div>
+    <h2>Points to Remember</h2>
+    <div class="goals"><b>Goal:</b> A last pass over every exam-worthy sentence from this chapter, exactly as the textbook states it.</div>
+  </div>
+  <div class="card">
+    <ul>
+      ${points.map(p=>`<li>${esc(p)}</li>`).join('')}
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Next up</h3>
+    <p>Ready to test your memory? Head to the <b>Flashcard Deck</b> next, or jump straight to the <b>Exam Preparation</b> page for a scored Quick Test.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" data-goto="flashcards">🗂️ Flashcard Deck</button>
+      <button class="btn btn-ghost" data-goto="examprep">📝 Exam Preparation</button>
+    </div>
+  </div>
+  `;
+}
+function wirePTR(){ gotoButtonsWire(); }
+
+/* =========================================================================
+   TOPIC 14 — Flashcard Deck
+   ========================================================================= */
+const FLASHCARDS = [
+  {term:'Paradigm', def:'The organizing principle of a program; an approach to programming.'},
+  {term:'Procedural Programming', def:'A list of instructions given to the computer to do something; organizes programs as subroutines/sub-programs, with all data global.'},
+  {term:'Modular Programming', def:'A paradigm with multiple modules, each holding a set of related functions; data is hidden under the modules.'},
+  {term:'Object Oriented Programming', def:'A programming approach based on classes and objects that emphasizes data rather than algorithm.'},
+  {term:'Class', def:'A user-defined data type / blueprint that binds data and its associated functions into a single unit; represents a group of similar objects.'},
+  {term:'Object', def:'An identifiable entity with characteristics (data) and behaviour (functions); an instance created from a class.'},
+  {term:'Encapsulation', def:'The mechanism by which data and functions are bound together into a single unit; also called data binding. Implements abstraction.'},
+  {term:'Data Hiding (Information Hiding)', def:'Encapsulation of data from direct access by the program — only the class\'s own functions can reach the data.'},
+  {term:'Data Abstraction', def:'Showing only the essential features of an object without revealing background (implementation) details.'},
+  {term:'Modularity', def:'Designing a system as a set of functional units (modules) that can be composed into a larger application.'},
+  {term:'Inheritance', def:'The technique of building new classes (derived class) from an existing class (base class); gives code reusability and is transitive in nature.'},
+  {term:'Polymorphism', def:'The ability of a message or function to be displayed in more than one form.'},
+];
+let flashIdx = 0;
+function renderFlashcards(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Flashcards</div>
+    <h2>Flashcard Deck</h2>
+    <div class="goals"><b>Goal:</b> Drill every key term in this chapter. Tap the card to flip it, then mark whether you already know it.</div>
+  </div>
+  <div class="card">
+    <div class="deck-wrap">
+      <div class="deck-meta">
+        <span id="deckPos">1 / ${FLASHCARDS.length}</span>
+        <span class="mastered-badge" id="deckMastered">0 mastered</span>
+      </div>
+      <div class="flip-card big" id="deckCard">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="ic">🗂️</div><div class="nm" id="deckTerm"></div><div class="hint">tap to flip</div></div>
+          <div class="flip-back" id="deckDef"></div>
+        </div>
+      </div>
+      <div class="deck-nav">
+        <button class="btn btn-ghost btn-sm" id="deckPrev">⬅ Prev</button>
+        <button class="btn btn-accent btn-sm" id="deckFlip">🔄 Flip</button>
+        <button class="btn btn-ghost btn-sm" id="deckNext">Next ➡</button>
+      </div>
+      <div class="deck-nav">
+        <button class="btn btn-primary btn-sm" id="deckKnow">✔ I know this</button>
+        <button class="btn btn-ghost btn-sm" id="deckReview">↺ Review again</button>
+        <button class="btn btn-ghost btn-sm" id="deckShuffle">🔀 Shuffle</button>
+      </div>
+    </div>
+  </div>
+  `;
+}
+function wireFlashcards(){
+  flashIdx = 0;
+  const card = document.getElementById('deckCard');
+  function renderDeckCard(){
+    const f = FLASHCARDS[flashIdx];
+    document.getElementById('deckTerm').textContent = f.term;
+    document.getElementById('deckDef').innerHTML = '<b>'+esc(f.term)+'</b>'+esc(f.def);
+    document.getElementById('deckPos').textContent = (flashIdx+1)+' / '+FLASHCARDS.length;
+    document.getElementById('deckMastered').textContent = state.flashMastered.length+' mastered';
+    card.classList.remove('flipped');
+  }
+  card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  document.getElementById('deckFlip').addEventListener('click', ()=> card.classList.toggle('flipped'));
+  document.getElementById('deckPrev').addEventListener('click', ()=>{ flashIdx=(flashIdx-1+FLASHCARDS.length)%FLASHCARDS.length; renderDeckCard(); });
+  document.getElementById('deckNext').addEventListener('click', ()=>{ flashIdx=(flashIdx+1)%FLASHCARDS.length; renderDeckCard(); });
+  document.getElementById('deckShuffle').addEventListener('click', ()=>{ flashIdx = Math.floor(Math.random()*FLASHCARDS.length); renderDeckCard(); });
+  document.getElementById('deckKnow').addEventListener('click', ()=>{
+    const term = FLASHCARDS[flashIdx].term;
+    if(!state.flashMastered.includes(term)) state.flashMastered.push(term);
+    saveState();
+    document.getElementById('deckMastered').textContent = state.flashMastered.length+' mastered';
+    flashIdx=(flashIdx+1)%FLASHCARDS.length; renderDeckCard();
+  });
+  document.getElementById('deckReview').addEventListener('click', ()=>{
+    const term = FLASHCARDS[flashIdx].term;
+    const i = state.flashMastered.indexOf(term);
+    if(i>-1){ state.flashMastered.splice(i,1); saveState(); }
+    document.getElementById('deckMastered').textContent = state.flashMastered.length+' mastered';
+    flashIdx=(flashIdx+1)%FLASHCARDS.length; renderDeckCard();
+  });
+  renderDeckCard();
+}
+
+/* =========================================================================
+   TOPIC 15 — Practice: Section B / C / D review
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Practice</div>
+    <h2>Practice: Textbook Evaluation — Section B, C &amp; D</h2>
+    <div class="goals"><b>Goal:</b> Work through the chapter's own written-answer questions. Try to answer in your own words first, then open the suggested answer.</div>
+  </div>
+
+  <div class="card">
+    <h3>Section B — Very Short Answers</h3>
+    <div id="secB"></div>
+  </div>
+
+  <div class="card">
+    <h3>Section C — Short Answers</h3>
+    <div id="secC"></div>
+  </div>
+
+  <div class="card">
+    <h3>Section D — Explain in Detail</h3>
+    <div id="secD"></div>
+  </div>
+
+  <div class="card">
+    <h3>📚 Reference Books <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(from the textbook)</span></h3>
+    <ol>
+      <li>Object Oriented Programming with C++ (4th Edition), Dr. E. Balagurusamy, Mc.Graw Hills.</li>
+      <li>The Complete Reference C++ (Forth Edition), Herbert Schildt. Mc.Graw Hills.</li>
+      <li>Computer Science with C++ (A text book of CBSE XI and XII), Sumita Arora, Dhanpat Rai &amp; Co.</li>
+      <li>A text book of CBSE XI and XII computer science by Preeti Arora and Pinky Gupta.</li>
+      <li>Computer Science with C++, Reeta Sahoo and Gagan Sahoo.</li>
+      <li>The C++ Programming Language, Bjarne Stroustrup.</li>
+      <li>C++ Primer (5th Edition) by S. B. Lippman, J. Lajoie, et al.</li>
+    </ol>
+  </div>
+  `;
+}
+const SECTION_B = [
+  {q:'How is modular programming different from procedural programming paradigm?', a:'Procedural programming organizes a program as subroutines/sub-programs with all data items global — any data-type change must be propagated everywhere. Modular programming also uses procedures, but groups related functions into independent modules that each hide their own local data; a module can work with its own data as well as data passed to it. So modular programming adds "grouping into modules + hiding data under the module" on top of the plain procedural style.'},
+  {q:'Differentiate classes and objects.', a:'A Class is a user-defined data type — a template/blueprint that binds data and its associated functions together and represents a group of similar objects. An Object is an actual instance created from a class — an identifiable entity with its own characteristics (data) and behaviour (functions), also called a class variable. In short: one class, many possible objects.'},
+  {q:'What is polymorphism?', a:'Polymorphism is the ability of a message or function to be displayed in more than one form (poly = many, morph = forms).'},
+  {q:'How is encapsulation and abstraction are interrelated?', a:'Abstraction decides WHAT essential attributes and functions a class should expose, while Encapsulation is HOW that data and those functions are physically bound together into one unit and shielded from outside access. The textbook states it directly: Encapsulation "implements abstraction" — encapsulation is the mechanism that puts abstraction into practice.'},
+  {q:'Write the disadvantages of OOP.', a:'Size (Object Oriented Programs are much larger than other programs), Effort (they require a lot of work to create), and Speed (they run slower than other programs, because of their size).'},
+];
+const SECTION_C = [
+  {q:'What is paradigm? Mention the different types of paradigm.', a:'Paradigm means the organizing principle of a program — an approach to programming. The textbook lists three types: Procedural programming, Modular Programming, and Object Oriented Programming.'},
+  {q:'Write a note on the features of procedural programming.', a:'Programs are organized as subroutines/sub-programs; all data items are global; it is suitable for small-sized software applications; and it is difficult to maintain/enhance because any change in a data type must be propagated to every subroutine that uses it, which is time consuming. Example languages: FORTRAN and COBOL.'},
+  {q:'List some of the features of modular programming.', a:'Emphasis on algorithm rather than data; programs are divided into individual modules; each module is independent with its own local data; and a module can work with its own data as well as data passed to it. Example languages: Pascal and C.'},
+  {q:'What do you mean by modularization and software reuse?', a:'Modularisation is where a program can be decomposed into modules. Software re-use is where a program can be composed from existing and new modules. These are the two things the Object-Oriented Programming approach mainly encourages.'},
+  {q:'Define information hiding.', a:'Information hiding (also called data hiding) is the encapsulation of data from direct access by the program — the data is not accessible to the outside world, and only the functions wrapped inside the class can access it.'},
+];
+const SECTION_D = [
+  {q:'Write the differences between Object Oriented Programming and procedural programming.', a:'TABLE', table:[
+    ['Aspect','Procedural Programming','Object Oriented Programming'],
+    ['Emphasis','On procedures / algorithm (doing things)','On data'],
+    ['Data visibility','All data items are global','Data and its operations are grouped into a single unit (bound inside a class)'],
+    ['Organisation','Subroutines / sub-programs','Classes and objects'],
+    ['Maintainability','Difficult — a data-type change must be propagated to every subroutine using it','Easier — new objects can be created with small differences to existing ones'],
+    ['Reusability','Low','High — mainly through inheritance (code reusability)'],
+    ['Example languages','FORTRAN, COBOL','C++, Java, VB.Net, Python'],
+  ]},
+  {q:'What are the advantages of OOPs?', a:'Re-usability ("write once and use it multiple times" by using a class), Redundancy (handled well — a common class can be written once and inherited by sub-classes that need the same functionality), Easy Maintenance (existing code can be modified easily since new objects can be created with small differences to existing ones), and Security (data hiding and abstraction provide only the necessary data, keeping the rest secure).'},
+  {q:'Write a note on the basic concepts that support OOPs.', a:'The five basic concepts are: Encapsulation (binds data and functions together into a single unit; implements abstraction), Data Abstraction (shows only the essential features, hiding background details), Modularity (divides a system into functional units/modules that compose into a larger application), Inheritance (builds new derived classes from an existing base class, giving code reusability, and is transitive in nature), and Polymorphism (the ability of a message or function to be displayed in more than one form).'},
+];
+function qaBlock(prefix, items){
+  return items.map((it,i)=>`
+    <div class="q-block">
+      <div class="q-text">${i+1}. ${esc(it.q)}</div>
+      <div class="btn-row"><button class="btn btn-ghost btn-sm" data-ans="${prefix}${i}">✅ Show Suggested Answer</button></div>
+      <div class="explain-box" id="ans-${prefix}${i}">
+        <div class="ans-box"><span class="lbl">Suggested Answer — based on this chapter's content; write it in your own words for the exam</span>
+          ${it.a==='TABLE' ? tableHTML(it.table) : esc(it.a)}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function tableHTML(rows){
+  let h = '<table class="tbl"><tr>'+rows[0].map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr>';
+  for(let r=1;r<rows.length;r++) h += '<tr>'+rows[r].map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>';
+  h += '</table>';
+  return h;
+}
+function wirePractice(){
+  document.getElementById('secB').innerHTML = qaBlock('b', SECTION_B);
+  document.getElementById('secC').innerHTML = qaBlock('c', SECTION_C);
+  document.getElementById('secD').innerHTML = qaBlock('d', SECTION_D);
+  document.querySelectorAll('[data-ans]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      document.getElementById('ans-'+this.dataset.ans).classList.toggle('show');
+    });
+  });
+}
+
+/* =========================================================================
+   TOPIC 16 — Exam Preparation
+   ========================================================================= */
+const QUICKTEST_QS = {
+  qt1:{q:'The term used to describe a programming approach based on classes and objects is', o:['OOP','POP','ADT','SOP'], c:0},
+  qt2:{q:'The paradigm which aims more at procedures.', o:['Object Oriented Programming','Procedural programming','Modular programming','Structural programming'], c:1},
+  qt3:{q:'Which of the following is a user defined data type?', o:['class','float','int','object'], c:0},
+  qt4:{q:'The identifiable entity with some characteristics and behaviour is.', o:['class','object','structure','member'], c:1},
+  qt5:{q:'The mechanism by which the data and functions are bound together into a single unit is known as', o:['Inheritance','Encapsulation','Polymorphism','Abstraction'], c:1},
+  qt6:{q:'Insulation of the data from direct access by the program is called as', o:['Data hiding','Encapsulation','Polymorphism','Abstraction'], c:0},
+  qt7:{q:'Which of the following concept encapsulate all the essential properties of the object that are to be created?', o:['class','Encapsulation','Polymorphism','Abstraction'], c:3},
+  qt8:{q:'Which of the following is the most important advantage of inheritance?', o:['data hiding','code reusability','code modification','accessibility'], c:1},
+  qt9:{q:'"Write once and use it multiple time" can be achieved by', o:['redundancy','reusability','modification','composition'], c:1},
+  qt10:{q:'Which of the following supports the transitive nature of data?', o:['Inheritance','Encapsulation','Polymorphism','Abstraction'], c:0},
+};
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Exam Preparation</div>
+    <h2>Chapter 13 Exam Preparation</h2>
+    <div class="goals"><b>Goal:</b> A fast, focused revision of every exam-worthy idea in this chapter.</div>
+  </div>
+
+  <div class="card">
+    <h3>🧠 Must Know</h3>
+    <ul>
+      <li>OOP organises software as objects that bundle data AND behaviour together (unlike procedural style, which keeps them loosely connected).</li>
+      <li>Three paradigms: Procedural (procedures, global data), Modular (modules, hidden local data), Object Oriented (data-centred, classes &amp; objects).</li>
+      <li>Class = user-defined data type / blueprint; Object = an instance of a class, with its own data and behaviour.</li>
+      <li>Five pillars of OOP: Encapsulation, Data Abstraction, Modularity, Inheritance, Polymorphism.</li>
+      <li>Encapsulation → data binding → data hiding/information hiding → "implements abstraction".</li>
+      <li>Inheritance's biggest advantage is code reusability; it is transitive in nature.</li>
+      <li>Advantages: Re-usability, Redundancy (via inheritance), Easy Maintenance, Security. Disadvantages: Size, Effort, Speed.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📐 Must Remember — Definitions Cheat Sheet</h3>
+    <table class="tbl">
+      <tr><th>Term</th><th>One-line definition</th></tr>
+      <tr><td>Paradigm</td><td>Organizing principle of a program; an approach to programming.</td></tr>
+      <tr><td>Class</td><td>User-defined data type / blueprint binding data &amp; functions; represents similar objects.</td></tr>
+      <tr><td>Object</td><td>Identifiable entity with characteristics and behaviour; instance of a class.</td></tr>
+      <tr><td>Encapsulation</td><td>Binding data and functions into a single unit (data binding); implements abstraction.</td></tr>
+      <tr><td>Data hiding</td><td>Encapsulation of data from direct access by the program.</td></tr>
+      <tr><td>Abstraction</td><td>Showing only essential features, hiding background details.</td></tr>
+      <tr><td>Modularity</td><td>System divided into functional units (modules) composed into a larger app.</td></tr>
+      <tr><td>Inheritance</td><td>Building derived classes from a base class; gives code reusability; transitive.</td></tr>
+      <tr><td>Polymorphism</td><td>A message/function displayed in more than one form.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🔑 Jump to a Lesson</h3>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" data-goto="paradigms">Programming Paradigms</button>
+      <button class="btn btn-ghost btn-sm" data-goto="classobject">Class &amp; Object</button>
+      <button class="btn btn-ghost btn-sm" data-goto="encapsulation">Encapsulation</button>
+      <button class="btn btn-ghost btn-sm" data-goto="abstraction">Data Abstraction</button>
+      <button class="btn btn-ghost btn-sm" data-goto="modularity">Modularity</button>
+      <button class="btn btn-ghost btn-sm" data-goto="inheritance">Inheritance</button>
+      <button class="btn btn-ghost btn-sm" data-goto="polymorphism">Polymorphism</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Common Exam Questions <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(from the textbook's own Evaluation section)</span></h3>
+    <ul>
+      <li>How is modular programming different from procedural programming paradigm?</li>
+      <li>Differentiate classes and objects.</li>
+      <li>How is encapsulation and abstraction are interrelated?</li>
+      <li>What is paradigm? Mention the different types of paradigm.</li>
+      <li>What do you mean by modularization and software reuse?</li>
+      <li>Write the differences between Object Oriented Programming and procedural programming.</li>
+      <li>Write a note on the basic concepts that support OOPs.</li>
+    </ul>
+    <div class="btn-row"><button class="btn btn-ghost btn-sm" data-goto="practice">✅ See suggested answers on the Practice page</button></div>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ One-Minute Revision</h3>
+    <ul style="columns:2;column-gap:24px;">
+      <li>Paradigm = approach to programming</li>
+      <li>Procedural = procedures, global data</li>
+      <li>Modular = modules, hidden local data</li>
+      <li>OOP = data-centred, classes &amp; objects</li>
+      <li>Class = blueprint; Object = instance</li>
+      <li>Encapsulation = data binding</li>
+      <li>Data hiding = result of encapsulation</li>
+      <li>Abstraction = essential features only</li>
+      <li>Modularity = modules → bigger app</li>
+      <li>Inheritance = base → derived; transitive</li>
+      <li>Polymorphism = one message, many forms</li>
+      <li>Adv: reuse, redundancy, maintenance, security</li>
+      <li>Disadv: size, effort, speed</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📝 Quick Test <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(Textbook Evaluation, Section A — all 10 MCQs, scored)</span></h3>
+    <div id="quickTestWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="qtScoreBtn">🏁 Show My Score</button></div>
+    <div id="qtScoreOut" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(enrichment — applying today's concepts, not textbook questions)</span></h3>
+    <div class="q-block">
+      <span class="q-meta tier-red">🔴 Challenge</span>
+      <div class="q-text">A school wants new software to manage Students, Teachers and Courses. It must reuse common functionality wherever possible, and must keep each student's marks safe from being changed accidentally by unrelated parts of the program. Which OOP pillars would you lean on, and why?</div>
+      <div class="btn-row"><button class="btn btn-ghost btn-sm" id="chHintBtn">💡 Hint</button><button class="btn btn-ghost btn-sm" id="chSolBtn">✅ Show One Possible Answer</button></div>
+      <div class="explain-box" id="chHint">Hint: one pillar is about reusing code between similar classes; another pillar is about protecting data from direct, unintended access.</div>
+      <div class="explain-box" id="chSol"><b>Inheritance</b> — a common base class (say, "Person") holding shared data/behaviour could be reused by derived classes like Student and Teacher, giving code reusability. <b>Encapsulation</b> (data hiding) — keeping each Student's marks as private data, reachable only through the class's own functions (like getData()/showData()), stops unrelated code from changing marks directly — exactly the "Security" advantage described in 13.4.</div>
+    </div>
+    <div class="q-block">
+      <span class="q-meta tier-red">🔴 Challenge</span>
+      <div class="q-text">Match each description to the correct paradigm: (1) "All data items are global, organised as subroutines" (2) "Data is hidden under independent modules with their own local data" (3) "Emphasizes data over algorithm, implements programs using classes and objects".</div>
+      <div id="matchMCQ"></div>
+    </div>
+  </div>
+  `;
+}
+function wireExamPrep(){
+  gotoButtonsWire();
+
+  let html = '';
+  Object.keys(QUICKTEST_QS).forEach(k=> html += mcqHTML(k, QUICKTEST_QS[k], 'tier-green', ''));
+  document.getElementById('quickTestWrap').innerHTML = html;
+  wireMCQ('#quickTestWrap', QUICKTEST_QS);
+
+  document.getElementById('qtScoreBtn').addEventListener('click', ()=>{
+    let score = 0;
+    Object.keys(QUICKTEST_QS).forEach(k=>{
+      const block = document.getElementById('block-'+k);
+      if(!block) return;
+      const chosenCorrect = block.querySelector('.opt.correct') && block.dataset.answered && !block.querySelector('.opt.incorrect');
+      if(chosenCorrect) score++;
+    });
+    const pct = Math.round(score/10*100);
+    document.getElementById('qtScoreOut').innerHTML = `<span class="score-pill">Score: ${score} / 10 (${pct}%)</span> ${score>=8?'🌟 Excellent!':score>=5?'👍 Good — review the missed ones above.':'📘 Revisit the topics above and try again.'}`;
+  });
+
+  document.getElementById('chHintBtn').addEventListener('click', ()=> document.getElementById('chHint').classList.toggle('show'));
+  document.getElementById('chSolBtn').addEventListener('click', ()=> document.getElementById('chSol').classList.toggle('show'));
+
+  const matchQs = {
+    m1:{q:'"All data items are global, organised as subroutines" describes', o:['Procedural programming','Modular programming','Object Oriented Programming'], c:0, exp:'13.2.1 — Procedural programming: subroutines/sub-programs, all data items global.'}
+  };
+  document.getElementById('matchMCQ').innerHTML = mcqHTML('m1', matchQs.m1, 'tier-red', '🔴 Challenge');
+  wireMCQ('#matchMCQ', matchQs);
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+setLang(state.lang || 'en');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
