@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 — Arrays and Structures | C++ Learning Lab</title>
+<style>
+  :root{
+    --bg:#f3f6fb;
+    --card:#ffffff;
+    --primary:#1d4ed8;
+    --primary-dark:#1e3a8a;
+    --primary-light:#eaf1ff;
+    --accent:#7c3aed;
+    --accent-light:#f1e9ff;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#b45309;
+    --warn-bg:#fff6e6;
+    --text:#1b2430;
+    --muted:#5b6673;
+    --border:#dfe6ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{line-height:1.4;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;
+    position:sticky;top:0;z-index:40;box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#dce7ff;}
+  header.top .lang-toggle{display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;}
+  header.top .lang-toggle button{border:none;background:transparent;color:#eaf1ff;padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:700;cursor:pointer;}
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  nav.sidebar{width:290px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);padding:16px 10px 90px;overflow-y:auto;}
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;cursor:pointer;font-size:.9rem;color:var(--text);}
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.7rem;color:var(--muted);background:#eef1f4;border-radius:6px;padding:2px 6px;min-width:46px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+  .sidebar-backdrop{display:none;}
+
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:920px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(20,30,40,.04);}
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#eef4ff;border-left:5px solid #2563eb;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#1d4ed8;font-size:.8rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.8rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.8rem;margin-bottom:4px;display:block;}
+  .example-box{background:#f5f3ff;border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:var(--accent);font-size:.8rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.8rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.8rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.8rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.8rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.8rem;margin-bottom:4px;display:block;}
+  .fixbox{background:var(--correct-bg);border-left:5px solid var(--correct);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .fixbox .lbl{font-weight:800;color:var(--correct);font-size:.8rem;margin-bottom:4px;display:block;}
+  .ta-box{background:#fff9e6;border-left:5px solid #ca8a04;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:.92rem;}
+  .ta-box .lbl{font-weight:800;color:#92700a;font-size:.8rem;margin-bottom:4px;display:block;}
+  body[data-lang="en"] .ta-only{display:none;}
+  body[data-lang="ta"] .ta-only{display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fafbfc;}
+  table.tbl td.c, table.tbl th.c{text-align:center;}
+
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#eef1f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+  .code-box{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono',Consolas,Menlo,monospace;font-size:.82rem;overflow-x:auto;margin:10px 0;white-space:pre;line-height:1.55;}
+  .code-box .hl{background:rgba(124,58,237,.35);display:inline-block;width:100%;border-radius:4px;}
+  .out-box{background:#111827;color:#4ade80;border-radius:10px;padding:12px 16px;font-family:'JetBrains Mono',Consolas,Menlo,monospace;font-size:.82rem;white-space:pre;margin:10px 0;overflow-x:auto;}
+  .code-cap{font-size:.78rem;color:var(--muted);font-weight:700;margin:14px 0 2px;}
+
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:9px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:110px;}
+  .flow-node.alt{background:var(--accent-light);border-color:var(--accent);color:#5b21b6;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.06);box-shadow:0 4px 14px rgba(29,78,216,.4);}
+  .flow-arrow{font-size:1.2rem;color:var(--muted);}
+  .flow-arrow.down{font-size:1.1rem;}
+
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.88rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#eef1f4;color:var(--text);}
+  .btn-ghost:hover{background:#e3e7ec;}
+  .btn-sm{padding:6px 12px;font-size:.78rem;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  input[type=text], input[type=number], select, textarea{font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.9rem;width:100%;}
+  textarea{resize:vertical;min-height:70px;font-family:'JetBrains Mono',Consolas,monospace;}
+  .field-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;}
+  .field-row .f{flex:1 1 140px;min-width:120px;}
+  .field-row label{font-size:.76rem;color:var(--muted);display:block;margin-bottom:4px;font-weight:700;}
+
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.88rem;background:#fbfcfd;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#e7e9f2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.76rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  /* array / memory box visualizer */
+  .array-vis{display:flex;gap:4px;flex-wrap:wrap;margin:14px 0;align-items:flex-end;}
+  .array-grp{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .array-grp .glabel{font-size:.68rem;color:var(--muted);font-weight:700;margin-bottom:2px;}
+  .array-row{display:flex;gap:4px;}
+  .array-cell{border:2px solid var(--primary);border-radius:8px;min-width:50px;text-align:center;background:#fff;overflow:hidden;}
+  .array-cell .idx{font-size:.66rem;color:var(--primary-dark);background:var(--primary-light);padding:2px 0;font-weight:700;}
+  .array-cell .val{font-weight:800;padding:8px 4px;font-family:'JetBrains Mono',Consolas,monospace;font-size:.95rem;min-height:1.3em;}
+  .array-cell .addr{font-size:.6rem;color:#94a3b8;padding-bottom:3px;}
+  .array-cell.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.25);transform:translateY(-3px);}
+  .array-cell.dim{opacity:.4;}
+  .array-cell.ok{border-color:var(--correct);}
+  .array-cell.no{border-color:var(--incorrect);}
+  .array-cell.ptr{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.25);}
+
+  .struct-box{display:inline-flex;border:2px solid var(--primary);border-radius:8px;overflow:hidden;margin:14px 0;}
+  .struct-field{padding:10px 14px;border-right:1px solid var(--border);text-align:center;background:#fff;min-width:80px;}
+  .struct-field:last-child{border-right:none;}
+  .struct-field .fname{font-weight:800;color:var(--primary-dark);font-size:.82rem;}
+  .struct-field .ftype{font-size:.7rem;color:var(--muted);}
+  .struct-field .fbytes{font-size:.66rem;color:#94a3b8;margin-top:4px;}
+  .struct-field.active{background:var(--accent-light);border-color:var(--accent);}
+
+  .log-panel{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px 14px;font-family:'JetBrains Mono',Consolas,monospace;font-size:.8rem;max-height:260px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #334155;}
+  .log-panel .ln:last-child{border-bottom:none;}
+  .log-panel .ln .step-no{color:#38bdf8;font-weight:700;}
+  .log-panel .ln .tf{font-weight:800;}
+  .log-panel .ln .tf.t{color:#4ade80;}
+  .log-panel .ln .tf.f{color:#f87171;}
+
+  .bug-table{width:100%;border-collapse:collapse;font-size:.84rem;margin:10px 0;}
+  .bug-table th,.bug-table td{border:1px solid var(--border);padding:7px 9px;text-align:left;vertical-align:top;}
+  .bug-table th{background:var(--warn-bg);color:var(--warn);}
+  .bug-table .tag{font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:999px;color:#fff;display:inline-block;}
+  .tag-syntax{background:#dc2626;}
+  .tag-logic{background:#d97706;}
+  .tag-style{background:#64748b;}
+
+  .score-pill{display:inline-block;background:var(--primary);color:#fff;font-weight:800;padding:4px 14px;border-radius:999px;font-size:.9rem;}
+
+  .bottom-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;}
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);width:84vw;max-width:320px;}
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .struct-box{display:flex;flex-wrap:wrap;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.88rem;}
+    .flow-node{min-width:84px;font-size:.78rem;padding:7px 9px;}
+    .array-cell{min-width:40px;}
+    .array-cell .val{font-size:.82rem;padding:6px 2px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="Menu">☰</button>
+    <div class="title-wrap">
+      <h1>C++ Learning Lab · Class 11 · Tamil Nadu State Board</h1>
+      <p id="headerSub">Chapter 12 — Arrays and Structures</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langEn" class="active" data-lang="en">English</button>
+      <button id="langTa" data-lang="ta">தமிழ்</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Topic list">
+      <div class="progress-wrap">
+        <div class="progress-label"><span id="progLabel">Chapter Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label" id="topicsLabel">Topics</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ Previous</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">Next ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 11 Computer Science · Unit III · Chapter 12: Arrays and Structures · Based on the Tamil Nadu State Board textbook · Offline Learning Lab</footer>
+</div>
+
+<script>
+/* =========================================================================
+   STORAGE
+   ========================================================================= */
+const STORE_KEY = 'cs11_ch12_arrays_structures_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* ignore */ }
+  return {lang:'en', completed:[]};
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* =========================================================================
+   UTIL
+   ========================================================================= */
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function parseNums(str){
+  return String(str).split(/[,\s]+/).map(s=>s.trim()).filter(s=>s!=='').map(Number).filter(n=>!isNaN(n));
+}
+
+function arrayVis(values, opts){
+  opts = opts || {};
+  const activeSet = new Set(opts.highlight || []);
+  const okSet = new Set(opts.ok || []);
+  const noSet = new Set(opts.no || []);
+  const dimSet = new Set(opts.dim || []);
+  const addrStart = (opts.addrStart === undefined) ? null : opts.addrStart;
+  const bytes = opts.bytesPerElem || 4;
+  const prefix = opts.prefix || 'a';
+  let html = '<div class="array-vis">';
+  values.forEach((v,i)=>{
+    let cls = 'array-cell';
+    if(activeSet.has(i)) cls += ' active';
+    if(okSet.has(i)) cls += ' ok';
+    if(noSet.has(i)) cls += ' no';
+    if(dimSet.has(i)) cls += ' dim';
+    const shown = (v===undefined || v===null || v==='') ? (opts.emptyLabel || '—') : esc(v);
+    html += '<div class="'+cls+'">';
+    html += '<div class="idx">'+prefix+'['+i+']</div>';
+    html += '<div class="val">'+shown+'</div>';
+    if(addrStart !== null) html += '<div class="addr">'+(addrStart + i*bytes)+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function structVis(fields, opts){
+  opts = opts || {};
+  const activeIdx = (opts.active === undefined) ? -1 : opts.active;
+  let html = '<div class="struct-box">';
+  fields.forEach((f,i)=>{
+    html += '<div class="struct-field'+(i===activeIdx?' active':'')+'">';
+    html += '<div class="fname">'+esc(f.name)+'</div>';
+    html += '<div class="ftype">'+esc(f.type)+'</div>';
+    html += '<div class="fbytes">'+f.bytes+' byte'+(f.bytes>1?'s':'')+(f.value!==undefined?(' = '+esc(f.value)):'')+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* =========================================================================
+   C++ PROGRAM LISTINGS (verbatim from textbook unless noted as Improved/Suggested)
+   ========================================================================= */
+const CODE_INPUT_LOOP =
+`#include <iostream>
+using namespace std;
+int main()
+{
+    int num[5];
+    for(int i=0; i<5; i++)
+    {
+        cout<< "\\n Enter value " << i+1 << "= ";
+        cin>>num[i];
+    }
+}`;
+
+const CODE_ACCESS =
+`#include <iostream>
+using namespace std;
+int main()
+{
+    int num[5] = {10, 20, 30, 40, 50};
+    int t=2;
+    cout<<num[2] <<endl;     // S1
+    cout<<num[3+1] <<endl;   // S2
+    cout<<num[t=t+1];        // S3
+}`;
+const OUT_ACCESS = `30
+50
+40`;
+
+const CODE_ODDEVEN =
+`#include <iostream>
+using namespace std;
+int main()
+{
+    int num[10], even=0, odd=0;
+    for (int i=0; i<10; i++)
+    {
+        cout<< "\\n Enter Number " << i+1 <<"= ";
+        cin>>num[i];
+        if (num[i] % 2 == 0)
+          ++even;
+        else
+          ++odd;
+    }
+    cout << "\\n There are "<< even <<" Even Numbers";
+    cout << "\\n There are "<< odd <<" Odd Numbers";
+}`;
+const OUT_ODDEVEN =
+`Enter Number 1= 78
+Enter Number 2= 51
+Enter Number 3= 32
+Enter Number 4= 66
+Enter Number 5= 41
+Enter Number 6= 68
+Enter Number 7= 27
+Enter Number 8= 65
+Enter Number 9= 28
+Enter Number 10= 94
+There are 6 Even Numbers
+There are 4 Odd Numbers`;
+
+const CODE_SEARCH_TB =
+`#include <iostream>
+using namespace std;
+int main()
+{
+    int num[10], val, id=-1;
+    for (int i=0; i<10; i++)
+    {
+        cout<< "\\n Enter value " << i+1 <<"= ";
+        cin>>num[i];
+    }
+    cout<< "\\n Enter a value to be searched: ";
+    cin>>val;
+    for (int i=0; i<10; i++)
+    {
+        if (arr[i] == val)
+        {   id= i;
+            break;
+        }
+    }
+    if(id==-1)
+        cout<< "\\n Given value is not found in the array..";
+    else
+        cout<< "\\n The value is found at the position" << id+1;
+    return 0;
+}`;
+
+const CODE_SEARCH_FIXED =
+`#include <iostream>
+using namespace std;
+int main()
+{
+    int num[10], val, id=-1;
+    for (int i=0; i<10; i++)
+    {
+        cout<< "\\n Enter value " << i+1 <<"= ";
+        cin>>num[i];
+    }
+    cout<< "\\n Enter a value to be searched: ";
+    cin>>val;
+    for (int i=0; i<10; i++)
+    {
+        if (num[i] == val)      // fixed: num, not arr
+        {   id= i;
+            break;
+        }
+    }
+    if(id==-1)
+        cout<< "\\n Given value is not found in the array..";
+    else
+        cout<< "\\n The value is found at the position" << id+1;
+    return 0;
+}`;
+
+const CODE_CHARARRAY =
+`#include <iostream>
+using namespace std;
+int main()
+{
+     char country[6];
+     cout<< "Enter the name of the country: ";
+     cin>>country;
+     cout<<" The name of the country is "<<country;
+}`;
+const OUT_CHARARRAY =
+`Enter the name of the country: INDIA
+ The name of the country is INDIA`;
+
+const CODE_PALINDROME_TB =
+`#include<iostream>
+#include<string.h>
+using namespace std;
+int main( )
+{
+    int i, j, len, flag =1;
+    char a [20];
+    cout<<"Enter a string:";
+    cin>>a;
+    for(len=strlen(a);a[len]!='\\0';++len)
+        for(i=0,j=len-1;i<len/2;++i,--j)
+        {
+            if(a[j]!=a[i])
+                flag=0;
+                break;
+        }
+    if(flag==1)
+        cout<<"\\n The String is palindrome";
+    else
+        cout<<"\\n The String is not palindrome";
+    return 0;
+}`;
+const OUT_PALINDROME =
+`Enter a string : madam
+The String is palindrome`;
+
+const CODE_PALINDROME_FIXED =
+`#include<iostream>
+#include<string.h>
+using namespace std;
+int main( )
+{
+    int i, j, len, flag=1;
+    char a[20];
+    cout<<"Enter a string:";
+    cin>>a;
+    len = strlen(a);
+    for(i=0,j=len-1; i<len/2; ++i,--j)
+    {
+        if(a[j]!=a[i])
+        {
+            flag=0;
+            break;
+        }
+    }
+    if(flag==1)
+        cout<<"\\n The String is palindrome";
+    else
+        cout<<"\\n The String is not palindrome";
+    return 0;
+}`;
+
+const CODE_MATRIX_ADD =
+`#include <iostream>
+#include <conio.h>
+using namespace std;
+int main()
+{
+    int row, col, m1[10][10], m2[10][10], sum[10][10];
+    cout << "Enter the number of rows : ";
+    cin >> row;
+    cout << "Enter the number of columns : ";
+    cin >> col;
+
+    cout << "Enter the elements of first matrix." << endl;
+    for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
+            cin >> m1[i][j];
+
+    cout << "Enter the elements of second matrix:" << endl;
+    for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
+            cin >> m2[i][j];
+
+    cout << "Output: " << endl;
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            sum[i][j] = m1[i][j] + m2[i][j];
+            cout << sum[i][j] << " ";
+        }
+        cout << endl;
+    }
+    getch();
+    return 0;
+}`;
+const OUT_MATRIX_ADD =
+`Enter the number of rows :  2
+Enter the number of columns : 2
+Enter the elements of first matrix.
+1
+1
+1
+1
+Enter the elements of second matrix:
+1
+1
+1
+1
+Output:
+2 2
+2 2`;
+
+const CODE_COLOUR =
+`#include<iostream>
+using namespace std;
+int main( )
+{
+    // initialize 2d array
+    char colour[4][10] = {"Blue","Red","Orange","yellow"};
+
+    // printing strings stored in 2d array
+    for (int i=0; i<4; i++)
+        cout << colour[i] << "\\n";
+}`;
+const OUT_COLOUR =
+`Blue
+Red
+Orange
+Yellow`;
+
+const CODE_STUDENT_STRUCT_TB =
+`#include <iostream>
+using namespace std;
+struct Student
+{
+    int  age;
+    float height, weight;
+} mahesh;
+
+void main( )
+{
+    cout<< " Enter the age:"<<endl;
+    cin>>mahesh.age;
+    cout<< "Enter the height:"<<endl;
+    cin>>mahesh.height;
+    cout<< "Enter the weight:"<<endl;
+    cin>>mahesh.weight;
+    cout<< "The values entered for Age, height and weight are"<<endl;
+    cout<<mahesh.age<< "\\t"<<mahesh.height<< "\\t"<<Mahesh.weight;
+}`;
+const OUT_STUDENT_STRUCT =
+`Enter the age:
+18
+Enter the height:
+160.5
+Enter the weight:
+46.5
+The values entered for Age, height and weight are
+18     160.5           46.5`;
+
+const CODE_STUDENT_STRUCT_FIXED =
+`#include <iostream>
+using namespace std;
+struct Student
+{
+    int  age;
+    float height, weight;
+} mahesh;
+
+int main( )
+{
+    cout<< " Enter the age:"<<endl;
+    cin>>mahesh.age;
+    cout<< "Enter the height:"<<endl;
+    cin>>mahesh.height;
+    cout<< "Enter the weight:"<<endl;
+    cin>>mahesh.weight;
+    cout<< "The values entered for Age, height and weight are"<<endl;
+    cout<<mahesh.age<< "\\t"<<mahesh.height<< "\\t"<<mahesh.weight;   // fixed: mahesh, not Mahesh
+    return 0;
+}`;
+
+const CODE_BOOKS =
+`#include<iostream>
+#include<stdio.h>
+#include<string.h>
+using namespace std;
+struct books {
+    char name[20], author[20];
+} a[2];
+
+int main()
+{
+    cout<< "Details of Book No " << 1 << "\\n";
+    cout<< "----------------------\\n";
+    cout<< "Book Name :"<<strcpy(a[0].name,"Programming ")<<endl;
+    cout<< "Book Author :"<<strcpy(a[0].author,"Dromy")<<endl;
+    cout<< "\\nDetails of Book No " << 2 << "\\n";
+    cout<< "----------------------\\n";
+    cout<< "Book Name :"<<strcpy(a[1].name,"C++programming" )<<endl;
+    cout<< "Book Author :"<<strcpy(a[1].author,"BjarneStroustrup ")<<endl;
+    cout<<"\\n\\n";
+    cout<< "====================================================\\n";
+    cout<< " S.No\\t| Book Name\\t|author\\n";
+    cout<< "====================================================";
+    for (int i = 0; i < 2; i++) {
+        cout<< "\\n " << i + 1 << "\\t|" << a[i].name << "\\t| " << a[i].author;
+    }
+    cout<< "\\n====================================================";
+    return 0;
+}`;
+const OUT_BOOKS =
+`Details of Book No 1
+----------------------
+Book Name :Programming
+Book Author :Dromy
+
+Details of Book No 2
+----------------------
+Book Name :C++programming
+Book Author :BjarneStroustrup
+
+====================================================
+ S.No	| Book Name	|author
+====================================================
+ 1	|Programming 	| Dromy
+ 2	|C++programming	| BjarneStroustrup
+====================================================`;
+
+const CODE_P1P2 =
+`#include <iostream>
+#include <string.h>
+using namespace std;
+struct student
+{
+    int roll_no;
+    char name[10];
+    long phone_number;
+};
+int main(){
+    student p1 = {1,"Brown",123443}, p2;
+    p2.roll_no = 2;
+    strcpy(p2.name ,"Sam");
+    p2.phone_number = 1234567822;
+    cout<< "First Student" <<endl;
+    cout<< "roll no : " << p1.roll_no <<endl<< "name : " << p1.name <<endl;
+    cout<< "phone no : " << p1.phone_number <<endl;
+    cout<< "Second Student" <<endl;
+    cout<< "roll no : " << p2.roll_no <<endl<< "name : " << p2.name <<endl;
+    cout<< "phone no : " << p2.phone_number <<endl;
+    return 0;
+}`;
+const OUT_P1P2 =
+`First Student
+roll no : 1
+name : Brown
+phone no : 123443
+Second Student
+roll no : 2
+name : Sam
+phone no : 1234567822`;
+
+const CODE_DEBUG_BUGGY =
+`#include <istream.h>
+struct PersonRec
+{
+    char lastName[10];
+    char firstName[10];
+    int age;
+}
+PersonRecPeopleArrayType[10];
+
+void main()
+{
+    PersonRecord people;
+    for (i = 0; i < 10; i++)
+    {
+        cout<<people.firstName<< ' ' <<people.lastName  <<people.age;
+    }
+    for (int i = 0; i < 10; i++)
+    {
+        cout<< "Enter first name: ";   cin<<peop[i].firstName;
+        cout<< "Enter last name: ";    cin>>peop[i].lastName;
+        cout<< "Enter age: ";          cin>> people[i].age;
+    }
+}`;
+
+const CODE_DEBUG_FIXED =
+`#include <iostream>
+using namespace std;
+struct PersonRec
+{
+    char lastName[10];
+    char firstName[10];
+    int age;
+};
+PersonRec people[10];
+
+int main()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        cout<< "Enter first name: ";
+        cin>> people[i].firstName;
+        cout<< "Enter last name: ";
+        cin>> people[i].lastName;
+        cout<< "Enter age: ";
+        cin>> people[i].age;
+    }
+    for (int i = 0; i < 10; i++)
+    {
+        cout<<people[i].firstName<< ' ' <<people[i].lastName<< ' ' <<people[i].age<<endl;
+    }
+    return 0;
+}`;
+
+const CODE_FILLBLANK_SKELETON =
+`struct student {int exam_no,lang,eng,phy,che,mat,csc,total; char name[15];};
+int main()
+{
+    student s[20];
+    for(int i=0;i<20;i++)
+    {
+        ……………………..   //accept student details
+    }
+    for(int i=0;i<20;i++)
+    {
+        ……………………..   //check for name starts with letter "S"
+        ……………………    // display the detail of the checked name
+    }
+    return 0;
+}`;
+
+const CODE_FILLBLANK_SAMPLE =
+`struct student {int exam_no,lang,eng,phy,che,mat,csc,total; char name[15];};
+int main()
+{
+    student s[20];
+    for(int i=0;i<20;i++)
+    {
+        cout<<"Enter exam no, name, marks (lang eng phy che mat csc): ";
+        cin>>s[i].exam_no>>s[i].name>>s[i].lang>>s[i].eng>>s[i].phy>>s[i].che>>s[i].mat>>s[i].csc;
+        s[i].total = s[i].lang+s[i].eng+s[i].phy+s[i].che+s[i].mat+s[i].csc;
+    }
+    for(int i=0;i<20;i++)
+    {
+        if(s[i].name[0]=='S')
+            cout<<s[i].exam_no<<" "<<s[i].name<<" Total = "<<s[i].total<<endl;
+    }
+    return 0;
+}`;
+
+const CODE_MATRIX_DIFF =
+`// Same as the Matrix Addition program you already studied —
+// only the + changes to - when computing the result matrix.
+diff[i][j] = m1[i][j] - m2[i][j];
+cout << diff[i][j] << " ";`;
+
+const CODE_DISTANCE =
+`#include <iostream>
+using namespace std;
+struct Distance
+{
+    int feet;
+    float inch;
+} d1, d2, sum;
+
+int main()
+{
+    cout << "Enter feet and inch for first distance: ";
+    cin >> d1.feet >> d1.inch;
+    cout << "Enter feet and inch for second distance: ";
+    cin >> d2.feet >> d2.inch;
+
+    sum.feet = d1.feet + d2.feet;
+    sum.inch = d1.inch + d2.inch;
+
+    if (sum.inch >= 12)
+    {
+        sum.inch -= 12;
+        sum.feet += 1;
+    }
+
+    cout << "Sum = " << sum.feet << " feet " << sum.inch << " inch";
+    return 0;
+}`;
+
+/* =========================================================================
+   TOPIC DATA
+   ========================================================================= */
+const TOPICS = [
+  {id:'overview',   num:'12.1',      en:'Introduction & Concept Map',          ta:'அறிமுகம் & கருத்து வரைபடம்'},
+  {id:'arrbasics',  num:'12.2',      en:'1-D Arrays: Declaration & Memory',    ta:'ஓரிட அணி: அறிவிப்பு & நினைவகம்'},
+  {id:'arrinit',    num:'12.2',      en:'Array Initialization & Input',        ta:'அணி துவக்கம் & உள்ளீடு'},
+  {id:'arraccess',  num:'12.2',      en:'Accessing Elements & Odd/Even',       ta:'அணி கூறுகளை அணுகுதல்'},
+  {id:'arrsearch',  num:'12.2',      en:'Searching: Linear Search',            ta:'தேடல்: நேரிய தேடல்'},
+  {id:'strbasics',  num:'Strings',   en:'Strings as Character Arrays',         ta:'சரங்கள்'},
+  {id:'strpalin',   num:'Strings',   en:'Palindrome Program',                  ta:'மடக்குச் சொல் திட்டம்'},
+  {id:'twodim',     num:'12.3',      en:'2-D Arrays: Declaration & Access',    ta:'ஈரிட அணி'},
+  {id:'twodimadd',  num:'12.3',      en:'Matrix Addition',                     ta:'அணி கூட்டல்'},
+  {id:'twodimmem',  num:'12.3.4',    en:'2-D Array Memory: Row/Column Major',  ta:'நினைவக வரிசைமுறை'},
+  {id:'arrstrings', num:'12.4',      en:'Array of Strings',                    ta:'சரங்களின் அணி'},
+  {id:'structbasics',num:'12.5',     en:'Structures: Declare & Access',        ta:'கட்டமைப்புகள்'},
+  {id:'structinit', num:'12.5.4',    en:'Structure Init & Assignment',         ta:'கட்டமைப்பு துவக்கம்'},
+  {id:'practice',   num:'Practice',  en:'Practice & Debugging Lab',            ta:'பயிற்சி & பிழை திருத்தம்'},
+  {id:'examprep',   num:'Exam',      en:'Exam Preparation',                    ta:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* =========================================================================
+   NAV / SIDEBAR
+   ========================================================================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i===currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    const label = state.lang==='ta' ? t.ta : t.en;
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+label+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', ()=>{ goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length-1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx===0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx===TOPICS.length-1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  const doneTxt = state.lang==='ta' ? '✔ முடிந்தது' : '✔ Completed';
+  const todoTxt = state.lang==='ta' ? '✔ முடித்ததாக குறி' : '✔ Mark Complete';
+  markBtn.textContent = done ? doneTxt : todoTxt;
+  document.getElementById('prevTopicBtn').textContent = state.lang==='ta' ? '⬅ முந்தையது' : '⬅ Previous';
+  document.getElementById('nextTopicBtn').textContent = state.lang==='ta' ? 'அடுத்தது ➡' : 'Next ➡';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', ()=>goTo(currentIdx-1));
+document.getElementById('nextTopicBtn').addEventListener('click', ()=>goTo(currentIdx+1));
+document.getElementById('markCompleteBtn').addEventListener('click', ()=>{
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx===-1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', ()=>{
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+document.getElementById('langEn').addEventListener('click', ()=>setLang('en'));
+document.getElementById('langTa').addEventListener('click', ()=>setLang('ta'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.body.setAttribute('data-lang', l);
+  document.getElementById('headerSub').textContent = l==='ta' ? 'பாடம் 12 — அணிகளும் கட்டமைப்புகளும் (Arrays and Structures)' : 'Chapter 12 — Arrays and Structures';
+  document.getElementById('progLabel').textContent = l==='ta' ? 'பாட முன்னேற்றம்' : 'Chapter Progress';
+  document.getElementById('topicsLabel').textContent = l==='ta' ? 'தலைப்புகள்' : 'Topics';
+  renderSidebar();
+  updateBottomBar();
+}
+
+/* =========================================================================
+   GENERIC MCQ ENGINE
+   ========================================================================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['A','B','C','D'];
+  let optsHtml = qObj.o.map((opt,i)=>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${esc(opt)}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${esc(qObj.q)}</div>
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${esc(qObj.exp)}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap, onAnswered){
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt=>{
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i)=>{
+        if(i===qObj.c) o.classList.add('correct');
+        if(i===idx && idx!==qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      const ok = idx===qObj.c;
+      fb.textContent = ok ? '🎉 Correct!' : '❌ Not quite. Correct answer: ' + qObj.o[qObj.c];
+      fb.className = 'feedback-line ' + (ok?'ok':'bad');
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+      if(onAnswered) onAnswered(qid, ok);
+    });
+  });
+}
+
+/* =========================================================================
+   MAIN RENDER DISPATCH
+   ========================================================================= */
+const RENDERERS = {
+  overview: renderOverview,
+  arrbasics: renderArrBasics,
+  arrinit: renderArrInit,
+  arraccess: renderArrAccess,
+  arrsearch: renderArrSearch,
+  strbasics: renderStrBasics,
+  strpalin: renderStrPalin,
+  twodim: renderTwoDim,
+  twodimadd: renderTwoDimAdd,
+  twodimmem: renderTwoDimMem,
+  arrstrings: renderArrStrings,
+  structbasics: renderStructBasics,
+  structinit: renderStructInit,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+const WIRERS = {
+  overview: wireOverview,
+  arrbasics: wireArrBasics,
+  arrinit: wireArrInit,
+  arraccess: wireArrAccess,
+  arrsearch: wireArrSearch,
+  strbasics: wireStrBasics,
+  strpalin: wireStrPalin,
+  twodim: wireTwoDim,
+  twodimadd: wireTwoDimAdd,
+  twodimmem: wireTwoDimMem,
+  arrstrings: wireArrStrings,
+  structbasics: wireStructBasics,
+  structinit: wireStructInit,
+  practice: wirePractice,
+  examprep: wireExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  if(WIRERS[t.id]) WIRERS[t.id]();
+}
+
+/* =========================================================================
+   TOPIC 1 — Overview & Concept Map
+   ========================================================================= */
+function renderOverview(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Unit III · Chapter 12 · 12.1</div>
+    <h2>Introduction to Arrays <span style="color:var(--muted);font-weight:500;">&amp; Chapter Concept Map</span></h2>
+    <div class="goals">
+      <b>Learning Objectives (textbook):</b> Know the structured data type using arrays · Know the types of arrays · Write programs to manipulate different types of arrays · (later in this chapter) understand structures and how they group mixed data types.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>12.1 Introduction</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 Textbook Definition</span>
+      "The variables are used to store data. These variables are one of the basic building blocks in C++. A single variable is used to store a single value that can be used anywhere in the memory. In some situations, we need to store multiple values of the same type. In that case, it needs multiple variables of the same data type. ... An array is a collection of variables of the same type that are referenced by a common name."
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Easy Explanation</span>
+      To store the roll numbers of 100 students, the textbook points out it would take 100 separate variables — <span class="mono">roll1, roll2, roll3 ... roll100</span>. That is hard to declare and hard to manage. An <b>array</b> solves this: one name, many boxes of the same type, each identified by a number called an <b>index</b> (or subscript) that starts from 0.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 Real-life Analogy</span>
+      Think of an egg tray with 10 slots. The tray has ONE name ("egg tray"), but each slot has its own position (slot 0, slot 1 ... slot 9). You don't need 10 different names for 10 eggs — you just say "the egg in slot 3". An array works exactly the same way for data in memory.
+      <div class="ta-only" style="margin-top:8px;"><b>தமிழில்:</b> 10 முட்டைகள் வைக்கும் ட்ரே போல — ஒரே பெயர் (egg tray), ஆனால் ஒவ்வொரு இடத்திற்கும் ஒரு எண் (0 முதல் 9 வரை). அணியும் இப்படித்தான் வேலை செய்கிறது.</div>
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ Exam Point</span>
+      An array is also called a <b>derived data type</b> in C++. The subscript (index) always starts from <b>0</b> and must be an unsigned integer.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Concept Map for this Chapter</h3>
+    <div class="diagram-box">
+      <div class="flow-col">
+        <div class="flow-node">Variable (single value)</div>
+        <div class="flow-arrow down">↓ many values of same type?</div>
+        <div class="flow-node">Array</div>
+        <div class="flow-arrow down">↓</div>
+        <div class="flow-row">
+          <div class="flow-node alt">1-D Array</div>
+          <div class="flow-node alt">2-D Array</div>
+          <div class="flow-node alt">Array of Strings</div>
+        </div>
+        <div class="flow-arrow down">↓ need DIFFERENT types grouped together?</div>
+        <div class="flow-node">Structure (struct)</div>
+      </div>
+      <div class="diagram-cap">Easy Explanation diagram — not from the textbook, built to show how the topics in this chapter connect.</div>
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Why two different tools?</span>
+      Arrays are perfect when every value is the <b>same type</b> (all int, all float...). But a student record needs a roll number (long), an age (int) and a weight (float) together — different types. That is exactly the gap a <b>structure</b> fills, as you'll see later in this chapter (12.5).
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ Quick Check</span>
+    <div id="qc-overview"></div>
+  </div>
+  `;
+}
+function wireOverview(){
+  const qs = {
+    q1:{q:'Which of the following is the collection of variables of the same type that can be referenced by a common name?', o:['int','float','Array','class'], c:2, exp:'Textbook Evaluation, Section A, Q1. An array groups variables of the same type under one common name.'}
+  };
+  document.getElementById('qc-overview').innerHTML = mcqHTML('q1', qs.q1, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-overview', qs);
+}
+
+/* =========================================================================
+   TOPIC 2 — 12.2 / 12.2.1 One-dimensional array: declaration & memory
+   ========================================================================= */
+function renderArrBasics(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.2 &amp; 12.2.1</div>
+    <h2>One-dimensional Arrays: Declaration &amp; Memory</h2>
+    <div class="goals"><b>Goal:</b> Understand the types of arrays in C++, learn the declaration syntax, and see exactly how memory is allocated for an array.</div>
+  </div>
+
+  <div class="card">
+    <h3>12.2 Types of Arrays</h3>
+    <p>The textbook lists three types of arrays used in C++:</p>
+    <ul>
+      <li><b>One-dimensional arrays</b> — a single row (or column) of values</li>
+      <li><b>Two-dimensional arrays</b> — values arranged in rows and columns</li>
+      <li><b>Multi-dimensional arrays</b></li>
+    </ul>
+    <h4>12.2.1 One-dimensional Array</h4>
+    <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"This is the simplest form of an array. A one dimensional array represents values that are stored in a single row or in a single column."</div>
+  </div>
+
+  <div class="card">
+    <h3>Declaration Syntax</h3>
+    <div class="code-box">&lt;data type&gt;&lt;array_name&gt; [&lt;array_size&gt;];</div>
+    <p><span class="mono">data_type</span> — the type of every element in the array &nbsp;·&nbsp; <span class="mono">array_name</span> — the common name &nbsp;·&nbsp; <span class="mono">array_size</span> — how many elements, written inside <span class="mono">[ ]</span>.</p>
+    <div class="example-box">
+      <span class="lbl">Example</span>
+      <div class="code-box">int num[10];</div>
+      Reserves memory for <b>10</b> integers under the common name <span class="mono">num</span>.
+    </div>
+    <p>More declarations from the textbook:</p>
+    <div class="code-box">char emp_name[25];      // character array, size 25
+float salary[20];       // floating-point array, size 20
+int a[5], b[10], c[15]; // multiple arrays of type int</div>
+  </div>
+
+  <div class="card">
+    <h3>Memory Representation</h3>
+    <p>For <span class="mono">int num[10];</span> the compiler allocates 10 memory boxes, numbered (subscripted) from 0 to 9:</p>
+    <div id="staticBoxes1"></div>
+    <div class="tb-def"><span class="lbl">📘 Note (textbook)</span>Each element (memory box) has a unique index number starting from 0, known as the <b>subscript</b>. It is always an unsigned integer. Each element is referred to by its name with the subscript inside square brackets — e.g. <span class="mono">num[3]</span> refers to the <b>4th</b> element.</div>
+
+    <p style="margin-top:14px;">Figure 12.1-style memory allocation for <span class="mono">int numb[5];</span> (Dev C++ compiler, 4 bytes per int, starting address 1025):</p>
+    <div id="staticBoxes2"></div>
+
+    <table class="tbl">
+      <tr><th>Datatype</th><th class="c">Turbo C++ (bytes)</th><th class="c">Dev C++ (bytes)</th></tr>
+      <tr><td>char</td><td class="c">1</td><td class="c">1</td></tr>
+      <tr><td>int</td><td class="c">2</td><td class="c">4</td></tr>
+      <tr><td>float</td><td class="c">4</td><td class="c">4</td></tr>
+      <tr><td>long</td><td class="c">4</td><td class="c">4</td></tr>
+      <tr><td>double</td><td class="c">8</td><td class="c">8</td></tr>
+      <tr><td>long double</td><td class="c">10</td><td class="c">10</td></tr>
+    </table>
+    <div class="exam-point"><span class="lbl">⭐ Exam Point — Memory Formula</span>
+      <div class="code-box" style="margin:6px 0;">Memory space (bytes) = Number of bytes per element &times; Number of elements</div>
+      All examples in this chapter use the <b>Dev C++</b> column (int = 4 bytes) unless stated otherwise.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Array Memory Calculator <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(Interactive Simulation)</span></h3>
+    <div class="field-row">
+      <div class="f"><label>Data type</label>
+        <select id="mcType">
+          <option value="char">char (1 byte)</option>
+          <option value="int" selected>int (4 bytes)</option>
+          <option value="float">float (4 bytes)</option>
+          <option value="double">double (8 bytes)</option>
+          <option value="long">long (4 bytes)</option>
+        </select>
+      </div>
+      <div class="f"><label>Array size</label><input type="number" id="mcSize" value="5" min="1" max="10"></div>
+      <div class="f"><label>Starting address</label><input type="number" id="mcAddr" value="1000" min="0" step="4"></div>
+      <div class="f"><button class="btn btn-primary" id="mcBuild">🔄 Build Array</button></div>
+    </div>
+    <div id="mcOut"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-arrbasics"></div></div>
+  `;
+}
+const ARR_BYTES = {char:1, int:4, float:4, double:8, long:4};
+function wireArrBasics(){
+  document.getElementById('staticBoxes1').innerHTML = arrayVis(new Array(10).fill(''), {prefix:'num', emptyLabel:'?'});
+  document.getElementById('staticBoxes2').innerHTML = arrayVis([ '','','','',''], {prefix:'numb', addrStart:1025, bytesPerElem:4, emptyLabel:'?'});
+
+  function buildCalc(){
+    const type = document.getElementById('mcType').value;
+    const size = Math.max(1, Math.min(10, parseInt(document.getElementById('mcSize').value,10) || 1));
+    const addr = parseInt(document.getElementById('mcAddr').value,10) || 0;
+    const bytes = ARR_BYTES[type];
+    const total = bytes * size;
+    let html = arrayVis(new Array(size).fill('?'), {prefix:'arr', addrStart:addr, bytesPerElem:bytes, emptyLabel:'?'});
+    html += `<div class="easy"><span class="lbl">Result</span>${bytes} bytes &times; ${size} elements = <b>${total} bytes</b> total memory reserved for this array (values shown as "?" because the array has only been <i>declared</i>, not initialized — real C++ would contain garbage values here).</div>`;
+    document.getElementById('mcOut').innerHTML = html;
+  }
+  document.getElementById('mcBuild').addEventListener('click', buildCalc);
+  buildCalc();
+
+  const qs = {
+    q2:{q:'How many bytes of memory does "double x[4];" need on a Dev C++ compiler?', o:['4 bytes','8 bytes','16 bytes','32 bytes'], c:3, exp:'double = 8 bytes per element on Dev C++. 8 × 4 elements = 32 bytes. (Learning Activity — apply the memory formula.)'}
+  };
+  document.getElementById('qc-arrbasics').innerHTML = mcqHTML('q2', qs.q2, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-arrbasics', qs);
+}
+
+/* =========================================================================
+   TOPIC 3 — Initialization & runtime input
+   ========================================================================= */
+function renderArrInit(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.2.1</div>
+    <h2>Array Initialization &amp; Accepting Values at Run Time</h2>
+    <div class="goals"><b>Goal:</b> Learn how to give an array its starting values, and how a <span class="mono">for</span> loop is used to read values into an array while the program runs.</div>
+  </div>
+
+  <div class="card">
+    <h3>Initialization Syntax</h3>
+    <p>Unless an array is initialized, all its elements contain <b>garbage values</b>. While declaring and initializing values in an array, the values must be given inside curly braces <span class="mono">{ }</span>.</p>
+    <div class="code-box">&lt;datatype&gt; &lt;array_name&gt; [size] = {value 1, value 2, ......, value n};</div>
+    <div class="example-box">
+      <span class="lbl">Example — Figure 12.1</span>
+      <div class="code-box">int age[5] = {19,21,16,1,50};</div>
+      <div id="fig121"></div>
+    </div>
+    <div class="easy"><span class="lbl">💡 Easy Explanation</span>Size is optional when you initialize directly — the compiler counts the values for you:</div>
+    <div class="code-box">int age[] = {19,21,16,1,50};   // size automatically becomes 5</div>
+    <p>More examples from the textbook:</p>
+    <div class="code-box">float x[5]  = {5.6, 5.7, 5.8, 5.9, 6.1};
+char vowel[6] = {'a','e','i','o','u','\\0'};</div>
+  </div>
+
+  <div class="card">
+    <h3>Accepting Values to an Array During Run Time</h3>
+    <p>Multiple assignment statements would be needed to fill every cell one by one. A <span class="mono">for</span> loop is ideally suited for iterating through the array elements instead.</p>
+    <div class="code-cap">📘 Textbook Program — "Input values while execution"</div>
+    <div class="code-box" id="codeInputLoop"></div>
+    <div class="tb-def"><span class="lbl">📘 Note (textbook)</span>In a <span class="mono">for</span> loop, the index <span class="mono">i</span> is declared with an initial value 0 (zero). In most cases, the initial value of the loop index is used as the array subscript.</div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Step-by-step Simulation — "Run the Input Loop"</h3>
+    <p>Give 5 values (or keep the textbook's own values) and press <b>Step</b> to watch the <span class="mono">for</span> loop fill <span class="mono">num[0]</span> to <span class="mono">num[4]</span>, exactly like the iteration table in the textbook.</p>
+    <div class="field-row">
+      <div class="f" style="flex:2 1 260px;"><label>Values to feed in (comma separated, 5 numbers)</label><input type="text" id="loopVals" value="5,10,15,20,25"></div>
+      <div class="f"><button class="btn btn-primary" id="loopStepBtn">▶ Step</button></div>
+      <div class="f"><button class="btn btn-ghost" id="loopResetBtn">⟲ Reset</button></div>
+    </div>
+    <div id="loopBoxes"></div>
+    <div class="log-panel" id="loopLog"><div class="ln">Press "Step" to begin...</div></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-arrinit"></div></div>
+  `;
+}
+let loopSim = null;
+function wireArrInit(){
+  document.getElementById('codeInputLoop').innerHTML = esc(CODE_INPUT_LOOP);
+  document.getElementById('fig121').innerHTML = arrayVis([19,21,16,1,50], {prefix:'age'});
+
+  function resetLoop(){
+    const vals = parseNums(document.getElementById('loopVals').value);
+    loopSim = {vals: vals, i:0, filled: new Array(5).fill('')};
+    document.getElementById('loopBoxes').innerHTML = arrayVis(loopSim.filled, {prefix:'num', emptyLabel:'?'});
+    document.getElementById('loopLog').innerHTML = '<div class="ln">Press "Step" to begin the loop (i = 0)...</div>';
+  }
+  function stepLoop(){
+    if(!loopSim) resetLoop();
+    const log = document.getElementById('loopLog');
+    if(loopSim.i >= 5){
+      log.innerHTML += '<div class="ln"><span class="step-no">Condition:</span> i &lt; 5 → <span class="tf f">FALSE (i=5)</span> → <b>Exit loop</b></div>';
+      log.scrollTop = log.scrollHeight;
+      return;
+    }
+    const i = loopSim.i;
+    const v = (loopSim.vals[i] !== undefined) ? loopSim.vals[i] : 0;
+    loopSim.filled[i] = v;
+    document.getElementById('loopBoxes').innerHTML = arrayVis(loopSim.filled, {prefix:'num', highlight:[i], emptyLabel:'?'});
+    log.innerHTML += `<div class="ln"><span class="step-no">Iteration ${i+1}:</span> i &lt; 5 → <span class="tf t">TRUE (i=${i})</span> &nbsp;|&nbsp; cout prompts "Enter value ${i+1}= " &nbsp;|&nbsp; cin stores <b>num[${i}] = ${v}</b> &nbsp;|&nbsp; i++ → i=${i+1}</div>`;
+    log.scrollTop = log.scrollHeight;
+    loopSim.i++;
+  }
+  document.getElementById('loopStepBtn').addEventListener('click', stepLoop);
+  document.getElementById('loopResetBtn').addEventListener('click', resetLoop);
+  resetLoop();
+
+  const qs = {
+    q3:{q:'int age[]={6,90,20,18,2}; How many elements are there in this array?', o:['2','5','6','4'], c:1, exp:'Textbook Evaluation, Section A, Q2. The compiler counts 5 values inside the braces, so the array size becomes 5.'}
+  };
+  document.getElementById('qc-arrinit').innerHTML = mcqHTML('q3', qs.q3, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-arrinit', qs);
+}
+
+/* =========================================================================
+   TOPIC 4 — Accessing elements + Odd/Even program
+   ========================================================================= */
+function renderArrAccess(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.2.1</div>
+    <h2>Accessing Array Elements</h2>
+    <div class="goals"><b>Goal:</b> Read and index into array elements using a name + subscript, and apply this inside a counting program.</div>
+  </div>
+
+  <div class="card">
+    <h3>Accessing Syntax</h3>
+    <p>Array elements can be used anywhere a normal variable can be used. Elements are accessed with the array name followed by the subscript index inside square brackets.</p>
+    <div class="code-box">cout&lt;&lt;num[3];   // displays the 4th element</div>
+    <div class="tb-def"><span class="lbl">📘 Note (textbook)</span>The subscript in the bracket can be a <b>variable</b>, a <b>constant</b>, or an <b>expression</b> that evaluates to an integer.</div>
+
+    <div class="code-cap">📘 Textbook Program — "Accessing array elements"</div>
+    <div class="code-box" id="codeAccess"></div>
+    <p>Click each statement below to see which element it refers to:</p>
+    <div id="accessExplorer"></div>
+    <div class="code-cap">Output</div>
+    <div class="out-box" id="outAccess"></div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Expression Evaluator</h3>
+    <p>Array: <span class="mono">num[5] = {10,20,30,40,50}</span>. Try subscripts like <span class="mono">2</span>, <span class="mono">3+1</span>, or <span class="mono">t=t+1</span> (t starts at 2) and see which box lights up.</p>
+    <div class="field-row">
+      <div class="f" style="flex:2 1 220px;"><label>Expression inside num[ ... ]</label><input type="text" id="accExpr" value="t=t+1"></div>
+      <div class="f"><button class="btn btn-primary" id="accEvalBtn">🔍 Evaluate</button></div>
+    </div>
+    <div id="accBoxes"></div>
+    <div id="accResult" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h3>C++ Program: Count Odd and Even Numbers</h3>
+    <p>Inputs 10 values into an array and counts how many are odd and how many are even using the modulus operator <span class="mono">%</span>.</p>
+    <div class="code-box" id="codeOddEven"></div>
+    <div class="code-cap">Output</div>
+    <div class="out-box" id="outOddEven"></div>
+    <div class="tryit-box">
+      <span class="lbl">🧪 HOT (Higher Order Thinking) — from the textbook</span>
+      "Rewrite the above program using the conditional operator instead of if."
+      <div class="btn-row"><button class="btn btn-ghost btn-sm" id="hotRevealBtn">💡 Show one possible solution</button></div>
+      <div class="explain-box" id="hotReveal">
+        <div class="code-box">(num[i] % 2 == 0) ? ++even : ++odd;</div>
+        This replaces the <span class="mono">if...else</span> block with a single conditional (ternary) operator statement, labeled here as a <b>Suggested Solution</b> (not textbook-printed code).
+      </div>
+    </div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-arraccess"></div></div>
+  `;
+}
+function wireArrAccess(){
+  document.getElementById('codeAccess').innerHTML = esc(CODE_ACCESS);
+  document.getElementById('outAccess').innerHTML = esc(OUT_ACCESS);
+  document.getElementById('codeOddEven').innerHTML = esc(CODE_ODDEVEN);
+  document.getElementById('outOddEven').innerHTML = esc(OUT_ODDEVEN);
+
+  const stmts = [
+    {label:'S1: cout<<num[2];', idx:2, explain:'num[2] is the 3rd element (index starts at 0) → value 30.'},
+    {label:'S2: cout<<num[3+1];', idx:4, explain:'The expression 3+1 evaluates to 4, so num[4] is accessed → value 50.'},
+    {label:'S3: cout<<num[t=t+1];', idx:3, explain:'t starts at 2. t=t+1 assigns t=3 and evaluates to 3, so num[3] is accessed → value 40.'},
+  ];
+  let expWrap = '<div class="btn-row">';
+  stmts.forEach((s,i)=> expWrap += `<button class="btn btn-ghost btn-sm" data-stmt="${i}">${esc(s.label)}</button>`);
+  expWrap += '</div><div id="stmtBoxes"></div><div class="explain-box" id="stmtExplain"></div>';
+  document.getElementById('accessExplorer').innerHTML = expWrap;
+  document.getElementById('stmtBoxes').innerHTML = arrayVis([10,20,30,40,50], {prefix:'num'});
+  document.querySelectorAll('[data-stmt]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      const s = stmts[parseInt(this.dataset.stmt,10)];
+      document.getElementById('stmtBoxes').innerHTML = arrayVis([10,20,30,40,50], {prefix:'num', highlight:[s.idx]});
+      const exp = document.getElementById('stmtExplain');
+      exp.textContent = s.explain;
+      exp.classList.add('show');
+    });
+  });
+
+  function evalExpr(){
+    const arr = [10,20,30,40,50];
+    const exprRaw = document.getElementById('accExpr').value.trim();
+    let t = 2, idx;
+    try{
+      if(/^t\s*=\s*t\s*\+\s*1$/.test(exprRaw)){ t = t+1; idx = t; }
+      else if(/^\d+(\s*\+\s*\d+)*$/.test(exprRaw)){ idx = exprRaw.split('+').reduce((a,b)=>a+parseInt(b,10),0); }
+      else { idx = NaN; }
+    }catch(e){ idx = NaN; }
+    const box = document.getElementById('accResult');
+    if(isNaN(idx) || idx<0 || idx>4){
+      document.getElementById('accBoxes').innerHTML = arrayVis(arr, {prefix:'num'});
+      box.style.display = 'block';
+      box.innerHTML = '⚠️ Try an expression like <span class="mono">2</span>, <span class="mono">3+1</span>, or <span class="mono">t=t+1</span> — the result must land between 0 and 4.';
+    } else {
+      document.getElementById('accBoxes').innerHTML = arrayVis(arr, {prefix:'num', highlight:[idx]});
+      box.style.display = 'block';
+      box.innerHTML = `<span class="lbl">Result</span>num[${esc(exprRaw)}] → index <b>${idx}</b> → value <b>${arr[idx]}</b>`;
+    }
+  }
+  document.getElementById('accEvalBtn').addEventListener('click', evalExpr);
+  evalExpr();
+
+  document.getElementById('hotRevealBtn').addEventListener('click', function(){
+    document.getElementById('hotReveal').classList.toggle('show');
+  });
+
+  const qs = {
+    q4:{q:'cin>>n[3]; To which element does this statement accept the value?', o:['the 2nd element','the 4th element','the 3rd element','the 5th element'], c:1, exp:'Textbook Evaluation, Section A, Q3. n[3] refers to the 4th element because indexing starts at 0 (n[0] is 1st, n[1] is 2nd, n[2] is 3rd, n[3] is 4th).'}
+  };
+  document.getElementById('qc-arraccess').innerHTML = mcqHTML('q4', qs.q4, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-arraccess', qs);
+}
+
+/* =========================================================================
+   TOPIC 5 — Linear Search
+   ========================================================================= */
+function renderArrSearch(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.2.1</div>
+    <h2>Searching in a One-dimensional Array: Linear Search</h2>
+    <div class="goals"><b>Goal:</b> Understand what "traversal" and "searching" mean for an array, and trace the linear (sequential) search algorithm step by step.</div>
+  </div>
+
+  <div class="card">
+    <h3>Definition</h3>
+    <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"Searching is a process of finding a particular value present in a given set of numbers. The linear search or sequential search compares each element of the list with the value that has to be searched until all the elements in the array have been traversed and compared."</div>
+    <div class="easy"><span class="lbl">💡 Easy Explanation</span><b>Traversal</b> simply means visiting every element of the array, one by one, from the first to the last — like reading every name on a class list from top to bottom.</div>
+
+    <div class="code-cap">📘 Textbook Program — "Program for Linear Search"</div>
+    <div class="code-box" id="codeSearchTB"></div>
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Spot the Mistake (as printed in the textbook)</span>
+      Look closely: the array is declared and filled as <span class="mono">num[10]</span>, but the second loop compares <span class="mono">arr[i] == val</span>. <span class="mono">arr</span> was never declared! This is a classic beginner slip — using a different (undeclared) array name than the one you actually filled with data. A real compiler would reject this with an error such as <span class="mono">'arr' was not declared in this scope</span>.
+    </div>
+    <div class="fixbox">
+      <span class="lbl">✅ Improved Example (corrected)</span>
+      <div class="code-box" id="codeSearchFixed"></div>
+      Only one word changed: <span class="mono">arr[i]</span> → <span class="mono">num[i]</span>. The simulator below uses this corrected logic.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Step-by-step Simulation — Linear Search</h3>
+    <div class="field-row">
+      <div class="f" style="flex:2 1 260px;"><label>Array values (comma separated)</label><input type="text" id="searchArr" value="23,8,45,12,67,3,90,15"></div>
+      <div class="f"><label>Value to search</label><input type="number" id="searchVal" value="67"></div>
+      <div class="f"><button class="btn btn-primary" id="searchStepBtn">▶ Step</button></div>
+      <div class="f"><button class="btn btn-ghost" id="searchResetBtn">⟲ Reset</button></div>
+    </div>
+    <div id="searchBoxes"></div>
+    <div class="log-panel" id="searchLog"><div class="ln">Press "Step" to compare one element at a time...</div></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-arrsearch"></div></div>
+  `;
+}
+let searchSim = null;
+function wireArrSearch(){
+  document.getElementById('codeSearchTB').innerHTML = esc(CODE_SEARCH_TB);
+  document.getElementById('codeSearchFixed').innerHTML = esc(CODE_SEARCH_FIXED);
+
+  function resetSearch(){
+    const arr = parseNums(document.getElementById('searchArr').value);
+    const val = parseFloat(document.getElementById('searchVal').value);
+    searchSim = {arr, val, i:0, found:-1, done:false};
+    document.getElementById('searchBoxes').innerHTML = arrayVis(arr, {prefix:'num'});
+    document.getElementById('searchLog').innerHTML = '<div class="ln">Press "Step" to begin comparing from num[0]...</div>';
+  }
+  function stepSearch(){
+    if(!searchSim) resetSearch();
+    const log = document.getElementById('searchLog');
+    if(searchSim.done) return;
+    const {arr, val, i} = searchSim;
+    if(i >= arr.length){
+      searchSim.done = true;
+      document.getElementById('searchBoxes').innerHTML = arrayVis(arr, {prefix:'num', no: arr.map((_,k)=>k)});
+      log.innerHTML += `<div class="ln"><b>Given value ${val} is not found in the array.</b></div>`;
+      log.scrollTop = log.scrollHeight;
+      return;
+    }
+    const match = arr[i] === val;
+    document.getElementById('searchBoxes').innerHTML = arrayVis(arr, {prefix:'num', highlight:[i]});
+    log.innerHTML += `<div class="ln"><span class="step-no">Compare num[${i}]:</span> ${arr[i]} == ${val}? <span class="tf ${match?'t':'f'}">${match?'TRUE':'FALSE'}</span></div>`;
+    log.scrollTop = log.scrollHeight;
+    if(match){
+      searchSim.done = true;
+      searchSim.found = i;
+      document.getElementById('searchBoxes').innerHTML = arrayVis(arr, {prefix:'num', ok:[i]});
+      log.innerHTML += `<div class="ln"><b>✅ The value is found at position ${i+1} (index ${i}). break; exits the loop.</b></div>`;
+      log.scrollTop = log.scrollHeight;
+    } else {
+      searchSim.i++;
+    }
+  }
+  document.getElementById('searchStepBtn').addEventListener('click', stepSearch);
+  document.getElementById('searchResetBtn').addEventListener('click', resetSearch);
+  resetSearch();
+
+  const qs = {
+    q5:{q:'What does "traversal" of an array mean?', o:['Deleting every element', 'Visiting / processing every element of the array once, in order', 'Sorting the array', 'Only accessing the first element'], c:1, exp:'Textbook Evaluation, Section B, Q1 (Very Short Answer). Traversal means going through each element of the array from start to end.'}
+  };
+  document.getElementById('qc-arrsearch').innerHTML = mcqHTML('q5', qs.q5, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-arrsearch', qs);
+}
+
+/* =========================================================================
+   TOPIC 6 — Strings as character arrays
+   ========================================================================= */
+function renderStrBasics(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · Strings</div>
+    <h2>Strings as Character Arrays</h2>
+    <div class="goals"><b>Goal:</b> Understand that C++ stores text as a one-dimensional character array ending with a null character.</div>
+  </div>
+
+  <div class="card">
+    <h3>What is a String?</h3>
+    <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"A string is defined as a sequence of characters where each character may be a letter, number or a symbol. Each element occupies one byte of memory. Every string is terminated by a null ('\\0', ASCII code 0) character which must be appended at the end of the string. In C++, there is no basic data type to represent a string (However, we can use string object to holding strings in C++). Instead, it implements a string as a one-dimensional character array."</div>
+    <div class="easy"><span class="lbl">💡 Easy Explanation</span>When declaring a character array for a string, it must also hold a null character at the end, so the array size should be <b>one character longer</b> than the length of the string you want to store.</div>
+    <div class="exam-point"><span class="lbl">⭐ Exam Point</span>By default, a C++ string ends with the character <span class="mono">'\\0'</span> (ASCII 0) — not <span class="mono">'\\n'</span> and not a space.</div>
+  </div>
+
+  <div class="card">
+    <h3>Character Array (String) Creation</h3>
+    <p>To create any array, its size must be known in advance so memory can be allocated. Once created, its length is fixed and cannot change at run time (Figure 12.2):</p>
+    <div id="fig122"></div>
+    <h4>Syntax</h4>
+    <div class="code-box">char array_name[size];</div>
+    <div class="example-box">
+      <span class="lbl">Example</span>
+      <div class="code-box">char country[6];</div>
+      Reserves 6 bytes of memory. The string stored can have a maximum length of <b>5 characters</b> — the 6th byte is reserved for the null character.
+    </div>
+    <div class="code-cap">📘 Textbook Program — character array demo</div>
+    <div class="code-box" id="codeChar"></div>
+    <div class="code-cap">Output</div>
+    <div class="out-box" id="outChar"></div>
+  </div>
+
+  <div class="card">
+    <h3>Initialization</h3>
+    <div class="code-box">char array_name[size] = { list of characters separated by comma or a string };</div>
+    <div class="example-box">
+      <span class="lbl">Example — Figure 12.3</span>
+      <div class="code-box">char country[6] = "INDIA";</div>
+      <div id="fig123"></div>
+    </div>
+    <p>C++ also provides other equivalent ways of initializing a character array:</p>
+    <div class="code-box">char country[6] = {'I','N','D','I','A','\\0'};
+char country[]  = "INDIA";
+char country[]  = {'I','N','D','I','A','\\0'};</div>
+    <div class="tb-def"><span class="lbl">📘 Note (textbook)</span>If all characters are not initialized, the rest are filled with <b>NULL</b>.</div>
+    <table class="tbl">
+      <tr><th>Statement</th><th>Value</th></tr>
+      <tr><td class="mono">char str[5] = {'5','+','A'};</td><td></td></tr>
+      <tr><td class="mono">str[0]</td><td class="mono">5</td></tr>
+      <tr><td class="mono">str[1]</td><td class="mono">+</td></tr>
+      <tr><td class="mono">str[2]</td><td class="mono">A</td></tr>
+      <tr><td class="mono">str[3]</td><td class="mono">NULL</td></tr>
+      <tr><td class="mono">str[4]</td><td class="mono">NULL</td></tr>
+    </table>
+    <div class="mistake-box"><span class="lbl">⚠️ Common Mistake</span>During initialization, the array of elements <b>cannot be initialized with more values than its declared size</b>.
+      <div class="code-box">char str[2] = {'5','+','A','B'};  // Invalid!</div>
+      The compiler reports an error such as <span class="mono">initializer-string for array of chars is too long</span>.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Build Your Own String</h3>
+    <div class="field-row">
+      <div class="f"><label>Word to store</label><input type="text" id="strWord" value="TAMIL" maxlength="9"></div>
+      <div class="f"><label>Array size</label><input type="number" id="strSize" value="6" min="1" max="10"></div>
+      <div class="f"><button class="btn btn-primary" id="strBuildBtn">🔄 Build</button></div>
+    </div>
+    <div id="strOut"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-strbasics"></div></div>
+  `;
+}
+function wireStrBasics(){
+  document.getElementById('fig122').innerHTML = `<div class="diagram-box"><div style="text-align:center;font-size:.85rem;margin-bottom:6px;">Array Name: a &nbsp;·&nbsp; Array Length: n</div>` + arrayVis(['a[0]','a[1]','a[2]','a[3]','...','a[n-1]'], {prefix:''}) + `<div class="diagram-cap">Figure 12.2 — first element a[0], last element a[n-1]</div></div>`;
+  document.getElementById('codeChar').innerHTML = esc(CODE_CHARARRAY);
+  document.getElementById('outChar').innerHTML = esc(OUT_CHARARRAY);
+  document.getElementById('fig123').innerHTML = arrayVis(['I','N','D','I','A','\\0'], {prefix:'country', addrStart:1000, bytesPerElem:1});
+
+  function buildStr(){
+    const word = document.getElementById('strWord').value.toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+    const size = Math.max(1, Math.min(12, parseInt(document.getElementById('strSize').value,10)||1));
+    const out = document.getElementById('strOut');
+    if(word.length + 1 > size){
+      out.innerHTML = `<div class="mistake-box"><span class="lbl">⚠️ Error</span>"${esc(word)}" needs ${word.length} characters + 1 for the null terminator = ${word.length+1} bytes, but the array size is only ${size}. Increase the array size or shorten the word.</div>`;
+      return;
+    }
+    const cells = [];
+    for(let i=0;i<size;i++){
+      if(i < word.length) cells.push(word[i]);
+      else if(i === word.length) cells.push('\\0');
+      else cells.push('NULL');
+    }
+    out.innerHTML = arrayVis(cells, {prefix:'str', highlight:[word.length]});
+  }
+  document.getElementById('strBuildBtn').addEventListener('click', buildStr);
+  buildStr();
+
+  const qs = {
+    q6:{q:'By default, a string ends with which character?', o:["'\\0'", "'\\t'", "'\\n'", "'\\b'"], c:0, exp:'Textbook Evaluation, Section A, Q4. Every C++ string (character array) must end with the null character \\0.'}
+  };
+  document.getElementById('qc-strbasics').innerHTML = mcqHTML('q6', qs.q6, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-strbasics', qs);
+}
+
+/* =========================================================================
+   TOPIC 7 — Palindrome program
+   ========================================================================= */
+function renderStrPalin(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · Strings</div>
+    <h2>Program: Check Palindrome or Not</h2>
+    <div class="goals"><b>Goal:</b> Trace a complete string-processing program, and learn to spot a very common bracing mistake.</div>
+  </div>
+
+  <div class="card">
+    <h3>📘 Textbook Program</h3>
+    <div class="code-box" id="codePalinTB"></div>
+    <div class="code-cap">Output</div>
+    <div class="out-box" id="outPalin"></div>
+
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Common Mistake — Missing Braces</span>
+      Look very carefully at the inner loop body:
+      <div class="code-box">if(a[j]!=a[i])
+    flag=0;
+    break;</div>
+      Because there is <b>no { }</b> around the <span class="mono">if</span>, only <span class="mono">flag=0;</span> belongs to the <span class="mono">if</span>. The <span class="mono">break;</span> line runs <b>unconditionally, every single time</b>, after only the very first comparison — so the loop actually stops after checking just one pair of characters, and never finishes comparing the rest of the string!
+      <br><br>
+      Worse still, the outer <span class="mono">for(len=strlen(a); a[len]!='\\0'; ++len)</span> loop also has no braces, so its "body" is the entire inner <span class="mono">for</span> loop. Since <span class="mono">len</span> is set to <span class="mono">strlen(a)</span> — which already points at the null character — the condition <span class="mono">a[len]!='\\0'</span> is <b>false immediately</b>, so the inner loop (the real comparison logic) <b>never runs at all</b>! <span class="mono">flag</span> stays at its starting value of 1, so this program as printed would say "palindrome" for <i>any</i> word typed in.
+    </div>
+
+    <div class="fixbox">
+      <span class="lbl">✅ Improved Example (corrected)</span>
+      <div class="code-box" id="codePalinFixed"></div>
+      Two fixes: (1) <span class="mono">len = strlen(a);</span> is written as a normal statement, not a stray <span class="mono">for</span> loop. (2) Curly braces <span class="mono">{ }</span> now wrap both <span class="mono">flag=0;</span> and <span class="mono">break;</span> so they only run together, only when a mismatch is actually found.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Step-by-step Simulation — Palindrome Tracer</h3>
+    <p>This simulator follows the <b>corrected logic</b> so you can see how a real palindrome check should work: two pointers, <span class="mono">i</span> from the left and <span class="mono">j</span> from the right, move toward the middle.</p>
+    <div class="field-row">
+      <div class="f"><label>Word to check</label><input type="text" id="palinWord" value="madam" maxlength="12"></div>
+      <div class="f"><button class="btn btn-primary" id="palinStepBtn">▶ Step</button></div>
+      <div class="f"><button class="btn btn-ghost" id="palinResetBtn">⟲ Reset</button></div>
+    </div>
+    <div id="palinBoxes"></div>
+    <div class="log-panel" id="palinLog"><div class="ln">Press "Step" to compare a[i] and a[j]...</div></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-strpalin"></div></div>
+  `;
+}
+let palinSim = null;
+function wireStrPalin(){
+  document.getElementById('codePalinTB').innerHTML = esc(CODE_PALINDROME_TB);
+  document.getElementById('outPalin').innerHTML = esc(OUT_PALINDROME);
+  document.getElementById('codePalinFixed').innerHTML = esc(CODE_PALINDROME_FIXED);
+
+  function resetPalin(){
+    const word = (document.getElementById('palinWord').value || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+    palinSim = {word, i:0, j:word.length-1, flag:1, done:false};
+    document.getElementById('palinBoxes').innerHTML = arrayVis(word.split(''), {prefix:'a', highlight:[palinSim.i, palinSim.j]});
+    document.getElementById('palinLog').innerHTML = `<div class="ln">len = ${word.length}. i starts at 0, j starts at ${palinSim.j}. Press "Step"...</div>`;
+  }
+  function stepPalin(){
+    if(!palinSim) resetPalin();
+    const log = document.getElementById('palinLog');
+    const {word} = palinSim;
+    if(palinSim.done) return;
+    if(palinSim.i >= word.length/2){
+      palinSim.done = true;
+      const verdict = palinSim.flag===1 ? 'The String is palindrome' : 'The String is not palindrome';
+      document.getElementById('palinBoxes').innerHTML = arrayVis(word.split(''), {prefix:'a', ok: palinSim.flag===1 ? word.split('').map((_,k)=>k) : []});
+      log.innerHTML += `<div class="ln"><b>i &lt; len/2 is now FALSE → loop ends. flag = ${palinSim.flag} → "${verdict}"</b></div>`;
+      log.scrollTop = log.scrollHeight;
+      return;
+    }
+    const {i,j} = palinSim;
+    const match = word[i] === word[j];
+    document.getElementById('palinBoxes').innerHTML = arrayVis(word.split(''), {prefix:'a', highlight:[i,j]});
+    log.innerHTML += `<div class="ln"><span class="step-no">Compare:</span> a[${i}]='${word[i]}' vs a[${j}]='${word[j]}' → <span class="tf ${match?'t':'f'}">${match?'MATCH':'MISMATCH'}</span></div>`;
+    if(!match){
+      palinSim.flag = 0;
+      palinSim.done = true;
+      document.getElementById('palinBoxes').innerHTML = arrayVis(word.split(''), {prefix:'a', no:[i,j]});
+      log.innerHTML += `<div class="ln"><b>flag = 0, break; → "The String is not palindrome"</b></div>`;
+    } else {
+      palinSim.i++; palinSim.j--;
+    }
+    log.scrollTop = log.scrollHeight;
+  }
+  document.getElementById('palinStepBtn').addEventListener('click', stepPalin);
+  document.getElementById('palinResetBtn').addEventListener('click', resetPalin);
+  resetPalin();
+
+  const qs = {
+    q7:{q:'In the corrected palindrome program, what do the pointers i and j do?', o:['i and j both start from 0', 'i moves from the left end, j moves from the right end, towards the middle', 'i and j stay fixed', 'j always equals i'], c:1, exp:'Learning Activity — i starts at the first character (0), j starts at the last character (len-1); each step moves i forward and j backward.'}
+  };
+  document.getElementById('qc-strpalin').innerHTML = mcqHTML('q7', qs.q7, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-strpalin', qs);
+}
+
+/* =========================================================================
+   TOPIC 8 — 2-D array basics
+   ========================================================================= */
+function gridVis(values2d, opts){
+  opts = opts || {};
+  const hl = opts.highlight || null;
+  let html = '<div class="diagram-box"><table class="tbl" style="margin:0;">';
+  html += '<tr><th></th>' + values2d[0].map((_,c)=>'<th class="c">col '+c+'</th>').join('') + '</tr>';
+  values2d.forEach((row,r)=>{
+    html += '<tr><th>row '+r+'</th>';
+    row.forEach((v,c)=>{
+      const isHl = hl && hl[0]===r && hl[1]===c;
+      html += `<td class="c" style="${isHl?'background:var(--accent-light);font-weight:800;border:2px solid var(--accent);':''}">${esc(v)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table></div>';
+  return html;
+}
+function renderTwoDim(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.3</div>
+    <h2>Two-dimensional Arrays</h2>
+    <div class="goals"><b>Goal:</b> Declare, initialize and access elements of a 2-D array (rows and columns).</div>
+  </div>
+
+  <div class="card">
+    <h3>Definition</h3>
+    <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"Two-dimensional (2D) arrays are collection of similar elements where the elements are stored in certain number of rows and columns. An example m &times; n matrix where m denotes the number of rows and n denotes the number of columns."</div>
+    <p>Figure 12.4 — conceptual view of <span class="mono">int arr[3][3];</span> as a 3&times;3 matrix (subscripts start at 0, so <span class="mono">arr[0][0]</span> is the first element):</p>
+    <div id="fig124"></div>
+  </div>
+
+  <div class="card">
+    <h3>12.3.1 Declaration</h3>
+    <div class="code-box">data-type array_name[row-size][col-size];</div>
+    <div class="example-box"><span class="lbl">Example</span><div class="code-box">int A[3][4];</div>A is a 2-D array; 3 rows &times; 4 columns = a maximum of 12 elements.</div>
+    <div class="code-box">int A[3][3];
+float x[2][3];
+char name[5][20];</div>
+    <div class="tb-def"><span class="lbl">📘 Note (textbook)</span>Array size must be an unsigned integer value greater than 0. In arrays, <b>column size is compulsory</b> but <b>row size is optional</b>.</div>
+  </div>
+
+  <div class="card">
+    <h3>12.3.2 Initialization</h3>
+    <div class="code-box">int matrix[4][3] = {
+    {10,20,30},   // Row 0
+    {40,50,60},   // Row 1
+    {70,80,90},   // Row 2
+    {100,110,120} // Row 3
+};
+// ...is the same as:
+int matrix[4][3] = {10,20,30,40,50,60,70,80,90,100,110,120};</div>
+    <p>Row size can be left out (column size cannot):</p>
+    <div class="code-box">int matrix[][3] = {
+    {10,20,30},
+    {40,50,60},
+    {70,80,90},
+    {100,110,120}
+};</div>
+  </div>
+
+  <div class="card">
+    <h3>12.3.3 Accessing Elements</h3>
+    <p>Two index values are needed — the first for the row, the second for the column:</p>
+    <div class="code-box">matrix[0][0] = 10;   // first element of first row
+matrix[0][1] = 20;   // second element of first row
+matrix[1][2] = 60;   // third element of second row
+matrix[3][0] = 100;  // first element of fourth row</div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — 2-D Array Grid Builder</h3>
+    <div class="field-row">
+      <div class="f"><label>Rows</label><input type="number" id="gridRows" value="3" min="1" max="5"></div>
+      <div class="f"><label>Columns</label><input type="number" id="gridCols" value="3" min="1" max="5"></div>
+      <div class="f"><button class="btn btn-primary" id="gridFillBtn">🔄 Fill with random values</button></div>
+    </div>
+    <div id="gridArea"></div>
+    <div class="field-row">
+      <div class="f"><label>Row index to inspect</label><input type="number" id="gridR" value="1" min="0"></div>
+      <div class="f"><label>Column index to inspect</label><input type="number" id="gridC" value="1" min="0"></div>
+      <div class="f"><button class="btn btn-ghost" id="gridInspectBtn">🔍 Show arr[r][c]</button></div>
+    </div>
+    <div id="gridInspectOut" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-twodim"></div></div>
+  `;
+}
+let gridData = [[1,2,3],[4,5,6],[7,8,9]];
+function wireTwoDim(){
+  document.getElementById('fig124').innerHTML = gridVis([['arr[0][0]','arr[0][1]','arr[0][2]'],['arr[1][0]','arr[1][1]','arr[1][2]'],['arr[2][0]','arr[2][1]','arr[2][2]']]);
+
+  function redrawGrid(){ document.getElementById('gridArea').innerHTML = gridVis(gridData); }
+  function fillGrid(){
+    const r = Math.max(1, Math.min(5, parseInt(document.getElementById('gridRows').value,10)||1));
+    const c = Math.max(1, Math.min(5, parseInt(document.getElementById('gridCols').value,10)||1));
+    gridData = [];
+    for(let i=0;i<r;i++){ const row=[]; for(let j=0;j<c;j++) row.push(Math.floor(Math.random()*90)+10); gridData.push(row); }
+    redrawGrid();
+  }
+  document.getElementById('gridFillBtn').addEventListener('click', fillGrid);
+  redrawGrid();
+
+  document.getElementById('gridInspectBtn').addEventListener('click', ()=>{
+    const r = parseInt(document.getElementById('gridR').value,10);
+    const c = parseInt(document.getElementById('gridC').value,10);
+    const out = document.getElementById('gridInspectOut');
+    if(!gridData[r] || gridData[r][c]===undefined){
+      out.style.display='block';
+      out.innerHTML = `⚠️ arr[${r}][${c}] is out of range for this ${gridData.length}×${gridData[0].length} grid.`;
+      document.getElementById('gridArea').innerHTML = gridVis(gridData);
+      return;
+    }
+    document.getElementById('gridArea').innerHTML = gridVis(gridData, {highlight:[r,c]});
+    out.style.display='block';
+    out.innerHTML = `<span class="lbl">Result</span>arr[${r}][${c}] = <b>${gridData[r][c]}</b>`;
+  });
+
+  const qs = {
+    q8:{q:'What is the syntax to declare a two-dimensional array?', o:['data-type array_name[col-size];', 'data-type array_name[row-size][col-size];', 'array_name data-type[row][col];', 'data-type array_name(row-size,col-size);'], c:1, exp:'Textbook Evaluation, Section B, Q3. Row size comes first, column size second, each inside its own square brackets.'}
+  };
+  document.getElementById('qc-twodim').innerHTML = mcqHTML('q8', qs.q8, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-twodim', qs);
+}
+
+/* =========================================================================
+   TOPIC 9 — Matrix addition
+   ========================================================================= */
+function renderTwoDimAdd(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.3</div>
+    <h2>Program: Addition of Two Matrices</h2>
+    <div class="goals"><b>Goal:</b> See nested <span class="mono">for</span> loops used to read, add and print 2-D arrays.</div>
+  </div>
+
+  <div class="card">
+    <h3>📘 Textbook Program</h3>
+    <div class="code-box" id="codeMatAdd"></div>
+    <div class="code-cap" style="font-style:italic;">(Re-formatted for readability from the textbook scan; logic and output are unchanged — getch()/conio.h are Turbo C++ specific and can be removed on modern compilers like Dev C++ or g++.)</div>
+    <div class="code-cap">Output (rows = 2, columns = 2, both matrices filled with 1s)</div>
+    <div class="out-box" id="outMatAdd"></div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Matrix Addition Simulator</h3>
+    <div class="field-row">
+      <div class="f"><label>Rows</label><input type="number" id="maRows" value="2" min="1" max="4"></div>
+      <div class="f"><label>Columns</label><input type="number" id="maCols" value="2" min="1" max="4"></div>
+      <div class="f"><button class="btn btn-ghost" id="maNewBtn">🔄 New grids</button></div>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted);">Matrix 1</p><div id="maGrid1"></div>
+    <p style="font-size:.85rem;color:var(--muted);">Matrix 2</p><div id="maGrid2"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="maAddBtn">➕ Add Matrices</button></div>
+    <div id="maResult"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-twodimadd"></div></div>
+  `;
+}
+let ma1=[[1,1],[1,1]], ma2=[[1,1],[1,1]];
+function wireTwoDimAdd(){
+  document.getElementById('codeMatAdd').innerHTML = esc(CODE_MATRIX_ADD);
+  document.getElementById('outMatAdd').innerHTML = esc(OUT_MATRIX_ADD);
+
+  function newGrids(){
+    const r = Math.max(1, Math.min(4, parseInt(document.getElementById('maRows').value,10)||1));
+    const c = Math.max(1, Math.min(4, parseInt(document.getElementById('maCols').value,10)||1));
+    ma1=[]; ma2=[];
+    for(let i=0;i<r;i++){ const row1=[],row2=[]; for(let j=0;j<c;j++){ row1.push(Math.floor(Math.random()*9)+1); row2.push(Math.floor(Math.random()*9)+1);} ma1.push(row1); ma2.push(row2); }
+    document.getElementById('maGrid1').innerHTML = gridVis(ma1);
+    document.getElementById('maGrid2').innerHTML = gridVis(ma2);
+    document.getElementById('maResult').innerHTML = '';
+  }
+  document.getElementById('maNewBtn').addEventListener('click', newGrids);
+  document.getElementById('maAddBtn').addEventListener('click', ()=>{
+    const sum = ma1.map((row,i)=>row.map((v,j)=>v+ma2[i][j]));
+    document.getElementById('maResult').innerHTML = `<p style="font-size:.85rem;color:var(--muted);margin-top:10px;">Result (sum[i][j] = m1[i][j] + m2[i][j])</p>` + gridVis(sum);
+  });
+  newGrids();
+
+  const qs = {
+    q9:{q:'In the matrix addition program, which loop structure fills each cell?', o:['A single for loop', 'A nested for loop (one for rows, one for columns)', 'A while loop only', 'No loop is needed'], c:1, exp:'Learning Activity. Processing every row AND every column of a 2-D array needs one loop inside another — this is called a nested loop.'}
+  };
+  document.getElementById('qc-twodimadd').innerHTML = mcqHTML('q9', qs.q9, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-twodimadd', qs);
+}
+
+/* =========================================================================
+   TOPIC 10 — 2-D memory: row-major / column-major
+   ========================================================================= */
+function renderTwoDimMem(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.3.4</div>
+    <h2>Memory Representation of a 2-D Array</h2>
+    <div class="goals"><b>Goal:</b> Understand that computer memory is linear (one row of boxes), so a 2-D array must be "flattened" — either row by row or column by column.</div>
+  </div>
+
+  <div class="card">
+    <h3>Row-major vs Column-major Order</h3>
+    <p>Like one-dimensional arrays, 2-D array elements are stored in continuous memory. There are two ways to do this:</p>
+    <ul><li><b>Row-major order</b> — all elements of row 0 first, then row 1, then row 2...</li><li><b>Column-major order</b> — all elements of column 0 first, then column 1...</li></ul>
+    <div class="example-box"><span class="lbl">Example</span><div class="code-box">int A[4][3] = { {8,6,5}, {2,1,9}, {3,6,4}, {4,3,2} };</div></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="memRowBtn">🔵 Row-major order</button>
+      <button class="btn btn-ghost" id="memColBtn">🟢 Column-major order</button>
+    </div>
+    <div id="memStrip"></div>
+    <div class="exam-point"><span class="lbl">⭐ Exam Point</span>C++ (like most languages) stores multi-dimensional arrays internally in <b>row-major order</b> by default.</div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-twodimmem"></div></div>
+  `;
+}
+function wireTwoDimMem(){
+  const rowMajor = {vals:[8,6,5,2,1,9,3,6,4,4,3,2], groups:[['Row 0',0,3],['Row 1',3,6],['Row 2',6,9],['Row 3',9,12]]};
+  const colMajor = {vals:[8,2,3,4,6,1,6,3,5,9,4,2], groups:[['Col 0',0,4],['Col 1',4,8],['Col 2',8,12]]};
+  function drawStrip(data){
+    let html = '<div class="diagram-box"><div class="array-vis">';
+    data.vals.forEach((v,i)=>{
+      html += `<div class="array-cell"><div class="idx">${1000+i*4}</div><div class="val">${v}</div></div>`;
+    });
+    html += '</div><div class="flow-row" style="margin-top:8px;">';
+    data.groups.forEach(g=> html += `<div style="font-size:.8rem;font-weight:700;color:var(--muted);min-width:${(g[2]-g[1])*58}px;text-align:center;">${g[0]}</div>`);
+    html += '</div></div>';
+    return html;
+  }
+  document.getElementById('memStrip').innerHTML = drawStrip(rowMajor);
+  document.getElementById('memRowBtn').addEventListener('click', ()=>{ document.getElementById('memStrip').innerHTML = drawStrip(rowMajor); });
+  document.getElementById('memColBtn').addEventListener('click', ()=>{ document.getElementById('memStrip').innerHTML = drawStrip(colMajor); });
+
+  const qs = {
+    q10:{q:'Which order does C++ use by default to store a 2-D array in memory?', o:['Column-major order', 'Row-major order', 'Random order', 'Diagonal order'], c:1, exp:'Learning Activity. C++ stores 2-D arrays in row-major order: all of row 0, then all of row 1, and so on.'}
+  };
+  document.getElementById('qc-twodimmem').innerHTML = mcqHTML('q10', qs.q10, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-twodimmem', qs);
+}
+
+/* =========================================================================
+   TOPIC 11 — Array of Strings
+   ========================================================================= */
+function renderArrStrings(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.4</div>
+    <h2>Array of Strings</h2>
+    <div class="goals"><b>Goal:</b> Store several words/names together using a 2-D character array.</div>
+  </div>
+
+  <div class="card">
+    <h3>Definition</h3>
+    <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"An array of strings is a two-dimensional character array. The size of the first index (rows) denotes the number of strings and the size of the second index (columns) denotes the maximum length of each string."</div>
+    <div class="code-box">char Name[6][10];</div>
+    <p>6 refers to the number of rows (number of names), 10 refers to the number of columns (maximum length of each name, including the null character).</p>
+  </div>
+
+  <div class="card">
+    <h3>12.4.1 Initialization</h3>
+    <div class="code-box">char Name[6][10] = {"Mr. Bean","Mr.Bush","Nicole","Kidman","Arnold","Jodie"};</div>
+    <p>Each string is stored in its own row, padded with NULL characters to fill the rest of that row:</p>
+    <div id="nameFigure"></div>
+    <div class="code-cap">📘 Textbook Program — array of strings</div>
+    <div class="code-box" id="codeColour"></div>
+    <div class="code-cap">Output</div>
+    <div class="out-box" id="outColour"></div>
+    <div class="ta-box" style="font-size:.78rem;">(Note: the textbook code initializes the last colour as "yellow" in lowercase, but the shown output prints "Yellow" with a capital Y — a small inconsistency in the original text, kept here for accuracy.)</div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Array of Strings Explorer</h3>
+    <p>Click any cell in the grid below, or type a row/column pair, to see exactly which character is stored there.</p>
+    <div id="nameGrid"></div>
+    <div class="field-row">
+      <div class="f"><label>Row</label><input type="number" id="nameR" value="2" min="0" max="5"></div>
+      <div class="f"><label>Column</label><input type="number" id="nameC" value="2" min="0" max="9"></div>
+      <div class="f"><button class="btn btn-ghost" id="nameInspectBtn">🔍 Show Name[r][c]</button></div>
+    </div>
+    <div id="nameOut" class="easy" style="display:none;"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-arrstrings"></div></div>
+  `;
+}
+const NAME_ROWS = ["Mr. Bean","Mr.Bush","Nicole","Kidman","Arnold","Jodie"];
+function nameGridCells(){
+  return NAME_ROWS.map(s=>{
+    const cells = s.split('');
+    cells.push('\\0');
+    while(cells.length<10) cells.push('·');
+    return cells;
+  });
+}
+function wireArrStrings(){
+  document.getElementById('nameFigure').innerHTML = gridVis(nameGridCells(), {});
+  document.getElementById('codeColour').innerHTML = esc(CODE_COLOUR);
+  document.getElementById('outColour').innerHTML = esc(OUT_COLOUR);
+
+  function redrawNameGrid(hl){
+    document.getElementById('nameGrid').innerHTML = gridVis(nameGridCells(), hl?{highlight:hl}:{});
+  }
+  redrawNameGrid();
+  document.getElementById('nameInspectBtn').addEventListener('click', ()=>{
+    const r = parseInt(document.getElementById('nameR').value,10);
+    const c = parseInt(document.getElementById('nameC').value,10);
+    const grid = nameGridCells();
+    const out = document.getElementById('nameOut');
+    if(!grid[r] || grid[r][c]===undefined){ out.style.display='block'; out.innerHTML='⚠️ Out of range for this 6×10 array.'; return; }
+    redrawNameGrid([r,c]);
+    out.style.display='block';
+    out.innerHTML = `<span class="lbl">Result</span>Name[${r}][${c}] = <b>'${esc(grid[r][c])}'</b>`;
+  });
+
+  const qs = {
+    q11:{q:'In "char Name[6][10];", what does the second index (10) represent?', o:['Number of names stored', 'Maximum length of each name (including the null character)', 'Number of vowels allowed', 'The ASCII value of the first letter'], c:1, exp:'The first index (6) is the number of strings/rows; the second index (10) is the maximum length of each individual string.'}
+  };
+  document.getElementById('qc-arrstrings').innerHTML = mcqHTML('q11', qs.q11, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-arrstrings', qs);
+}
+
+/* =========================================================================
+   TOPIC 12 — Structures: declare & access
+   ========================================================================= */
+const STRUCT_TYPE_BYTES = {int:4, long:4, float:4, double:8, char:1};
+function renderStructBasics(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.5, 12.5.1, 12.5.2, 12.5.3</div>
+    <h2>Structures: Declaring &amp; Accessing</h2>
+    <div class="goals"><b>Goal:</b> Group different data types (int, float, char array...) into one single named unit.</div>
+  </div>
+
+  <div class="card">
+    <h3>12.5 Introduction</h3>
+    <div class="tb-def"><span class="lbl">📘 Textbook Definition</span>"Structure is a user-defined [data type] which has the combination of data items with different data types. This allows to group variables of mixed data types together into a single unit."</div>
+    <h4>12.5.1 Purpose of Structures</h4>
+    <p>When more than one variable is needed to represent objects of <i>uniform</i> data types, an array can be used. But if the elements are of <i>different</i> data types, an array cannot support that. Storing them as separate variables works, but they are not guaranteed to be in adjacent memory locations, which increases search time. A <b>structure</b> stores different data types as part of the same logical element, adjacent to each other in memory.</p>
+    <div class="analogy"><span class="lbl">🔗 Real-life Analogy</span>Think of a student's ID card: name (text), roll number (number), date of birth (date), photo — all different "types" of information, but bundled into <b>one single card</b>. A structure does the same for a program.</div>
+  </div>
+
+  <div class="card">
+    <h3>12.5.2 Declaring and Defining Structures</h3>
+    <p>A structure is declared using the keyword <span class="mono">struct</span>:</p>
+    <div class="code-box">struct structure_name {
+    type member_name1;
+    type member_name2;
+} reference_name;</div>
+    <div class="tb-def"><span class="lbl">📘 Note (textbook)</span>Objects declared along with the structure definition are called <b>global objects</b>. The optional field <span class="mono">reference_name</span> can be used to declare objects of the structure type directly.</div>
+    <div class="example-box">
+      <span class="lbl">Example</span>
+      <div class="code-box">struct Student
+{
+    long rollno;
+    int age;
+    float weight;
+};</div>
+      The three variables <span class="mono">rollno, age, weight</span> inside the struct are called <b>members</b> (or fields).
+    </div>
+    <p>Figure 12.5 — memory allocation for one <span class="mono">Student</span> object (members stored next to each other):</p>
+    <div id="fig125"></div>
+    <div class="code-box">struct Student balu;   // creates a Student object named balu
+struct Student frank;  // another Student object named frank
+// ...or combine declaration and object creation:
+struct Student
+{
+    long rollno;
+    int age;
+    float weight;
+} balu, frank;</div>
+  </div>
+
+  <div class="card">
+    <h3>12.5.3 Referencing Structure Elements</h3>
+    <p>Once an object is declared, its members are accessed using the <b>dot operator ( . )</b> between the object name and the member name:</p>
+    <div class="code-box">balu.rollno
+balu.age
+balu.weight
+frank.rollno
+frank.age
+frank.weight</div>
+    <div class="activity-box">
+      <span class="lbl">Anonymous Structure vs Named Structure</span>
+      A structure without a name/tag is called an <b>anonymous structure</b>:
+      <div class="code-box">struct
+{
+    long rollno;
+    int age;
+    float weight;
+} student;</div>
+      <span class="mono">student</span> is used as the reference name, and members are accessed exactly the same way: <span class="mono">student.rollno</span>, <span class="mono">student.age</span>, <span class="mono">student.weight</span>.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Try It — Build a Structure</h3>
+    <p>Pick 2 to 4 fields and see the generated <span class="mono">struct</span> declaration, its memory layout, and sample dot-operator access statements.</p>
+    <div id="structBuilderFields"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" id="sbAddBtn">➕ Add field</button>
+      <button class="btn btn-ghost btn-sm" id="sbRemoveBtn">➖ Remove field</button>
+    </div>
+    <div class="field-row"><div class="f"><label>Object name</label><input type="text" id="sbObjName" value="myStudent"></div></div>
+    <div class="btn-row"><button class="btn btn-primary" id="sbBuildBtn">🔄 Generate</button></div>
+    <div id="sbOut"></div>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-structbasics"></div></div>
+  `;
+}
+let sbFields = [{name:'rollno', type:'long'}, {name:'age', type:'int'}, {name:'weight', type:'float'}];
+function wireStructBasics(){
+  document.getElementById('fig125').innerHTML = structVis([{name:'Rollno',type:'long',bytes:4},{name:'Age',type:'int',bytes:2},{name:'weight',type:'float',bytes:4}]);
+
+  function drawFields(){
+    let html = '';
+    sbFields.forEach((f,i)=>{
+      html += `<div class="field-row" style="margin:6px 0;">
+        <div class="f"><label>Field ${i+1} name</label><input type="text" class="sbName" data-i="${i}" value="${esc(f.name)}"></div>
+        <div class="f"><label>Type</label><select class="sbType" data-i="${i}">
+          <option value="int"${f.type==='int'?' selected':''}>int</option>
+          <option value="long"${f.type==='long'?' selected':''}>long</option>
+          <option value="float"${f.type==='float'?' selected':''}>float</option>
+          <option value="double"${f.type==='double'?' selected':''}>double</option>
+          <option value="char"${f.type==='char'?' selected':''}>char</option>
+        </select></div>
+      </div>`;
+    });
+    document.getElementById('structBuilderFields').innerHTML = html;
+    document.querySelectorAll('.sbName').forEach(inp=> inp.addEventListener('input', function(){ sbFields[this.dataset.i].name = this.value; }));
+    document.querySelectorAll('.sbType').forEach(sel=> sel.addEventListener('change', function(){ sbFields[this.dataset.i].type = this.value; }));
+  }
+  document.getElementById('sbAddBtn').addEventListener('click', ()=>{ if(sbFields.length<4){ sbFields.push({name:'field'+(sbFields.length+1), type:'int'}); drawFields(); }});
+  document.getElementById('sbRemoveBtn').addEventListener('click', ()=>{ if(sbFields.length>2){ sbFields.pop(); drawFields(); }});
+  drawFields();
+
+  function buildStruct(){
+    const objName = (document.getElementById('sbObjName').value || 'obj').replace(/[^A-Za-z0-9_]/g,'') || 'obj';
+    let decl = 'struct MyStruct\n{\n';
+    sbFields.forEach(f=> decl += `    ${f.type} ${f.name||'field'};\n`);
+    decl += `} ${objName};`;
+    let out = `<div class="code-cap">Generated declaration</div><div class="code-box">${esc(decl)}</div>`;
+    out += structVis(sbFields.map(f=>({name:f.name||'field', type:f.type, bytes:STRUCT_TYPE_BYTES[f.type]||4})));
+    out += `<div class="code-cap">Accessing members</div><div class="code-box">`+ sbFields.map(f=>`${objName}.${f.name||'field'}`).join('\n') + `</div>`;
+    document.getElementById('sbOut').innerHTML = out;
+  }
+  document.getElementById('sbBuildBtn').addEventListener('click', buildStruct);
+  buildStruct();
+
+  const qs = {
+    q12:{q:'A structure definition is terminated by', o:[':', '}', ';', '::'], c:2, exp:'Textbook Evaluation, Section A, Q5. A struct declaration always ends with a semicolon after the closing brace.'}
+  };
+  document.getElementById('qc-structbasics').innerHTML = mcqHTML('q12', qs.q12, 'tier-green', '🟢 Beginner');
+  wireMCQ('#qc-structbasics', qs);
+}
+
+/* =========================================================================
+   TOPIC 13 — Structure init & assignment
+   ========================================================================= */
+function renderStructInit(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Chapter 12 · 12.5.4, 12.5.5</div>
+    <h2>Initializing Structure Elements &amp; Structure Assignment</h2>
+    <div class="goals"><b>Goal:</b> Give values to structure members, and copy one structure object into another.</div>
+  </div>
+
+  <div class="card">
+    <h3>12.5.4 Initializing Structure Elements</h3>
+    <p>Values can be assigned to structure elements similar to assigning values to ordinary variables:</p>
+    <div class="code-box">balu.rollno = "702016";
+balu.age = 18;
+balu.weight = 48.5;</div>
+    <div class="mistake-box"><span class="lbl">⚠️ Careful</span><span class="mono">rollno</span> was declared as <span class="mono">long</span>, so it should really be given a plain number like <span class="mono">balu.rollno = 702016;</span> (no quotes). A quoted value like <span class="mono">"702016"</span> is text, not a number, and would not match a <span class="mono">long</span> member.</div>
+    <p>Values can also be assigned directly, similar to arrays:</p>
+    <div class="code-box">balu = {702016, 18, 48.5};</div>
+
+    <h3 style="margin-top:20px;">12.5.5 Structure Assignment</h3>
+    <p>A structure object can be assigned directly to another structure object, instead of assigning every member one by one.</p>
+    <div class="exam-point"><span class="lbl">⭐ Exam Point</span>Structure assignment is possible only if <b>both structure variables/objects are of the same type</b>.</div>
+    <div class="example-box">
+      <span class="lbl">Example</span>
+      If Mahesh and Praveen have the same age, height and weight, Mahesh's values can be copied to Praveen:
+      <div class="code-box">struct Student
+{
+    int age;
+    float height, weight;
+} mahesh;
+
+mahesh = {17, 164.5, 52.5};
+praveen = mahesh;   // copies age, height and weight all at once</div>
+    </div>
+    <div id="structCopyDemo"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="structCopyBtn">▶ Run praveen = mahesh;</button></div>
+  </div>
+
+  <div class="card">
+    <h3>📘 Textbook Program — read &amp; display student info</h3>
+    <div class="code-box" id="codeStudentTB"></div>
+    <div class="mistake-box">
+      <span class="lbl">⚠️ Spot the Mistake — Case Sensitivity</span>
+      Look at the very last line: <span class="mono">Mahesh.weight</span> (capital M). But the object was declared as <span class="mono">mahesh</span> (lowercase m). <b>C++ is case-sensitive</b> — <span class="mono">Mahesh</span> and <span class="mono">mahesh</span> are two completely different names, and <span class="mono">Mahesh</span> was never declared. A real compiler would reject this line.
+      <br><br>
+      Also note: this textbook example uses <span class="mono">void main( )</span>, which is non-standard. Modern compilers (Dev C++, g++) expect <span class="mono">int main()</span> that <span class="mono">return</span>s an integer.
+    </div>
+    <div class="fixbox"><span class="lbl">✅ Improved Example (corrected)</span><div class="code-box" id="codeStudentFixed"></div></div>
+    <div class="code-cap">Output</div>
+    <div class="out-box" id="outStudentTB"></div>
+  </div>
+
+  <div class="card">
+    <h3>📝 Points to Remember <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(textbook, verbatim)</span></h3>
+    <ul>
+      <li>Structure is a user-defined [data type] which has the combination of data items with different data types.</li>
+      <li>Structure is declared using the keyword 'struct'.</li>
+      <li>Structure elements are referenced using its object name followed by dot(.) operator and then the member name.</li>
+      <li>A structure without a name/tag is called anonymous structure.</li>
+      <li>Structure elements can be initialized either by using separate assignment statements or at the time of declaration, by surrounding its values with braces.</li>
+      <li>A structure object can also be assigned to another structure object only if both the objects are of the same structure type.</li>
+      <li>The structure declared within another structure is called a nested structure.</li>
+      <li>A structure can contain array as its member element.</li>
+      <li>Array of structure variable can also be created.</li>
+    </ul>
+  </div>
+
+  <div class="quickcheck"><span class="lbl">✅ Quick Check</span><div id="qc-structinit"></div></div>
+  `;
+}
+function wireStructInit(){
+  document.getElementById('codeStudentTB').innerHTML = esc(CODE_STUDENT_STRUCT_TB);
+  document.getElementById('codeStudentFixed').innerHTML = esc(CODE_STUDENT_STRUCT_FIXED);
+  document.getElementById('outStudentTB').innerHTML = esc(OUT_STUDENT_STRUCT);
+
+  function drawCopy(copied){
+    const maheshF = [{name:'age',type:'int',bytes:4,value:17},{name:'height',type:'float',bytes:4,value:164.5},{name:'weight',type:'float',bytes:4,value:52.5}];
+    const praveenF = copied ? maheshF.map(f=>({...f})) : [{name:'age',type:'int',bytes:4,value:'?'},{name:'height',type:'float',bytes:4,value:'?'},{name:'weight',type:'float',bytes:4,value:'?'}];
+    return `<p style="font-size:.85rem;color:var(--muted);margin-bottom:2px;">mahesh</p>${structVis(maheshF)}<p style="font-size:.85rem;color:var(--muted);margin:10px 0 2px;">praveen ${copied?'(after copy)':'(before copy)'}</p>${structVis(praveenF)}`;
+  }
+  document.getElementById('structCopyDemo').innerHTML = drawCopy(false);
+  document.getElementById('structCopyBtn').addEventListener('click', ()=>{
+    document.getElementById('structCopyDemo').innerHTML = drawCopy(true);
+  });
+
+  const qs = {
+    q13:{q:'A structure declaration is given below:\nstruct Time { int hours; int minutes; int seconds; } t;\nUsing this declaration, which of the following refers to seconds?', o:['Time.seconds', 'Time::seconds', 'seconds', 't.seconds'], c:3, exp:'Textbook Evaluation, Section A, Q7. You access a member through the OBJECT name (t), not the structure tag name (Time).'}
+  };
+  document.getElementById('qc-structinit').innerHTML = mcqHTML('q13', qs.q13, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#qc-structinit', qs);
+}
+
+/* =========================================================================
+   TOPIC 14 — Practice: predict output, debug lab, fill blank, flashcards
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Practice</div>
+    <h2>Practice &amp; Debugging Lab</h2>
+    <div class="goals"><b>Goal:</b> Apply everything from this chapter — predict outputs, hunt bugs, and complete a program skeleton.</div>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Predict the Output #1 — Array of Structures</h3>
+    <p>Based on Textbook Evaluation Section D, Q3.</p>
+    <div class="code-box" id="pBooksCode"></div>
+    <div id="pBooksMCQ"></div>
+    <details class="acc"><summary>🔍 Trace the program</summary><div class="acc-body">Each <span class="mono">strcpy(dest, "text")</span> copies "text" into <span class="mono">dest</span> AND returns it, so <span class="mono">cout</span> prints the copied text immediately. The loop at the end then re-prints both books' name and author in a small table using <span class="mono">a[i].name</span> and <span class="mono">a[i].author</span>.<div class="out-box" style="margin-top:8px;" id="pBooksOut"></div></div></details>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Predict the Output #2 — Two Structure Objects</h3>
+    <p>Based on Textbook Evaluation Section D, Q4.</p>
+    <div class="code-box" id="pP1P2Code"></div>
+    <div id="pP1P2MCQ"></div>
+    <details class="acc"><summary>🔍 Trace the program</summary><div class="acc-body"><span class="mono">p1</span> is initialized directly with <span class="mono">{1,"Brown",123443}</span>. <span class="mono">p2</span>'s members are set one at a time: <span class="mono">roll_no</span> by assignment, <span class="mono">name</span> by <span class="mono">strcpy</span> (because you cannot use <span class="mono">=</span> on a character array after declaration), and <span class="mono">phone_number</span> by assignment.<div class="out-box" style="margin-top:8px;" id="pP1P2Out"></div></div></details>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Debugging Lab</h3>
+    <p>Based on Textbook Evaluation Section D, Q5 — "Debug the error in the following program."</p>
+    <div class="code-box" id="pDebugCode"></div>
+    <details class="acc"><summary>🔍 Try to spot the bugs first (hint list)</summary><div class="acc-body">
+      There are at least <b>6</b> separate problems here — a mix of wrong header file, wrong type names, undeclared variables, a wrong operator, and loops in the wrong order. Look line by line before opening the answer below!
+    </div></details>
+    <div class="btn-row"><button class="btn btn-accent" id="pDebugRevealBtn">✅ Show All Bugs &amp; Corrected Version</button></div>
+    <div class="explain-box" id="pDebugReveal">
+      <table class="bug-table">
+        <tr><th>Issue</th><th>Type</th><th>Fix</th></tr>
+        <tr><td><span class="mono">#include &lt;istream.h&gt;</span></td><td><span class="tag tag-syntax">Syntax</span></td><td>Should be <span class="mono">#include &lt;iostream&gt;</span> plus <span class="mono">using namespace std;</span></td></tr>
+        <tr><td><span class="mono">PersonRecord people;</span></td><td><span class="tag tag-syntax">Syntax</span></td><td>The struct is named <span class="mono">PersonRec</span>, not <span class="mono">PersonRecord</span> — undeclared type.</td></tr>
+        <tr><td><span class="mono">for (i = 0; ...)</span></td><td><span class="tag tag-syntax">Syntax</span></td><td><span class="mono">i</span> is never declared — should be <span class="mono">for (int i = 0; ...)</span>.</td></tr>
+        <tr><td>Display loop runs before any input loop</td><td><span class="tag tag-logic">Logical</span></td><td>Move the display loop AFTER the input loop, or data will be printed before it exists.</td></tr>
+        <tr><td><span class="mono">cin&lt;&lt;peop[i].firstName;</span></td><td><span class="tag tag-syntax">Syntax</span></td><td>Wrong operator — reading input needs <span class="mono">cin&gt;&gt;</span>, not <span class="mono">cin&lt;&lt;</span>.</td></tr>
+        <tr><td><span class="mono">peop[i]</span></td><td><span class="tag tag-syntax">Syntax</span></td><td>The array was declared as <span class="mono">PersonRecPeopleArrayType</span> (or, in the fix, <span class="mono">people</span>) — <span class="mono">peop</span> was never declared.</td></tr>
+        <tr><td><span class="mono">void main()</span></td><td><span class="tag tag-style">Style</span></td><td>Prefer standard <span class="mono">int main() { ... return 0; }</span>.</td></tr>
+      </table>
+      <div class="code-cap">✅ Improved Example (corrected)</div>
+      <div class="code-box" id="pDebugFixed"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>✍️ Fill in the Blanks</h3>
+    <p>Based on Textbook Evaluation Section C, Q3 — complete the program so it sums up the marks of every student whose name starts with 'S'.</p>
+    <div class="code-box" id="pFillSkeleton"></div>
+    <div class="field-row">
+      <div class="f" style="flex:1 1 100%;"><label>Blank 1 — accept student details (one line is enough)</label><textarea id="fillB1"></textarea></div>
+    </div>
+    <div class="field-row">
+      <div class="f" style="flex:1 1 100%;"><label>Blanks 2 &amp; 3 — check name starts with 'S' and display the detail</label><textarea id="fillB2"></textarea></div>
+    </div>
+    <div class="btn-row"><button class="btn btn-ghost" id="pFillHintBtn">💡 Hint</button><button class="btn btn-primary" id="pFillRevealBtn">✅ Show Sample Answer</button></div>
+    <div class="explain-box" id="pFillHint">Hint: to check the first letter of a C-string member <span class="mono">name</span>, compare <span class="mono">s[i].name[0]</span> with the character <span class="mono">'S'</span>.</div>
+    <div class="explain-box" id="pFillReveal"><div class="code-cap">Sample completed program</div><div class="code-box" id="pFillCode"></div></div>
+  </div>
+
+  <div class="card">
+    <h3>🗂️ Short-answer Flashcards <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(Textbook Evaluation, Section B)</span></h3>
+    <div id="flashWrap"></div>
+  </div>
+  `;
+}
+function wirePractice(){
+  document.getElementById('pBooksCode').innerHTML = esc(CODE_BOOKS);
+  document.getElementById('pBooksOut').innerHTML = esc(OUT_BOOKS);
+  document.getElementById('pP1P2Code').innerHTML = esc(CODE_P1P2);
+  document.getElementById('pP1P2Out').innerHTML = esc(OUT_P1P2);
+  document.getElementById('pDebugCode').innerHTML = esc(CODE_DEBUG_BUGGY);
+  document.getElementById('pDebugFixed').innerHTML = esc(CODE_DEBUG_FIXED);
+  document.getElementById('pFillSkeleton').innerHTML = esc(CODE_FILLBLANK_SKELETON);
+  document.getElementById('pFillCode').innerHTML = esc(CODE_FILLBLANK_SAMPLE);
+
+  const pQs = {
+    pb1:{q:'What will the program print as the Book Name for Book No 2?', o:['Programming','C++programming','Dromy','BjarneStroustrup'], c:1, exp:'strcpy(a[1].name,"C++programming") both copies AND prints "C++programming" for Book No 2.'},
+    pp1:{q:"What will p2's name print as?", o:['Brown','Sam','123443','1234567822'], c:1, exp:'strcpy(p2.name,"Sam") sets the second student\'s name to "Sam".'}
+  };
+  document.getElementById('pBooksMCQ').innerHTML = mcqHTML('pb1', pQs.pb1, 'tier-yellow', '🟡 Practice');
+  document.getElementById('pP1P2MCQ').innerHTML = mcqHTML('pp1', pQs.pp1, 'tier-yellow', '🟡 Practice');
+  wireMCQ('#pBooksMCQ', pQs);
+  wireMCQ('#pP1P2MCQ', pQs);
+
+  document.getElementById('pDebugRevealBtn').addEventListener('click', ()=> document.getElementById('pDebugReveal').classList.toggle('show'));
+  document.getElementById('pFillHintBtn').addEventListener('click', ()=> document.getElementById('pFillHint').classList.toggle('show'));
+  document.getElementById('pFillRevealBtn').addEventListener('click', ()=> document.getElementById('pFillReveal').classList.toggle('show'));
+
+  const flash = [
+    {q:'What is Traversal in an array?', a:'Visiting / processing every element of the array once, in order, from the first to the last.'},
+    {q:'What is a String?', a:'A sequence of characters (letters, numbers or symbols), stored as a one-dimensional character array that ends with the null character \\0.'},
+    {q:'What is the syntax to declare a two-dimensional array?', a:'data-type array_name[row-size][col-size];  — column size is compulsory, row size is optional.'},
+    {q:'Define structure. What is its use?', a:'A structure is a user-defined data type that groups data items of different data types into a single unit. It is used when related data of mixed types (e.g. roll number, age, weight) needs to be stored together.'},
+    {q:'What is the error in: struct employee{ in teno;char ename[20];char dept;} Employee e1,e2;', a:'"in teno;" should be "int teno;" (typo in the data type and missing underscore/spacing). Also the struct tag "employee" is lowercase but the object declaration uses "Employee" (capital E) — C++ is case-sensitive, so this would not compile as written.'},
+  ];
+  document.getElementById('flashWrap').innerHTML = flash.map((f,i)=>`
+    <details class="acc"><summary>${i+1}. ${esc(f.q)}</summary><div class="acc-body">${esc(f.a)}</div></details>
+  `).join('');
+}
+
+/* =========================================================================
+   TOPIC 15 — Exam preparation
+   ========================================================================= */
+const QUICKTEST_QS = {
+  qt1:{q:'Which of the following is the collection of variables of the same type that can be referenced by a common name?', o:['int','float','Array','class'], c:2},
+  qt2:{q:'int age[]={6,90,20,18,2}; How many elements are there in this array?', o:['2','5','6','4'], c:1},
+  qt3:{q:'cin>>n[3]; To which element does this statement accept the value?', o:['2nd element','3rd element','4th element','5th element'], c:2},
+  qt4:{q:'By default, a string ends with which character?', o:["\\0", "\\t", "\\n", "\\b"], c:0},
+  qt5:{q:'Structure definition is terminated by', o:[':', '}', ';', '::'], c:2},
+  qt6:{q:'What will happen when the structure is declared?', o:['It will not allocate any memory','It will allocate the memory','It will be declared and initialized','It will be only declared'], c:0},
+  qt7:{q:'struct Time { int hours; int minutes; int seconds; } t;  Which refers to seconds?', o:['Time.seconds','Time::seconds','seconds','t.seconds'], c:3},
+  qt8:{q:'Which of the following is a properly defined structure?', o:['struct {int num;}','struct sum {int num;}','struct sum int sum;','struct sum {int num;};'], c:3},
+  qt9:{q:'struct employee{int empno; char ename[10];} e[5];  Which statement is correct?', o:['cout<<e[0].empno<<e[0].ename;','cout<<e[0].empno<<ename;','cout<<e[0]->empno<<e[0]->ename;','cout<<e.empno<<e.ename;'], c:0},
+  qt10:{q:'When accessing a structure member, the identifier to the LEFT of the dot operator is the name of', o:['structure variable','structure tag','structure member','structure function'], c:0},
+};
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">Exam Preparation</div>
+    <h2>Chapter 12 Exam Preparation</h2>
+    <div class="goals"><b>Goal:</b> A fast, focused revision of every exam-worthy idea in this chapter.</div>
+  </div>
+
+  <div class="card">
+    <h3>🧠 Must Know</h3>
+    <ul>
+      <li>An array is a collection of same-type variables under one common name; indexing starts at 0.</li>
+      <li>A string in C++ is a character array ending with <span class="mono">'\\0'</span>; there is no basic "string" data type (object-based <span class="mono">string</span> type aside).</li>
+      <li>A 2-D array needs row-size and column-size; column size is compulsory, row size is optional.</li>
+      <li>C++ stores 2-D arrays in <b>row-major order</b> by default.</li>
+      <li>An array of strings is really a 2-D character array (rows = number of strings, columns = max length).</li>
+      <li>A structure groups <b>different</b> data types into one unit; members are accessed with the dot (.) operator.</li>
+      <li>Structure assignment (<span class="mono">obj2 = obj1;</span>) only works between objects of the <b>same</b> structure type.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📐 Must Remember — Syntax Cheat Sheet</h3>
+    <div class="code-box">int num[10];                              // 1-D array declaration
+int age[5] = {19,21,16,1,50};             // 1-D array initialization
+char country[6] = "INDIA";                // character array (string)
+int A[3][4];                              // 2-D array declaration
+int matrix[4][3] = {{10,20,30}, ...};     // 2-D array initialization
+char Name[6][10] = {"...", "..."};        // array of strings
+struct Student { long rollno; int age; float weight; };  // structure
+struct Student balu;                      // structure object
+balu.rollno = 702016;                     // accessing a member
+balu = {702016, 18, 48.5};                // structure initialization
+praveen = mahesh;                         // structure assignment</div>
+  </div>
+
+  <div class="card">
+    <h3>💻 Important Programs</h3>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" data-goto="arrinit">Input values while execution</button>
+      <button class="btn btn-ghost btn-sm" data-goto="arraccess">Odd/Even counting</button>
+      <button class="btn btn-ghost btn-sm" data-goto="arrsearch">Linear Search</button>
+      <button class="btn btn-ghost btn-sm" data-goto="strpalin">Palindrome Check</button>
+      <button class="btn btn-ghost btn-sm" data-goto="twodimadd">Matrix Addition</button>
+      <button class="btn btn-ghost btn-sm" data-goto="arrstrings">Array of Strings (colours)</button>
+      <button class="btn btn-ghost btn-sm" data-goto="structinit">Student Structure Read &amp; Display</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Common Exam Questions <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(from the textbook's own Evaluation section)</span></h3>
+    <ul>
+      <li>Define an Array. What are the types?</li>
+      <li>Write a note on Array of strings.</li>
+      <li>How to access members of a structure? Give an example.</li>
+      <li>What is called anonymous structure? Give an example.</li>
+      <li>Write a C++ program to find the difference between two matrices.</li>
+      <li>Write a C++ program to add two distances using a given structure definition.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ One-Minute Revision</h3>
+    <ul style="columns:2;column-gap:24px;">
+      <li>Array index starts at 0</li>
+      <li>Array = same type; Structure = mixed types</li>
+      <li>String ends with '\\0'</li>
+      <li>2-D array: [row][col], col compulsory</li>
+      <li>Row-major = default storage order</li>
+      <li>Array of strings = 2-D char array</li>
+      <li>struct ends with a semicolon ;</li>
+      <li>Dot operator (.) accesses members</li>
+      <li>Structure assignment needs same type</li>
+      <li>C++ is case-sensitive everywhere</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📝 Quick Test <span style="font-size:.75rem;color:var(--muted);font-weight:500;">(Textbook Evaluation, Section A — all 10 MCQs, scored)</span></h3>
+    <div id="quickTestWrap"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="qtScoreBtn">🏁 Show My Score</button></div>
+    <div id="qtScoreOut" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test</h3>
+    <div class="q-block">
+      <span class="q-meta tier-red">🔴 Challenge</span>
+      <div class="q-text">Write a C++ program to find the difference between two matrices. (Textbook Evaluation, Section D, Q1)</div>
+      <div class="btn-row"><button class="btn btn-ghost btn-sm" data-ch="diff">💡 Hint</button><button class="btn btn-ghost btn-sm" data-ch2="diff">✅ Show Suggested Solution</button></div>
+      <div class="explain-box" id="chHint-diff">Hint: this is almost identical to the Matrix Addition program you already studied — only the arithmetic operator changes.</div>
+      <div class="explain-box" id="chSol-diff"><div class="code-cap">Suggested Solution (adapted from the Matrix Addition program)</div><div class="code-box" id="chCodeDiff"></div></div>
+    </div>
+    <div class="q-block">
+      <span class="q-meta tier-red">🔴 Challenge</span>
+      <div class="q-text">Write a C++ program to add two distances using: struct Distance{ int feet; float inch; } d1, d2, sum; (Textbook Evaluation, Section D, Q2)</div>
+      <div class="btn-row"><button class="btn btn-ghost btn-sm" data-ch="dist">💡 Hint</button><button class="btn btn-ghost btn-sm" data-ch2="dist">✅ Show Suggested Solution</button></div>
+      <div class="explain-box" id="chHint-dist">Hint: add feet to feet and inch to inch separately. Since 12 inches = 1 foot, if the summed inch reaches 12 or more, subtract 12 from it and carry 1 over to feet.</div>
+      <div class="explain-box" id="chSol-dist"><div class="code-cap">Suggested Solution</div><div class="code-box" id="chCodeDist"></div></div>
+    </div>
+  </div>
+  `;
+}
+function wireExamPrep(){
+  document.querySelectorAll('[data-goto]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      const idx = TOPICS.findIndex(t=>t.id===this.dataset.goto);
+      if(idx>-1) goTo(idx);
+    });
+  });
+
+  let html = '';
+  Object.keys(QUICKTEST_QS).forEach(k=> html += mcqHTML(k, QUICKTEST_QS[k], 'tier-green', ''));
+  document.getElementById('quickTestWrap').innerHTML = html;
+  wireMCQ('#quickTestWrap', QUICKTEST_QS);
+
+  document.getElementById('qtScoreBtn').addEventListener('click', ()=>{
+    let score = 0;
+    Object.keys(QUICKTEST_QS).forEach(k=>{
+      const block = document.getElementById('block-'+k);
+      if(block && block.querySelector('.opt.correct.incorrect')) { /* n/a */ }
+    });
+    Object.keys(QUICKTEST_QS).forEach(k=>{
+      const block = document.getElementById('block-'+k);
+      if(!block) return;
+      const chosenCorrect = block.querySelector('.opt.correct') && block.dataset.answered && !block.querySelector('.opt.incorrect');
+      if(chosenCorrect) score++;
+    });
+    const pct = Math.round(score/10*100);
+    document.getElementById('qtScoreOut').innerHTML = `<span class="score-pill">Score: ${score} / 10 (${pct}%)</span> ${score>=8?'🌟 Excellent!':score>=5?'👍 Good — review the missed ones above.':'📘 Revisit the topics above and try again.'}`;
+  });
+
+  document.getElementById('chCodeDiff').innerHTML = esc(CODE_MATRIX_DIFF);
+  document.getElementById('chCodeDist').innerHTML = esc(CODE_DISTANCE);
+  document.querySelectorAll('[data-ch]').forEach(btn=> btn.addEventListener('click', function(){ document.getElementById('chHint-'+this.dataset.ch).classList.toggle('show'); }));
+  document.querySelectorAll('[data-ch2]').forEach(btn=> btn.addEventListener('click', function(){ document.getElementById('chSol-'+this.dataset.ch2).classList.toggle('show'); }));
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+setLang(state.lang || 'en');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
