@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>பாடம் 11 — தரவுத்தள கருத்துகள் (Database Concepts) | Computer Science Learning Lab</title>
+<style>
+  :root{
+    --bg:#f6f1f7;
+    --card:#ffffff;
+    --primary:#8b2f97;
+    --primary-dark:#5e1f68;
+    --primary-light:#f3e5f7;
+    --accent:#c0407e;
+    --accent-light:#fdeaf3;
+    --correct:#15803d;
+    --correct-bg:#eafaf0;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecec;
+    --warn:#c2651b;
+    --warn-bg:#fff3e6;
+    --text:#241a2b;
+    --muted:#6b5c72;
+    --border:#e6d9ea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Tamil','Latha','Nirmala UI','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{line-height:1.45;}
+  a{color:var(--primary);}
+  button{font-family:inherit;}
+  .app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+  /* ---- Header ---- */
+  header.top{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:#fff;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:40;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header.top .burger{
+    background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    width:40px;height:40px;font-size:1.2rem;cursor:pointer;flex:0 0 auto;
+    display:none;align-items:center;justify-content:center;
+  }
+  header.top .title-wrap{flex:1;min-width:0;}
+  header.top h1{margin:0;font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.top p{margin:0;font-size:.75rem;color:#f3dcee;}
+  header.top .lang-toggle{
+    display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;flex:0 0 auto;
+  }
+  header.top .lang-toggle button{
+    border:none;background:transparent;color:#fbeefa;padding:6px 12px;border-radius:999px;
+    font-size:.8rem;font-weight:700;cursor:pointer;
+  }
+  header.top .lang-toggle button.active{background:#fff;color:var(--primary-dark);}
+
+  .body-row{display:flex;flex:1;min-height:0;}
+
+  /* ---- Sidebar ---- */
+  nav.sidebar{
+    width:280px;flex:0 0 auto;background:#fff;border-right:1px solid var(--border);
+    padding:16px 10px 90px;overflow-y:auto;
+  }
+  nav.sidebar .progress-wrap{padding:6px 8px 16px;}
+  nav.sidebar .progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:6px;}
+  nav.sidebar .progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;}
+  nav.sidebar .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s;}
+  .topic-btn{
+    display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:10px;padding:10px 10px;margin-bottom:4px;
+    cursor:pointer;font-size:.92rem;color:var(--text);
+  }
+  .topic-btn:hover{background:var(--primary-light);}
+  .topic-btn.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+  .topic-btn .num{flex:0 0 auto;font-size:.72rem;color:var(--muted);background:#eee3f0;border-radius:6px;padding:2px 6px;min-width:50px;text-align:center;}
+  .topic-btn.active .num{background:var(--primary);color:#fff;}
+  .topic-btn .chk{flex:0 0 auto;margin-left:auto;color:var(--correct);font-weight:800;}
+  .sidebar-section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 8px 6px;}
+
+  .sidebar-backdrop{display:none;}
+
+  /* ---- Main ---- */
+  main.content{flex:1;min-width:0;padding:22px 20px 110px;overflow-y:auto;}
+  .content-inner{max-width:920px;margin:0 auto;}
+  .topic-header{margin-bottom:18px;}
+  .topic-header .crumb{font-size:.8rem;color:var(--muted);margin-bottom:4px;}
+  .topic-header h2{margin:0 0 6px;font-size:1.5rem;color:var(--primary-dark);}
+  .topic-header .goals{background:var(--primary-light);border-radius:12px;padding:12px 16px;font-size:.92rem;}
+  .topic-header .goals b{color:var(--primary-dark);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(50,20,55,.05);
+  }
+  .card h3{margin-top:0;color:var(--primary-dark);font-size:1.12rem;}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:6px;}
+
+  .tb-def{background:#f3eaff;border-left:5px solid #7c3aed;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .tb-def .lbl{font-weight:800;color:#5b21b6;font-size:.82rem;margin-bottom:4px;display:block;}
+  .easy{background:var(--primary-light);border-left:5px solid var(--primary);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .easy .lbl{font-weight:800;color:var(--primary-dark);font-size:.82rem;margin-bottom:4px;display:block;}
+  .analogy{background:#fff7ed;border-left:5px solid #ea580c;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .analogy .lbl{font-weight:800;color:#c2410c;font-size:.82rem;margin-bottom:4px;display:block;}
+  .example-box{background:var(--accent-light);border-left:5px solid var(--accent);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .example-box .lbl{font-weight:800;color:#9d174d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .activity-box{background:#ecfeff;border-left:5px solid #0891b2;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .activity-box .lbl{font-weight:800;color:#0e7490;font-size:.82rem;margin-bottom:4px;display:block;}
+  .mistake-box{background:var(--warn-bg);border-left:5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .mistake-box .lbl{font-weight:800;color:var(--warn);font-size:.82rem;margin-bottom:4px;display:block;}
+  .exam-point{background:#fdf2f8;border-left:5px solid #db2777;border-radius:10px;padding:12px 16px;margin:12px 0;}
+  .exam-point .lbl{font-weight:800;color:#be185d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .tryit-box{background:#f0fdf4;border:2px dashed #16a34a;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .tryit-box .lbl{font-weight:800;color:#15803d;font-size:.82rem;margin-bottom:4px;display:block;}
+  .quickcheck{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .quickcheck .lbl{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:4px;display:block;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.tbl th{background:var(--primary-light);color:var(--primary-dark);}
+  table.tbl tr:nth-child(even) td{background:#fbf7fc;}
+  .tbl-wrap{overflow-x:auto;}
+
+  .eng{color:var(--muted);font-weight:600;}
+  code, .mono{font-family:'JetBrains Mono',Consolas,Menlo,monospace;background:#f1e7f4;padding:1px 6px;border-radius:6px;font-size:.9em;}
+
+  /* Diagrams */
+  .diagram-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;}
+  .diagram-cap{text-align:center;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .flow-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .flow-node{background:var(--primary-light);border:2px solid var(--primary);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:700;text-align:center;color:var(--primary-dark);min-width:100px;}
+  .flow-node.active{background:var(--primary);color:#fff;transform:scale(1.07);box-shadow:0 4px 14px rgba(139,47,151,.4);}
+  .flow-node.muted{opacity:.45;}
+  .flow-node.ellipse{border-radius:50%;background:#fff7ed;border-color:#ea580c;color:#9a3412;padding:14px 10px;min-width:70px;}
+  .flow-node.diamond-wrap{background:none;border:none;padding:0;min-width:0;}
+  .flow-node.leaf{background:#ecfdf5;border-color:#16a34a;color:#166534;}
+  .diamond{width:90px;height:60px;background:#fff3e0;border:2px solid #ea580c;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;margin:14px auto;}
+  .diamond span{transform:rotate(-45deg);font-size:.78rem;font-weight:800;color:#9a3412;text-align:center;}
+  .flow-arrow{font-size:1.3rem;color:var(--muted);}
+  .flow-arrow.active{color:var(--accent);font-weight:900;}
+  .flow-down{font-size:1.3rem;color:var(--muted);text-align:center;width:100%;}
+  .map-tree{list-style:none;padding:0;margin:0;text-align:center;}
+  .map-tree li{margin:4px 0;}
+
+  /* Model gallery / relationship / algebra tabs */
+  .tab-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .tab-btn{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--text);}
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  /* Buttons */
+  .btn{border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,opacity .15s;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-ghost{background:#f1e7f4;color:var(--text);}
+  .btn-ghost:hover{background:#e5d4ea;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  select, input[type=text]{
+    font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.92rem;
+  }
+
+  /* MCQ option styling (shared) */
+  .q-block{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .q-block .q-meta{font-size:.72rem;font-weight:800;color:#fff;background:var(--muted);display:inline-block;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+  .q-block .q-meta.tier-green{background:#16a34a;}
+  .q-block .q-meta.tier-yellow{background:#d97706;}
+  .q-block .q-meta.tier-red{background:#dc2626;}
+  .q-text{font-weight:700;margin-bottom:10px;}
+  .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;background:#fbfafc;}
+  .opt:hover{border-color:var(--primary);background:var(--primary-light);}
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .opt .letter{width:24px;height:24px;border-radius:50%;background:#efe4f1;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex:0 0 auto;}
+  .opt.correct .letter{background:var(--correct);color:#fff;}
+  .opt.incorrect .letter{background:var(--incorrect);color:#fff;}
+  .feedback-line{font-size:.85rem;font-weight:700;margin-top:6px;min-height:1.2em;}
+  .feedback-line.ok{color:var(--correct);}
+  .feedback-line.bad{color:var(--incorrect);}
+  .explain-box{display:none;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.85rem;}
+  .explain-box.show{display:block;}
+  .hint-btn{background:#fff7ed;border:1px dashed #ea580c;color:#9a3412;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;margin-bottom:8px;}
+  .hint-text{display:none;font-size:.82rem;color:#9a3412;background:#fff7ed;border-radius:8px;padding:8px 10px;margin-bottom:8px;}
+  .hint-text.show{display:block;}
+
+  details.acc{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;background:#fafbfc;}
+  details.acc[open] summary{background:var(--primary-light);color:var(--primary-dark);}
+  details.acc .acc-body{padding:12px 16px;}
+
+  .fib-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:.92rem;}
+  .fib-row input{width:200px;}
+
+  /* Debugging / misconception cards */
+  .misc-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+  .misc-wrong{background:var(--incorrect-bg);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:.9rem;}
+  .misc-right{display:none;background:var(--correct-bg);border-radius:8px;padding:10px 12px;font-size:.9rem;}
+  .misc-right.show{display:block;}
+
+  /* Database structure simulator */
+  .db-table-wrap{overflow-x:auto;}
+  table.db-sim{border-collapse:collapse;width:100%;margin:10px 0;}
+  table.db-sim th, table.db-sim td{border:2px solid var(--border);padding:10px 12px;font-size:.9rem;text-align:left;cursor:pointer;transition:background .15s;}
+  table.db-sim th{background:#eee0f2;color:var(--primary-dark);font-weight:800;}
+  table.db-sim th.col-hl, table.db-sim td.col-hl{background:#c7f9e7 !important;}
+  table.db-sim tr.row-hl td{background:#ffe8b8 !important;}
+  table.db-sim.relation-hl{outline:3px solid var(--accent);outline-offset:4px;}
+  .sim-caption{font-size:.85rem;color:var(--muted);margin-top:6px;}
+
+  /* Predict game */
+  .predict-opt{border:1.5px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;background:#fbfafc;}
+  .predict-opt:hover{border-color:var(--primary);}
+  .predict-opt.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .predict-opt.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .predict-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;}
+  table.mini{border-collapse:collapse;width:100%;font-size:.78rem;}
+  table.mini th, table.mini td{border:1px solid var(--border);padding:4px 6px;}
+  table.mini th{background:var(--primary-light);}
+
+  /* Log panel (step-by-step execution trace) */
+  .log-panel{background:#241129;color:#f3e4f7;border-radius:10px;padding:12px 14px;font-family:monospace;font-size:.82rem;max-height:260px;overflow-y:auto;margin-top:10px;}
+  .log-panel .ln{margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #5c3763;}
+  .log-panel .ln:last-child{border-bottom:none;}
+  .log-panel .ln .step-no{color:#f0abfc;font-weight:700;}
+  .log-panel .ln.keep{color:#86efac;}
+  .log-panel .ln.drop{color:#fca5a5;}
+  .log-empty{color:#9ca3af;font-style:italic;}
+
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .chip{background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:999px;padding:6px 14px;font-size:.8rem;font-weight:700;cursor:pointer;}
+  .chip:hover{background:var(--primary);color:#fff;}
+
+  /* Bottom bar */
+  .bottom-bar{
+    position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;z-index:30;
+  }
+  .bottom-bar .mark-btn{background:var(--correct-bg);color:var(--correct);}
+  .bottom-bar .mark-btn.done{background:var(--correct);color:#fff;}
+
+  footer.note{text-align:center;font-size:.72rem;color:#9aa6b2;padding:10px;background:#fff;border-top:1px solid var(--border);}
+
+  @media (max-width:860px){
+    nav.sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:60;transform:translateX(-100%);
+      transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    }
+    nav.sidebar.open{transform:translateX(0);}
+    header.top .burger{display:flex;}
+    .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
+    main.content{padding:16px 12px 100px;}
+    .topic-header h2{font-size:1.25rem;}
+    .predict-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    header.top h1{font-size:.92rem;}
+    .flow-node{min-width:80px;font-size:.78rem;padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="top">
+    <button class="burger" id="burgerBtn" aria-label="பட்டி">☰</button>
+    <div class="title-wrap">
+      <h1>Computer Science Learning Lab · Class 12 · Tamil Nadu State Board</h1>
+      <p>பாடம் 11 — தரவுத்தள கருத்துகள் (Database Concepts)</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Interface language">
+      <button id="langTa" class="active" data-lang="ta">தமிழ்</button>
+      <button id="langEn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <div class="body-row">
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="பாட பட்டியல்">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>முன்னேற்றம் / Progress</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="sidebar-section-label">தலைப்புகள் (Topics)</div>
+      <div id="topicList"></div>
+    </nav>
+
+    <main class="content">
+      <div class="content-inner" id="mainContent"></div>
+    </main>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" id="prevTopicBtn">⬅ முந்தையது</button>
+    <button class="btn mark-btn" id="markCompleteBtn">✔ Mark Complete</button>
+    <button class="btn btn-primary" id="nextTopicBtn">அடுத்தது ➡</button>
+  </div>
+  <footer class="note">Vagai Sudar · Class 12 Computer Science · Chapter 11: Database Concepts · தமிழக அரசு பாடநூல் அடிப்படையில் · ஆஃப்லைன் கற்றல் கூடம்</footer>
+</div>
+
+<script>
+/* =========================================================================
+   STORAGE (safe wrapper)
+   ========================================================================= */
+const STORE_KEY = 'cs12_dbconcepts_lab_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* storage unavailable - continue with defaults */ }
+  return { completed:[], lang:'ta', quiz:{} };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+let state = loadState();
+
+/* =========================================================================
+   TOPIC DATA
+   ========================================================================= */
+const TOPICS = [
+  {id:'intro',         num:'Intro',    title:'அறிமுகம் & கருத்து வரைபடம்'},
+  {id:'foundation',    num:'11.1-11.3',title:'தரவு, தகவல் & தரவுத்தளம்'},
+  {id:'dbms',          num:'11.4',     title:'DBMS & RDBMS'},
+  {id:'components',    num:'11.4.4',   title:'DBMS கூறுகள்'},
+  {id:'structure',     num:'11.5',     title:'தரவுத்தள அமைப்பு'},
+  {id:'models',        num:'11.6',     title:'தரவு மாதிரிகள் (Data Models)'},
+  {id:'users',         num:'11.6.2',   title:'DBMS பயனர் வகைகள்'},
+  {id:'compare',       num:'11.7',     title:'DBMS vs RDBMS'},
+  {id:'relationships', num:'11.8',     title:'உறவுமுறை வகைகள்'},
+  {id:'algebra',       num:'11.9',     title:'Relational Algebra'},
+  {id:'practice',      num:'Practice', title:'பயிற்சி & Debugging Lab'},
+  {id:'examprep',      num:'Exam',     title:'தேர்வு தயாரிப்பு'},
+];
+let currentIdx = 0;
+
+/* =========================================================================
+   SIDEBAR / NAV RENDERING
+   ========================================================================= */
+function renderSidebar(){
+  const wrap = document.getElementById('topicList');
+  wrap.innerHTML = '';
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === currentIdx ? ' active' : '');
+    const done = state.completed.includes(t.id);
+    btn.innerHTML = '<span class="num">'+t.num+'</span><span>'+t.title+'</span>' + (done ? '<span class="chk">✔</span>' : '');
+    btn.addEventListener('click', () => { goTo(i); closeSidebarMobile(); });
+    wrap.appendChild(btn);
+  });
+  const pct = Math.round((state.completed.length / TOPICS.length) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function goTo(i){
+  currentIdx = Math.max(0, Math.min(TOPICS.length - 1, i));
+  renderMain();
+  renderSidebar();
+  updateBottomBar();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('main.content').scrollTo({top:0, behavior:'smooth'});
+}
+function goToTopicId(id){
+  const i = TOPICS.findIndex(t => t.id === id);
+  if(i >= 0) goTo(i);
+}
+
+function updateBottomBar(){
+  document.getElementById('prevTopicBtn').disabled = currentIdx === 0;
+  document.getElementById('nextTopicBtn').disabled = currentIdx === TOPICS.length - 1;
+  const markBtn = document.getElementById('markCompleteBtn');
+  const done = state.completed.includes(TOPICS[currentIdx].id);
+  markBtn.classList.toggle('done', done);
+  markBtn.textContent = done ? '✔ முடிந்தது (Completed)' : '✔ Mark Complete';
+}
+
+document.getElementById('prevTopicBtn').addEventListener('click', () => goTo(currentIdx - 1));
+document.getElementById('nextTopicBtn').addEventListener('click', () => goTo(currentIdx + 1));
+document.getElementById('markCompleteBtn').addEventListener('click', () => {
+  const id = TOPICS[currentIdx].id;
+  const idx = state.completed.indexOf(id);
+  if(idx === -1) state.completed.push(id); else state.completed.splice(idx,1);
+  saveState();
+  renderSidebar();
+  updateBottomBar();
+});
+
+/* mobile sidebar */
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+document.getElementById('burgerBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', closeSidebarMobile);
+function closeSidebarMobile(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+
+/* language toggle (UI chrome only; lesson text follows textbook Tamil with English technical terms inline, since DB terms such as DBMS, RDBMS, SELECT, PROJECT, relation, tuple, attribute always stay in English) */
+document.getElementById('langTa').addEventListener('click', () => setLang('ta'));
+document.getElementById('langEn').addEventListener('click', () => setLang('en'));
+function setLang(l){
+  state.lang = l; saveState();
+  document.getElementById('langTa').classList.toggle('active', l==='ta');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.body.setAttribute('data-lang', l);
+}
+
+/* =========================================================================
+   SHARED RELATIONAL ALGEBRA DATA (Textbook Tables 11.1 / 11.2 / 11.3)
+   ========================================================================= */
+const STUDENT = [
+  {no:'cs1', name:'Kannan',        course:'Big Data',           year:'II'},
+  {no:'cs2', name:'Gowri Shankar', course:'R language',         year:'I'},
+  {no:'cs3', name:'Lenin',         course:'Big Data',           year:'I'},
+  {no:'cs4', name:'Padmaja',       course:'Python Programming', year:'I'},
+];
+const TABLE_A = [ {no:'cs1', name:'Kannan'}, {no:'cs3', name:'Lenin'}, {no:'cs4', name:'Padmaja'} ];
+const TABLE_B = [ {no:'cs1', name:'Kannan'}, {no:'cs2', name:'GowriShankarn'}, {no:'cs3', name:'Lenin'} ];
+const CART_A  = [ {no:'cs1', name:'Kannan'}, {no:'cs2', name:'Gowri Shankar'}, {no:'cs4', name:'Padmaja'} ];
+const CART_B  = [ {code:'cs28', subject:'Big Data'}, {code:'cs62', subject:'R language'}, {code:'cs25', subject:'python programming'} ];
+const COL_LABEL = {no:'Studno', name:'Name', course:'Course', year:'Year', code:'Course', subject:'Subject'};
+
+function buildTable(rows, cols, rowClassFn){
+  let h = '<div class="tbl-wrap"><table class="tbl mini"><tr>' + cols.map(c=>'<th>'+COL_LABEL[c]+'</th>').join('') + '</tr>';
+  rows.forEach((r,i) => {
+    const cls = rowClassFn ? rowClassFn(r,i) : '';
+    h += '<tr class="'+cls+'">' + cols.map(c=>'<td>'+r[c]+'</td>').join('') + '</tr>';
+  });
+  h += '</table></div>';
+  return h;
+}
+
+/* =========================================================================
+   MAIN RENDER DISPATCH
+   ========================================================================= */
+const RENDERERS = {
+  intro: renderIntro,
+  foundation: renderFoundation,
+  dbms: renderDbms,
+  components: renderComponents,
+  structure: renderStructure,
+  models: renderModels,
+  users: renderUsers,
+  compare: renderCompare,
+  relationships: renderRelationships,
+  algebra: renderAlgebra,
+  practice: renderPractice,
+  examprep: renderExamPrep,
+};
+
+function renderMain(){
+  const t = TOPICS[currentIdx];
+  const el = document.getElementById('mainContent');
+  el.innerHTML = RENDERERS[t.id]();
+  wireUpHandlers(t.id);
+}
+
+/* =========================================================================
+   TOPIC 1 — Introduction & Concept Map
+   ========================================================================= */
+function renderIntro(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › அறிமுகம்</div>
+    <h2>தரவுத்தள கருத்துகள் <span class="eng">(Database Concepts)</span></h2>
+    <div class="goals">
+      <b>கற்றலின் நோக்கங்கள் (Learning Objectives — பாடநூல்):</b>
+      இப்பாடம் முடிவில் மாணவர் பின்வருவனவற்றை அறிந்து கொள்வர் — தரவுத்தளம் (database) மற்றும் தொடர்புடைய தரவுத்தளத்தின் (relational database) கருத்து · தரவுத்தளத்தின் வெவ்வேறு கூறுகள் (components) · தரவுத்தள மாதிரிகளின் வகைகள் (types of database models) · உறவுமுறை வகைகள் (types of relationship) · தொடர்புடைய இயற்கணிதத்தின் (relational algebra) கருத்துகள்.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📘 இந்த Learning Lab-ஐ எப்படி பயன்படுத்துவது?</h3>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      இடப்புறம் உள்ள பட்டியலில் (sidebar) உள்ள தலைப்புகளைத் தொடர்ச்சியாகப் படியுங்கள். ஒவ்வொரு தலைப்பிலும் — பாடநூல் வரையறை 📘, எளிய விளக்கம் 💡, நிஜ வாழ்க்கை ஒப்புமை 🔗, கற்றல் உருவகப்படுத்துதல் (simulation) 🧪, தேர்வுக் குறிப்பு ⭐ மற்றும் விரைவு சோதனை ✅ ஆகியவை இடம்பெற்றுள்ளன. ஒரு தலைப்பை முடித்தவுடன் கீழே உள்ள <b>"✔ Mark Complete"</b> பொத்தானை அழுத்தினால் உங்கள் முன்னேற்றம் (progress) சேமிக்கப்படும் (இந்த உலாவியில் மட்டும்).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🗺️ கருத்து வரைபடம் (Concept Map)</h3>
+    <p>இந்த அதிகாரத்தின் கருத்துகள் ஒன்றன்மேல் ஒன்று சார்ந்தவை (prerequisite). கீழே உள்ள வரிசையில் படிப்பது சிறந்தது:</p>
+    <div class="diagram-box">
+      <ul class="map-tree">
+        <li><span class="flow-node">1. தரவு (Data) → தகவல் (Information)</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node">2. தரவுத்தளம் (Database) → DBMS → RDBMS</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node">3. DBMS இன் 5 கூறுகள் (Components)</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node">4. தரவுத்தள அமைப்பு — Relation / Tuple / Attribute</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node">5. தரவு மாதிரிகள் — Hierarchical, Relational, Network, ER, Object</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node">6. DBMS பயனர்கள் &amp; DBMS vs RDBMS</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node">7. உறவுமுறைகள் — 1:1, 1:N, N:1, N:N</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node active">8. Relational Algebra — σ, ∏, ∪, ∩, −, ×</span></li>
+        <li class="flow-down">↓</li>
+        <li><span class="flow-node leaf">9. பயிற்சி &amp; தேர்வு தயாரிப்பு</span></li>
+      </ul>
+      <div class="diagram-cap">இந்த அதிகாரத்தின் கற்றல் வரிசை (learning hierarchy) — பாடநூலின் தலைப்பு வரிசையை அடிப்படையாகக் கொண்டது</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔑 இந்த அதிகாரத்தில் காணும் முக்கிய குறியீடுகள் (Symbols)</h3>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <tr><th>செயல்பாடு (Operation)</th><th>குறியீடு (Symbol)</th><th>பகுதி (Section)</th></tr>
+      <tr><td>SELECT</td><td class="mono">σ</td><td>11.9</td></tr>
+      <tr><td>PROJECT</td><td class="mono">∏</td><td>11.9</td></tr>
+      <tr><td>UNION</td><td class="mono">∪</td><td>11.9</td></tr>
+      <tr><td>INTERSECTION</td><td class="mono">∩</td><td>11.9</td></tr>
+      <tr><td>DIFFERENCE</td><td class="mono">−</td><td>11.9</td></tr>
+      <tr><td>CARTESIAN PRODUCT</td><td class="mono">X</td><td>11.9</td></tr>
+    </table>
+    </div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 2 — 11.1 Data, 11.2 Information, 11.3 Database
+   ========================================================================= */
+function renderFoundation(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.1 – 11.3</div>
+    <h2>தரவு, தகவல் &amp; தரவுத்தளம் <span class="eng">(Data, Information &amp; Database)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>11.1 தரவு (Data)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      Data are raw facts stored in a computer. A data may contain any character, text, word or a number.<br>
+      <b>எ.கா. (Example):</b> <span class="mono">600006, DPI Campus, SCERT, Chennai, College Road</span>
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      தரவு (Data) என்பது கணினியில் சேமிக்கப்படும் மூலக் கூறுகள் (raw facts) — எண்களாகவோ, சொற்களாகவோ இருக்கலாம். இவை தனித்தனியாக இருக்கும்போது அதிக அர்த்தம் தராது.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.2 தகவல் (Information)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      Information is processed data, which allows to be utilized in a significant way.
+    </div>
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-col">
+          <div class="flow-node muted">600006</div>
+          <div class="flow-node muted">DPI Campus</div>
+          <div class="flow-node muted">SCERT</div>
+          <div class="flow-node muted">Chennai</div>
+          <div class="flow-node muted">College Road</div>
+          <div class="diagram-cap">தரவு (Data) — தனித்தனி சொற்கள்/எண்கள்</div>
+        </div>
+        <div class="flow-arrow">⟶<br><small>process &amp;<br>organize</small></div>
+        <div class="flow-col">
+          <div class="flow-node active">SCERT<br>College Road<br>DPI Campus<br>Chennai 600006</div>
+          <div class="diagram-cap">தகவல் (Information) — SCERT நிறுவனத்தின் முகவரி</div>
+        </div>
+      </div>
+      <div class="diagram-cap">படம் — பாடநூலின் உதாரணம்: தரவு செயலாக்கப்பட்டு (processed), ஒழுங்கமைக்கப்பட்டு (organized), வடிவமைக்கப்படும்போது (formatted) அது அர்த்தமுள்ள தகவலாக மாறுகிறது</div>
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      மேலே உள்ள உதாரணத்தில், ஒவ்வொரு சொல்லும் (SCERT, College Road...) தனித்தனியே தரவு (data) தான். ஆனால் அவை சேர்ந்து, முறையாக வரிசைப்படுத்தப்படும்போது — அது SCERT நிறுவனத்தின் முழு முகவரி (contact address) என்ற அர்த்தமுள்ள தகவலாக (information) மாறுகிறது.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      Data = unprocessed, no meaning · Information = processed, organized, formatted data = meaningful.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.3 தரவுத்தளம் (Database)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      A database is an organized collection of data, generally stored and accessed electronically from a computer system. The term "database" is also used to refer to any of the DBMS, the database system or an application associated with the database.<br><br>
+      Database is a repository collection of related data organized in a way that data can be easily accessed, managed and updated. Database can be a software or hardware based, with one sole purpose of storing data.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 நிஜ வாழ்க்கை ஒப்புமை (பாடநூல் உதாரணம்)</span>
+      A school class register is a database where names are arranged alphabetically. Databases have been around since people started recording things — இங்கு நாம் மின்னணு தரவுத்தளங்களில் (electronic databases) கவனம் செலுத்துகிறோம்.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை (Quick Check)</span>
+    <div id="qc-foundation"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 3 — 11.4 DBMS, 11.4.1 RDBMS, 11.4.2 Characteristics, 11.4.3 Advantages
+   ========================================================================= */
+function renderDbms(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.4</div>
+    <h2>DBMS &amp; RDBMS</h2>
+    <div class="goals">முன் தேவை: தரவு, தகவல் &amp; தரவுத்தளம்</div>
+  </div>
+
+  <div class="card">
+    <h3>11.4 DataBase Management System (DBMS)</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      A DBMS is a software that allows us to create, define and manipulate database, allowing users to store, process and analyze data easily. DBMS provides us with an interface or a tool, to perform various operations to create a database, storing of data and for updating data, etc. DBMS also provides protection and security to the databases. It also maintains data consistency in case of multiple users.<br>
+      <b>Examples of DBMS softwares:</b> Foxpro, dbase.
+    </div>
+    <div class="analogy">
+      <span class="lbl">🔗 எளிய ஒப்புமை (Easy Explanation)</span>
+      DBMS என்பது ஒரு தரவுத்தளத்துடன் பேசுவதற்கான "இடைமுகம்" (interface) போன்றது — நீங்கள் நேரடியாக கோப்பில் (file) தரவை எழுதவோ, தேடவோ தேவையில்லை; DBMS அதைப் பாதுகாப்பாகவும் முறையாகவும் செய்து தரும்.
+    </div>
+
+    <h4>11.4.1 Relational Database Management System (RDBMS)</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      RDBMS is more advanced version of DBMS, that allows to data in a more efficient way. It is used to store and manupulate the data that are in the form of tables.<br>
+      <b>Example of RDBMS:</b> MySQL, Oracle, MS-Access etc.
+    </div>
+    <div class="mistake-box">
+      <span class="lbl">⚠️ பொதுவான தவறு (Common Misconception)</span>
+      DBMS, RDBMS இரண்டும் ஒன்றே என நினைப்பது தவறு. DBMS ஒரு பொதுவான தரவுத்தள மென்பொருள் (எ.கா. FoxPro, dbase); RDBMS அதைவிட மேம்பட்டது — தரவை அட்டவணைகளாக (tables) சேமிக்கிறது, Normalization மூலம் redundancy-ஐ குறைக்கிறது, Keys பயன்படுத்துகிறது (எ.கா. MySQL, Oracle, MS-Access).
+    </div>
+
+    <h4>11.4.2 Characteristics of Relational Database Management System</h4>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <tr><th>பண்பு (Characteristic)</th><th>விளக்கம் (பாடநூல்)</th></tr>
+      <tr><td><b>1. Ability to manipulate data</b></td><td>RDBMS provides the facility to manipulate data (store, modify and delete) in a data base.</td></tr>
+      <tr><td><b>2. Reduced Redundancy</b></td><td>Hard drives were once expensive, so repetition of data was a big problem. RDBMS follows Normalisation which divides the data so that repetition is minimum.</td></tr>
+      <tr><td><b>3. Data Consistency</b></td><td>On live data, continuously updated and added — maintaining consistency can be a challenge, but RDBMS handles it by itself.</td></tr>
+      <tr><td><b>4. Support Multiple user &amp; Concurrent Access</b></td><td>RDBMS allows multiple users to work on it (update, insert, delete) at the same time and still maintains data consistency.</td></tr>
+      <tr><td><b>5. Query Language</b></td><td>RDBMS provides users with a simple query language, using which data can be easily fetched, inserted, deleted and updated.</td></tr>
+      <tr><td><b>6. Security</b></td><td>RDBMS takes care of security, protecting data from unauthorized access, using user accounts with different access permissions.</td></tr>
+      <tr><td><b>7. DBMS Supports Transactions</b></td><td>It allows us to better handle and manage data integrity in real world applications where multi-threading is extensively used.</td></tr>
+    </table>
+    </div>
+
+    <h4>11.4.3 Advantages of RDBMS</h4>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      <ul>
+        <li>Segregation of application program</li>
+        <li>Minimal data duplication or Data Redundancy</li>
+        <li>Easy retrieval of data using the Query Language</li>
+        <li>Reduced development time and maintenance</li>
+      </ul>
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      DBMS → Foxpro, dbase · RDBMS → MySQL, Oracle, MS-Access · RDBMS இன் 7 பண்புகளையும் வரிசையாக நினைவில் கொள்ளுங்கள்.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-dbms"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 4 — 11.4.4 Components of DBMS
+   ========================================================================= */
+function renderComponents(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.4.4</div>
+    <h2>DBMS இன் கூறுகள் <span class="eng">(Components of DBMS)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      The Database Management System can be divided into five major components: 1. Hardware 2. Software 3. Data 4. Procedures/Methods 5. Database Access Languages.
+    </div>
+
+    <div class="diagram-box">
+      <div class="flow-row">
+        <div class="flow-node">👤 USER</div>
+        <div class="flow-arrow">⇅</div>
+        <div class="flow-node">Database Access Languages</div>
+        <div class="flow-arrow">⇅<br><small>DATA</small></div>
+        <div class="flow-node active">Hardware + Software</div>
+        <div class="flow-arrow">⇅</div>
+        <div class="flow-node">Procedures / Methods</div>
+      </div>
+      <div class="diagram-cap">படம் 11.1 — DBMS இன் கூறுகள் (simplified recreation): USER, Database Access Languages மூலமாக DATA-வை Hardware+Software உடன் தொடர்பு கொள்கிறார்; Procedures/Methods இதை இயக்க வழிகாட்டுகிறது</div>
+    </div>
+
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <tr><th>கூறு (Component)</th><th>விளக்கம் (பாடநூல்)</th></tr>
+      <tr><td><b>1. Hardware</b></td><td>The computer, hard disk, I/O channels for data, and any other physical component involved in storage of data.</td></tr>
+      <tr><td><b>2. Software</b></td><td>This main component is a program that controls everything. The DBMS software is capable of understanding the Database Access Languages and interprets into database commands for execution.</td></tr>
+      <tr><td><b>3. Data</b></td><td>It is the resource for which DBMS is designed. DBMS creation is to store and utilize data.</td></tr>
+      <tr><td><b>4. Procedures/Methods</b></td><td>General instructions to use a database management system such as installation of DBMS, managing databases to take backups, report generation, etc.</td></tr>
+      <tr><td><b>5. DataBase Access Languages</b></td><td>The languages used to write commands to access, insert, update and delete data stored in any database.</td></tr>
+    </table>
+    </div>
+    <div class="example-box">
+      <span class="lbl">📎 உதாரணம் (Example — பாடநூல்)</span>
+      Examples of popular DBMS: Dbase, FoxPro.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-components"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 5 — 11.5 Database Structure (+ interactive table simulator)
+   ========================================================================= */
+function renderStructure(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.5</div>
+    <h2>தரவுத்தள அமைப்பு <span class="eng">(Database Structure)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      Table is the entire collection of related data in one table, referred to as a File or Table where the data is organized as row and column.<br>
+      Each row in a table represents a record, which is a set of data for each database entry.<br>
+      Each table column represents a Field, which groups each piece or item of data among the records into specific categories or types of data. Eg. StuNo., StuName, StuAge, StuClass, StuSec.
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு — மூன்று முக்கிய பெயர்கள்</span>
+      A Table is known as a <b>RELATION</b> &nbsp;·&nbsp; A Row is known as a <b>TUPLE</b> &nbsp;·&nbsp; A column is known as an <b>ATTRIBUTE</b>
+    </div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 கற்றல் செயல்பாடு (Learning Simulation) — Relation / Tuple / Attribute Explorer</span>
+      கீழே பாடநூலின் படம் 11.2 அட்டவணை உள்ளது. ஒரு <b>column header</b>-ஐ கிளிக் செய்தால் அது <b>ATTRIBUTE</b> என அடையாளம் காட்டும். ஒரு <b>row</b>-ஐ கிளிக் செய்தால் அது <b>TUPLE</b> என அடையாளம் காட்டும். "முழு அட்டவணையும் = RELATION" பொத்தானை அழுத்தி முழு அட்டவணையையும் பாருங்கள்.
+      <div class="db-table-wrap">
+        <table class="db-sim" id="structTable">
+          <tr><th data-col="0">StuNo</th><th data-col="1">StuName</th><th data-col="2">StuAge</th><th data-col="3">StuClass</th><th data-col="4">StuSec</th></tr>
+          <tr><td>1101</td><td>Kannan</td><td>14</td><td>9</td><td>A</td></tr>
+          <tr><td>1102</td><td>Ramakrishnan</td><td>14</td><td>9</td><td>A</td></tr>
+          <tr><td>1103</td><td>Vidhya</td><td>14</td><td>10</td><td>B</td></tr>
+          <tr><td>1104</td><td>Britto</td><td>15</td><td>9</td><td>A</td></tr>
+          <tr><td>1105</td><td>Padmaja</td><td>14</td><td>10</td><td>B</td></tr>
+        </table>
+      </div>
+      <div class="sim-caption" id="structCaption">👆 ஒரு column header அல்லது row-ஐ கிளிக் செய்து பாருங்கள்.</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="structRelationBtn">📐 முழு அட்டவணையும் = RELATION</button>
+        <button class="btn btn-ghost" id="structResetBtn">↺ Reset</button>
+      </div>
+      <div class="diagram-cap">படம் 11.2 — DataBase Structure (textbook data, Fig 11.2)</div>
+    </div>
+
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      மேலே உள்ள அட்டவணையில் "StuName" என்ற column-ஐ க்ளிக் செய்தால், Kannan, Ramakrishnan, Vidhya... என அனைத்து மாணவர்களின் பெயர்களும் ஒரே categorical column-ஆக தெரியும் — இதுதான் ATTRIBUTE. "Vidhya" என்ற row-ஐ க்ளிக் செய்தால், Vidhya-வைப் பற்றிய முழு தகவலும் (1103, Vidhya, 14, 10, B) ஒரு தொகுப்பாகத் (single record) தெரியும் — இதுதான் TUPLE.
+    </div>
+    <div class="mistake-box">
+      <span class="lbl">⚠️ பொதுவான தவறு</span>
+      Row-வையும் Column-வையும் மாற்றிக் குழப்பிக் கொள்ளக்கூடாது. Row = TUPLE (ஒரு பதிவு); Column = ATTRIBUTE (ஒரு தகவல் வகை); முழு அட்டவணை = RELATION.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-structure"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 6 — 11.6 Data Model + 11.6.1 Gallery (5 models)
+   ========================================================================= */
+const MODELS = {
+  hier: {
+    name:'Hierarchical Model',
+    def:'Hierarchical model was developed by IBM as Information Management System. In Hierarchical model, data is represented as a simple tree like structure form. This model represents a one-to-many relationship i.e parent-child relationship. One child can have only one parent but one parent can have many children. This model is mainly used in IBM Main Frame computers.',
+    diagram:`
+      <div class="flow-row"><div class="flow-node active">School</div></div>
+      <div class="flow-down">↓</div>
+      <div class="flow-row"><div class="flow-node">Course</div><div class="flow-node">Resources</div></div>
+      <div class="flow-down">↓ (Course இன் குழந்தைகள்)</div>
+      <div class="flow-row"><div class="flow-node">Theory</div><div class="flow-node">Lab</div></div>
+      <div class="diagram-cap">படம் 11.3 — Hierarchical Model (one parent → many children)</div>`
+  },
+  rel: {
+    name:'Relational Model',
+    def:'The Relational Database model was first proposed by E.F. Codd in 1970. Nowadays, it is the most widespread data model used for database applications around the world. The basic structure of data in relational model is tables (relations). All the information related to a particular type is stored in rows of that table. Hence tables are also known as relations in a relational model. A relation key is an attribute which uniquely identifies a particular tuple (row in a relation (table)).',
+    diagram:`
+      <div class="flow-row" style="align-items:flex-start;">
+        <div>${buildTable([{sid:1,name:'Malar',age:17},{sid:2,name:'Suncar',age:16},{sid:3,name:'Velu',age:16}], ['sid','name','age'])}<div class="diagram-cap">Student</div></div>
+        <div>${buildTable([{sj:1,name:'C++',t:'Kannan'},{sj:2,name:'Php',t:'Ramakrishnan'},{sj:3,name:'Python',t:'Vidhya'}], ['sj','name','t'])}<div class="diagram-cap">Subject</div></div>
+        <div>${buildTable([{sid:1,sj:1,m:92},{sid:1,sj:2,m:89},{sid:3,sj:2,m:96}], ['sid','sj','m'])}<div class="diagram-cap">Stu_id ↔ Subj_id (Marks)</div></div>
+      </div>
+      <div class="diagram-cap">படம் 11.4 — Relational Model: எண்கள் (keys) மூலம் அட்டவணைகள் இணைக்கப்படுகின்றன</div>`
+  },
+  net: {
+    name:'Network Model',
+    def:'Network database model is an extended form of hierarchical data model. In hierarchical model, a child record has only one parent node; in a Network model, a child may have many parent nodes — representing many-to-many relationships. This model is easier and faster to access the data.',
+    diagram:`
+      <div class="flow-row"><div class="flow-node active">School</div></div>
+      <div class="flow-down">↓</div>
+      <div class="flow-row"><div class="flow-node">Library</div><div class="flow-node">Office</div><div class="flow-node">Staff Room</div></div>
+      <div class="flow-down">↓ ↓ ↓ (மூன்று parent-களும் ஒன்றுசேர்கின்றன)</div>
+      <div class="flow-row"><div class="flow-node leaf">Student<br><small>(3 parent nodes)</small></div></div>
+      <div class="diagram-cap">படம் 11.5 — Network Model: Student இற்கு Library, Office, Staff Room என 3 parent-கள் உள்ளன</div>`
+  },
+  er: {
+    name:'Entity Relationship (ER) Model',
+    def:'In this database model, relationships are created by dividing the object into entity and its characteristics into attributes. It was developed by Chen in 1976. This model is useful in developing a conceptual design for the database. Rectangle represents the entities (E.g. Doctor and Patient). Ellipse represents the attributes (E.g. D-id, D-name, P-id, P-name). Diamond represents the relationship in ER diagrams. E.g. Doctor diagnosis the Patient.',
+    diagram:`
+      <div class="flow-row">
+        <div class="flow-col"><div class="flow-node active" style="border-radius:6px;">Doctor</div>
+          <div class="flow-row"><div class="flow-node ellipse">D-id</div><div class="flow-node ellipse">D-Name</div></div>
+        </div>
+        <div class="diamond"><span>Diagnosis</span></div>
+        <div class="flow-col"><div class="flow-node active" style="border-radius:6px;">Patient</div>
+          <div class="flow-row"><div class="flow-node ellipse">P-id</div><div class="flow-node ellipse">P-Name</div></div>
+        </div>
+      </div>
+      <div class="diagram-cap">படம் 11.6 — ER Model: Rectangle = Entity, Ellipse = Attribute, Diamond = Relationship</div>`
+  },
+  obj: {
+    name:'Object Model',
+    def:'Object model stores the data in the form of objects, attributes, methods, classes and Inheritance. This model handles more complex applications, such as Geographic information System (GIS), scientific experiments, engineering design and manufacturing. It is used in file Management System. It represents real world objects, attributes and behaviors. It provides a clear modular structure and is easy to maintain and modify the existing code.',
+    diagram:`
+      <div class="flow-row"><div class="flow-node active">Shape<br><small>get_area()<br>get_perimeter()</small></div></div>
+      <div class="flow-down">↑ ↑ ↑ (inherits)</div>
+      <div class="flow-row">
+        <div class="flow-node">Circle<br><small>Radius</small></div>
+        <div class="flow-node">Rectangle<br><small>Length, breadth</small></div>
+        <div class="flow-node">Triangle<br><small>Base, Height</small></div>
+      </div>
+      <div class="diagram-cap">படம் 11.7 — Object Model: Circle, Rectangle, Triangle ஆகியவை Shape-இலிருந்து inherit செய்கின்றன</div>`
+  }
+};
+function renderModels(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.6</div>
+    <h2>தரவு மாதிரிகள் <span class="eng">(Data Model)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>11.6 Data Model — அறிமுகம்</h3>
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      <ul>
+        <li>A data model describes how the data can be represented and accessed from a software after complete implementation.</li>
+        <li>It is a simple abstraction of complex real world data gathering environment.</li>
+        <li>The main purpose of data model is to give an idea as how the final system or software will look like after development is completed.</li>
+      </ul>
+    </div>
+
+    <h4>11.6.1 Types of Data Model</h4>
+    <div class="tab-row" id="modelTabs">
+      <button class="tab-btn active" data-model="hier">Hierarchical</button>
+      <button class="tab-btn" data-model="rel">Relational</button>
+      <button class="tab-btn" data-model="net">Network</button>
+      <button class="tab-btn" data-model="er">ER Model</button>
+      <button class="tab-btn" data-model="obj">Object</button>
+    </div>
+    <div id="modelDetail"></div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-models"></div>
+  </div>
+  `;
+}
+function renderModelDetail(key){
+  const m = MODELS[key];
+  return `
+  <div class="card">
+    <h3>${m.name}</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>${m.def}</div>
+    <div class="diagram-box">${m.diagram}</div>
+  </div>`;
+}
+
+/* =========================================================================
+   TOPIC 7 — 11.6.2 Types of DBMS Users
+   ========================================================================= */
+function renderUsers(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.6.2</div>
+    <h2>DBMS பயனர் வகைகள் <span class="eng">(Types of DBMS Users)</span></h2>
+  </div>
+
+  <div class="card">
+    <h4>Database Administrators (DBA)</h4>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>Database Administrator or DBA is the one who manages the complete database management system. DBA takes care of the security of the DBMS, managing the license keys, managing user accounts and access etc.</div>
+
+    <h4>Application Programmers or Software Developers</h4>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>This user group is involved in developing and designing the parts of DBMS.</div>
+
+    <h4>End User</h4>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>All modern applications, web or mobile, store user data. Applications are programmed in such a way that they collect user data and store the data on DBMS systems running on their server. End users are the one who store, retrieve, update and delete data.</div>
+
+    <h4>Database designers</h4>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>Database designers are responsible for identifying the data to be stored in the database for choosing appropriate structures to represent and store the data.</div>
+
+    <div class="easy">
+      <span class="lbl">💡 எளிய விளக்கம்</span>
+      ஒரு பள்ளியை எடுத்துக் கொண்டால்: <b>DBA</b> = கணினி அறையைப் பராமரிக்கும் தலைமை ஆசிரியர் (பாதுகாப்பு, அணுகல் உரிமை); <b>Application Programmer</b> = பள்ளி மென்பொருளை எழுதும் டெவலப்பர்; <b>End User</b> = தினமும் login செய்து மதிப்பெண் பதிவு செய்யும் ஆசிரியர்/மாணவர்; <b>Database Designer</b> = எந்தெந்த columns (StuNo, StuName...) தேவை என திட்டமிடுபவர்.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-users"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 8 — 11.7 Difference between DBMS and RDBMS
+   ========================================================================= */
+function renderCompare(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.7</div>
+    <h2>DBMS மற்றும் RDBMS வேறுபாடு <span class="eng">(Difference between DBMS and RDBMS)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <tr><th>Basis of Comparison</th><th>DBMS</th><th>RDBMS</th></tr>
+      <tr><td>Expansion</td><td>Database Management System</td><td>Relational DataBase Management System</td></tr>
+      <tr><td>Data storage</td><td>Navigational model — data by linked records</td><td>Relational model (in tables) — data as row and column</td></tr>
+      <tr><td>Data redundancy</td><td>Present</td><td>Not Present</td></tr>
+      <tr><td>Normalization</td><td>Not performed</td><td>RDBMS uses normalization to reduce redundancy</td></tr>
+      <tr><td>Data access</td><td>Consumes more time</td><td>Faster, compared to DBMS</td></tr>
+      <tr><td>Keys and indexes</td><td>Does not use</td><td>Used to establish relationship; Keys are used in RDBMS</td></tr>
+      <tr><td>Transaction management</td><td>Inefficient, Error prone and insecure</td><td>Efficient and secure</td></tr>
+      <tr><td>Distributed Databases</td><td>Not supported</td><td>Supported by RDBMS</td></tr>
+      <tr><td>Example</td><td>Dbase, FoxPro</td><td>SQL server, Oracle, mysql, MariaDB, SQLite, MS Access</td></tr>
+    </table>
+    </div>
+    <div class="exam-point">
+      <span class="lbl">⭐ தேர்வுக் குறிப்பு</span>
+      Database normalization was first proposed by <b>Dr. Edgar F Codd</b> as an integral part of RDBMS in order to reduce data redundancy and improve data integrity. These rules are known as <b>E F Codd Rules</b>.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-compare"></div>
+  </div>
+  `;
+}
+
+/* =========================================================================
+   TOPIC 9 — 11.8 Types of Relationships (simulator)
+   ========================================================================= */
+const RELS = {
+  one1: {
+    name:'One-to-One Relationship',
+    def:'In One-to-One Relationship, one entity is related with only one other entity. One row in a table is linked with only one row in another table and vice versa. For example: A student can have only one exam number.',
+    left:['Tamilselvi','Jayapandiyan','Sarojini'], leftLabel:'Student',
+    right:['1001','1002','1003'], rightLabel:'Exam No',
+    mapping:['Tamilselvi → 1001','Jayapandiyan → 1002','Sarojini → 1003'],
+    fig:'படம் 11.8 — One to one Relationships'
+  },
+  one_n: {
+    name:'One-to-Many Relationship',
+    def:'In One-to-Many relationship, one entity is related to many other entities. One row in a table A is linked to many rows in a table B, but one row in table B is linked to only one row in table A. For example: One Department has many staff members.',
+    left:['Computer','Tamil','Maths'], leftLabel:'Department',
+    right:['Gajalakshmi','Bindhu','Radha','Ramesh','Malaiarasu'], rightLabel:'Staff',
+    mapping:['Computer → Gajalakshmi','Computer → Bindhu','Tamil → Malaiarasu'],
+    fig:'படம் 11.9 — One to Many Mapping'
+  },
+  n_one: {
+    name:'Many-to-One Relationship',
+    def:'In Many-to-One Relationship, many entities can be related with only one in the other entity. For example: A number of staff members working in one Department. Multiple rows in staff members table is related with only one row in Department table.',
+    left:['Suganya','Bala','Valarmathi'], leftLabel:'Staff',
+    right:['Computer','Maths'], rightLabel:'Department',
+    mapping:['Suganya → Computer','Bala → Computer','Valarmathi → Computer'],
+    fig:'படம் 11.10 — Many to one Relationship'
+  },
+  n_n: {
+    name:'Many-to-Many Relationship',
+    def:'A many-to-many relationship occurs when multiple records in a table are associated with multiple records in another table. Example 1: Customers and Product — Customers can purchase various products and Products can be purchased by many customers. Example 2: Students and Courses. Example 3: Books and Student — Many Books in a Library are issued to many students.',
+    left:['C++','SQL','python'], leftLabel:'Book',
+    right:['Kalaivani','Manjula','Sridevi'], rightLabel:'Student',
+    mapping:['C++ ↔ Kalaivani, Manjula, Sridevi','SQL ↔ Kalaivani, Manjula, Sridevi','python ↔ Kalaivani, Manjula, Sridevi'],
+    fig:'படம் 11.11 — Many to Many Relationship'
+  }
+};
+function renderRelationships(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.8</div>
+    <h2>உறவுமுறை வகைகள் <span class="eng">(Types of Relationships)</span></h2>
+  </div>
+
+  <div class="card">
+    <p>Following are the types of relationships used in a database:</p>
+    <div class="tab-row" id="relTabs">
+      <button class="tab-btn active" data-rel="one1">1. One-to-One</button>
+      <button class="tab-btn" data-rel="one_n">2. One-to-Many</button>
+      <button class="tab-btn" data-rel="n_one">3. Many-to-One</button>
+      <button class="tab-btn" data-rel="n_n">4. Many-to-Many</button>
+    </div>
+    <div id="relDetail"></div>
+
+    <div class="activity-box">
+      <span class="lbl">🧪 உங்களுக்குத் தெரியுமா? (Did You Know — textbook)</span>
+      The relational model was invented by <b>Edgar Frank Codd</b> (Father of Relational DataBase) as a general model of data, and subsequently promoted by Chris Date and Hugh Darwen among others.
+    </div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-relationships"></div>
+  </div>
+  `;
+}
+function renderRelDetail(key){
+  const r = RELS[key];
+  return `
+  <div class="card">
+    <h3>${r.name}</h3>
+    <div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>${r.def}</div>
+    <div class="diagram-box">
+      <div class="flow-row" style="align-items:flex-start;">
+        <div class="flow-col">
+          <div class="flow-node" style="background:#eee0f2;">${r.leftLabel}</div>
+          ${r.left.map(x=>'<div class="flow-node">'+x+'</div>').join('')}
+        </div>
+        <div class="flow-arrow">⟶</div>
+        <div class="flow-col">
+          <div class="flow-node" style="background:#eee0f2;">${r.rightLabel}</div>
+          ${r.right.map(x=>'<div class="flow-node leaf">'+x+'</div>').join('')}
+        </div>
+      </div>
+      <div class="diagram-cap">${r.fig}</div>
+    </div>
+    <div class="easy">
+      <span class="lbl">💡 Mapping விளக்கம்</span>
+      ${r.mapping.map(x=>'<div>• '+x+'</div>').join('')}
+    </div>
+  </div>`;
+}
+
+/* =========================================================================
+   TOPIC 10 — 11.9 Relational Algebra (the big simulation lab)
+   ========================================================================= */
+let algState = { op:'select', cond:'Big Data', projCols:['course'], log:[], result:null, step:0 };
+
+function renderAlgebra(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பாடம் 11 › 11.9</div>
+    <h2>தொடர்புடைய இயற்கணிதம் <span class="eng">(Relational Algebra)</span></h2>
+  </div>
+
+  <div class="card">
+    <div class="tb-def">
+      <span class="lbl">📘 பாடநூல் வரையறை</span>
+      Relational Algebra, was first created by <b>Edgar F Codd</b> while at IBM. It was used for modeling the data stored in relational databases and defining queries on it. Relational Algebra is a procedural query language used to query the database tables using SQL. Relational algebra operations are performed recursively on a relation (table) to yield an output. The output of these operations is a new relation, which might be formed by one or more input relations.
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <tr><th>குழு (Group)</th><th>செயல்பாடு</th><th>குறியீடு</th></tr>
+      <tr><td rowspan="2">Unary Relational Operations</td><td>SELECT</td><td class="mono">σ</td></tr>
+      <tr><td>PROJECT</td><td class="mono">∏</td></tr>
+      <tr><td rowspan="4">Relational Algebra Operations from Set Theory</td><td>UNION</td><td class="mono">∪</td></tr>
+      <tr><td>INTERSECTION</td><td class="mono">∩</td></tr>
+      <tr><td>DIFFERENCE</td><td class="mono">−</td></tr>
+      <tr><td>CARTESIAN PRODUCT</td><td class="mono">X</td></tr>
+    </table>
+    </div>
+
+    <div class="tab-row" id="algTabs">
+      <button class="tab-btn active" data-alg="select">SELECT (σ)</button>
+      <button class="tab-btn" data-alg="project">PROJECT (∏)</button>
+      <button class="tab-btn" data-alg="union">UNION (∪)</button>
+      <button class="tab-btn" data-alg="intersect">INTERSECTION (∩)</button>
+      <button class="tab-btn" data-alg="diff">DIFFERENCE (−)</button>
+      <button class="tab-btn" data-alg="cart">CARTESIAN PRODUCT (X)</button>
+    </div>
+    <div id="algStage"></div>
+  </div>
+
+  <div class="quickcheck">
+    <span class="lbl">✅ விரைவு சோதனை</span>
+    <div id="qc-algebra"></div>
+  </div>
+  `;
+}
+
+function algHeader(title, defHtml){
+  return `<h3>${title}</h3><div class="tb-def"><span class="lbl">📘 பாடநூல் வரையறை</span>${defHtml}</div>`;
+}
+
+function renderAlgStage(){
+  const el = document.getElementById('algStage');
+  if(!el) return;
+  let html = '';
+  if(algState.op === 'select'){
+    html += algHeader('SELECT (σ)', 'General form σ<sub>c</sub>(R) with a relation R and a condition C on the attributes of R. The SELECT operation is used for selecting a subset with tuples according to a given condition. Select filters out all tuples that do not satisfy C.');
+    html += `<div class="example-box"><span class="lbl">📎 பாடநூல் உதாரணம் (Table 11.1 — STUDENT)</span>
+      ${buildTable(STUDENT, ['no','name','course','year'])}
+      <div class="mono" style="margin-top:6px;">σ<sub>course</sub> = "Big Data" (STUDENT)</div></div>
+    <div class="tryit-box"><span class="lbl">🟢 முயற்சி செய்யுங்கள் (Try it yourself)</span>
+      condition: course = <select id="selCondInput">
+        <option value="Big Data">Big Data</option>
+        <option value="R language">R language</option>
+        <option value="Python Programming">Python Programming</option>
+      </select>
+    </div>`;
+  } else if(algState.op === 'project'){
+    html += algHeader('PROJECT (∏)', 'The projection eliminates all attributes of the input relation but those mentioned in the projection list. The projection method defines a relation that contains a vertical subset of Relation.');
+    html += `<div class="example-box"><span class="lbl">📎 பாடநூல் உதாரணம் (Table 11.1 — STUDENT)</span>
+      ${buildTable(STUDENT, ['no','name','course','year'])}
+      <div style="margin-top:6px;">Example 1: <span class="mono">∏<sub>course</sub>(STUDENT)</span> &nbsp;·&nbsp; Example 2: <span class="mono">∏<sub>studno, course</sub>(STUDENT)</span></div></div>
+    <div class="tryit-box"><span class="lbl">🟢 முயற்சி செய்யுங்கள் — column(s) தேர்ந்தெடுக்கவும்</span>
+      <label><input type="checkbox" class="projChk" value="no"> Studno</label> &nbsp;
+      <label><input type="checkbox" class="projChk" value="name"> Name</label> &nbsp;
+      <label><input type="checkbox" class="projChk" value="course" checked> Course</label> &nbsp;
+      <label><input type="checkbox" class="projChk" value="year"> Year</label>
+    </div>`;
+  } else if(algState.op === 'union'){
+    html += algHeader('UNION (∪)', 'It includes all tuples that are in tables A or in B. It also eliminates duplicates. Set A Union Set B would be expressed as A ∪ B.');
+    html += `<div class="example-box"><span class="lbl">📎 பாடநூல் உதாரணம் (Table 11.2)</span>
+      <div class="flow-row" style="align-items:flex-start;">
+        <div>${buildTable(TABLE_A, ['no','name'])}<div class="diagram-cap">Table A</div></div>
+        <div>${buildTable(TABLE_B, ['no','name'])}<div class="diagram-cap">Table B <small>(spelling as printed in textbook)</small></div></div>
+      </div>
+      <div class="mono">Table A ∪ Table B</div></div>`;
+  } else if(algState.op === 'intersect'){
+    html += algHeader('INTERSECTION (∩)', 'Defines a relation consisting of a set of all tuples that are in both A and B. However, A and B must be union-compatible.');
+    html += `<div class="example-box"><span class="lbl">📎 பாடநூல் உதாரணம் (Table 11.2)</span>
+      <div class="flow-row" style="align-items:flex-start;">
+        <div>${buildTable(TABLE_A, ['no','name'])}<div class="diagram-cap">Table A</div></div>
+        <div>${buildTable(TABLE_B, ['no','name'])}<div class="diagram-cap">Table B</div></div>
+      </div>
+      <div class="mono">A ∩ B</div></div>`;
+  } else if(algState.op === 'diff'){
+    html += algHeader('SET DIFFERENCE (−)', 'The result of A − B, is a relation which includes all tuples that are in A but not in B. The attribute name of A has to match with the attribute name in B.');
+    html += `<div class="example-box"><span class="lbl">📎 பாடநூல் உதாரணம் (Table 11.2)</span>
+      <div class="flow-row" style="align-items:flex-start;">
+        <div>${buildTable(TABLE_A, ['no','name'])}<div class="diagram-cap">Table A</div></div>
+        <div>${buildTable(TABLE_B, ['no','name'])}<div class="diagram-cap">Table B</div></div>
+      </div>
+      <div class="mono">Table A − Table B</div></div>`;
+  } else if(algState.op === 'cart'){
+    html += algHeader('CARTESIAN PRODUCT (X)', 'Cross product is a way of combining two relations. The resulting relation contains both relations being combined. A x B means A times B, where the relation A and B have different attributes. This type of operation is helpful to merge columns from two relations.');
+    html += `<div class="example-box"><span class="lbl">📎 பாடநூல் உதாரணம் (Table 11.3)</span>
+      <div class="flow-row" style="align-items:flex-start;">
+        <div>${buildTable(CART_A, ['no','name'])}<div class="diagram-cap">Table A (3 rows)</div></div>
+        <div>${buildTable(CART_B, ['code','subject'])}<div class="diagram-cap">Table B (3 rows)</div></div>
+      </div>
+      <div class="mono">Table A X Table B  →  3 × 3 = 9 tuples</div></div>
+      <div class="easy"><span class="lbl">💡 Loop உடன் தொடர்பு (Easy Explanation — enrichment)</span>
+      Cartesian Product வேலை செய்யும் விதம், ஒரு <b>nested loop</b> போன்றது: Table A-இல் உள்ள ஒவ்வொரு row-க்காகவும் (outer loop), Table B-இல் உள்ள ஒவ்வொரு row-ஐயும் (inner loop) இணைக்கிறோம்.</div>`;
+  }
+
+  html += `<div class="btn-row">
+      <button class="btn btn-primary" id="algStepBtn">▶ அடுத்த படி (Next Step)</button>
+      <button class="btn btn-ghost" id="algResetBtn">↺ Reset</button>
+    </div>
+    <div class="log-panel" id="algLog"><div class="log-empty">"▶ அடுத்த படி" பொத்தானை அழுத்தி படிப்படியாகப் பாருங்கள் (Run Step-by-Step)...</div></div>
+    <div id="algResultWrap"></div>`;
+
+  el.innerHTML = html;
+  wireAlgStage();
+}
+
+function algSteps(){
+  const steps = [];
+  if(algState.op === 'select'){
+    const cond = algState.cond;
+    STUDENT.forEach(r => {
+      const keep = r.course === cond;
+      steps.push({cls: keep?'keep':'drop', text: 'Row '+r.no+' ('+r.name+', course="'+r.course+'") — condition course="'+cond+'" → '+(keep?'TRUE ✓ → வைத்துக்கொள்ளப்படுகிறது':'FALSE ✗ → நீக்கப்படுகிறது')});
+    });
+    steps.push({final:true, result: STUDENT.filter(r=>r.course===cond), cols:['no','name','course','year'], note:'σ<sub>course</sub> = "'+cond+'" (STUDENT)'});
+  } else if(algState.op === 'project'){
+    const cols = algState.projCols.length ? algState.projCols : ['course'];
+    steps.push({cls:'keep', text:'தேர்ந்தெடுக்கப்பட்ட columns: '+cols.map(c=>COL_LABEL[c]).join(', ')+' — மற்ற columns நீக்கப்படுகின்றன (vertical subset)'});
+    let rows = STUDENT.map(r => { const o={}; cols.forEach(c=>o[c]=r[c]); return o; });
+    const before = rows.length;
+    const seen = new Set(); const dedup = [];
+    rows.forEach(r => { const key = JSON.stringify(r); if(!seen.has(key)){ seen.add(key); dedup.push(r); } });
+    if(dedup.length < before) steps.push({cls:'drop', text:'நகல் வரிசைகள் (duplicate rows) கண்டறியப்பட்டு நீக்கப்படுகின்றன — duplicate row is removed in the result (textbook note)'});
+    else steps.push({cls:'keep', text:'இந்தத் தேர்வில் நகல் வரிசைகள் (duplicates) எதுவும் இல்லை'});
+    steps.push({final:true, result:dedup, cols:cols, note:'∏<sub>'+cols.map(c=>COL_LABEL[c].toLowerCase()).join(', ')+'</sub>(STUDENT)'});
+  } else if(algState.op === 'union'){
+    const seen = new Set(); const out = [];
+    TABLE_A.forEach(r=>{ const k=r.no; steps.push({cls:'keep', text:'Table A row '+r.no+' ('+r.name+') → result-இல் சேர்க்கப்படுகிறது'}); if(!seen.has(k)){seen.add(k); out.push(r);} });
+    TABLE_B.forEach(r=>{ const k=r.no; const dup = seen.has(k); steps.push({cls: dup?'drop':'keep', text:'Table B row '+r.no+' ('+r.name+') → '+(dup?'ஏற்கனவே உள்ளது (duplicate) → நீக்கப்படுகிறது':'புதியது → result-இல் சேர்க்கப்படுகிறது')}); if(!dup){seen.add(k); out.push({no:r.no,name:r.no==='cs2'?'GowriShankar':r.name});} });
+    out.sort((a,b)=>a.no.localeCompare(b.no));
+    steps.push({final:true, result:out, cols:['no','name'], note:'Table A ∪ Table B (duplicates removed)'});
+  } else if(algState.op === 'intersect'){
+    const bSet = new Set(TABLE_B.map(r=>r.no));
+    const out = [];
+    TABLE_A.forEach(r=>{ const inB = bSet.has(r.no); steps.push({cls: inB?'keep':'drop', text:'Table A row '+r.no+' ('+r.name+') — Table B-இலும் உள்ளதா? '+(inB?'ஆம் (TRUE) → result-இல் சேர்க்கப்படுகிறது':'இல்லை (FALSE) → நீக்கப்படுகிறது')}); if(inB) out.push(r); });
+    steps.push({final:true, result:out, cols:['no','name'], note:'A ∩ B'});
+  } else if(algState.op === 'diff'){
+    const bSet = new Set(TABLE_B.map(r=>r.no));
+    const out = [];
+    TABLE_A.forEach(r=>{ const inB = bSet.has(r.no); steps.push({cls: inB?'drop':'keep', text:'Table A row '+r.no+' ('+r.name+') — Table B-இல் உள்ளதா? '+(inB?'ஆம் → A−B இலிருந்து நீக்கப்படுகிறது':'இல்லை → A−B இல் வைத்துக்கொள்ளப்படுகிறது')}); if(!inB) out.push(r); });
+    steps.push({final:true, result:out, cols:['no','name'], note:'Table A − Table B'});
+  } else if(algState.op === 'cart'){
+    const out = [];
+    CART_A.forEach((a,i) => {
+      CART_B.forEach((b,j) => {
+        steps.push({cls:'keep', text:'Outer i='+(i+1)+'/3 ('+a.no+' '+a.name+')  ×  Inner j='+(j+1)+'/3 ('+b.code+' '+b.subject+')  →  combined row added'});
+        out.push({no:a.no, name:a.name, code:b.code, subject:b.subject});
+      });
+    });
+    steps.push({final:true, result:out, cols:['no','name','code','subject'], note:'Table A X Table B  (3 × 3 = 9 tuples, nested-loop style)'});
+  }
+  return steps;
+}
+
+function wireAlgStage(){
+  const tabs = document.querySelectorAll('#algTabs .tab-btn');
+  tabs.forEach(b => b.addEventListener('click', function(){
+    tabs.forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    algState.op = this.dataset.alg;
+    algState.step = 0; algState.log = []; algState.result = null;
+    renderAlgStage();
+  }));
+  const condSel = document.getElementById('selCondInput');
+  if(condSel){ condSel.value = algState.cond; condSel.addEventListener('change', function(){ algState.cond = this.value; algState.step=0; algState.log=[]; algState.result=null; algRefreshLogAndResult(); }); }
+  document.querySelectorAll('.projChk').forEach(chk => {
+    chk.checked = algState.projCols.includes(chk.value);
+    chk.addEventListener('change', function(){
+      const vals = Array.from(document.querySelectorAll('.projChk:checked')).map(c=>c.value);
+      algState.projCols = vals.length ? vals : ['course'];
+      algState.step=0; algState.log=[]; algState.result=null; algRefreshLogAndResult();
+    });
+  });
+  const stepBtn = document.getElementById('algStepBtn');
+  const resetBtn = document.getElementById('algResetBtn');
+  if(stepBtn) stepBtn.addEventListener('click', algNextStep);
+  if(resetBtn) resetBtn.addEventListener('click', () => { algState.step=0; algState.log=[]; algState.result=null; algRefreshLogAndResult(); });
+}
+function algRefreshLogAndResult(){
+  const logEl = document.getElementById('algLog');
+  const resEl = document.getElementById('algResultWrap');
+  if(logEl) logEl.innerHTML = '<div class="log-empty">"▶ அடுத்த படி" பொத்தானை அழுத்தி படிப்படியாகப் பாருங்கள் (Run Step-by-Step)...</div>';
+  if(resEl) resEl.innerHTML = '';
+}
+function algNextStep(){
+  const steps = algSteps();
+  if(algState.step >= steps.length) return;
+  const s = steps[algState.step];
+  const logEl = document.getElementById('algLog');
+  if(logEl.querySelector('.log-empty')) logEl.innerHTML = '';
+  if(s.final){
+    algState.result = s;
+    const resEl = document.getElementById('algResultWrap');
+    resEl.innerHTML = '<div class="tryit-box"><span class="lbl">✅ Result — '+s.note+'</span>'+buildTable(s.result, s.cols)+
+      (s.result.length===0 ? '<p>(result empty — ஒரு tuple கூட condition-ஐ பூர்த்தி செய்யவில்லை)</p>' : '')+
+      '<p><b>என்ன நடந்தது?</b> மேலே உள்ள log panel-இல் ஒவ்வொரு row-உம் எப்படி சோதிக்கப்பட்டது (step-by-step) எனப் பாருங்கள்.</p></div>';
+  } else {
+    const ln = document.createElement('div');
+    ln.className = 'ln ' + (s.cls||'');
+    ln.innerHTML = '<span class="step-no">Step '+(algState.step+1)+':</span> '+s.text;
+    logEl.appendChild(ln);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  algState.step++;
+}
+
+/* =========================================================================
+   TOPIC 11 — Practice & Debugging Lab
+   ========================================================================= */
+function renderPractice(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">பயிற்சி</div>
+    <h2>பயிற்சி &amp; Debugging Lab <span class="eng">(Practice Zone)</span></h2>
+    <div class="goals">🟢 Beginner · 🟡 Practice · 🔴 Challenge</div>
+  </div>
+
+  <div class="card">
+    <h3>பகுதி — அ : சரியான விடையைத் தேர்ந்தெடுக்க (MCQ — பாடநூல் வினாக்கள், Part I)</h3>
+    <p style="font-size:.82rem;color:var(--muted);">குறிப்பு: இந்தப் பாடநூலில் Part-I MCQ க்கான தீர்வுக் குறிப்பு (answer key) QR குறியீடு வழியே தரப்பட்டுள்ளது, பக்கத்தில் அச்சிடப்படவில்லை. கீழே உள்ள சரியான விடைகள் பாடநூல் உள்ளடக்கத்தின் அடிப்படையில் வழங்கப்பட்டவை.</p>
+    <div id="mcqBookWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Predict the Result — Relational Algebra Game <span class="eng">(Learning Activity — enrichment)</span></h3>
+    <p>ஒவ்வொரு கேள்வியிலும், ஒரு Relational Algebra செயல்பாடு கொடுக்கப்பட்டுள்ளது. சரியான result அட்டவணையை நான்கு தேர்வுகளிலிருந்து தேர்ந்தெடுக்கவும்.</p>
+    <div id="predictWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🐞 Concept Confusion Detector — பொதுவான தவறான புரிதல்கள் <span class="eng">(Easy Explanation — enrichment)</span></h3>
+    <p>இந்த அதிகாரத்தில் code இல்லை என்பதால், கீழே உள்ளவை Syntax/Logical/Runtime errors அல்ல — மாறாக, மாணவர்கள் அடிக்கடி குழப்பிக் கொள்ளும் <b>கருத்துப் புரிதல் தவறுகள் (concept misconceptions)</b>. ஒவ்வொரு அட்டையிலும் ❌ தவறான புரிதலைப் படித்து, பிறகு ✅ சரியான புரிதலைக் காண கிளிக் செய்யவும்.</p>
+    <div id="misconceptWrap"></div>
+  </div>
+  `;
+}
+
+const MCQ_BOOK = {
+  'b1': {q:'1. What is the acronym of DBMS?', o:['DataBase Management Symbol','Database Managing System','DataBase Management System','DataBasic Management System'], c:2},
+  'b2': {q:'2. A table is known as', o:['tuple','attribute','relation','entity'], c:2},
+  'b3': {q:'3. Which database model represents parent-child relationship?', o:['Relational','Network','Hierarchical','Object'], c:2},
+  'b4': {q:'4. Relational database model was first proposed by', o:['E F Codd','E E Codd','E F Cadd','E F Codder'], c:0},
+  'b5': {q:'5. What type of relationship does hierarchical model represent?', o:['one-to-one','one-to-many','many-to-one','many-to-many'], c:1},
+  'b6': {q:'6. Who is called Father of Relational Database from the following?', o:['Chris Date','Hugh Darween','Edgar Frank Cadd','Edgar Frank Codd'], c:3},
+  'b7': {q:'7. Which of the following is an RDBMS?', o:['Dbase','Foxpro','Microsoft Access','Microsoft Excel'], c:2},
+  'b8': {q:'8. What symbol is used for SELECT statement?', o:['σ','∏','X','Ω'], c:0},
+  'b9': {q:'9. A tuple is also known as', o:['table','row','attribute','field'], c:1},
+  'b10': {q:'10. Who developed ER model?', o:['Chen','EF Codd','Chend','Chand'], c:0},
+};
+
+const PREDICT_QS = [
+  {
+    q:'σ<sub>course</sub> = "Big Data" (STUDENT) இன் விளைவு எது?',
+    tables:[
+      {label:'A (சரி)', rows:[{no:'cs1',name:'Kannan',course:'Big Data',year:'II'},{no:'cs3',name:'Lenin',course:'Big Data',year:'I'}], cols:['no','name','course','year']},
+      {label:'B', rows:STUDENT, cols:['no','name','course','year']},
+      {label:'C', rows:[{no:'cs1',name:'Kannan',course:'Big Data',year:'II'}], cols:['no','name','course','year']},
+      {label:'D', rows:[{no:'cs4',name:'Padmaja',course:'Python Programming',year:'I'}], cols:['no','name','course','year']},
+    ], c:0,
+    exp:'SELECT (σ) ரோ-க்களை மட்டும் (horizontal subset) வடிகட்டும். STUDENT-இல் course="Big Data" என உள்ள cs1, cs3 ஆகிய இரண்டு tuples மட்டுமே match ஆகும்.'
+  },
+  {
+    q:'∏<sub>course</sub>(STUDENT) இன் விளைவில் எத்தனை rows இருக்கும்?',
+    tables:[
+      {label:'A — 3 rows (சரி)', rows:[{course:'Big Data'},{course:'R language'},{course:'Python Programming'}], cols:['course']},
+      {label:'B — 4 rows', rows:[{course:'Big Data'},{course:'R language'},{course:'Big Data'},{course:'Python Programming'}], cols:['course']},
+      {label:'C — 2 rows', rows:[{course:'Big Data'},{course:'R language'}], cols:['course']},
+      {label:'D — 1 row', rows:[{course:'Big Data'}], cols:['course']},
+    ], c:0,
+    exp:'PROJECT (∏) duplicate rows-ஐ நீக்கும் (textbook note: "duplicate row is removed in the result"). STUDENT-இல் Big Data இரண்டு முறை வந்தாலும், PROJECT-இன் பின் அது ஒரே ஒரு முறை தான் தோன்றும் → மொத்தம் 3 தனித்துவமான courses.'
+  },
+  {
+    q:'Table A ∪ Table B (Table 11.2) இன் விளைவில் எத்தனை rows இருக்கும்?',
+    tables:[
+      {label:'A — 4 rows (சரி)', rows:[{no:'cs1',name:'Kannan'},{no:'cs2',name:'GowriShankar'},{no:'cs3',name:'Lenin'},{no:'cs4',name:'Padmaja'}], cols:['no','name']},
+      {label:'B — 6 rows', rows:[...TABLE_A, ...TABLE_B], cols:['no','name']},
+      {label:'C — 2 rows', rows:[{no:'cs1',name:'Kannan'},{no:'cs3',name:'Lenin'}], cols:['no','name']},
+      {label:'D — 3 rows', rows:TABLE_A, cols:['no','name']},
+    ], c:0,
+    exp:'UNION (∪) duplicates-ஐ நீக்கிவிட்டு, A அல்லது B-இல் உள்ள அனைத்து தனித்துவமான tuples-ஐயும் தரும். cs1, cs3 இரண்டு அட்டவணைகளிலும் இருப்பதால் ஒரே முறை தான் எண்ணப்படும் → மொத்தம் 4 rows.'
+  },
+  {
+    q:'A ∩ B (Table 11.2) இன் விளைவு எது?',
+    tables:[
+      {label:'A — {cs1 Kannan, cs3 Lenin} (சரி)', rows:[{no:'cs1',name:'Kannan'},{no:'cs3',name:'Lenin'}], cols:['no','name']},
+      {label:'B — {cs4 Padmaja}', rows:[{no:'cs4',name:'Padmaja'}], cols:['no','name']},
+      {label:'C — அனைத்து 4 rows', rows:[{no:'cs1',name:'Kannan'},{no:'cs2',name:'GowriShankar'},{no:'cs3',name:'Lenin'},{no:'cs4',name:'Padmaja'}], cols:['no','name']},
+      {label:'D — காலி (empty)', rows:[], cols:['no','name']},
+    ], c:0,
+    exp:'INTERSECTION (∩) இரண்டு அட்டவணைகளிலும் பொதுவாக உள்ள tuples-ஐ மட்டும் தரும். cs1, cs3 இரண்டும் Table A மற்றும் Table B இரண்டிலும் உள்ளன.'
+  },
+  {
+    q:'Table A (3 rows) X Table B (3 rows) — Cartesian Product இன் விளைவில் எத்தனை rows இருக்கும்?',
+    tables:[
+      {label:'A — 9 rows (சரி)', rows:[{n:'3×3=9'}], cols:['n']},
+      {label:'B — 3 rows', rows:[{n:'(தவறு — zip போல் எடுத்துக்கொள்ளப்பட்டது)'}], cols:['n']},
+      {label:'C — 6 rows', rows:[{n:'(தவறு — 3+3 என கூட்டப்பட்டது)'}], cols:['n']},
+      {label:'D — 12 rows', rows:[{n:'(தவறு)'}], cols:['n']},
+    ], c:0,
+    exp:'CARTESIAN PRODUCT ஒரு nested loop போன்றது — Table A-இன் ஒவ்வொரு row-உம், Table B-இன் ஒவ்வொரு row-உடனும் இணைக்கப்படும் → 3 × 3 = 9 tuples.'
+  },
+];
+
+const MISCONCEPTIONS = [
+  {wrong:'DBMS மற்றும் RDBMS இரண்டும் ஒன்றுதான்.', right:'DBMS ஒரு பொதுவான தரவுத்தள மென்பொருள் (எ.கா. FoxPro, dbase). RDBMS அதைவிட மேம்பட்டது — தரவை அட்டவணைகளாக (tables/relations) சேமிக்கிறது, Normalization மூலம் redundancy-ஐ குறைக்கிறது, Keys பயன்படுத்துகிறது (எ.கா. MySQL, Oracle, MS-Access).'},
+  {wrong:'ஒரு அட்டவணையில் row மற்றும் column ஒரே பொருளைக் குறிக்கும்.', right:'Row = TUPLE (ஒரு முழு பதிவு/record), Column = ATTRIBUTE (ஒரு தகவல் வகை/field). முழு அட்டவணையே RELATION எனப்படும்.'},
+  {wrong:'One-to-Many மற்றும் Many-to-One ஒரே உறவுமுறை.', right:'திசை (direction) தான் வேறுபாடு. One-to-Many: ஒரு Department-க்கு பல Staff (Department பக்கத்திலிருந்து பார்க்கும்போது). Many-to-One: பல Staff ஒரே Department-ஐச் சேர்ந்தவர்கள் (Staff பக்கத்திலிருந்து பார்க்கும்போது). இரண்டும் ஒரே நிஜ-வாழ்க்கை உறவை வெவ்வேறு கோணத்தில் விளக்குகின்றன.'},
+  {wrong:'SELECT மற்றும் PROJECT இரண்டும் ஒரே வேலையைச் செய்யும்.', right:'SELECT (σ) rows-ஐத் தேர்ந்தெடுக்கும் (condition பூர்த்தி செய்யும் rows மட்டும் — horizontal subset). PROJECT (∏) columns-ஐத் தேர்ந்தெடுக்கும் (vertical subset) மற்றும் result-இல் உள்ள நகல் rows-ஐயும் நீக்கும்.'},
+  {wrong:'UNION இரண்டு அட்டவணைகளின் rows-ஐ, repeat ஆனாலும் அப்படியே அடுக்கி வைக்கும்.', right:'UNION (∪) A மற்றும் B-இல் உள்ள அனைத்து tuples-ஐயும் சேர்க்கும், ஆனால் duplicates-ஐ நீக்கிவிடும் — ஒவ்வொரு தனித்துவமான row-உம் result-இல் ஒரே ஒரு முறை தான் தோன்றும்.'},
+  {wrong:'Normalization என்பது பாதுகாப்பிற்காக தரவை மேலும் copy செய்வது.', right:'Normalization உண்மையில் redundancy-ஐக் குறைக்கிறது — repetition குறைவாக இருக்கும் வகையில் தரவை பிரிக்கிறது, அதிகமாக்குவதில்லை.'},
+];
+
+/* =========================================================================
+   TOPIC 12 — Exam Prep
+   ========================================================================= */
+function renderExamPrep(){
+  return `
+  <div class="topic-header">
+    <div class="crumb">தேர்வு தயாரிப்பு</div>
+    <h2>தேர்வு தயாரிப்பு <span class="eng">(Exam Preparation)</span></h2>
+  </div>
+
+  <div class="card">
+    <h3>⭐ Must Know — முக்கிய கருத்துகள்</h3>
+    <div class="chip-row">
+      <button class="chip" data-goto="foundation">Data → Information → Database</button>
+      <button class="chip" data-goto="dbms">DBMS → RDBMS</button>
+      <button class="chip" data-goto="components">DBMS இன் 5 கூறுகள்</button>
+      <button class="chip" data-goto="structure">Relation / Tuple / Attribute</button>
+      <button class="chip" data-goto="models">5 Data Models</button>
+      <button class="chip" data-goto="relationships">4 Relationship types</button>
+      <button class="chip" data-goto="algebra">6 Relational Algebra ops</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📖 Must Remember — பாடநூலின் "Points to remember"</h3>
+    <ul>
+      <li>DBMS is a computer based record keeping system</li>
+      <li>Data is unprocessed data which contains any character, text, word or number — has no meaning</li>
+      <li>Information is processed data, organized and formatted</li>
+      <li>Examples of RDBMS are mysql, oracle, sql server, ibm db2</li>
+      <li>Redundancy means duplication of data in a database</li>
+      <li>Data Consistency means that data values are the same at all instances of a database</li>
+      <li>Data Integrity is security from unauthorized users</li>
+      <li>Table is known a relation</li>
+      <li>A row is called a tuple</li>
+      <li>A column is known as attribute</li>
+      <li>Types of data model are Hierarchical, Relational, Network, ER and Object model</li>
+      <li>Hierarchical model is a simple tree like structure form with one-to-many relationship called parent-child relationship</li>
+      <li>Relational Model represents data as relations or tables</li>
+      <li>Network model is similar to Hierarchical model but it allows a record to have more than one parent</li>
+      <li>ER model consists of entities, attributes and relationships</li>
+      <li>Object model stores data as objects, attributes, methods, classes and inheritance</li>
+      <li>Normalization reduces data redundancy and improves data integrity</li>
+      <li>Different types of Relationship are one-to-one, one-to-many, many-to-one and many-to-many relationships</li>
+      <li>Database Normalization was proposed by Dr. Edgar F Codd</li>
+      <li>Relational Algebra is used for modeling data stored in relational databases and for defining queries on it</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🖼️ Important Diagrams &amp; Tables — quick links</h3>
+    <div class="chip-row">
+      <button class="chip" data-goto="components">Fig 11.1 Components</button>
+      <button class="chip" data-goto="structure">Fig 11.2 Structure</button>
+      <button class="chip" data-goto="models">Fig 11.3–11.7 Models</button>
+      <button class="chip" data-goto="relationships">Fig 11.8–11.11 Relationships</button>
+      <button class="chip" data-goto="algebra">Fig 11.12 Cartesian Product</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📘 பாடநூல் வினாக்கள் — Part II, III, IV <span class="eng">(Suggested Answers — enrichment, not an official answer key)</span></h3>
+    <details class="acc"><summary>Part — II : 2 Marks</summary>
+      <div class="acc-body">
+        <ol>
+          <li><b>Mention few examples of a DBMS.</b><br><i>Suggested Answer:</i> Foxpro, dbase (as given in the textbook — section 11.4).</li>
+          <li><b>List some examples of RDBMS.</b><br><i>Suggested Answer:</i> MySQL, Oracle, MS-Access, SQL server, MariaDB, SQLite (sections 11.4.1 &amp; 11.7).</li>
+          <li><b>What is data consistency?</b><br><i>Suggested Answer:</i> Data Consistency means that data values are the same at all instances of a database. On live data, which is continuously updated, maintaining consistency can be a challenge, but RDBMS handles it by itself.</li>
+          <li><b>What is the difference between Hierarchical and Network data model?</b><br><i>Suggested Answer:</i> In Hierarchical model, a child record has only one parent node (one-to-many / parent-child). In Network model, a child may have many parent nodes, representing many-to-many relationships — it is easier and faster to access the data.</li>
+          <li><b>What is normalization?</b><br><i>Suggested Answer:</i> RDBMS follows Normalisation which divides the data in such a way that repetition (redundancy) is minimum. It reduces data redundancy and improves data integrity. It was proposed by Dr. Edgar F Codd.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>Part — III : 3 Marks</summary>
+      <div class="acc-body">
+        <ol>
+          <li><b>What is the difference between Select and Project command?</b><br><i>Suggested Answer:</i> SELECT (σ) selects a horizontal subset of tuples (rows) that satisfy a given condition. PROJECT (∏) selects a vertical subset of attributes (columns) and removes duplicate rows from the result.</li>
+          <li><b>What is the role of DBA?</b><br><i>Suggested Answer:</i> Database Administrator (DBA) manages the complete database management system — takes care of security, managing license keys, and managing user accounts and access.</li>
+          <li><b>Explain Cartesian Product with a suitable example.</b><br><i>Suggested Answer:</i> Cartesian Product (X) combines two relations so the result contains both relations being combined; A x B means A times B. Using Table 11.3 (Table A, 3 rows × Table B, 3 rows), the result has 3 × 3 = 9 tuples (see the Relational Algebra lab in this topic).</li>
+          <li><b>Explain Object Model with example.</b><br><i>Suggested Answer:</i> Object model stores data as objects, attributes, methods, classes and inheritance. Example: Shape (get_area(), get_perimeter()) with Circle (Radius), Rectangle (Length, breadth) and Triangle (Base, Height) all inheriting from Shape.</li>
+          <li><b>Write a note on different types of DBMS users.</b><br><i>Suggested Answer:</i> Database Administrators (DBA) — manage the DBMS; Application Programmers / Software Developers — develop and design parts of the DBMS; End User — store, retrieve, update and delete data; Database designers — identify data to be stored and choose structures to represent it.</li>
+        </ol>
+      </div>
+    </details>
+    <details class="acc"><summary>Part — IV : 5 Marks</summary>
+      <div class="acc-body">
+        <ol>
+          <li><b>Explain the different types of data model.</b><br><i>Suggested Answer:</i> Five types — Hierarchical (tree-like, parent-child, one-to-many), Relational (tables/relations, proposed by E.F. Codd 1970), Network (extends hierarchical, child can have many parents, many-to-many), ER model (entities as rectangles, attributes as ellipses, relationships as diamonds, developed by Chen 1976), Object model (objects, attributes, methods, classes, inheritance). See the Data Models gallery in this topic for diagrams.</li>
+          <li><b>Explain the different types of relationship mapping.</b><br><i>Suggested Answer:</i> One-to-One (one row ↔ one row, e.g. Student–Exam No), One-to-Many (one Department → many Staff), Many-to-One (many Staff → one Department), Many-to-Many (many Books ↔ many Students). See the Relationship simulator in this topic.</li>
+          <li><b>Differentiate DBMS and RDBMS.</b><br><i>Suggested Answer:</i> See the comparison table in section 11.7 — covering Expansion, Data storage, Redundancy, Normalization, Data access speed, Keys/indexes, Transaction management, Distributed databases, and Examples.</li>
+          <li><b>Explain the different operators in Relational algebra with suitable examples.</b><br><i>Suggested Answer:</i> SELECT (σ) — filters rows by condition; PROJECT (∏) — keeps chosen columns, removes duplicates; UNION (∪) — combines tuples from A or B, no duplicates; INTERSECTION (∩) — tuples common to both A and B; DIFFERENCE (−) — tuples in A but not in B; CARTESIAN PRODUCT (X) — combines every row of A with every row of B. Full worked examples are in the Relational Algebra Lab in this topic.</li>
+          <li><b>Explain the characteristics of RDBMS.</b><br><i>Suggested Answer:</i> Ability to manipulate data, Reduced Redundancy, Data Consistency, Support Multiple user &amp; Concurrent Access, Query Language, Security, DBMS Supports Transactions — see section 11.4.2.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ Quick Test (10 கேள்விகள்)</h3>
+    <p>பாடநூலின் Part-I MCQ கேள்விகளே இந்தத் தேர்வில் பயன்படுத்தப்பட்டுள்ளன. "பயிற்சி" பக்கத்தில் முழுமையான விளக்கங்களுடன் முயற்சி செய்யலாம்.</p>
+    <div class="btn-row"><button class="btn btn-primary" id="goToPracticeBtn">➡ பயிற்சி பக்கத்திற்குச் செல்</button></div>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Challenge Test <span class="eng">(Learning Activity — enrichment, grounded in textbook's general rules)</span></h3>
+    <div id="challengeWrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>🕐 One-Minute Revision</h3>
+    <div class="exam-point">
+      <span class="lbl">⚡ மிக விரைவான நினைவூட்டல்</span>
+      Data (raw) → Information (processed) → Database (organized collection) → DBMS (software to manage it) → RDBMS (tables + normalization). Table=Relation, Row=Tuple, Column=Attribute. 5 Models: Hierarchical, Relational, Network, ER, Object. 4 Relationships: 1:1, 1:N, N:1, N:N. 6 Algebra ops: σ SELECT (rows), ∏ PROJECT (columns, no duplicates), ∪ UNION (A or B, no duplicates), ∩ INTERSECTION (common), − DIFFERENCE (A not B), X CARTESIAN PRODUCT (every × every). E.F. Codd = Father of Relational Database &amp; Normalization.
+    </div>
+  </div>
+  `;
+}
+
+const CHALLENGE_QS = {
+  'c1': {q:'🔴 σ<sub>course</sub> ≠ "Big Data" (STUDENT) இன் விளைவில் எத்தனை tuples இருக்கும்?', o:['1','2','3','4'], c:1, exp:'STUDENT-இல் 4 tuples உள்ளன; course = "Big Data" எனப் பொருந்துபவை cs1, cs3 (2 tuples). எனவே course ≠ "Big Data" எனப் பொருந்துபவை மீதமுள்ள cs2 (R language), cs4 (Python Programming) — மொத்தம் 2.'},
+  'c2': {q:'🔴 ஒரு Table A-இல் 3 rows-உம், Table B-இல் 4 rows-உம் இருந்தால், Cartesian Product (A X B) எத்தனை tuples தரும்?', o:['7','12','1','3'], c:1, exp:'Cartesian Product nested-loop போன்றது — A இன் ஒவ்வொரு row-உம் B இன் ஒவ்வொரு row-உடனும் இணைகிறது → 3 × 4 = 12.'},
+  'c3': {q:'🔴 PROJECT (∏) செயல்பாட்டிற்குப் பிறகு, SELECT (σ) செயல்பாட்டை ஏன் முதலில் செய்யக் கூடாது என ஒரு காரணம் சொல்லுங்கள் — STUDENT அட்டவணையில் ∏<sub>course</sub>(STUDENT) செய்த பின் course="Big Data" என SELECT செய்தால் என்ன நடக்கும்?', o:['studno, name, year columns ஏற்கனவே நீக்கப்பட்டுவிட்டதால், அந்த விவரங்களுடன் கூடிய முடிவு கிடைக்காது','எந்த மாற்றமும் இல்லை','Error ஏற்படும்','Duplicate rows தானாகவே சேர்க்கப்படும்'], c:0, exp:'PROJECT ஏற்கனவே columns-ஐ நீக்கிவிட்டால் (vertical subset), பிறகு செய்யப்படும் SELECT-க்கு அந்த columns கிடைக்காது — எனவே பொதுவாக முதலில் SELECT (rows வடிகட்ட), பிறகு PROJECT (columns தேர்ந்தெடுக்க) செய்வது வழக்கமான வரிசை.'},
+};
+
+/* =========================================================================
+   QUICK-CHECK MCQ HELPER (generic renderer + event wiring)
+   ========================================================================= */
+function mcqHTML(qid, qObj, tierClass, tierLabel){
+  const letters = ['அ','ஆ','இ','ஈ','உ'];
+  let optsHtml = qObj.o.map((opt,i) =>
+    `<div class="opt" data-qid="${qid}" data-idx="${i}"><span class="letter">${letters[i]}</span><span>${opt}</span></div>`
+  ).join('');
+  return `
+  <div class="q-block" id="block-${qid}">
+    ${tierLabel ? `<span class="q-meta ${tierClass}">${tierLabel}</span>` : ''}
+    <div class="q-text">${qObj.q}</div>
+    ${qObj.hint ? `<button class="hint-btn" id="hintbtn-${qid}">💡 Hint</button><div class="hint-text" id="hint-${qid}">${qObj.hint}</div>` : ''}
+    <div class="opts-wrap">${optsHtml}</div>
+    <div class="feedback-line" id="fb-${qid}"></div>
+    ${qObj.exp ? `<div class="explain-box" id="exp-${qid}">💡 ${qObj.exp}</div>` : ''}
+  </div>`;
+}
+function wireMCQ(containerSel, dataMap){
+  document.querySelectorAll(containerSel + ' .hint-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const qid = this.id.replace('hintbtn-','');
+      document.getElementById('hint-'+qid).classList.toggle('show');
+    });
+  });
+  document.querySelectorAll(containerSel + ' .opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qid = this.dataset.qid;
+      const idx = parseInt(this.dataset.idx,10);
+      const block = document.getElementById('block-'+qid);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const qObj = dataMap[qid];
+      const opts = block.querySelectorAll('.opt');
+      opts.forEach((o,i) => {
+        if(i === qObj.c) o.classList.add('correct');
+        if(i === idx && idx !== qObj.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('fb-'+qid);
+      if(idx === qObj.c){ fb.textContent = '✅ சரியான விடை!'; fb.className='feedback-line ok'; }
+      else { fb.textContent = '❌ தவறான விடை. சரியான விடை: ' + qObj.o[qObj.c]; fb.className='feedback-line bad'; }
+      const exp = document.getElementById('exp-'+qid);
+      if(exp) exp.classList.add('show');
+    });
+  });
+}
+
+/* =========================================================================
+   QUICK-CHECK QUESTION BANKS (one per topic, small, 1-2 Qs each)
+   ========================================================================= */
+const QC_BANKS = {
+  foundation: { 'qc1': {q:'Information என்பது எது?', o:['தனித்த raw facts','செயலாக்கப்பட்ட, அர்த்தமுள்ள தரவு','ஒரு DBMS மென்பொருள்','ஒரு query language'], c:1, exp:'Information is processed data, which allows to be utilized in a significant way.'} },
+  dbms: { 'qc2': {q:'RDBMS, DBMS-ஐ விட எதில் மேம்பட்டது?', o:['தரவை tables-ஆக சேமித்தல்','தரவை இழந்துவிடுதல்','slower access','no security'], c:0, exp:'RDBMS stores data as tables (relations) and adds normalization, keys, faster/secure access.'} },
+  components: { 'qc3': {q:'DBMS-இன் 5 கூறுகளில் இல்லாதது எது?', o:['Hardware','Software','Internet Browser','Procedures/Methods'], c:2, exp:'5 components: Hardware, Software, Data, Procedures/Methods, Database Access Languages.'} },
+  structure: { 'qc4': {q:'ஒரு row என அழைக்கப்படுவது?', o:['Attribute','Relation','Tuple','Field'], c:2, exp:'A Row is known as a TUPLE.'} },
+  models: { 'qc5': {q:'ER model-இல் Diamond எதைக் குறிக்கிறது?', o:['Entity','Attribute','Relationship','Key'], c:2, exp:'Diamond represents the relationship in ER diagrams.'} },
+  users: { 'qc6': {q:'DBMS-இன் security, license keys, user accounts ஆகியவற்றை பராமரிப்பவர் யார்?', o:['End User','DBA','Application Programmer','Database Designer'], c:1, exp:'Database Administrator (DBA) manages security, license keys, user accounts and access.'} },
+  compare: { 'qc7': {q:'RDBMS-இல் Normalization எதைக் குறைக்கிறது?', o:['Security','Data Redundancy','Speed','Users'], c:1, exp:'RDBMS uses normalization to reduce redundancy.'} },
+  relationships: { 'qc8': {q:'ஒரு Department-க்கு பல Staff உறுப்பினர்கள் — இது எவ்வகை உறவுமுறை?', o:['One-to-One','One-to-Many','Many-to-One','Many-to-Many'], c:1, exp:'One Department has many staff members → One-to-Many Relationship.'} },
+  algebra: { 'qc9': {q:'PROJECT (∏) செயல்பாடு result-இல் என்ன செய்யும்?', o:['Rows-ஐ மட்டும் வடிகட்டும்','Duplicate rows-ஐ நீக்கும்','Duplicate rows-ஐ சேர்க்கும்','ஒன்றும் செய்யாது'], c:1, exp:'The projection eliminates columns not in the list, and the textbook notes "duplicate row is removed in the result".'} },
+};
+function renderQC(topicId){
+  const bank = QC_BANKS[topicId];
+  if(!bank) return '';
+  let html = '';
+  Object.keys(bank).forEach(qid => { html += mcqHTML(qid, bank[qid], '', ''); });
+  return html;
+}
+
+/* =========================================================================
+   WIRE-UP: called after each renderMain() to attach interactive JS per page
+   ========================================================================= */
+function wireUpHandlers(topicId){
+  const qcMap = { foundation:'qc-foundation', dbms:'qc-dbms', components:'qc-components', structure:'qc-structure',
+                  models:'qc-models', users:'qc-users', compare:'qc-compare', relationships:'qc-relationships', algebra:'qc-algebra' };
+  if(qcMap[topicId]){
+    const el = document.getElementById(qcMap[topicId]);
+    if(el){ el.innerHTML = renderQC(topicId); wireMCQ('#'+qcMap[topicId], QC_BANKS[topicId]); }
+  }
+
+  if(topicId === 'structure') wireStructure();
+  if(topicId === 'models') wireModels();
+  if(topicId === 'relationships') wireRelationships();
+  if(topicId === 'algebra'){ algState = { op:'select', cond:'Big Data', projCols:['course'], log:[], result:null, step:0 }; renderAlgStage(); }
+  if(topicId === 'practice') wirePractice();
+  if(topicId === 'examprep') wireExamPrep();
+}
+
+/* ---- Database Structure simulator wiring ---- */
+function wireStructure(){
+  const table = document.getElementById('structTable');
+  const caption = document.getElementById('structCaption');
+  if(!table) return;
+  table.querySelectorAll('th').forEach(th => {
+    th.addEventListener('click', function(){
+      table.classList.remove('relation-hl');
+      table.querySelectorAll('.col-hl').forEach(e=>e.classList.remove('col-hl'));
+      table.querySelectorAll('.row-hl').forEach(e=>e.classList.remove('row-hl'));
+      const colIdx = this.dataset.col;
+      table.querySelectorAll('tr').forEach(tr => {
+        const cell = tr.children[colIdx];
+        if(cell) cell.classList.add('col-hl');
+      });
+      caption.textContent = '🟢 ATTRIBUTE / COLUMN தேர்ந்தெடுக்கப்பட்டது: "' + this.textContent + '" — இந்த column-இல் உள்ள அனைத்து மதிப்புகளும் ஒரே வகையான தகவலைக் (category) குறிக்கின்றன.';
+    });
+  });
+  table.querySelectorAll('tr').forEach((tr,i) => {
+    if(i===0) return;
+    tr.addEventListener('click', function(e){
+      if(e.target.tagName === 'TH') return;
+      table.classList.remove('relation-hl');
+      table.querySelectorAll('.col-hl').forEach(el=>el.classList.remove('col-hl'));
+      table.querySelectorAll('.row-hl').forEach(el=>el.classList.remove('row-hl'));
+      this.classList.add('row-hl');
+      caption.textContent = '🟠 TUPLE / ROW தேர்ந்தெடுக்கப்பட்டது — இது ஒரு மாணவரின் முழு பதிவு (single record): ' + this.textContent.trim().replace(/\\s+/g,' ');
+    });
+  });
+  document.getElementById('structRelationBtn').addEventListener('click', () => {
+    table.querySelectorAll('.col-hl').forEach(el=>el.classList.remove('col-hl'));
+    table.querySelectorAll('.row-hl').forEach(el=>el.classList.remove('row-hl'));
+    table.classList.add('relation-hl');
+    caption.textContent = '🟣 RELATION தேர்ந்தெடுக்கப்பட்டது — இந்த முழு அட்டவணையுமே ஒரு RELATION (table) ஆகும்.';
+  });
+  document.getElementById('structResetBtn').addEventListener('click', () => {
+    table.classList.remove('relation-hl');
+    table.querySelectorAll('.col-hl').forEach(el=>el.classList.remove('col-hl'));
+    table.querySelectorAll('.row-hl').forEach(el=>el.classList.remove('row-hl'));
+    caption.textContent = '👆 ஒரு column header அல்லது row-ஐ கிளிக் செய்து பாருங்கள்.';
+  });
+}
+
+/* ---- Data Model gallery wiring ---- */
+function wireModels(){
+  const detail = document.getElementById('modelDetail');
+  detail.innerHTML = renderModelDetail('hier');
+  document.querySelectorAll('#modelTabs .tab-btn').forEach(b => {
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#modelTabs .tab-btn').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      detail.innerHTML = renderModelDetail(this.dataset.model);
+    });
+  });
+}
+
+/* ---- Relationship simulator wiring ---- */
+function wireRelationships(){
+  const detail = document.getElementById('relDetail');
+  detail.innerHTML = renderRelDetail('one1');
+  document.querySelectorAll('#relTabs .tab-btn').forEach(b => {
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#relTabs .tab-btn').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      detail.innerHTML = renderRelDetail(this.dataset.rel);
+    });
+  });
+}
+
+/* ---- Practice page wiring ---- */
+function wirePractice(){
+  const mcqWrap = document.getElementById('mcqBookWrap');
+  mcqWrap.innerHTML = Object.keys(MCQ_BOOK).map(qid => mcqHTML(qid, MCQ_BOOK[qid], '', '')).join('');
+  wireMCQ('#mcqBookWrap', MCQ_BOOK);
+
+  const predictWrap = document.getElementById('predictWrap');
+  predictWrap.innerHTML = PREDICT_QS.map((pq,i) => `
+    <div class="q-block" id="pblock-${i}">
+      <div class="q-text">${i+1}. ${pq.q}</div>
+      <div class="predict-grid">
+        ${pq.tables.map((t,j) => `<div class="predict-opt" data-pq="${i}" data-pidx="${j}"><b>${t.label}</b>${buildTable(t.rows, t.cols)}</div>`).join('')}
+      </div>
+      <div class="feedback-line" id="pfb-${i}"></div>
+      <div class="explain-box" id="pexp-${i}">💡 ${pq.exp} &nbsp; <button class="chip" data-goto="algebra">➡ Relational Algebra Lab-இல் trace செய்ய</button></div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.predict-opt').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const i = this.dataset.pq;
+      const block = document.getElementById('pblock-'+i);
+      if(block.dataset.answered) return;
+      block.dataset.answered = '1';
+      const j = parseInt(this.dataset.pidx,10);
+      const pq = PREDICT_QS[i];
+      block.querySelectorAll('.predict-opt').forEach((o,k) => {
+        if(k === pq.c) o.classList.add('correct');
+        if(k === j && j !== pq.c) o.classList.add('incorrect');
+      });
+      const fb = document.getElementById('pfb-'+i);
+      fb.textContent = (j === pq.c) ? '✅ சரி!' : '❌ தவறு — சரியான தேர்வு: ' + pq.tables[pq.c].label;
+      fb.className = 'feedback-line ' + (j===pq.c ? 'ok' : 'bad');
+      document.getElementById('pexp-'+i).classList.add('show');
+    });
+  });
+  predictWrap.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); goToTopicId(b.dataset.goto); }));
+
+  const miscWrap = document.getElementById('misconceptWrap');
+  miscWrap.innerHTML = MISCONCEPTIONS.map((m,i) => `
+    <div class="misc-card">
+      <div class="misc-wrong">❌ <b>தவறான புரிதல்:</b> ${m.wrong}</div>
+      <button class="btn btn-ghost" id="miscbtn-${i}">✅ சரியான புரிதலைக் காட்டு</button>
+      <div class="misc-right" id="miscright-${i}">✅ <b>சரியான புரிதல்:</b> ${m.right}</div>
+    </div>
+  `).join('');
+  MISCONCEPTIONS.forEach((m,i) => {
+    document.getElementById('miscbtn-'+i).addEventListener('click', function(){
+      document.getElementById('miscright-'+i).classList.toggle('show');
+    });
+  });
+}
+
+/* ---- Exam prep wiring ---- */
+function wireExamPrep(){
+  document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => goToTopicId(b.dataset.goto)));
+  document.getElementById('goToPracticeBtn').addEventListener('click', () => goToTopicId('practice'));
+  const cWrap = document.getElementById('challengeWrap');
+  cWrap.innerHTML = Object.keys(CHALLENGE_QS).map(qid => mcqHTML(qid, CHALLENGE_QS[qid], '', '')).join('');
+  wireMCQ('#challengeWrap', CHALLENGE_QS);
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+document.body.setAttribute('data-lang', state.lang || 'ta');
+renderSidebar();
+renderMain();
+updateBottomBar();
+</script>
+</body>
+</html>
